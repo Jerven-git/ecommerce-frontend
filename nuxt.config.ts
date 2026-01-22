@@ -8,8 +8,12 @@ export default defineNuxtConfig({
   
   components: {
     global: true,
-    dirs: ['~/components']
+    dirs: [
+      '~/components'
+    ]
   },
+
+  css: ['~/assets/css/main.css'],
   
   app: {
     head: {
