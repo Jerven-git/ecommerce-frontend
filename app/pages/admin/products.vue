@@ -33,6 +33,7 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Weight (kg)</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -52,6 +53,7 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap">${{ parseFloat(String(product.price)).toFixed(2) }}</td>
               <td class="px-6 py-4 whitespace-nowrap">{{ product.stock }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ parseFloat(String(product.weight || 0)).toFixed(2) }} kg</td>
               <td class="px-6 py-4 whitespace-nowrap">{{ product.category }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" :class="product.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
@@ -103,6 +105,12 @@
           </div>
 
           <div>
+            <label class="block text-gray-700 font-medium mb-2">Weight (kg) *</label>
+            <input v-model.number="form.weight" type="number" step="0.01" min="0" required class="input-field" placeholder="0.00" />
+            <p class="text-sm text-gray-500 mt-1">Product weight for shipping calculation</p>
+          </div>
+
+          <div>
             <label class="block text-gray-700 font-medium mb-2">Category</label>
             <input v-model="form.category" type="text" class="input-field" />
           </div>
@@ -144,6 +152,7 @@ interface Product {
   description: string
   price: number | string
   stock: number
+  weight: number | string
   category: string
   image_url: string
   is_active: boolean
@@ -170,6 +179,7 @@ const form = ref({
   description: '',
   price: 0,
   stock: 0,
+  weight: 0,
   category: 'general',
   image_url: '',
   is_active: true
@@ -206,6 +216,7 @@ const openAddModal = () => {
     description: '',
     price: 0,
     stock: 0,
+    weight: 0,
     category: 'general',
     image_url: '',
     is_active: true
@@ -221,6 +232,7 @@ const editProduct = (product: Product) => {
     description: product.description,
     price: parseFloat(product.price as string),
     stock: product.stock,
+    weight: parseFloat(String(product.weight || 0)),
     category: product.category,
     image_url: product.image_url,
     is_active: product.is_active
