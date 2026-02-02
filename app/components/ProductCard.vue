@@ -43,6 +43,6 @@ const props = defineProps<{
 const usecartStore = useCartStore()
 
 const addToCart = () => {
-  usecartStore.addToCart(props.product)
+  usecartStore.addItem(props.product)
 }
 </script>

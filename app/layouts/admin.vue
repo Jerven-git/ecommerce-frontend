@@ -162,6 +162,41 @@
                 </div>
               </div>
             </NuxtLink>
+
+            <NuxtLink
+              to="/admin/tax-settings"
+              class="block p-3 rounded-lg transition-colors"
+              :class="linkClass('/admin/tax-settings')"
+              @click="closeSidebarOnMobile"
+            >
+              <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white/90 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <div>
+                  <h3 class="font-semibold text-white">Tax Settings</h3>
+                  <p class="text-sm text-white/70">Configure tax rates and display</p>
+                </div>
+              </div>
+            </NuxtLink>
+
+            <NuxtLink
+              to="/admin/payment-settings"
+              class="block p-3 rounded-lg transition-colors"
+              :class="linkClass('/admin/payment-settings')"
+              @click="closeSidebarOnMobile"
+            >
+              <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white/90 mr-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
+                </svg>
+
+                <div>
+                  <h3 class="font-semibold text-white">Payment Settings</h3>
+                  <p class="text-sm text-white/70">Configure payment methods and settings</p>
+                </div>
+              </div>
+            </NuxtLink>
           </nav>
 
           <div class="mt-4 pt-4 border-t border-white/10">
@@ -253,18 +288,6 @@
   </div>
 </template>
 
-<style scoped>
-/* Hide scrollbar but keep scrolling */
-.sidebar-scroll {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge legacy */
-}
-.sidebar-scroll::-webkit-scrollbar {
-  width: 0px; /* Chrome/Safari */
-  height: 0px;
-}
-</style>
-
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
@@ -317,3 +340,15 @@ const linkClass = (path: string) => {
   return isActive ? active : inactive
 }
 </script>
+
+<style scoped>
+/* Hide scrollbar but keep scrolling */
+.sidebar-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.sidebar-scroll::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+</style>

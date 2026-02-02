@@ -1,101 +1,300 @@
 <template>
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <h1 class="text-4xl font-bold mb-8">Checkout</h1>
+  <div class="min-h-screen bg-gray-50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-3xl font-bold mb-8">Checkout</h1>
 
-    <div v-if="cartStore.items.length === 0" class="text-center py-16">
-      <p class="text-xl text-gray-500 mb-6">Your cart is empty</p>
-      <NuxtLink to="/shop" class="btn-primary">
-        Continue Shopping
-      </NuxtLink>
-    </div>
-
-    <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <div class="lg:col-span-2">
-        <div class="card mb-6">
-          <h2 class="text-2xl font-bold mb-6">Shipping Information</h2>
-
-          <form @submit.prevent="handleSubmit" class="space-y-4">
-            <div>
-              <label class="block text-gray-700 font-medium mb-2">Full Name *</label>
-              <input
-                v-model="form.customer_name"
-                type="text"
-                required
-                class="input-field"
-                placeholder="John Doe"
-              />
-            </div>
-
-            <div>
-              <label class="block text-gray-700 font-medium mb-2">Email *</label>
-              <input
-                v-model="form.customer_email"
-                type="email"
-                required
-                class="input-field"
-                placeholder="john@example.com"
-              />
-            </div>
-
-            <div>
-              <label class="block text-gray-700 font-medium mb-2">Phone</label>
-              <input
-                v-model="form.customer_phone"
-                type="tel"
-                class="input-field"
-                placeholder="+1 (555) 123-4567"
-              />
-            </div>
-
-            <div>
-              <label class="block text-gray-700 font-medium mb-2">Shipping Address *</label>
-              <textarea
-                v-model="form.shipping_address"
-                required
-                rows="3"
-                class="input-field"
-                placeholder="123 Main St, City, State, ZIP"
-              ></textarea>
-            </div>
-
-            <button
-              type="submit"
-              class="btn-primary w-full"
-              :disabled="submitting"
-            >
-              {{ submitting ? 'Processing...' : 'Place Order' }}
-            </button>
-
-            <div v-if="error" class="p-3 bg-red-100 text-red-700 rounded-lg">
-              {{ error }}
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <div>
-        <div class="card sticky top-24">
-          <h2 class="text-2xl font-bold mb-6">Order Summary</h2>
-
-          <div class="space-y-3 mb-6 max-h-64 overflow-y-auto">
-            <div v-for="item in cartStore.items" :key="item.id" class="flex justify-between text-sm">
-              <span>{{ item.name }} x{{ item.quantity }}</span>
-              <span>${{ (item.price * item.quantity).toFixed(2) }}</span>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Checkout Form -->
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Customer Information -->
+          <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-bold mb-4">Customer Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                <input v-model="form.customer_name" type="text" required class="input-field" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                <input v-model="form.customer_email" type="email" required class="input-field" />
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                <input v-model="form.customer_phone" type="tel" class="input-field" />
+              </div>
             </div>
           </div>
 
-          <div class="border-t pt-4 space-y-2">
-            <div class="flex justify-between text-gray-600">
-              <span>Subtotal</span>
-              <span>${{ cartStore.totalPrice.toFixed(2) }}</span>
+          <!-- Delivery Method -->
+          <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-bold mb-4">Delivery Method</h2>
+            <div class="space-y-3">
+              <label class="flex items-start p-4 border-2 rounded-lg cursor-pointer transition-colors" :class="deliveryMethod === 'delivery' ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-gray-300'">
+                <input 
+                  v-model="deliveryMethod" 
+                  type="radio" 
+                  value="delivery" 
+                  class="mt-1 h-4 w-4 text-blue-600"
+                >
+                <div class="ml-3 flex-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-semibold">Delivery</span>
+                    <span v-if="deliveryMethod === 'delivery'" class="text-xs bg-blue-600 text-white px-2 py-1 rounded">Selected</span>
+                  </div>
+                  <p class="text-sm text-gray-600 mt-1">Get it delivered to your address</p>
+                </div>
+              </label>
+
+              <label class="flex items-start p-4 border-2 rounded-lg cursor-pointer transition-colors" :class="deliveryMethod === 'pickup' ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-gray-300'">
+                <input 
+                  v-model="deliveryMethod" 
+                  type="radio" 
+                  value="pickup" 
+                  class="mt-1 h-4 w-4 text-blue-600"
+                >
+                <div class="ml-3 flex-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-semibold">Self Pickup</span>
+                    <span v-if="deliveryMethod === 'pickup'" class="text-xs bg-blue-600 text-white px-2 py-1 rounded">Selected</span>
+                  </div>
+                  <p class="text-sm text-gray-600 mt-1">Pick up from our store - No shipping fee</p>
+                </div>
+              </label>
             </div>
-            <div class="flex justify-between text-gray-600">
-              <span>Shipping</span>
-              <span>Free</span>
+          </div>
+
+          <!-- Shipping Address (only if delivery) -->
+          <div v-if="deliveryMethod === 'delivery'" class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-bold mb-4">Shipping Address</h2>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Street Address *</label>
+                <textarea v-model="form.shipping_address" required rows="3" class="input-field"></textarea>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                  <input v-model="form.city" type="text" required class="input-field" @change="updateShipping" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">State/Province *</label>
+                  <input v-model="form.state" type="text" required class="input-field" @change="updateShipping" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Country *</label>
+                  <input v-model="form.country" type="text" required class="input-field" @change="updateShipping" />
+                </div>
+              </div>
             </div>
-            <div class="flex justify-between text-xl font-bold">
+          </div>
+
+          <!-- Shipping Options (only if delivery) -->
+          <div v-if="deliveryMethod === 'delivery'" class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-bold mb-4">Additional Shipping Services</h2>
+            
+            <div v-if="shippingOptions.length === 0" class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded">
+              <p class="text-sm text-yellow-800">
+                <strong>No shipping options configured.</strong>
+              </p>
+            </div>
+
+            <p v-else class="text-sm text-gray-600 mb-4">Select optional services for your delivery</p>
+            
+            <div v-if="shippingOptions.length > 0" class="space-y-3">
+              <label v-for="option in shippingOptions" :key="option.id" class="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                <input 
+                  type="checkbox" 
+                  :value="option.id" 
+                  v-model="selectedShippingOptions"
+                  @change="updateShippingOptions"
+                  class="mt-1 h-4 w-4 text-blue-600"
+                />
+                <div class="ml-3 flex-1">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <span class="font-medium">{{ option.name }}</span>
+                      <p class="text-sm text-gray-600 mt-1">{{ option.description }}</p>
+                    </div>
+                    <span class="font-semibold text-blue-600 ml-4">+${{ parseFloat(option.fee || 0).toFixed(2) }}</span>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Payment Method Selection -->
+          <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-bold mb-4">Payment Method</h2>
+            
+            <div v-if="loadingPaymentMethods" class="text-center py-4">
+              <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <p class="text-sm text-gray-600 mt-2">Loading payment methods...</p>
+            </div>
+
+            <div v-else-if="paymentMethods.length === 0" class="p-4 bg-yellow-50 border border-yellow-200 rounded">
+              <p class="text-sm text-yellow-800">
+                <strong>No payment methods available.</strong><br>
+                Please enable payment methods in Admin → Payment Settings.
+              </p>
+            </div>
+
+            <div v-else class="space-y-3">
+              <label 
+                v-for="method in paymentMethods" 
+                :key="method.id" 
+                class="flex items-start p-4 border-2 rounded-lg cursor-pointer transition-colors" 
+                :class="selectedPaymentMethod === method.id ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-gray-300'"
+              >
+                <input 
+                  v-model="selectedPaymentMethod" 
+                  type="radio" 
+                  :value="method.id" 
+                  class="mt-1 h-4 w-4 text-blue-600"
+                >
+                <div class="ml-3 flex-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-semibold">{{ method.name }}</span>
+                    <span v-if="selectedPaymentMethod === method.id" class="text-xs bg-blue-600 text-white px-2 py-1 rounded">Selected</span>
+                  </div>
+                  <p class="text-sm text-gray-600 mt-1">{{ method.description }}</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Payment UI (only shows when payment method is selected and not cash) -->
+          <div v-if="selectedPaymentMethod && selectedPaymentMethod !== 'cash' && canShowPaymentUI" class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-bold mb-4">Payment Details</h2>
+            
+            <!-- Stripe Payment -->
+            <StripePayment 
+              v-if="selectedPaymentMethod === 'stripe'"
+              :amount="finalTotal"
+              :publishable-key="getPaymentConfig('stripe')?.publishable_key"
+              :customer-email="form.customer_email"
+              @success="handlePaymentSuccess"
+              @error="handlePaymentError"
+            />
+
+            <!-- PayPal Payment -->
+            <PayPalPayment
+              v-else-if="selectedPaymentMethod === 'paypal'"
+              :amount="finalTotal"
+              :client-id="getPaymentConfig('paypal')?.client_id"
+              @success="handlePaymentSuccess"
+              @error="handlePaymentError"
+            />
+
+            <!-- Square Payment -->
+            <SquarePayment
+              v-else-if="selectedPaymentMethod === 'square'"
+              :amount="finalTotal"
+              :application-id="getPaymentConfig('square')?.application_id"
+              :location-id="getPaymentConfig('square')?.location_id"
+              @success="handlePaymentSuccess"
+              @error="handlePaymentError"
+            />
+          </div>
+
+          <!-- Place Order Button (only for Cash) -->
+          <div v-if="selectedPaymentMethod === 'cash'" class="bg-white rounded-lg shadow p-6">
+            <button 
+              @click="placeOrder" 
+              :disabled="submitting || !isFormValid" 
+              class="btn-primary w-full"
+            >
+              {{ submitting ? 'Processing...' : 'Place Order (Cash on Delivery)' }}
+            </button>
+
+            <div v-if="error" class="mt-4 p-3 bg-red-50 rounded text-sm text-red-800">
+              {{ error }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-lg shadow p-6 sticky top-4">
+            <h2 class="text-xl font-bold mb-4">Order Summary</h2>
+
+            <!-- Cart Items -->
+            <div class="space-y-3 mb-4 pb-4 border-b max-h-64 overflow-y-auto">
+              <div v-for="item in cartStore.items" :key="item.id" class="flex justify-between text-sm">
+                <span class="text-gray-700">{{ item.name }} × {{ item.quantity }}</span>
+                <span class="font-medium">${{ (item.price * item.quantity).toFixed(2) }}</span>
+              </div>
+            </div>
+
+            <!-- Price Breakdown -->
+            <div class="space-y-2 mb-4 pb-4 border-b">
+              <div class="flex justify-between text-gray-700">
+                <span>Subtotal</span>
+                <span>${{ cartStore.subtotal.toFixed(2) }}</span>
+              </div>
+
+              <!-- Tax -->
+              <div v-if="cartStore.taxInfo.enabled">
+                <div v-if="cartStore.taxInfo.mode === 'inclusive'" class="text-sm text-gray-600 italic">
+                  <p>(Includes {{ cartStore.taxInfo.name }} {{ cartStore.taxInfo.rate }}%: ${{ cartStore.taxAmount.toFixed(2) }})</p>
+                </div>
+                <div v-else class="flex justify-between text-gray-700">
+                  <span>{{ cartStore.taxInfo.name }} ({{ cartStore.taxInfo.rate }}%)</span>
+                  <span>${{ cartStore.taxAmount.toFixed(2) }}</span>
+                </div>
+              </div>
+
+              <!-- Shipping -->
+              <div v-if="deliveryMethod === 'pickup'" class="flex justify-between text-green-600 font-semibold">
+                <span>Shipping (Self Pickup)</span>
+                <span>FREE</span>
+              </div>
+              <div v-else-if="!cartStore.shippingCalculation" class="flex justify-between text-gray-400">
+                <span>Shipping</span>
+                <span class="text-sm">Enter address</span>
+              </div>
+              <div v-else>
+                <div class="flex justify-between text-gray-700 font-medium">
+                  <span>Shipping</span>
+                  <span v-if="cartStore.shippingCalculation.free_shipping" class="text-green-600">FREE</span>
+                  <span v-else>${{ cartStore.shippingCost.toFixed(2) }}</span>
+                </div>
+
+                <!-- Shipping Breakdown -->
+                <div v-if="!cartStore.shippingCalculation.free_shipping && cartStore.shippingCalculation.total > 0" class="pl-4 mt-2 space-y-1">
+                  <div v-if="cartStore.shippingCalculation.base_shipping > 0" class="flex justify-between text-xs text-gray-600">
+                    <span>Base shipping</span>
+                    <span>${{ cartStore.shippingCalculation.base_shipping.toFixed(2) }}</span>
+                  </div>
+                  <div v-if="cartStore.shippingCalculation.weight_fee > 0" class="flex justify-between text-xs text-gray-600">
+                    <span>Weight ({{ cartStore.totalWeight.toFixed(2) }} kg)</span>
+                    <span>${{ cartStore.shippingCalculation.weight_fee.toFixed(2) }}</span>
+                  </div>
+                  <div v-if="cartStore.shippingCalculation.options_fee > 0" class="flex justify-between text-xs text-gray-600">
+                    <span>Additional services</span>
+                    <span>${{ cartStore.shippingCalculation.options_fee.toFixed(2) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Grand Total -->
+            <div class="flex justify-between text-2xl font-bold mb-6">
               <span>Total</span>
-              <span>${{ cartStore.totalPrice.toFixed(2) }}</span>
+              <span>${{ finalTotal.toFixed(2) }}</span>
+            </div>
+
+            <NuxtLink to="/cart" class="btn-secondary w-full block text-center">
+              Back to Cart
+            </NuxtLink>
+
+            <!-- Delivery Method Notice -->
+            <div class="mt-4 p-3 rounded text-sm" :class="deliveryMethod === 'pickup' ? 'bg-green-50 text-green-800' : 'bg-blue-50 text-blue-800'">
+              <p v-if="deliveryMethod === 'pickup'">
+                <strong>Self Pickup:</strong> You will receive pickup instructions via email.
+              </p>
+              <p v-else>
+                <strong>Delivery:</strong> Your order will be shipped to the address provided.
+              </p>
             </div>
           </div>
         </div>
@@ -105,67 +304,202 @@
 </template>
 
 <script setup lang="ts">
+// import StripePayment from '~/components/StripePayment.vue'
+// import PayPalPayment from '~/components/PayPalPayment.vue'
+// import SquarePayment from '~/components/SquarePayment.vue'
+
 const cartStore = useCartStore()
+const { $apiFetch } = useNuxtApp()
+
+const deliveryMethod = ref<'delivery' | 'pickup'>('delivery')
 
 const form = ref({
   customer_name: '',
   customer_email: '',
   customer_phone: '',
-  shipping_address: ''
+  shipping_address: '',
+  city: '',
+  state: '',
+  country: ''
 })
 
+const shippingOptions = ref<any[]>([])
+const selectedShippingOptions = ref<string[]>([])
+const paymentMethods = ref<any[]>([])
+const selectedPaymentMethod = ref<string>('')
+const loadingPaymentMethods = ref(true)
 const submitting = ref(false)
-const error = ref('')
+const error = ref<string | null>(null)
+const paymentTransactionId = ref<string | null>(null)
 
-const handleSubmit = async () => {
-  // if (cartStore.items.length === 0) return
+const isFormValid = computed(() => {
+  const basicInfo = form.value.customer_name && 
+                    form.value.customer_email &&
+                    selectedPaymentMethod.value
 
-  // submitting.value = true
-  // error.value = ''
+  if (deliveryMethod.value === 'pickup') {
+    return basicInfo
+  }
 
-  // try {
-  //   const orderData = {
-  //     customer_name: form.value.customer_name,
-  //     customer_email: form.value.customer_email,
-  //     customer_phone: form.value.customer_phone,
-  //     shipping_address: form.value.shipping_address,
-  //     total_amount: cartStore.totalPrice,
-  //     status: 'pending'
-  //   }
+  return basicInfo && 
+        form.value.shipping_address &&
+        form.value.city &&
+        form.value.state &&
+        form.value.country
+})
 
-  //   const { data: order, error: orderError } = await supabase
-  //     .from('orders')
-  //     .insert(orderData)
-  //     .select()
-  //     .single()
+const canShowPaymentUI = computed(() => {
+  return isFormValid.value
+})
 
-  //   if (orderError) throw orderError
+const finalTotal = computed(() => {
+  if (deliveryMethod.value === 'pickup') {
+    if (cartStore.taxInfo.mode === 'inclusive') {
+      return cartStore.subtotal
+    } else {
+      return cartStore.subtotal + cartStore.taxAmount
+    }
+  }
+  return cartStore.grandTotal
+})
 
-  //   const orderItems = cartStore.items.map(item => ({
-  //     order_id: order.id,
-  //     product_id: item.id,
-  //     product_name: item.name,
-  //     product_price: item.price,
-  //     quantity: item.quantity,
-  //     subtotal: item.price * item.quantity
-  //   }))
-
-  //   const { error: itemsError } = await supabase
-  //     .from('order_items')
-  //     .insert(orderItems)
-
-  //   if (itemsError) throw itemsError
-
-  //   cartStore.clearCart()
-
-  //   navigateTo({
-  //     path: '/order-success',
-  //     query: { orderId: order.id }
-  //   })
-  // } catch (err: any) {
-  //   error.value = err.message || 'An error occurred while placing your order'
-  // } finally {
-  //   submitting.value = false
-  // }
+const getPaymentConfig = (methodId: string) => {
+  const method = paymentMethods.value.find(m => m.id === methodId)
+  return method?.config || null
 }
+
+const updateShipping = async () => {
+  if (deliveryMethod.value === 'pickup') {
+    cartStore.shippingCalculation = null
+    return
+  }
+
+  if (form.value.country && form.value.state && form.value.city) {
+    await cartStore.calculateShipping({
+      country: form.value.country,
+      state: form.value.state,
+      city: form.value.city
+    })
+  }
+}
+
+const updateShippingOptions = () => {
+  if (deliveryMethod.value === 'delivery') {
+    cartStore.setShippingOptions(selectedShippingOptions.value)
+  }
+}
+
+const loadShippingOptions = async () => {
+  try {
+    const response = await $apiFetch<any>('/shipping/options', {
+      method: 'GET'
+    })
+    
+    if (response?.data) {
+      shippingOptions.value = response.data
+    }
+  } catch (err) {
+    console.error('Error loading shipping options:', err)
+  }
+}
+
+const loadPaymentMethods = async () => {
+  loadingPaymentMethods.value = true
+  error.value = null
+
+  try {
+    const response = await $apiFetch<any>('/payment-settings/methods', { 
+      method: 'GET' 
+    })
+
+    console.log('Payment methods response:', response)
+
+    paymentMethods.value = response?.data ?? []
+
+    if (!selectedPaymentMethod.value && paymentMethods.value.length > 0) {
+      selectedPaymentMethod.value = paymentMethods.value[0].id
+    }
+  } catch (err: any) {
+    console.error('Error loading payment methods:', err)
+    paymentMethods.value = []
+    error.value = err?.data?.message || 'Failed to load payment methods.'
+  } finally {
+    loadingPaymentMethods.value = false
+  }
+}
+
+const handlePaymentSuccess = async (transactionId: string) => {
+  console.log('Payment successful:', transactionId)
+  paymentTransactionId.value = transactionId
+  await placeOrder()
+}
+
+const handlePaymentError = (errorMessage: string) => {
+  console.error('Payment error:', errorMessage)
+  error.value = errorMessage
+}
+
+const placeOrder = async () => {
+  if (!isFormValid.value) return
+
+  submitting.value = true
+  error.value = null
+
+  try {
+    const shippingAddress = deliveryMethod.value === 'pickup' 
+      ? 'Self Pickup' 
+      : `${form.value.shipping_address}, ${form.value.city}, ${form.value.state}, ${form.value.country}`
+
+    const orderData = {
+      customer_name: form.value.customer_name,
+      customer_email: form.value.customer_email,
+      customer_phone: form.value.customer_phone,
+      shipping_address: shippingAddress,
+      delivery_method: deliveryMethod.value,
+      payment_method: selectedPaymentMethod.value,
+      payment_transaction_id: paymentTransactionId.value,
+      items: cartStore.items.map(item => ({
+        product_id: item.id,
+        quantity: item.quantity
+      })),
+      shipping_options: deliveryMethod.value === 'delivery' ? selectedShippingOptions.value : []
+    }
+
+    console.log('Submitting order:', orderData)
+
+    await $apiFetch('/orders', {
+      method: 'POST',
+      body: orderData
+    })
+
+    cartStore.clearCart()
+    navigateTo('/order-success')
+  } catch (err: any) {
+    console.error('Error placing order:', err)
+    error.value = err?.data?.message || 'Failed to place order. Please try again.'
+  } finally {
+    submitting.value = false
+  }
+}
+
+watch(deliveryMethod, (newMethod) => {
+  if (newMethod === 'pickup') {
+    cartStore.shippingCalculation = null
+    selectedShippingOptions.value = []
+    cartStore.setShippingOptions([])
+  } else {
+    updateShipping()
+  }
+})
+
+onMounted(() => {
+  if (cartStore.items.length === 0) {
+    navigateTo('/cart')
+    return
+  }
+
+  loadShippingOptions()
+  loadPaymentMethods()
+  cartStore.calculateTax()
+})
 </script>
