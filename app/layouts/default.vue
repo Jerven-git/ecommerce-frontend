@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div>
     <Header />
-    <main class="flex-grow">
+    <main>
       <slot />
     </main>
     <Footer />
@@ -11,7 +11,10 @@
 <script setup lang="ts">
 const cartStore = useCartStore()
 
+// Initialize cart - recalculate tax on mount
 onMounted(() => {
-  cartStore.loadCart()
+  if (cartStore.items.length > 0) {
+    cartStore.calculateTax()
+  }
 })
 </script>
