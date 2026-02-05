@@ -44,38 +44,31 @@ export const useCartStore = defineStore('cart', {
       return state.items.reduce((total, item) => total + (item.weight * item.quantity), 0)
     },
 
-    // Raw subtotal (sum of all items without tax)
     rawSubtotal: (state) => {
       return state.items.reduce((total, item) => total + (item.price * item.quantity), 0)
     },
 
-    // Subtotal with tax calculation
     subtotal(): number {
       if (!this.taxCalculation) return this.rawSubtotal
       return this.taxCalculation.subtotal
     },
 
-    // Tax amount
     taxAmount(): number {
       return this.taxCalculation?.tax_amount || 0
     },
 
-    // Shipping cost
     shippingCost(): number {
       return this.shippingCalculation?.total || 0
     },
 
-    // Grand total (subtotal + tax + shipping)
     grandTotal(): number {
       if (!this.taxCalculation) {
         return this.rawSubtotal + this.shippingCost
       }
 
       if (this.taxCalculation.tax_display_mode === 'inclusive') {
-        // Tax already in prices, just add shipping
         return this.taxCalculation.total + this.shippingCost
       } else {
-        // Add subtotal + tax + shipping
         return this.taxCalculation.subtotal + this.taxCalculation.tax_amount + this.shippingCost
       }
     },
