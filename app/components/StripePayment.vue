@@ -1,33 +1,38 @@
 <template>
   <div class="stripe-payment">
+    <!-- ✅ Always render mount container in DOM -->
+    <div ref="paymentEl" class="mb-4"></div>
+
     <div v-if="!stripeLoaded" class="text-center py-4">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div
+        class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+      ></div>
       <p class="text-sm text-gray-600 mt-2">Loading Stripe...</p>
     </div>
 
-    <div v-else>
-      <div id="payment-element" class="mb-4"></div>
-      
-      <div v-if="error" class="p-3 bg-red-50 rounded text-sm text-red-800 mb-4">
-        {{ error }}
-      </div>
-
-      <button 
-        @click="handleSubmit" 
-        :disabled="processing || !stripe || !elements"
-        class="btn-primary w-full"
-      >
-        {{ processing ? 'Processing...' : `Pay $${amount.toFixed(2)}` }}
-      </button>
+    <div v-if="error" class="p-3 bg-red-50 rounded text-sm text-red-800 mb-4">
+      {{ error }}
     </div>
+
+    <button
+      v-if="stripeLoaded"
+      @click="handleSubmit"
+      :disabled="processing || !stripe || !elements"
+      class="btn-primary w-full"
+    >
+      {{ processing ? 'Processing...' : `Pay $${amount.toFixed(2)}` }}
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+
 const props = defineProps<{
   amount: number
   publishableKey: string
   customerEmail: string
+  orderId: string | number
 }>()
 
 const emit = defineEmits<{
@@ -41,57 +46,71 @@ const stripeLoaded = ref(false)
 const processing = ref(false)
 const error = ref<string | null>(null)
 
+const backendPaymentId = ref<string | null>(null)
+const paymentEl = ref<HTMLElement | null>(null)
+
 let stripe: any = null
 let elements: any = null
+let paymentElementInstance: any = null
+
+const emitError = (msg: unknown) => {
+  const text = typeof msg === 'string' ? msg : 'Payment failed'
+  emit('error', text)
+}
+
+const emitSuccess = (paymentId: string) => {
+  emit('success', paymentId)
+}
 
 const loadStripe = async () => {
   try {
-    // Load Stripe.js
-    const script = document.createElement('script')
-    script.src = 'https://js.stripe.com/v3/'
-    script.async = true
-    
-    await new Promise((resolve, reject) => {
-      script.onload = resolve
-      script.onerror = reject
-      document.head.appendChild(script)
-    })
+    // wait for DOM
+    await nextTick()
 
-    // Initialize Stripe
+    if (!paymentEl.value) {
+      throw new Error('Payment element container not found in DOM')
+    }
+
+    // Load Stripe.js once
+    if (!(window as any).Stripe) {
+      const script = document.createElement('script')
+      script.src = 'https://js.stripe.com/v3/'
+      script.async = true
+
+      await new Promise((resolve, reject) => {
+        script.onload = resolve
+        script.onerror = reject
+        document.head.appendChild(script)
+      })
+    }
+
     stripe = (window as any).Stripe(props.publishableKey)
 
-    // Create payment intent on backend
-    const response = await $apiFetch<any>('/payments/stripe/create-intent', {
-      method: 'POST',
-      body: {
-        amount: Math.round(props.amount * 100), // Convert to cents
-        currency: 'usd',
-        customer_email: props.customerEmail
-      }
+    // ✅ Create PaymentIntent for this order (server decides amount)
+    const response = await $apiFetch<any>(`/orders/${props.orderId}/stripe/intent`, {
+      method: 'POST'
     })
 
-    if (!response?.client_secret) {
+    const payload = response?.data ?? response
+    const clientSecret = payload?.client_secret
+    const paymentId = payload?.payment_id
+
+    if (!clientSecret || !paymentId) {
       throw new Error('Failed to create payment intent')
     }
 
-    // Create Elements instance
+    backendPaymentId.value = String(paymentId)
+
     elements = stripe.elements({
-      clientSecret: response.client_secret,
-      appearance: {
-        theme: 'stripe',
-        variables: {
-          colorPrimary: '#2563eb',
-        }
-      }
+      clientSecret,
+      appearance: { theme: 'stripe' }
     })
 
-    // Create and mount Payment Element
-    const paymentElement = elements.create('payment')
-    paymentElement.mount('#payment-element')
+    paymentElementInstance = elements.create('payment')
+    paymentElementInstance.mount(paymentEl.value)
 
     stripeLoaded.value = true
   } catch (err: any) {
-    console.error('Error loading Stripe:', err)
     const msg = err?.message ?? 'Failed to load payment form'
     error.value = msg
     emit('error', msg)
@@ -100,54 +119,50 @@ const loadStripe = async () => {
 
 const handleSubmit = async () => {
   if (!stripe || !elements) return
+  if (!backendPaymentId.value) {
+    emit('error', 'Missing payment id')
+    return
+  }
 
   processing.value = true
   error.value = null
 
   try {
-    const { error: submitError, paymentIntent } = await stripe.confirmPayment({
+    const returnUrl =
+      `${window.location.origin}/payment/complete?payment_id=${backendPaymentId.value}`
+
+    const { error: submitError } = await stripe.confirmPayment({
       elements,
-      confirmParams: {
-        return_url: window.location.origin + '/order-success',
-      },
+      confirmParams: { return_url: returnUrl },
       redirect: 'if_required'
     })
 
     if (submitError) {
-      error.value = submitError.message
-      if (error.value) {
-        emit('error', error.value)
-      }
-    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      emit('success', paymentIntent.id)
+      const msg = submitError.message || 'Payment failed'
+      error.value = msg
+      emit('error', msg)
+      return
     }
+
+    // ✅ emit a guaranteed string
+    emit('success', backendPaymentId.value)
   } catch (err: any) {
-    console.error('Payment error:', err)
-    error.value = err.message || 'Payment failed'
-    if (error.value) {
-      emit('error', error.value)
-    }
+    const msg = err?.message || 'Payment failed'
+    error.value = msg
+    emit('error', msg)
   } finally {
     processing.value = false
   }
 }
 
-onMounted(() => {
-  loadStripe()
-})
+onMounted(loadStripe)
 
 onBeforeUnmount(() => {
-  if (elements) {
-    elements = null
-  }
-  if (stripe) {
-    stripe = null
-  }
+  try {
+    if (paymentElementInstance) paymentElementInstance.unmount()
+  } catch {}
+  paymentElementInstance = null
+  elements = null
+  stripe = null
 })
 </script>
-
-<style scoped>
-#payment-element {
-  margin-bottom: 1rem;
-}
-</style>
