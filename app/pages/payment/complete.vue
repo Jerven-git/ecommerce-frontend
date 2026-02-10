@@ -17,22 +17,54 @@ const error = ref<string | null>(null)
 const isDone = ref(false)
 const running = ref(false)
 
-const paymentId = computed(() => {
-  const q = route.query.payment_id
-  const fromQuery = Array.isArray(q) ? q[0] : (q as string | undefined)
-  return fromQuery || localStorage.getItem('last_payment_id') || ''
+const paymentIdRef = ref<string>('')
+
+// read query params once
+const token = computed(() => {
+  const q = route.query.token
+  return Array.isArray(q) ? q[0] : ((q as string) || '')
 })
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-const getStatus = (res: any): string | null => {
-  // Your backend returns status at root: { id, status, provider, order_id }
-  if (typeof res?.status === 'string') return res.status
+function normalizePaymentId(v: unknown): string {
+  if (!v) return ''
+  return String(v).trim()
+}
 
-  // Some wrappers might wrap it: { data: { status } }
-  if (typeof res?.data?.status === 'string') return res.data.status
+function setPaymentId(id: unknown) {
+  const pid = normalizePaymentId(id)
+  if (!pid) return
+  paymentIdRef.value = pid
+  localStorage.setItem('last_payment_id', pid)
+}
 
-  return null
+async function pollUntilPaid(paymentId: string) {
+  const started = Date.now()
+  const timeoutMs = 45_000 // 45s window
+
+  while (!isDone.value && Date.now() - started < timeoutMs) {
+    try {
+      const res = await $apiFetch<any>(`/payments/${paymentId}`, { method: 'GET' })
+      const status = res?.status ?? res?.data?.status ?? null
+
+      if (status === 'paid') return true
+      if (status === 'failed') {
+        error.value = 'Payment failed. Please try checkout again.'
+        return false
+      }
+    } catch (err: any) {
+      if (err?.status === 404 || err?.response?.status === 404) {
+        error.value = 'Payment record not found. Please try checkout again.'
+        return false
+      }
+      // ignore transient errors and continue polling
+    }
+
+    await sleep(1500)
+  }
+
+  return false
 }
 
 const verifyAndFinish = async () => {
@@ -41,20 +73,23 @@ const verifyAndFinish = async () => {
   error.value = null
 
   try {
-    if (!paymentId.value) {
-      error.value = 'Missing payment id.'
-      return
-    }
+    // init paymentId from query/localStorage
+    const q = route.query.payment_id
+    const fromQuery = Array.isArray(q) ? q[0] : (q as string | undefined)
+    setPaymentId(fromQuery || localStorage.getItem('last_payment_id') || '')
 
-    // 15 tries with mild backoff (about ~25-30s total)
-    for (let i = 0; i < 15; i++) {
-      if (isDone.value) return
-
+    // PayPal: capture first
+    if (token.value) {
       try {
-        const res = await $apiFetch<any>(`/payments/${paymentId.value}`, { method: 'GET' })
-        const status = getStatus(res)
+        const cap = await $apiFetch<any>('/paypal/capture', {
+          method: 'POST',
+          body: { token: token.value },
+        })
 
-        if (status === 'paid') {
+        setPaymentId(cap?.payment_id ?? cap?.data?.payment_id)
+
+        const capStatus = cap?.status ?? cap?.data?.status
+        if (capStatus === 'paid') {
           isDone.value = true
           cartStore.clearCart()
           localStorage.removeItem('last_payment_id')
@@ -62,23 +97,38 @@ const verifyAndFinish = async () => {
           await navigateTo('/order-success')
           return
         }
-
-        // If status is something unexpected, still keep polling
-      } catch (err: any) {
-        // If backend returns 404, stop immediately (wrong id stored)
-        if (err?.status === 404 || err?.response?.status === 404) {
-          error.value = 'Payment record not found. Please try checkout again.'
-          return
-        }
-        // ignore transient errors
+      } catch (e: any) {
+        error.value = e?.data?.message || e?.message || 'PayPal capture failed.'
+        return
       }
-
-      // backoff: 1s, 1s, 1.5s, 2s, 2.5s...
-      const wait = 1000 + i * 250
-      await sleep(wait)
     }
 
-    error.value = 'Payment is not confirmed yet. Please refresh in a moment.'
+    if (!paymentIdRef.value) {
+      error.value = 'Missing payment id.'
+      return
+    }
+
+    // fallback polling (short)
+    const ok = await (async () => {
+      for (let i = 0; i < 8; i++) {
+        const ok = await pollUntilPaid(paymentIdRef.value)
+        if (ok) return true
+        await sleep(1500)
+      }
+      return false
+    })()
+
+    if (!ok) {
+      error.value = 'Payment is still finalizing. Please refresh in a moment.'
+      return
+    }
+
+    // success
+    isDone.value = true
+    cartStore.clearCart()
+    localStorage.removeItem('last_payment_id')
+    localStorage.removeItem('last_order_id')
+    await navigateTo('/order-success')
   } finally {
     running.value = false
   }
@@ -86,7 +136,6 @@ const verifyAndFinish = async () => {
 
 onMounted(verifyAndFinish)
 
-// Stop polling if user navigates away
 onBeforeRouteLeave(() => {
   isDone.value = true
 })
