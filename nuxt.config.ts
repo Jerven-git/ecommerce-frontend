@@ -17,7 +17,7 @@ export default defineNuxtConfig({
   
   app: {
     head: {
-      titleTemplate: 'AFIA',
+      titleTemplate: 'Shop System United',
       htmlAttrs: {
         lang: 'en',
       },
