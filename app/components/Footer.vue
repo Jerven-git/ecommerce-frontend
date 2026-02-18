@@ -1,34 +1,37 @@
 <template>
-  <footer class="bg-gray-900 text-white">
+  <footer class="bg-white border-t border-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
-          <NuxtLink to="/" class="text-2xl font-bold mb-4" :style="{ color: siteConfig?.primary_color || '#2563eb' }">
-            {{ siteConfig?.site_name || 'Store' }}
+          <NuxtLink to="/" class="inline-block mb-4">
+            <img v-if="siteConfig?.logo_url" :src="siteConfig.logo_url" :alt="siteConfig.site_name" class="h-32 w-auto object-contain" />
+            <span v-else class="text-2xl font-bold tracking-tight" :style="{ color: siteConfig?.primary_color || '#2563eb' }">
+              {{ siteConfig?.site_name || 'Store' }}
+            </span>
           </NuxtLink>
-          <p class="text-gray-400">Your trusted online shopping destination</p>
+          <p class="text-sm text-gray-500">Your trusted online shopping destination</p>
         </div>
 
         <div>
-          <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+          <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Quick Links</h4>
           <ul class="space-y-2">
-            <li><NuxtLink to="/shop" class="text-gray-400 hover:text-white transition-colors">Shop</NuxtLink></li>
-            <li><NuxtLink to="/about" class="text-gray-400 hover:text-white transition-colors">About Us</NuxtLink></li>
-            <li><NuxtLink to="/contact" class="text-gray-400 hover:text-white transition-colors">Contact</NuxtLink></li>
+            <li><NuxtLink to="/shop" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">Shop</NuxtLink></li>
+            <li><NuxtLink to="/about" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">About Us</NuxtLink></li>
+            <li><NuxtLink to="/contact" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">Contact</NuxtLink></li>
           </ul>
         </div>
 
         <div>
-          <h4 class="text-lg font-semibold mb-4">Contact Info</h4>
-          <ul class="space-y-2 text-gray-400">
-            <li>{{ siteConfig?.contact_email || 'contact@store.com' }}</li>
-            <li>{{ siteConfig?.contact_phone || '+1234567890' }}</li>
+          <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Contact Info</h4>
+          <ul class="space-y-2">
+            <li class="text-sm text-gray-500">{{ siteConfig?.contact_email || 'contact@store.com' }}</li>
+            <li class="text-sm text-gray-500">{{ siteConfig?.contact_phone || '+1234567890' }}</li>
           </ul>
         </div>
       </div>
 
-      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-        <p>&copy; {{ new Date().getFullYear() }} {{ siteConfig?.site_name || 'Store' }}. All rights reserved.</p>
+      <div class="border-t border-gray-100 mt-8 pt-8 text-center">
+        <p class="text-sm text-gray-400">&copy; {{ new Date().getFullYear() }} {{ siteConfig?.site_name || 'Store' }}. All rights reserved.</p>
       </div>
     </div>
   </footer>
@@ -44,6 +47,7 @@ interface SiteConfig {
   secondary_color: string
   contact_email: string
   contact_phone: string
+  logo_url: string
 }
 
 interface SiteConfigResponse {

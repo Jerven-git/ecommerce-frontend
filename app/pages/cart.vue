@@ -1,103 +1,170 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 class="text-3xl font-bold mb-8">Shopping Cart</h1>
+  <div class="min-h-screen flex flex-col">
 
-      <div v-if="cartStore.items.length === 0" class="text-center py-16 bg-white rounded-lg shadow">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-        </svg>
-        <h2 class="text-2xl font-semibold text-gray-700 mb-2">Your cart is empty</h2>
-        <p class="text-gray-500 mb-6">Add some products to get started!</p>
-        <NuxtLink to="/shop" class="btn-primary inline-block">Continue Shopping</NuxtLink>
+    <!-- Page Header -->
+    <div class="bg-white border-b border-gray-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Your Order</p>
+        <h1 class="text-3xl font-bold text-gray-900">Shopping Cart</h1>
+        <p class="text-sm text-gray-500 mt-1">
+          {{ cartStore.itemCount === 0 ? 'No items yet' : `${cartStore.itemCount} item${cartStore.itemCount === 1 ? '' : 's'}` }}
+        </p>
       </div>
+    </div>
 
-      <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Cart Items -->
-        <div class="lg:col-span-2 space-y-4">
-          <div v-for="item in cartStore.items" :key="item.id" class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center space-x-4">
-              <img v-if="item.image_url" :src="item.image_url" :alt="item.name" class="w-24 h-24 object-cover rounded" />
-              <div v-else class="w-24 h-24 bg-gray-200 rounded"></div>
+    <!-- Main Content -->
+    <div class="flex-1 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
 
-              <div class="flex-1">
-                <h3 class="font-semibold text-lg">{{ item.name }}</h3>
-                <p class="text-gray-600">${{ item.price.toFixed(2) }} × {{ item.quantity }}</p>
-                <p class="text-sm text-gray-500">Weight: {{ item.weight }} kg</p>
-              </div>
-
-              <div class="flex items-center space-x-3">
-                <button @click="cartStore.updateQuantity(item.id, item.quantity - 1)" class="w-8 h-8 rounded border hover:bg-gray-100">-</button>
-                <span class="w-12 text-center">{{ item.quantity }}</span>
-                <button @click="cartStore.updateQuantity(item.id, item.quantity + 1)" class="w-8 h-8 rounded border hover:bg-gray-100">+</button>
-              </div>
-
-              <div class="text-right">
-                <p class="font-semibold text-lg">${{ (item.price * item.quantity).toFixed(2) }}</p>
-                <button @click="cartStore.removeItem(item.id)" class="text-red-600 hover:text-red-800 text-sm mt-2">Remove</button>
-              </div>
-            </div>
+        <!-- Empty State -->
+        <div v-if="cartStore.items.length === 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-14 text-center max-w-sm mx-auto mt-8">
+          <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-5">
+            <svg class="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
           </div>
+          <p class="text-base font-semibold text-gray-900 mb-1">Your cart is empty</p>
+          <p class="text-sm text-gray-400 mb-6">Add some products to get started!</p>
+          <NuxtLink
+            to="/shop"
+            class="inline-flex items-center gap-2 btn-primary"
+          >
+            Continue Shopping
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </NuxtLink>
         </div>
 
-        <!-- Order Summary -->
-        <div class="lg:col-span-1">
-          <div class="bg-white rounded-lg shadow p-6 sticky top-4">
-            <h2 class="text-xl font-bold mb-4">Order Summary</h2>
+        <!-- Cart Grid -->
+        <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            <div class="space-y-3 mb-4 pb-4 border-b">
-              <div class="flex justify-between text-gray-700">
-                <span>Items ({{ cartStore.itemCount }})</span>
-                <span>${{ cartStore.rawSubtotal.toFixed(2) }}</span>
-              </div>
+          <!-- Cart Items -->
+          <div class="lg:col-span-2 space-y-4">
+            <div
+              v-for="(item, index) in cartStore.items"
+              :key="item.id"
+              class="card-stagger bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
+              :style="{ animationDelay: `${index * 60}ms` }"
+            >
+              <div class="flex items-center gap-4">
 
-              <!-- Tax Display -->
-              <div v-if="cartStore.taxInfo.enabled">
-                <!-- Inclusive Tax -->
-                <div v-if="cartStore.taxInfo.mode === 'inclusive'" class="text-sm text-gray-600">
-                  <p>(Includes {{ cartStore.taxInfo.name }} {{ cartStore.taxInfo.rate }}%: ${{ cartStore.taxAmount.toFixed(2) }})</p>
+                <!-- Image -->
+                <div class="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-gray-50 border border-gray-100">
+                  <img
+                    v-if="item.image_url"
+                    :src="item.image_url"
+                    :alt="item.name"
+                    class="w-full h-full object-cover"
+                  />
+                  <div v-else class="w-full h-full flex items-center justify-center">
+                    <svg class="w-8 h-8 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
                 </div>
 
-                <!-- Exclusive Tax -->
-                <div v-else class="flex justify-between text-gray-700">
-                  <span>{{ cartStore.taxInfo.name }} ({{ cartStore.taxInfo.rate }}%)</span>
-                  <span>${{ cartStore.taxAmount.toFixed(2) }}</span>
+                <!-- Info -->
+                <div class="flex-1 min-w-0">
+                  <h3 class="font-semibold text-gray-900 truncate">{{ item.name }}</h3>
+                  <p class="text-sm text-gray-400 mt-0.5">${{ item.price.toFixed(2) }} each &middot; {{ item.weight }} kg</p>
                 </div>
+
+                <!-- Quantity Controls -->
+                <div class="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-xl p-1 shrink-0">
+                  <button
+                    @click="cartStore.updateQuantity(item.id, item.quantity - 1)"
+                    class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-500 hover:bg-white hover:text-gray-900 hover:shadow-sm transition-all text-lg font-medium"
+                  >−</button>
+                  <span class="w-8 text-center text-sm font-semibold text-gray-900">{{ item.quantity }}</span>
+                  <button
+                    @click="cartStore.updateQuantity(item.id, item.quantity + 1)"
+                    class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-500 hover:bg-white hover:text-gray-900 hover:shadow-sm transition-all text-lg font-medium"
+                  >+</button>
+                </div>
+
+                <!-- Line Total + Remove -->
+                <div class="text-right shrink-0">
+                  <p class="font-bold text-gray-900">${{ (item.price * item.quantity).toFixed(2) }}</p>
+                  <button
+                    @click="cartStore.removeItem(item.id)"
+                    class="text-xs text-gray-400 hover:text-red-500 transition-colors mt-1"
+                  >Remove</button>
+                </div>
+
               </div>
-
-              <div v-if="cartStore.shippingCost > 0" class="flex justify-between text-gray-700">
-                <span>Shipping</span>
-                <span v-if="cartStore.shippingCalculation?.free_shipping" class="text-green-600 font-semibold">FREE</span>
-                <span v-else>${{ cartStore.shippingCost.toFixed(2) }}</span>
-              </div>
-            </div>
-
-            <div class="flex justify-between text-xl font-bold mb-6">
-              <span>Total</span>
-              <span>${{ cartStore.grandTotal.toFixed(2) }}</span>
-            </div>
-
-            <NuxtLink to="/checkout" class="btn-primary w-full block text-center mb-3">
-              Proceed to Checkout
-            </NuxtLink>
-
-            <NuxtLink to="/shop" class="btn-secondary w-full block text-center">
-              Continue Shopping
-            </NuxtLink>
-
-            <!-- Tax Info Notice -->
-            <div v-if="cartStore.taxInfo.enabled" class="mt-4 p-3 bg-blue-50 rounded text-sm text-blue-800">
-              <p v-if="cartStore.taxInfo.mode === 'inclusive'">
-                * Prices include {{ cartStore.taxInfo.name }}
-              </p>
-              <p v-else>
-                * {{ cartStore.taxInfo.name }} will be added at checkout
-              </p>
             </div>
           </div>
+
+          <!-- Order Summary -->
+          <div class="lg:col-span-1">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sticky top-4">
+              <h2 class="text-base font-bold text-gray-900 mb-5">Order Summary</h2>
+
+              <div class="space-y-3 pb-4 border-b border-gray-100">
+                <div class="flex justify-between text-sm text-gray-600">
+                  <span>Subtotal ({{ cartStore.itemCount }} item{{ cartStore.itemCount === 1 ? '' : 's' }})</span>
+                  <span class="font-medium text-gray-900">${{ cartStore.rawSubtotal.toFixed(2) }}</span>
+                </div>
+
+                <!-- Tax -->
+                <template v-if="cartStore.taxInfo.enabled">
+                  <div v-if="cartStore.taxInfo.mode === 'inclusive'" class="text-xs text-gray-400">
+                    Includes {{ cartStore.taxInfo.name }} {{ cartStore.taxInfo.rate }}%:
+                    <span class="font-medium">${{ cartStore.taxAmount.toFixed(2) }}</span>
+                  </div>
+                  <div v-else class="flex justify-between text-sm text-gray-600">
+                    <span>{{ cartStore.taxInfo.name }} ({{ cartStore.taxInfo.rate }}%)</span>
+                    <span class="font-medium text-gray-900">${{ cartStore.taxAmount.toFixed(2) }}</span>
+                  </div>
+                </template>
+
+                <!-- Shipping -->
+                <div v-if="cartStore.shippingCost > 0" class="flex justify-between text-sm text-gray-600">
+                  <span>Shipping</span>
+                  <span
+                    v-if="cartStore.shippingCalculation?.free_shipping"
+                    class="font-semibold text-green-600"
+                  >FREE</span>
+                  <span v-else class="font-medium text-gray-900">${{ cartStore.shippingCost.toFixed(2) }}</span>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center py-4">
+                <span class="font-bold text-gray-900">Total</span>
+                <span class="text-xl font-bold text-gray-900">${{ cartStore.grandTotal.toFixed(2) }}</span>
+              </div>
+
+              <NuxtLink
+                to="/checkout"
+                class="btn-primary w-full block text-center mb-3"
+              >
+                Proceed to Checkout
+              </NuxtLink>
+
+              <NuxtLink
+                to="/shop"
+                class="btn-secondary w-full block text-center"
+              >
+                Continue Shopping
+              </NuxtLink>
+
+              <!-- Tax Notice -->
+              <div v-if="cartStore.taxInfo.enabled" class="mt-5 p-3 bg-blue-50 rounded-xl text-xs text-blue-700">
+                <p v-if="cartStore.taxInfo.mode === 'inclusive'">
+                  * Prices include {{ cartStore.taxInfo.name }}
+                </p>
+                <p v-else>
+                  * {{ cartStore.taxInfo.name }} will be added at checkout
+                </p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -108,3 +175,21 @@ onMounted(() => {
   cartStore.calculateTax()
 })
 </script>
+
+<style scoped>
+.card-stagger {
+  opacity: 0;
+  animation: card-fade-up 0.4s ease forwards;
+}
+
+@keyframes card-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
