@@ -90,7 +90,7 @@
                 <span v-if="uploadingLogo" class="text-blue-600 font-medium">Uploading…</span>
                 <template v-else>Drop logo here or <span class="text-blue-600 font-medium">browse</span></template>
               </p>
-              <p class="text-xs text-gray-400 mt-1">PNG, JPG, SVG — max 2 MB</p>
+              <p class="text-xs text-gray-400 mt-1">PNG, JPG, SVG — max 10 MB</p>
               <input id="logoInput" ref="logoInput" type="file" class="hidden" accept="image/*" @change="handleLogoUpload" />
             </label>
           </div>
@@ -589,7 +589,7 @@ const setPreviewUrl = (type: MediaCollection, url: string) => {
  * ✅ Queue file + set local preview (NO upload yet)
  */
 const queueFile = (file: File, type: MediaCollection) => {
-  const maxSize = type === "logo" ? 2 : 10
+  const maxSize = 10
   if (!validateImage(file, maxSize)) return
 
   saveError.value = null
