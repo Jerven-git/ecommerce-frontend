@@ -161,6 +161,16 @@
       </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <ConfirmDeleteModal
+      :open="showDeleteModal"
+      title="Delete Discount"
+      message="Are you sure you want to delete this discount code? This action cannot be undone."
+      :deleting="deleting"
+      @confirm="confirmDelete"
+      @cancel="showDeleteModal = false"
+    />
+
     <!-- Add/Edit Modal -->
     <Teleport to="body">
       <Transition
@@ -386,6 +396,9 @@ const showModal = ref(false)
 const submitting = ref(false)
 const formError = ref<string | null>(null)
 const editingDiscount = ref<Discount | null>(null)
+const showDeleteModal = ref(false)
+const deletingId = ref<number | null>(null)
+const deleting = ref(false)
 
 const form = ref({
   code: '',
@@ -487,18 +500,24 @@ const saveDiscount = async () => {
   }
 }
 
-const deleteDiscount = async (id: number) => {
-  if (!confirm('Are you sure you want to delete this discount?')) return
+const deleteDiscount = (id: number) => {
+  deletingId.value = id
+  showDeleteModal.value = true
+}
+
+const confirmDelete = async () => {
+  if (!deletingId.value) return
+  deleting.value = true
 
   try {
-    await $apiFetch(`/discounts/${id}`, {
-      method: 'DELETE'
-    })
-
+    await $apiFetch(`/discounts/${deletingId.value}`, { method: 'DELETE' })
     await loadDiscounts()
+    showDeleteModal.value = false
+    deletingId.value = null
   } catch (err: any) {
     console.error('Error deleting discount:', err)
-    alert(err?.data?.message || 'Failed to delete discount')
+  } finally {
+    deleting.value = false
   }
 }
 
