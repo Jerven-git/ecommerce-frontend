@@ -1,43 +1,87 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
-    <nav class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16 items-center">
-          <div class="flex items-center space-x-4">
-            <NuxtLink to="/admin" class="text-gray-600 hover:text-gray-900">← Dashboard</NuxtLink>
-            <h1 class="text-2xl font-bold text-gray-900">Orders</h1>
-          </div>
-        </div>
+  <div>
+    <!-- Page Header -->
+    <div class="mb-8">
+      <div class="flex items-center gap-2 text-sm text-gray-400 mb-2">
+        <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
+        <span>/</span>
+        <span class="text-gray-600 font-medium">Orders</span>
       </div>
-    </nav>
+      <h1 class="text-2xl font-bold text-gray-900">Orders</h1>
+      <p class="text-gray-500 text-sm mt-1">View and manage customer orders</p>
+    </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div v-if="loading" class="text-center py-12">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    <!-- Loading -->
+    <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
+      <div class="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
+      <p class="text-sm text-gray-500">Loading orders…</p>
+    </div>
+
+    <!-- Error -->
+    <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">
+      <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
       </div>
+      <p class="font-semibold text-gray-800 mb-1">Failed to load orders</p>
+      <p class="text-sm text-red-500 mb-6">{{ error }}</p>
+      <button @click="loadOrders" class="btn-primary">Retry</button>
+    </div>
 
-      <div v-else-if="error" class="card text-center py-12">
-        <p class="text-red-500 mb-4">{{ error }}</p>
-        <button @click="loadOrders" class="btn-primary">Retry</button>
+    <!-- Empty state -->
+    <div v-else-if="orders.length === 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
+      <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <svg class="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
       </div>
+      <p class="font-semibold text-gray-700 mb-1">No orders yet</p>
+      <p class="text-sm text-gray-400">Orders will appear here once customers start purchasing</p>
+    </div>
 
-      <div v-else-if="orders.length === 0" class="card text-center py-12">
-        <p class="text-gray-500">No orders yet</p>
-      </div>
-
-      <div v-else class="space-y-4">
-        <div v-for="order in orders" :key="order.id" class="card">
-          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
+    <!-- Orders list -->
+    <div v-else class="space-y-4">
+      <div
+        v-for="order in orders"
+        :key="order.id"
+        class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+      >
+        <!-- Card header -->
+        <div class="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <!-- Status dot -->
+            <span
+              class="w-2.5 h-2.5 rounded-full shrink-0"
+              :class="{
+                'bg-amber-400': order.status === 'pending',
+                'bg-blue-500': order.status === 'processing',
+                'bg-purple-500': order.status === 'shipped',
+                'bg-green-500': order.status === 'delivered',
+                'bg-gray-400': order.status === 'cancelled',
+              }"
+            />
             <div>
-              <h3 class="text-lg font-semibold">Order #{{ order.id }}</h3>
-              <p class="text-sm text-gray-600">{{ formatDate(order.created_at) }}</p>
+              <p class="text-sm font-semibold text-gray-900">Order #{{ order.id }}</p>
+              <p class="text-xs text-gray-400">{{ formatDate(order.created_at) }}</p>
             </div>
-            <div class="flex items-center space-x-4 mt-3 lg:mt-0">
+          </div>
+
+          <!-- Status selector -->
+          <div class="flex items-center gap-2 shrink-0">
+            <div class="relative">
               <select
                 v-model="order.status"
                 @change="updateOrderStatus(order.id, order.status)"
-                class="input-field py-2 text-sm"
                 :disabled="updatingOrderId === order.id"
+                class="appearance-none text-sm font-medium rounded-lg border px-3 py-1.5 pr-8 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                :class="{
+                  'bg-amber-50 border-amber-200 text-amber-800': order.status === 'pending',
+                  'bg-blue-50 border-blue-200 text-blue-800': order.status === 'processing',
+                  'bg-purple-50 border-purple-200 text-purple-800': order.status === 'shipped',
+                  'bg-green-50 border-green-200 text-green-800': order.status === 'delivered',
+                  'bg-gray-100 border-gray-200 text-gray-600': order.status === 'cancelled',
+                }"
               >
                 <option value="pending">Pending</option>
                 <option value="processing">Processing</option>
@@ -45,47 +89,68 @@
                 <option value="delivered">Delivered</option>
                 <option value="cancelled">Cancelled</option>
               </select>
-              <span v-if="updatingOrderId === order.id" class="text-sm text-gray-500">Updating...</span>
+              <!-- Custom chevron -->
+              <span class="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+                <svg v-if="updatingOrderId === order.id" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                <svg v-else class="w-3.5 h-3.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer + Shipping grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+          <div class="px-6 py-4">
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Customer</p>
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-gray-900">{{ order.customer_name }}</p>
+              <p class="text-sm text-gray-500">{{ order.customer_email }}</p>
+              <p v-if="order.customer_phone" class="text-sm text-gray-500">{{ order.customer_phone }}</p>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <h4 class="font-semibold text-sm text-gray-700 mb-2">Customer Information</h4>
-              <p class="text-sm"><span class="font-medium">Name:</span> {{ order.customer_name }}</p>
-              <p class="text-sm"><span class="font-medium">Email:</span> {{ order.customer_email }}</p>
-              <p class="text-sm" v-if="order.customer_phone"><span class="font-medium">Phone:</span> {{ order.customer_phone }}</p>
-            </div>
-
-            <div>
-              <h4 class="font-semibold text-sm text-gray-700 mb-2">Shipping Address</h4>
-              <p class="text-sm">{{ order.shipping_address }}</p>
-            </div>
+          <div class="px-6 py-4">
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Ship To</p>
+            <p class="text-sm text-gray-600 leading-relaxed">{{ order.shipping_address }}</p>
           </div>
+        </div>
 
-          <div>
-            <h4 class="font-semibold text-sm text-gray-700 mb-2">Order Items</h4>
-            <div v-if="order.items && order.items.length > 0" class="space-y-2">
-              <div v-for="item in order.items" :key="item.id" class="flex justify-between text-sm bg-gray-50 p-2 rounded">
-                <span>{{ item.product_name }} x{{ item.quantity }}</span>
-                <span class="font-medium">${{ (parseFloat(String(item.product_price)) * item.quantity).toFixed(2) }}</span>
+        <!-- Order items -->
+        <div class="px-6 py-4 border-t border-gray-100">
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Items</p>
+
+          <div v-if="order.items && order.items.length > 0" class="space-y-2">
+            <div
+              v-for="item in order.items"
+              :key="item.id"
+              class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg"
+            >
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="text-xs font-semibold text-gray-400 bg-gray-200 rounded px-1.5 py-0.5 shrink-0">
+                  ×{{ item.quantity }}
+                </span>
+                <span class="text-sm text-gray-700 truncate">{{ item.product_name }}</span>
               </div>
+              <span class="text-sm font-semibold text-gray-900 shrink-0 ml-3">
+                ${{ (parseFloat(String(item.product_price)) * item.quantity).toFixed(2) }}
+              </span>
             </div>
-            <div v-else class="text-sm text-gray-500">No items</div>
           </div>
 
-          <div class="mt-4 pt-4 border-t flex justify-between items-center">
-            <span class="text-lg font-bold">Total: ${{ parseFloat(String(order.total_amount)).toFixed(2) }}</span>
-            <span class="px-3 py-1 text-sm rounded-full" :class="{
-              'bg-yellow-100 text-yellow-800': order.status === 'pending',
-              'bg-blue-100 text-blue-800': order.status === 'processing',
-              'bg-purple-100 text-purple-800': order.status === 'shipped',
-              'bg-green-100 text-green-800': order.status === 'delivered',
-              'bg-red-100 text-red-800': order.status === 'cancelled'
-            }">
-              {{ order.status.charAt(0).toUpperCase() + order.status.slice(1) }}
-            </span>
-          </div>
+          <p v-else class="text-sm text-gray-400 italic">No items recorded</p>
+        </div>
+
+        <!-- Card footer: total -->
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between">
+          <p class="text-xs text-gray-400 font-medium uppercase tracking-wider">Order Total</p>
+          <p class="text-lg font-bold text-gray-900">
+            ${{ parseFloat(String(order.total_amount)).toFixed(2) }}
+          </p>
         </div>
       </div>
     </div>

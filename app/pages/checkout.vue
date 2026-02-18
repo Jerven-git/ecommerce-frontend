@@ -1,315 +1,329 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 class="text-3xl font-bold mb-8">Checkout</h1>
+  <div class="min-h-screen flex flex-col">
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Checkout Form -->
-        <div class="lg:col-span-2 space-y-6">
-          <!-- Customer Information -->
-          <div class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-xl font-bold mb-4">Customer Information</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-                <input v-model="form.customer_name" type="text" required class="input-field" />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                <input v-model="form.customer_email" type="email" required class="input-field" />
-              </div>
-              <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                <input v-model="form.customer_phone" type="tel" class="input-field" />
+    <!-- Page Header -->
+    <div class="bg-white border-b border-gray-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Almost there</p>
+        <h1 class="text-3xl font-bold text-gray-900">Checkout</h1>
+        <p class="text-sm text-gray-500 mt-1">Complete your order below</p>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+          <!-- Left: Form -->
+          <div class="lg:col-span-2 space-y-5">
+
+            <!-- Customer Information -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Customer Information</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Full Name *</label>
+                  <input v-model="form.customer_name" type="text" required class="input-field" placeholder="Jane Smith" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Email *</label>
+                  <input v-model="form.customer_email" type="email" required class="input-field" placeholder="jane@example.com" />
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Phone</label>
+                  <input v-model="form.customer_phone" type="tel" class="input-field" placeholder="+1 555 000 0000" />
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Delivery Method -->
-          <div class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-xl font-bold mb-4">Delivery Method</h2>
-            <div class="space-y-3">
-              <label
-                class="flex items-start p-4 border-2 rounded-lg cursor-pointer transition-colors"
-                :class="deliveryMethod === 'delivery'
-                  ? 'border-blue-600 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300'"
-              >
-                <input
-                  v-model="deliveryMethod"
-                  type="radio"
-                  value="delivery"
-                  class="mt-1 h-4 w-4 text-blue-600"
+            <!-- Delivery Method -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Delivery Method</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                <label
+                  class="relative flex items-start gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all"
+                  :class="deliveryMethod === 'delivery'
+                    ? 'border-blue-500 bg-blue-50/50'
+                    : 'border-gray-200 hover:border-gray-300 bg-white'"
                 >
-                <div class="ml-3 flex-1">
-                  <div class="flex items-center justify-between">
-                    <span class="font-semibold">Delivery</span>
-                    <span
-                      v-if="deliveryMethod === 'delivery'"
-                      class="text-xs bg-blue-600 text-white px-2 py-1 rounded"
-                    >Selected</span>
-                  </div>
-                  <p class="text-sm text-gray-600 mt-1">Get it delivered to your address</p>
-                </div>
-              </label>
-
-              <label
-                class="flex items-start p-4 border-2 rounded-lg cursor-pointer transition-colors"
-                :class="deliveryMethod === 'pickup'
-                  ? 'border-blue-600 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300'"
-              >
-                <input
-                  v-model="deliveryMethod"
-                  type="radio"
-                  value="pickup"
-                  class="mt-1 h-4 w-4 text-blue-600"
-                >
-                <div class="ml-3 flex-1">
-                  <div class="flex items-center justify-between">
-                    <span class="font-semibold">Self Pickup</span>
-                    <span
-                      v-if="deliveryMethod === 'pickup'"
-                      class="text-xs bg-blue-600 text-white px-2 py-1 rounded"
-                    >Selected</span>
-                  </div>
-                  <p class="text-sm text-gray-600 mt-1">Pick up from our store - No shipping fee</p>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <!-- Shipping Address -->
-          <div v-if="deliveryMethod === 'delivery'" class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-xl font-bold mb-4">Shipping Address</h2>
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Street Address *</label>
-                <textarea v-model="form.shipping_address" required rows="3" class="input-field"></textarea>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">City *</label>
-                  <input v-model="form.city" type="text" required class="input-field" @change="updateShipping" />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">State/Province *</label>
-                  <input v-model="form.state" type="text" required class="input-field" @change="updateShipping" />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Country *</label>
-                  <input v-model="form.country" type="text" required class="input-field" @change="updateShipping" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Shipping Options -->
-          <div v-if="deliveryMethod === 'delivery'" class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-xl font-bold mb-4">Additional Shipping Services</h2>
-
-            <div v-if="shippingOptions.length === 0" class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded">
-              <p class="text-sm text-yellow-800">
-                <strong>No shipping options configured.</strong>
-              </p>
-            </div>
-
-            <p v-else class="text-sm text-gray-600 mb-4">Select optional services for your delivery</p>
-
-            <div v-if="shippingOptions.length > 0" class="space-y-3">
-              <label
-                v-for="option in shippingOptions"
-                :key="option.id"
-                class="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-              >
-                <input
-                  type="checkbox"
-                  :value="option.id"
-                  v-model="selectedShippingOptions"
-                  @change="updateShippingOptions"
-                  class="mt-1 h-4 w-4 text-blue-600"
-                />
-                <div class="ml-3 flex-1">
-                  <div class="flex justify-between items-start">
-                    <div>
-                      <span class="font-medium">{{ option.name }}</span>
-                      <p class="text-sm text-gray-600 mt-1">{{ option.description }}</p>
+                  <input v-model="deliveryMethod" type="radio" value="delivery" class="mt-0.5 h-4 w-4 text-blue-600 shrink-0" />
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-sm font-semibold text-gray-900">Delivery</span>
+                      <span
+                        v-if="deliveryMethod === 'delivery'"
+                        class="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full font-medium shrink-0"
+                      >Selected</span>
                     </div>
-                    <span class="font-semibold text-blue-600 ml-4">
-                      +${{ parseFloat(option.fee || 0).toFixed(2) }}
-                    </span>
+                    <p class="text-xs text-gray-500 mt-0.5">Delivered to your address</p>
                   </div>
-                </div>
-              </label>
-            </div>
-          </div>
+                </label>
 
-          <!-- Payment Method Selection -->
-          <div class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-xl font-bold mb-4">Payment Method</h2>
-
-            <div v-if="loadingPaymentMethods" class="text-center py-4">
-              <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p class="text-sm text-gray-600 mt-2">Loading payment methods...</p>
-            </div>
-
-            <div v-else-if="paymentMethods.length === 0" class="p-4 bg-yellow-50 border border-yellow-200 rounded">
-              <p class="text-sm text-yellow-800">
-                <strong>No payment methods available.</strong><br>
-                Please enable payment methods in Admin → Payment Settings.
-              </p>
-            </div>
-
-            <div v-else class="space-y-3">
-              <label
-                v-for="method in paymentMethods"
-                :key="method.id"
-                class="flex items-start p-4 border-2 rounded-lg cursor-pointer transition-colors"
-                :class="selectedPaymentMethod === method.id
-                  ? 'border-blue-600 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300'"
-              >
-                <input
-                  v-model="selectedPaymentMethod"
-                  type="radio"
-                  :value="method.id"
-                  class="mt-1 h-4 w-4 text-blue-600"
+                <label
+                  class="relative flex items-start gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all"
+                  :class="deliveryMethod === 'pickup'
+                    ? 'border-blue-500 bg-blue-50/50'
+                    : 'border-gray-200 hover:border-gray-300 bg-white'"
                 >
-                <div class="ml-3 flex-1">
-                  <div class="flex items-center justify-between">
-                    <span class="font-semibold">{{ method.name }}</span>
-                    <span
-                      v-if="selectedPaymentMethod === method.id"
-                      class="text-xs bg-blue-600 text-white px-2 py-1 rounded"
-                    >Selected</span>
+                  <input v-model="deliveryMethod" type="radio" value="pickup" class="mt-0.5 h-4 w-4 text-blue-600 shrink-0" />
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-sm font-semibold text-gray-900">Self Pickup</span>
+                      <span
+                        v-if="deliveryMethod === 'pickup'"
+                        class="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full font-medium shrink-0"
+                      >Selected</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-0.5">Collect in-store · No shipping fee</p>
                   </div>
-                  <p class="text-sm text-gray-600 mt-1">{{ method.description }}</p>
-                </div>
-              </label>
+                </label>
+
+              </div>
             </div>
-          </div>
 
-          <!-- Payment Area -->
-          <div
-            v-if="selectedPaymentMethod && selectedPaymentMethod !== 'cash' && canShowPaymentUI"
-            class="bg-white rounded-lg shadow p-6"
-          >
-            <h2 class="text-xl font-bold mb-4">Payment</h2>
+            <!-- Shipping Address -->
+            <div v-if="deliveryMethod === 'delivery'" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Shipping Address</h2>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Street Address *</label>
+                  <textarea v-model="form.shipping_address" required rows="3" class="input-field resize-none" placeholder="123 Main St, Apt 4B"></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">City *</label>
+                    <input v-model="form.city" type="text" required class="input-field" @change="updateShipping" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">State / Province *</label>
+                    <input v-model="form.state" type="text" required class="input-field" @change="updateShipping" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Country *</label>
+                    <input v-model="form.country" type="text" required class="input-field" @change="updateShipping" />
+                  </div>
+                </div>
+              </div>
+            </div>
 
-            <!-- Stripe SDK -->
-            <div v-if="selectedPaymentMethod === 'stripe'">
-              <div v-if="!createdOrderId" class="space-y-3">
-                <p class="text-sm text-gray-600">
-                  Click continue to create your order and load the card form.
-                </p>
+            <!-- Shipping Options -->
+            <div v-if="deliveryMethod === 'delivery'" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Additional Shipping Services</h2>
+
+              <div v-if="shippingOptions.length === 0" class="flex items-start gap-3 p-4 bg-amber-50 border border-amber-100 rounded-xl">
+                <svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-xs text-amber-800 font-medium">No additional shipping options configured.</p>
+              </div>
+
+              <div v-else class="space-y-3">
+                <p class="text-sm text-gray-500 mb-3">Select optional add-ons for your delivery</p>
+                <label
+                  v-for="option in shippingOptions"
+                  :key="option.id"
+                  class="flex items-start gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 hover:bg-gray-50/50 transition-all"
+                >
+                  <input
+                    type="checkbox"
+                    :value="option.id"
+                    v-model="selectedShippingOptions"
+                    @change="updateShippingOptions"
+                    class="mt-0.5 h-4 w-4 text-blue-600 rounded shrink-0"
+                  />
+                  <div class="flex-1 min-w-0 flex items-start justify-between gap-4">
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">{{ option.name }}</p>
+                      <p class="text-xs text-gray-500 mt-0.5">{{ option.description }}</p>
+                    </div>
+                    <span class="text-sm font-bold text-blue-600 shrink-0">+${{ parseFloat(option.fee || 0).toFixed(2) }}</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Payment Method</h2>
+
+              <!-- Loading -->
+              <div v-if="loadingPaymentMethods" class="flex items-center gap-3 py-4">
+                <div class="w-5 h-5 rounded-full border-2 border-blue-500 border-t-transparent animate-spin shrink-0"></div>
+                <p class="text-sm text-gray-500">Loading payment methods…</p>
+              </div>
+
+              <!-- None available -->
+              <div v-else-if="paymentMethods.length === 0" class="flex items-start gap-3 p-4 bg-amber-50 border border-amber-100 rounded-xl">
+                <svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-xs text-amber-800 font-medium">No payment methods available. Please enable them in Admin → Payment Settings.</p>
+              </div>
+
+              <!-- Method tiles -->
+              <div v-else class="space-y-3">
+                <label
+                  v-for="method in paymentMethods"
+                  :key="method.id"
+                  class="flex items-start gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all"
+                  :class="selectedPaymentMethod === method.id
+                    ? 'border-blue-500 bg-blue-50/50'
+                    : 'border-gray-200 hover:border-gray-300 bg-white'"
+                >
+                  <input
+                    v-model="selectedPaymentMethod"
+                    type="radio"
+                    :value="method.id"
+                    class="mt-0.5 h-4 w-4 text-blue-600 shrink-0"
+                  />
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-sm font-semibold text-gray-900">{{ method.name }}</span>
+                      <span
+                        v-if="selectedPaymentMethod === method.id"
+                        class="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full font-medium shrink-0"
+                      >Selected</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-0.5">{{ method.description }}</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Payment UI (Stripe / Redirect) -->
+            <div
+              v-if="selectedPaymentMethod && selectedPaymentMethod !== 'cash' && canShowPaymentUI"
+              class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+            >
+              <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Payment</h2>
+
+              <!-- Stripe -->
+              <div v-if="selectedPaymentMethod === 'stripe'">
+                <div v-if="!createdOrderId" class="space-y-4">
+                  <p class="text-sm text-gray-500">Click continue to create your order and load the card form.</p>
+                  <button
+                    @click="createOrderOnly"
+                    :disabled="submitting || !isFormValid"
+                    class="btn-primary w-full"
+                  >
+                    {{ submitting ? 'Processing…' : 'Continue to Card Payment' }}
+                  </button>
+                </div>
+                <StripePayment
+                  v-else
+                  :order-id="String(createdOrderId)"
+                  :amount="finalTotal"
+                  :publishable-key="getPaymentConfig('stripe')?.publishable_key"
+                  :customer-email="form.customer_email"
+                  @success="handleStripeSuccess"
+                  @error="handlePaymentError"
+                />
+              </div>
+
+              <!-- Redirect providers (PayPal, Square, etc.) -->
+              <div v-else class="space-y-4">
+                <p class="text-sm text-gray-500">You will be redirected to complete payment.</p>
                 <button
-                  @click="createOrderOnly"
+                  @click="placeOrderAndRedirect"
                   :disabled="submitting || !isFormValid"
                   class="btn-primary w-full"
                 >
-                  {{ submitting ? 'Processing...' : 'Continue to Card Payment' }}
+                  {{ submitting ? 'Processing…' : 'Place Order & Pay' }}
                 </button>
               </div>
 
-              <StripePayment
-                v-else
-                :order-id="String(createdOrderId)"
-                :amount="finalTotal"
-                :publishable-key="getPaymentConfig('stripe')?.publishable_key"
-                :customer-email="form.customer_email"
-                @success="handleStripeSuccess"
-                @error="handlePaymentError"
-              />
+              <div v-if="error" class="mt-4 flex items-start gap-2.5 p-3.5 bg-red-50 border border-red-100 rounded-xl">
+                <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-sm text-red-700">{{ error }}</p>
+              </div>
             </div>
 
-            <!-- Redirect Providers -->
-            <div v-else class="space-y-3">
-              <p class="text-sm text-gray-600">You will be redirected to complete payment.</p>
+            <!-- Cash on Delivery -->
+            <div v-if="selectedPaymentMethod === 'cash'" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Place Order</h2>
               <button
-                @click="placeOrderAndRedirect"
+                @click="placeCashOrder"
                 :disabled="submitting || !isFormValid"
                 class="btn-primary w-full"
               >
-                {{ submitting ? 'Processing...' : 'Place Order & Pay' }}
+                {{ submitting ? 'Processing…' : 'Place Order (Cash on Delivery)' }}
               </button>
-            </div>
 
-            <div v-if="error" class="mt-4 p-3 bg-red-50 rounded text-sm text-red-800">
-              {{ error }}
-            </div>
-          </div>
-
-          <!-- Cash -->
-          <div v-if="selectedPaymentMethod === 'cash'" class="bg-white rounded-lg shadow p-6">
-            <button
-              @click="placeCashOrder"
-              :disabled="submitting || !isFormValid"
-              class="btn-primary w-full"
-            >
-              {{ submitting ? 'Processing...' : 'Place Order (Cash on Delivery)' }}
-            </button>
-
-            <div v-if="error" class="mt-4 p-3 bg-red-50 rounded text-sm text-red-800">
-              {{ error }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Order Summary -->
-        <div class="lg:col-span-1">
-          <div class="bg-white rounded-lg shadow p-6 sticky top-4">
-            <h2 class="text-xl font-bold mb-4">Order Summary</h2>
-
-            <div class="space-y-3 mb-4 pb-4 border-b max-h-64 overflow-y-auto">
-              <div v-for="item in cartStore.items" :key="item.id" class="flex justify-between text-sm">
-                <span class="text-gray-700">{{ item.name }} × {{ item.quantity }}</span>
-                <span class="font-medium">${{ (item.price * item.quantity).toFixed(2) }}</span>
+              <div v-if="error" class="mt-4 flex items-start gap-2.5 p-3.5 bg-red-50 border border-red-100 rounded-xl">
+                <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-sm text-red-700">{{ error }}</p>
               </div>
             </div>
 
-            <div class="space-y-2 mb-4 pb-4 border-b">
-              <div class="flex justify-between text-gray-700">
-                <span>Subtotal</span>
-                <span>${{ cartStore.subtotal.toFixed(2) }}</span>
-              </div>
+          </div>
 
-              <div v-if="cartStore.taxInfo.enabled">
-                <div v-if="cartStore.taxInfo.mode === 'inclusive'" class="text-sm text-gray-600 italic">
-                  <p>(Includes {{ cartStore.taxInfo.name }} {{ cartStore.taxInfo.rate }}%: ${{ cartStore.taxAmount.toFixed(2) }})</p>
-                </div>
-                <div v-else class="flex justify-between text-gray-700">
-                  <span>{{ cartStore.taxInfo.name }} ({{ cartStore.taxInfo.rate }}%)</span>
-                  <span>${{ cartStore.taxAmount.toFixed(2) }}</span>
+          <!-- Right: Order Summary -->
+          <div class="lg:col-span-1">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sticky top-4">
+              <h2 class="text-base font-bold text-gray-900 mb-5">Order Summary</h2>
+
+              <!-- Item list -->
+              <div class="space-y-2.5 pb-4 border-b border-gray-100 max-h-60 overflow-y-auto">
+                <div v-for="item in cartStore.items" :key="item.id" class="flex justify-between items-start gap-2">
+                  <span class="text-sm text-gray-600 leading-snug">{{ item.name }} <span class="text-gray-400">×{{ item.quantity }}</span></span>
+                  <span class="text-sm font-medium text-gray-900 shrink-0">${{ (item.price * item.quantity).toFixed(2) }}</span>
                 </div>
               </div>
 
-              <div v-if="deliveryMethod === 'pickup'" class="flex justify-between text-green-600 font-semibold">
-                <span>Shipping (Self Pickup)</span>
-                <span>FREE</span>
-              </div>
-              <div v-else-if="!cartStore.shippingCalculation" class="flex justify-between text-gray-400">
-                <span>Shipping</span>
-                <span class="text-sm">Enter address</span>
-              </div>
-              <div v-else>
-                <div class="flex justify-between text-gray-700 font-medium">
+              <!-- Totals -->
+              <div class="space-y-2.5 py-4 border-b border-gray-100">
+                <div class="flex justify-between text-sm text-gray-600">
+                  <span>Subtotal</span>
+                  <span class="font-medium text-gray-900">${{ cartStore.subtotal.toFixed(2) }}</span>
+                </div>
+
+                <template v-if="cartStore.taxInfo.enabled">
+                  <div v-if="cartStore.taxInfo.mode === 'inclusive'" class="text-xs text-gray-400">
+                    Includes {{ cartStore.taxInfo.name }} {{ cartStore.taxInfo.rate }}%:
+                    <span class="font-medium">${{ cartStore.taxAmount.toFixed(2) }}</span>
+                  </div>
+                  <div v-else class="flex justify-between text-sm text-gray-600">
+                    <span>{{ cartStore.taxInfo.name }} ({{ cartStore.taxInfo.rate }}%)</span>
+                    <span class="font-medium text-gray-900">${{ cartStore.taxAmount.toFixed(2) }}</span>
+                  </div>
+                </template>
+
+                <div v-if="deliveryMethod === 'pickup'" class="flex justify-between text-sm">
+                  <span class="text-gray-600">Shipping (Pickup)</span>
+                  <span class="font-semibold text-green-600">FREE</span>
+                </div>
+                <div v-else-if="!cartStore.shippingCalculation" class="flex justify-between text-sm text-gray-400">
                   <span>Shipping</span>
-                  <span v-if="cartStore.shippingCalculation.free_shipping" class="text-green-600">FREE</span>
-                  <span v-else>${{ cartStore.shippingCost.toFixed(2) }}</span>
+                  <span class="italic">Enter address</span>
+                </div>
+                <div v-else class="flex justify-between text-sm text-gray-600">
+                  <span>Shipping</span>
+                  <span v-if="cartStore.shippingCalculation.free_shipping" class="font-semibold text-green-600">FREE</span>
+                  <span v-else class="font-medium text-gray-900">${{ cartStore.shippingCost.toFixed(2) }}</span>
                 </div>
               </div>
-            </div>
 
-            <div class="flex justify-between text-2xl font-bold mb-6">
-              <span>Total</span>
-              <span>${{ finalTotal.toFixed(2) }}</span>
-            </div>
+              <div class="flex justify-between items-center pt-4">
+                <span class="font-bold text-gray-900">Total</span>
+                <span class="text-xl font-bold text-gray-900">${{ finalTotal.toFixed(2) }}</span>
+              </div>
 
-            <NuxtLink to="/cart" class="btn-secondary w-full block text-center">Back to Cart</NuxtLink>
+              <NuxtLink to="/cart" class="btn-secondary w-full block text-center mt-5">
+                Back to Cart
+              </NuxtLink>
+            </div>
           </div>
+
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
