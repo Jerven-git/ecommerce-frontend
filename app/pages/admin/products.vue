@@ -144,6 +144,16 @@
       </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <ConfirmDeleteModal
+      :open="showDeleteModal"
+      title="Delete Product"
+      message="Are you sure you want to delete this product? This action cannot be undone."
+      :deleting="deleting"
+      @confirm="confirmDelete"
+      @cancel="showDeleteModal = false"
+    />
+
     <!-- Add / Edit Modal -->
     <Teleport to="body">
       <Transition
@@ -324,6 +334,9 @@ const showModal = ref(false)
 const submitting = ref(false)
 const formError = ref<string | null>(null)
 const editingProduct = ref<Product | null>(null)
+const showDeleteModal = ref(false)
+const deletingId = ref<number | null>(null)
+const deleting = ref(false)
 
 const form = ref({
   name: '',
@@ -427,18 +440,24 @@ const saveProduct = async () => {
   }
 }
 
-const deleteProduct = async (id: number) => {
-  if (!confirm('Are you sure you want to delete this product?')) return
+const deleteProduct = (id: number) => {
+  deletingId.value = id
+  showDeleteModal.value = true
+}
+
+const confirmDelete = async () => {
+  if (!deletingId.value) return
+  deleting.value = true
 
   try {
-    await $apiFetch(`/products/${id}`, {
-      method: 'DELETE'
-    })
-
+    await $apiFetch(`/products/${deletingId.value}`, { method: 'DELETE' })
     await loadProducts()
+    showDeleteModal.value = false
+    deletingId.value = null
   } catch (err: any) {
     console.error('Error deleting product:', err)
-    alert(err?.data?.message || 'Failed to delete product')
+  } finally {
+    deleting.value = false
   }
 }
 

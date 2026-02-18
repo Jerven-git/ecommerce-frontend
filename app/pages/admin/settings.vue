@@ -253,8 +253,8 @@
             <label class="block text-sm font-medium text-gray-700 mb-1.5">About Image</label>
 
             <!-- About Preview -->
-            <div v-if="form.about_image_url" class="relative rounded-xl overflow-hidden border border-gray-200 inline-block">
-              <img :src="form.about_image_url" alt="About Image" class="max-w-xs w-full h-40 object-cover" />
+            <div v-if="form.about_image_url" class="relative rounded-xl overflow-hidden border border-gray-200">
+              <img :src="form.about_image_url" alt="About Image" class="w-full h-40 object-cover" />
               <button
                 @click="removeAboutImage"
                 type="button"
@@ -323,8 +323,8 @@
             <label class="block text-sm font-medium text-gray-700 mb-1.5">Contact Image</label>
 
             <!-- Contact Preview -->
-            <div v-if="form.contact_image_url" class="relative rounded-xl overflow-hidden border border-gray-200 inline-block">
-              <img :src="form.contact_image_url" alt="Contact Image" class="max-w-xs w-full h-40 object-cover" />
+            <div v-if="form.contact_image_url" class="relative rounded-xl overflow-hidden border border-gray-200">
+              <img :src="form.contact_image_url" alt="Contact Image" class="w-full h-40 object-cover" />
               <button
                 @click="removeContactImage"
                 type="button"
