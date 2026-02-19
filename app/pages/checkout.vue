@@ -276,6 +276,53 @@
                 </div>
               </div>
 
+              <!-- Discount Code -->
+              <div class="py-4 border-b border-gray-100">
+                <div v-if="!appliedDiscount" class="flex gap-2">
+                  <input
+                    v-model="discountCode"
+                    type="text"
+                    class="input-field flex-1 uppercase font-mono tracking-widest text-sm"
+                    placeholder="DISCOUNT CODE"
+                    :disabled="applyingDiscount"
+                    @keydown.enter.prevent="applyDiscount"
+                  />
+                  <button
+                    type="button"
+                    @click="applyDiscount"
+                    :disabled="applyingDiscount || !discountCode.trim()"
+                    class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg transition-colors shrink-0"
+                  >
+                    <span v-if="applyingDiscount" class="flex items-center gap-1.5">
+                      <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                    </span>
+                    <span v-else>Apply</span>
+                  </button>
+                </div>
+                <div v-else class="flex items-center justify-between px-3 py-2 bg-green-50 border border-green-100 rounded-lg">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <div>
+                      <p class="text-xs font-bold text-green-700 font-mono tracking-wider">{{ appliedDiscount.code }}</p>
+                      <p class="text-xs text-green-600">
+                        {{ appliedDiscount.type === 'percentage' ? `${appliedDiscount.value}% off` : `$${parseFloat(String(appliedDiscount.value)).toFixed(2)} off` }}
+                      </p>
+                    </div>
+                  </div>
+                  <button type="button" @click="removeDiscount" class="text-gray-400 hover:text-red-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <p v-if="discountError" class="mt-1.5 text-xs text-red-600">{{ discountError }}</p>
+              </div>
+
               <!-- Totals -->
               <div class="space-y-2.5 py-4 border-b border-gray-100">
                 <div class="flex justify-between text-sm text-gray-600">
@@ -306,6 +353,11 @@
                   <span>Shipping</span>
                   <span v-if="cartStore.shippingCalculation.free_shipping" class="font-semibold text-green-600">FREE</span>
                   <span v-else class="font-medium text-gray-900">${{ cartStore.shippingCost.toFixed(2) }}</span>
+                </div>
+
+                <div v-if="appliedDiscount" class="flex justify-between text-sm text-green-700">
+                  <span>Discount ({{ appliedDiscount.code }})</span>
+                  <span class="font-semibold">-${{ discountAmount.toFixed(2) }}</span>
                 </div>
               </div>
 
@@ -352,6 +404,11 @@ const loadingPaymentMethods = ref(true)
 const submitting = ref(false)
 const error = ref<string | null>(null)
 
+const discountCode = ref('')
+const appliedDiscount = ref<{ code: string; type: 'percentage' | 'fixed'; value: number } | null>(null)
+const applyingDiscount = ref(false)
+const discountError = ref<string | null>(null)
+
 // store created order id (so Stripe can mount after order exists)
 const createdOrderId = ref<number | null>(null)
 
@@ -372,14 +429,60 @@ const isFormValid = computed(() => {
 
 const canShowPaymentUI = computed(() => isFormValid.value)
 
-const finalTotal = computed(() => {
-  if (deliveryMethod.value === 'pickup') {
-    return cartStore.taxInfo.mode === 'inclusive'
-      ? cartStore.subtotal
-      : cartStore.subtotal + cartStore.taxAmount
+const discountAmount = computed(() => {
+  if (!appliedDiscount.value) return 0
+  const base = cartStore.subtotal
+  if (appliedDiscount.value.type === 'percentage') {
+    return Math.min(base * (appliedDiscount.value.value / 100), base)
   }
-  return cartStore.grandTotal
+  return Math.min(appliedDiscount.value.value, base)
 })
+
+const finalTotal = computed(() => {
+  const base = (() => {
+    if (deliveryMethod.value === 'pickup') {
+      return cartStore.taxInfo.mode === 'inclusive'
+        ? cartStore.subtotal
+        : cartStore.subtotal + cartStore.taxAmount
+    }
+    return cartStore.grandTotal
+  })()
+  return Math.max(0, base - discountAmount.value)
+})
+
+const applyDiscount = async () => {
+  const code = discountCode.value.trim().toUpperCase()
+  if (!code) return
+
+  applyingDiscount.value = true
+  discountError.value = null
+
+  try {
+    const res = await $apiFetch<any>('/discounts/validate', {
+      method: 'POST',
+      body: { code, order_amount: cartStore.subtotal }
+    })
+    
+    const unwrapped = res?.data ?? res
+    const discount = unwrapped?.discount ?? unwrapped
+    appliedDiscount.value = {
+      code: discount.code ?? code,
+      type: discount.type,
+      value: parseFloat(String(discount.value ?? 0))
+    }
+    discountCode.value = ''
+  } catch (err: any) {
+    discountError.value = err?.data?.message || 'Invalid or expired discount code.'
+  } finally {
+    applyingDiscount.value = false
+  }
+}
+
+const removeDiscount = () => {
+  appliedDiscount.value = null
+  discountCode.value = ''
+  discountError.value = null
+}
 
 const getPaymentConfig = (methodId: string) => {
   const method = paymentMethods.value.find(m => m.id === methodId)
@@ -458,7 +561,8 @@ const buildOrderData = () => {
     })),
     shipping_options: deliveryMethod.value === 'delivery'
       ? selectedShippingOptions.value
-      : []
+      : [],
+    discount_code: appliedDiscount.value?.code ?? null
   }
 }
 
@@ -528,7 +632,6 @@ const placeOrderAndRedirect = async () => {
   }
 }
 
-// StripePayment should emit backend payment_id (not the paymentIntent id)
 const handleStripeSuccess = async (paymentId: string) => {
   localStorage.setItem('last_payment_id', paymentId)
   navigateTo(`/payment/complete?payment_id=${paymentId}`)
