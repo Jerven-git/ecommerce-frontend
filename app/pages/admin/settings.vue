@@ -124,7 +124,7 @@
                     :style="{ backgroundColor: form.primary_color }"
                   />
                 </div>
-                <input v-model="form.primary_color" type="text" class="input-field font-mono text-sm" placeholder="#2563eb" />
+                <input v-model="form.primary_color" type="text" class="input-field font-mono text-sm" placeholder="#6898ED" />
               </div>
             </div>
 
@@ -139,7 +139,7 @@
                     :style="{ backgroundColor: form.secondary_color }"
                   />
                 </div>
-                <input v-model="form.secondary_color" type="text" class="input-field font-mono text-sm" placeholder="#10b981" />
+                <input v-model="form.secondary_color" type="text" class="input-field font-mono text-sm" placeholder="#4B5979" />
               </div>
             </div>
           </div>
@@ -508,8 +508,8 @@ const contactImageInput = ref<HTMLInputElement | null>(null)
 
 const form = ref({
   site_name: "",
-  primary_color: "#2563eb",
-  secondary_color: "#10b981",
+  primary_color: "#6898ED",
+  secondary_color: "#4B5979",
   logo_url: "",
   hero_title: "",
   hero_subtitle: "",
@@ -625,8 +625,8 @@ const loadSettings = async () => {
 
       form.value = {
         site_name: response.data.site_name || "",
-        primary_color: response.data.primary_color || "#2563eb",
-        secondary_color: response.data.secondary_color || "#10b981",
+        primary_color: response.data.primary_color || "#6898ED",
+        secondary_color: response.data.secondary_color || "#4B5979",
         logo_url: response.data.logo_url || "",
         hero_title: response.data.hero_title || "",
         hero_subtitle: response.data.hero_subtitle || "",

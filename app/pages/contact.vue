@@ -180,12 +180,12 @@
     </section>
 
     <!-- Support Promise Strip -->
-    <section class="bg-gray-900 text-white py-14">
+    <section class="bg-[#4B5979] text-white py-14">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div class="group flex flex-col items-center px-6">
-            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-indigo-500 transition-colors duration-300">
-              <svg class="w-6 h-6 text-indigo-400 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-blue-500 transition-colors duration-300">
+              <svg class="w-6 h-6 text-blue-400 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
@@ -194,8 +194,8 @@
           </div>
 
           <div class="group flex flex-col items-center px-6 border-y md:border-y-0 md:border-x border-white/10 py-8 md:py-0">
-            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-indigo-500 transition-colors duration-300">
-              <svg class="w-6 h-6 text-indigo-400 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-blue-500 transition-colors duration-300">
+              <svg class="w-6 h-6 text-blue-400 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
@@ -204,8 +204,8 @@
           </div>
 
           <div class="group flex flex-col items-center px-6">
-            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-indigo-500 transition-colors duration-300">
-              <svg class="w-6 h-6 text-indigo-400 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-blue-500 transition-colors duration-300">
+              <svg class="w-6 h-6 text-blue-400 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
@@ -331,8 +331,8 @@ const heroStyle = computed(() => {
   }
 
   return {
-    backgroundImage: `linear-gradient(135deg, ${siteConfig.value?.primary_color || '#4f46e5'}, ${
-      siteConfig.value?.secondary_color || '#111827'
+    backgroundImage: `linear-gradient(135deg, ${siteConfig.value?.primary_color || '#6898ED'}, ${
+      siteConfig.value?.secondary_color || '#4B5979'
     })`,
   }
 })

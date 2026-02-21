@@ -5,7 +5,7 @@
         <div>
           <NuxtLink to="/" class="inline-block mb-4">
             <img v-if="siteConfig?.logo_url" :src="siteConfig.logo_url" :alt="siteConfig.site_name" class="h-32 w-auto object-contain" />
-            <span v-else class="text-2xl font-bold tracking-tight" :style="{ color: siteConfig?.primary_color || '#2563eb' }">
+            <span v-else class="text-2xl font-bold tracking-tight" :style="{ color: siteConfig?.primary_color || '#6898ED' }">
               {{ siteConfig?.site_name || 'Store' }}
             </span>
           </NuxtLink>
@@ -69,8 +69,8 @@ onMounted(async () => {
       site_name: 'Store',
       hero_title: '',
       hero_subtitle: '',
-      primary_color: '#2563eb',
-      secondary_color: '#10b981',
+      primary_color: '#6898ED',
+      secondary_color: '#4B5979',
       contact_email: 'contact@store.com',
       contact_phone: '+1234567890'
     }

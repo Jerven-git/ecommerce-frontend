@@ -53,17 +53,17 @@
             </div>
 
             <!-- Middle ring -->
-            <div class="absolute inset-3 rounded-full border border-indigo-200/70 animate-spin-slow-reverse"></div>
+            <div class="absolute inset-3 rounded-full border border-blue-200/70 animate-spin-slow-reverse"></div>
             <!-- Orbiting dot on middle ring -->
             <div class="absolute inset-3 animate-spin-slow-reverse">
-              <div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-indigo-400 shadow-sm shadow-indigo-300"></div>
+              <div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-blue-400 shadow-sm shadow-blue-300"></div>
             </div>
 
             <!-- Inner pulse ring -->
             <div class="absolute inset-6 rounded-full bg-blue-50 animate-ping-slow opacity-70"></div>
 
             <!-- Icon container -->
-            <div class="relative z-10 w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-200">
+            <div class="relative z-10 w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-200">
               <svg class="w-7 h-7 text-white animate-pulse-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
@@ -86,7 +86,7 @@
 
           <!-- Progress track -->
           <div class="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
-            <div class="h-full bg-gradient-to-r from-blue-400 via-indigo-500 to-blue-400 rounded-full animate-progress-slide"></div>
+            <div class="h-full bg-gradient-to-r from-blue-400 via-blue-500 to-blue-400 rounded-full animate-progress-slide"></div>
           </div>
 
           <!-- Footer note -->

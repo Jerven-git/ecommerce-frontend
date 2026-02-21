@@ -33,9 +33,7 @@
       <!-- Sidebar header -->
       <div class="h-16 px-4 flex items-center justify-between border-b border-gray-100 shrink-0">
         <NuxtLink to="/admin" class="flex items-center gap-2.5" @click="closeSidebarOnMobile">
-          <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
-            A
-          </div>
+          <img src="~/assets/css/svg/databasy.svg" alt="Databasy" class="h-8 w-auto shrink-0" />
           <div>
             <p class="text-sm font-bold text-gray-900 leading-tight">Admin Panel</p>
             <p class="text-xs text-gray-400 leading-tight">Store Manager</p>
@@ -169,6 +167,7 @@
             to="/"
             class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
             @click="closeSidebarOnMobile"
+            target="_blank"
           >
             <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -210,6 +209,7 @@
           <NuxtLink
             to="/"
             class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-800 transition-colors shrink-0"
+            target="_blank"
           >
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
