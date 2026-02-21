@@ -14,7 +14,7 @@
           <span
             v-else
             class="text-xl font-bold tracking-tight"
-            :style="{ color: siteConfig?.primary_color || '#2563eb' }"
+            :style="{ color: siteConfig?.primary_color || '#6898ED' }"
           >
             {{ siteConfig?.site_name || 'Store' }}
           </span>
@@ -175,8 +175,8 @@ onMounted(async () => {
       site_name: 'Store',
       hero_title: '',
       hero_subtitle: '',
-      primary_color: '#2563eb',
-      secondary_color: '#10b981',
+      primary_color: '#6898ED',
+      secondary_color: '#4B5979',
       logo_url: ''
     }
   }

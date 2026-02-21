@@ -116,7 +116,7 @@
     </div>
 
     <!-- Promo Banner -->
-    <section class="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white py-16">
+    <section class="relative overflow-hidden bg-gradient-to-br from-[#4B5979] via-blue-600 to-blue-400 text-white py-16">
       <!-- Floating orbs -->
       <div class="orb orb-1" />
       <div class="orb orb-2" />
@@ -156,7 +156,7 @@
 
         <NuxtLink
           to="/shop"
-          class="inline-flex items-center gap-2 bg-white text-indigo-600 font-bold px-8 py-3.5 rounded-xl shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300"
+          class="inline-flex items-center gap-2 bg-white text-blue-700 font-bold px-8 py-3.5 rounded-xl shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300"
         >
           Shop New Arrivals
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

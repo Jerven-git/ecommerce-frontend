@@ -44,10 +44,10 @@
         <div class="text-center mb-12">
           <p
             class="text-xs font-semibold uppercase tracking-widest mb-2"
-            :style="{ color: siteConfig?.primary_color || '#4f46e5' }"
+            :style="{ color: siteConfig?.primary_color || '#6898ED' }"
           >New Arrivals</p>
           <h2 class="text-3xl font-bold text-gray-900">Featured Products</h2>
-          <div class="mt-3 mx-auto w-12 h-1 rounded-full" :style="{ backgroundColor: siteConfig?.primary_color || '#4f46e5' }"></div>
+          <div class="mt-3 mx-auto w-12 h-1 rounded-full" :style="{ backgroundColor: siteConfig?.primary_color || '#6898ED' }"></div>
         </div>
 
         <!-- Skeleton -->
@@ -109,7 +109,7 @@
     <!-- How It Works -->
     <section class="py-20 bg-white">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <p class="text-xs font-semibold uppercase tracking-widest mb-2" :style="{ color: siteConfig?.primary_color || '#4f46e5' }">Simple & Easy</p>
+        <p class="text-xs font-semibold uppercase tracking-widest mb-2" :style="{ color: siteConfig?.primary_color || '#6898ED' }">Simple & Easy</p>
         <h2 class="text-3xl font-bold text-gray-900 mb-3">How It Works</h2>
         <p class="text-gray-500 text-sm mb-14 max-w-md mx-auto">Start shopping in just three easy steps — no hassle, no confusion.</p>
 
@@ -200,7 +200,7 @@
     </section>
 
     <!-- Stats Banner -->
-    <section class="py-16 text-white" :style="{ background: `linear-gradient(135deg, ${siteConfig?.primary_color || '#4f46e5'}, ${siteConfig?.secondary_color || '#111827'})` }">
+    <section class="py-16 text-white" :style="{ background: `linear-gradient(135deg, ${siteConfig?.primary_color || '#6898ED'}, ${siteConfig?.secondary_color || '#4B5979'})` }">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           <div v-for="stat in stats" :key="stat.label" class="group">
@@ -212,24 +212,24 @@
     </section>
 
     <!-- Newsletter CTA -->
-    <section class="py-20 bg-gray-900 text-white relative overflow-hidden">
+    <section class="py-20 bg-[#4B5979] text-white relative overflow-hidden">
       <div class="absolute inset-0 opacity-5 pointer-events-none">
         <div class="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-white blur-3xl"></div>
         <div class="absolute bottom-0 right-1/4 w-72 h-72 rounded-full bg-white blur-3xl"></div>
       </div>
       <div class="relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <p class="text-xs font-semibold uppercase tracking-widest text-indigo-400 mb-3">Stay in the loop</p>
+        <p class="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">Stay in the loop</p>
         <h2 class="text-3xl md:text-4xl font-bold mb-4">Don't miss a deal.</h2>
         <p class="text-gray-400 text-sm mb-8 max-w-sm mx-auto">Get the latest products, exclusive offers, and updates delivered straight to your inbox.</p>
         <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" @submit.prevent>
           <input
             type="email"
             placeholder="Enter your email"
-            class="flex-1 px-5 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition text-sm"
+            class="flex-1 px-5 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-blue-400 transition text-sm"
           />
           <button
             type="submit"
-            class="px-6 py-3 rounded-xl text-sm font-semibold text-white bg-indigo-500 hover:bg-indigo-400 hover:scale-105 transition-all duration-200 shadow-lg shrink-0"
+            class="px-6 py-3 rounded-xl text-sm font-semibold text-white bg-blue-500 hover:bg-blue-400 hover:scale-105 transition-all duration-200 shadow-lg shrink-0"
           >
             Subscribe
           </button>
@@ -305,8 +305,8 @@ const heroStyle = computed(() => {
   }
 
   return {
-    backgroundImage: `linear-gradient(135deg, ${siteConfig.value?.primary_color || '#4f46e5'}, ${
-      siteConfig.value?.secondary_color || '#111827'
+    backgroundImage: `linear-gradient(135deg, ${siteConfig.value?.primary_color || '#6898ED'}, ${
+      siteConfig.value?.secondary_color || '#4B5979'
     })`,
   }
 })
