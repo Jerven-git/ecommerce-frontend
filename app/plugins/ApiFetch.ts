@@ -51,6 +51,17 @@ export default defineNuxtPlugin(() => {
             console.error("CSRF token mismatch - token may have expired")
             } else if (response.status === 401) {
             console.error("Unauthorized - user may need to login again")
+            // Session expired — clear auth state and redirect to login
+            if (process.client) {
+                const authStore = useAuthStore()
+                if (authStore.isAuthenticated) {
+                    authStore.user = null
+                    authStore.isAuthenticated = false
+                    authStore.twoFactorRequired = false
+                    authStore.twoFactorEmail = null
+                    navigateTo('/admin/login')
+                }
+            }
             } else {
             console.error("API Error:", response.status, response.statusText)
             }

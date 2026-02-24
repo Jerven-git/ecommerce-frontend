@@ -14,11 +14,15 @@
         <div v-if="imageLoaded" class="absolute inset-0 bg-black/45" />
       </Transition>
 
-      <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <p class="text-xs font-semibold uppercase tracking-widest text-white/60 mb-3">Our Company</p>
-        <h1 class="text-5xl font-bold mb-4 leading-tight drop-shadow-md">About Us</h1>
-        <p class="text-lg text-white/80 drop-shadow max-w-md mx-auto">Learn more about our story and mission</p>
-      </div>
+      <Transition name="hero-up" appear>
+        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <span class="inline-block bg-white/15 backdrop-blur-sm text-xs font-semibold px-4 py-1.5 rounded-full mb-5 tracking-widest uppercase">
+            Our Company
+          </span>
+          <h1 class="text-5xl font-bold mb-4 leading-tight drop-shadow-md">About Us</h1>
+          <p class="text-lg text-white/80 drop-shadow max-w-lg mx-auto">Learn more about our story and mission</p>
+        </div>
+      </Transition>
     </section>
 
     <!-- Content Section -->

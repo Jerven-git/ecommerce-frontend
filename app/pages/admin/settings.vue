@@ -42,7 +42,7 @@
           </div>
           <div>
             <h2 class="text-sm font-semibold text-gray-900">General</h2>
-            <p class="text-xs text-gray-400">Store name and logo</p>
+            <p class="text-xs text-gray-400">Store name, logo, and site icon</p>
           </div>
         </div>
 
@@ -52,47 +52,94 @@
             <input v-model="form.site_name" type="text" class="input-field" placeholder="My Awesome Store" />
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Logo</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- Logo -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Logo</label>
 
-            <!-- Logo Preview -->
-            <div v-if="form.logo_url" class="inline-flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
-              <img :src="form.logo_url" alt="Logo" class="h-16 w-auto rounded-lg object-contain" />
-              <button
-                @click="removeLogo"
-                type="button"
-                class="flex items-center gap-1.5 text-xs text-red-500 hover:text-red-700 font-medium mt-1 transition-colors"
+              <!-- Logo Preview -->
+              <div v-if="form.logo_url" class="inline-flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                <img :src="form.logo_url" alt="Logo" class="h-16 w-auto rounded-lg object-contain" />
+                <button
+                  @click="removeLogo"
+                  type="button"
+                  class="flex items-center gap-1.5 text-xs text-red-500 hover:text-red-700 font-medium mt-1 transition-colors"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Remove
+                </button>
+              </div>
+
+              <!-- Drop zone -->
+              <label
+                v-else
+                for="logoInput"
+                class="flex flex-col items-center justify-center w-full h-36 rounded-xl cursor-pointer transition-all duration-200"
+                :class="isDraggingLogo
+                  ? 'bg-blue-50 border-2 border-blue-400 border-dashed'
+                  : 'bg-gray-50 border-2 border-gray-200 border-dashed hover:border-blue-300 hover:bg-blue-50/40'"
+                @dragenter.prevent="onDragEnter('logo')"
+                @dragover.prevent
+                @dragleave.prevent="onDragLeave('logo')"
+                @drop.prevent="onDropReset('logo'); handleLogoDrop($event)"
               >
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                <svg class="w-7 h-7 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                Remove
-              </button>
+                <p class="text-sm text-gray-500">
+                  <span v-if="uploadingLogo" class="text-blue-600 font-medium">Uploading…</span>
+                  <template v-else>Drop logo here or <span class="text-blue-600 font-medium">browse</span></template>
+                </p>
+                <p class="text-xs text-gray-400 mt-1">PNG, JPG, SVG — max 2 MB</p>
+                <input id="logoInput" ref="logoInput" type="file" class="hidden" accept="image/*" @change="handleLogoUpload" />
+              </label>
             </div>
 
-            <!-- Drop zone -->
-            <label
-              v-else
-              for="logoInput"
-              class="flex flex-col items-center justify-center w-full h-36 rounded-xl cursor-pointer transition-all duration-200"
-              :class="isDraggingLogo
-                ? 'bg-blue-50 border-2 border-blue-400 border-dashed'
-                : 'bg-gray-50 border-2 border-gray-200 border-dashed hover:border-blue-300 hover:bg-blue-50/40'"
-              @dragenter.prevent="onDragEnter('logo')"
-              @dragover.prevent
-              @dragleave.prevent="onDragLeave('logo')"
-              @drop.prevent="onDropReset('logo'); handleLogoDrop($event)"
-            >
-              <svg class="w-7 h-7 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <p class="text-sm text-gray-500">
-                <span v-if="uploadingLogo" class="text-blue-600 font-medium">Uploading…</span>
-                <template v-else>Drop logo here or <span class="text-blue-600 font-medium">browse</span></template>
-              </p>
-              <p class="text-xs text-gray-400 mt-1">PNG, JPG, SVG — max 10 MB</p>
-              <input id="logoInput" ref="logoInput" type="file" class="hidden" accept="image/*" @change="handleLogoUpload" />
-            </label>
+            <!-- Site Icon (Favicon) -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Site Icon</label>
+
+              <!-- Favicon Preview -->
+              <div v-if="form.favicon_url" class="inline-flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                <img :src="form.favicon_url" alt="Site Icon" class="h-16 w-16 rounded-lg object-contain" />
+                <button
+                  @click="removeFavicon"
+                  type="button"
+                  class="flex items-center gap-1.5 text-xs text-red-500 hover:text-red-700 font-medium mt-1 transition-colors"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Remove
+                </button>
+              </div>
+
+              <!-- Drop zone -->
+              <label
+                v-else
+                for="faviconInput"
+                class="flex flex-col items-center justify-center w-full h-36 rounded-xl cursor-pointer transition-all duration-200"
+                :class="isDraggingFavicon
+                  ? 'bg-blue-50 border-2 border-blue-400 border-dashed'
+                  : 'bg-gray-50 border-2 border-gray-200 border-dashed hover:border-blue-300 hover:bg-blue-50/40'"
+                @dragenter.prevent="onDragEnter('favicon')"
+                @dragover.prevent
+                @dragleave.prevent="onDragLeave('favicon')"
+                @drop.prevent="onDropReset('favicon'); handleFaviconDrop($event)"
+              >
+                <svg class="w-7 h-7 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p class="text-sm text-gray-500">
+                  <span v-if="uploadingFavicon" class="text-blue-600 font-medium">Uploading…</span>
+                  <template v-else>Drop icon here or <span class="text-blue-600 font-medium">browse</span></template>
+                </p>
+                <p class="text-xs text-gray-400 mt-1">Square preferred — max 2 MB</p>
+                <input id="faviconInput" ref="faviconInput" type="file" class="hidden" accept="image/*" @change="handleFaviconUpload" />
+              </label>
+            </div>
           </div>
         </div>
       </section>
@@ -312,10 +359,20 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
-          <div>
+          <div class="flex-1">
             <h2 class="text-sm font-semibold text-gray-900">Contact</h2>
-            <p class="text-xs text-gray-400">Email, phone, and contact page image</p>
+            <p class="text-xs text-gray-400">Contact page image and contact entries</p>
           </div>
+          <button
+            type="button"
+            @click="addContactEntry"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Contact
+          </button>
         </div>
 
         <div class="p-6 space-y-5">
@@ -362,28 +419,60 @@
             </label>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">Email Address</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </span>
-                <input v-model="form.contact_email" type="email" class="input-field pl-10" placeholder="hello@example.com" />
-              </div>
-            </div>
+          <!-- Repeatable Contact Entries -->
+          <div class="space-y-3">
+            <div
+              v-for="(entry, i) in form.contact_entries"
+              :key="i"
+              class="relative p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3"
+            >
+              <!-- Remove button -->
+              <button
+                v-if="form.contact_entries.length > 1"
+                type="button"
+                @click="removeContactEntry(i)"
+                class="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition-colors"
+                title="Remove entry"
+              >
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">Phone Number</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
-                </span>
-                <input v-model="form.contact_phone" type="tel" class="input-field pl-10" placeholder="+1 (555) 000-0000" />
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Label</label>
+                <input
+                  v-model="entry.label"
+                  type="text"
+                  class="input-field text-sm"
+                  placeholder="e.g. Sales, Support, Main Office"
+                />
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Email</label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </span>
+                    <input v-model="entry.email" type="email" class="input-field pl-9 text-sm" placeholder="hello@example.com" />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Phone</label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                    </span>
+                    <input v-model="entry.phone" type="tel" class="input-field pl-9 text-sm" placeholder="+1 (555) 000-0000" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -456,12 +545,19 @@
 <script setup lang="ts">
 definePageMeta({ middleware: "auth" })
 
+interface ContactEntry {
+  label: string
+  email: string
+  phone: string
+}
+
 interface SiteConfig {
   id: number
   site_name: string
   primary_color: string
   secondary_color: string
   logo_url: string
+  favicon_url: string
   hero_title: string
   hero_subtitle: string
   hero_image_url: string
@@ -470,6 +566,7 @@ interface SiteConfig {
   contact_image_url: string
   contact_email: string
   contact_phone: string
+  contact_entries: ContactEntry[]
   updated_at: string
 }
 
@@ -477,7 +574,7 @@ interface SiteConfigResponse {
   data: SiteConfig
 }
 
-type MediaCollection = "logo" | "hero" | "about" | "contact"
+type MediaCollection = "logo" | "favicon" | "hero" | "about" | "contact"
 
 const { $apiFetch } = useNuxtApp()
 
@@ -490,18 +587,21 @@ const configId = ref<number | null>(null)
 
 // upload state (now means “queued / will upload on save”)
 const uploadingLogo = ref(false)
+const uploadingFavicon = ref(false)
 const uploadingHeroImage = ref(false)
 const uploadingAboutImage = ref(false)
 const uploadingContactImage = ref(false)
 
 // drag state
 const isDraggingLogo = ref(false)
+const isDraggingFavicon = ref(false)
 const isDraggingHero = ref(false)
 const isDraggingAbout = ref(false)
 const isDraggingContact = ref(false)
-const dragCounter = reactive<Record<MediaCollection, number>>({ logo: 0, hero: 0, about: 0, contact: 0 })
+const dragCounter = reactive<Record<MediaCollection, number>>({ logo: 0, favicon: 0, hero: 0, about: 0, contact: 0 })
 
 const logoInput = ref<HTMLInputElement | null>(null)
+const faviconInput = ref<HTMLInputElement | null>(null)
 const heroImageInput = ref<HTMLInputElement | null>(null)
 const aboutImageInput = ref<HTMLInputElement | null>(null)
 const contactImageInput = ref<HTMLInputElement | null>(null)
@@ -511,6 +611,7 @@ const form = ref({
   primary_color: "#6898ED",
   secondary_color: "#4B5979",
   logo_url: "",
+  favicon_url: "",
   hero_title: "",
   hero_subtitle: "",
   hero_image_url: "",
@@ -519,6 +620,7 @@ const form = ref({
   contact_image_url: "",
   contact_email: "",
   contact_phone: "",
+  contact_entries: [{ label: '', email: '', phone: '' }] as ContactEntry[],
 })
 
 /**
@@ -526,6 +628,7 @@ const form = ref({
  */
 const pending = reactive<Record<MediaCollection, File | null>>({
   logo: null,
+  favicon: null,
   hero: null,
   about: null,
   contact: null,
@@ -536,6 +639,7 @@ const pending = reactive<Record<MediaCollection, File | null>>({
  */
 const blobPreview = reactive<Record<MediaCollection, string | null>>({
   logo: null,
+  favicon: null,
   hero: null,
   about: null,
   contact: null,
@@ -543,6 +647,7 @@ const blobPreview = reactive<Record<MediaCollection, string | null>>({
 
 const setUploading = (type: MediaCollection, v: boolean) => {
   if (type === "logo") uploadingLogo.value = v
+  if (type === "favicon") uploadingFavicon.value = v
   if (type === "hero") uploadingHeroImage.value = v
   if (type === "about") uploadingAboutImage.value = v
   if (type === "contact") uploadingContactImage.value = v
@@ -550,21 +655,31 @@ const setUploading = (type: MediaCollection, v: boolean) => {
 
 const setDragging = (key: MediaCollection, value: boolean) => {
   if (key === "logo") isDraggingLogo.value = value
+  if (key === "favicon") isDraggingFavicon.value = value
   if (key === "hero") isDraggingHero.value = value
   if (key === "about") isDraggingAbout.value = value
   if (key === "contact") isDraggingContact.value = value
 }
 
-const validateImage = (file: File, maxSizeMB: number): boolean => {
-  const maxSize = maxSizeMB * 1024 * 1024
+const uploadLimits: Record<MediaCollection, { maxMB: number; label: string }> = {
+  logo: { maxMB: 2, label: 'Logo' },
+  favicon: { maxMB: 2, label: 'Site icon' },
+  hero: { maxMB: 10, label: 'Hero image' },
+  about: { maxMB: 10, label: 'About image' },
+  contact: { maxMB: 10, label: 'Contact image' },
+}
+
+const validateImage = (file: File, type: MediaCollection): boolean => {
+  const { maxMB, label } = uploadLimits[type]
+  const maxSize = maxMB * 1024 * 1024
 
   if (!file.type.startsWith("image/")) {
-    saveError.value = "Please upload a valid image file"
+    saveError.value = `${label}: Please upload a valid image file (PNG, JPG, SVG, GIF)`
     return false
   }
 
   if (file.size > maxSize) {
-    saveError.value = `Image size must be less than ${maxSizeMB}MB`
+    saveError.value = `${label}: File size (${(file.size / 1024 / 1024).toFixed(1)}MB) exceeds the ${maxMB}MB limit`
     return false
   }
 
@@ -580,6 +695,7 @@ const clearPreviewFor = (type: MediaCollection) => {
 
 const setPreviewUrl = (type: MediaCollection, url: string) => {
   if (type === "logo") form.value.logo_url = url
+  if (type === "favicon") form.value.favicon_url = url
   if (type === "hero") form.value.hero_image_url = url
   if (type === "about") form.value.about_image_url = url
   if (type === "contact") form.value.contact_image_url = url
@@ -589,8 +705,7 @@ const setPreviewUrl = (type: MediaCollection, url: string) => {
  * ✅ Queue file + set local preview (NO upload yet)
  */
 const queueFile = (file: File, type: MediaCollection) => {
-  const maxSize = 10
-  if (!validateImage(file, maxSize)) return
+  if (!validateImage(file, type)) return
 
   saveError.value = null
 
@@ -618,7 +733,7 @@ const loadSettings = async () => {
       configId.value = response.data.id
 
       // when loading from server, clear any pending local files/previews
-      ;(["logo", "hero", "about", "contact"] as MediaCollection[]).forEach((t) => {
+      ;(["logo", "favicon", "hero", "about", "contact"] as MediaCollection[]).forEach((t) => {
         pending[t] = null
         clearPreviewFor(t)
       })
@@ -628,6 +743,7 @@ const loadSettings = async () => {
         primary_color: response.data.primary_color || "#6898ED",
         secondary_color: response.data.secondary_color || "#4B5979",
         logo_url: response.data.logo_url || "",
+        favicon_url: response.data.favicon_url || "",
         hero_title: response.data.hero_title || "",
         hero_subtitle: response.data.hero_subtitle || "",
         hero_image_url: response.data.hero_image_url || "",
@@ -636,6 +752,9 @@ const loadSettings = async () => {
         contact_image_url: response.data.contact_image_url || "",
         contact_email: response.data.contact_email || "",
         contact_phone: response.data.contact_phone || "",
+        contact_entries: response.data.contact_entries?.length
+          ? response.data.contact_entries
+          : [{ label: '', email: '', phone: '' }],
       }
     }
   } catch (err: any) {
@@ -682,6 +801,13 @@ const handleLogoUpload = async (event: Event) => {
   queueFile(file, "logo")
   target.value = ""
 }
+const handleFaviconUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+  queueFile(file, "favicon")
+  target.value = ""
+}
 const handleHeroImageUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
@@ -710,6 +836,10 @@ const handleLogoDrop = async (event: DragEvent) => {
   const file = event.dataTransfer?.files?.[0]
   if (file) queueFile(file, "logo")
 }
+const handleFaviconDrop = async (event: DragEvent) => {
+  const file = event.dataTransfer?.files?.[0]
+  if (file) queueFile(file, "favicon")
+}
 const handleHeroImageDrop = async (event: DragEvent) => {
   const file = event.dataTransfer?.files?.[0]
   if (file) queueFile(file, "hero")
@@ -733,6 +863,7 @@ const handleContactImageDrop = async (event: DragEvent) => {
  */
 const pendingDelete = reactive<Record<MediaCollection, boolean>>({
   logo: false,
+  favicon: false,
   hero: false,
   about: false,
   contact: false,
@@ -748,15 +879,26 @@ const markDeleted = (type: MediaCollection) => {
 
   // also clear native input
   if (type === "logo" && logoInput.value) logoInput.value.value = ""
+  if (type === "favicon" && faviconInput.value) faviconInput.value.value = ""
   if (type === "hero" && heroImageInput.value) heroImageInput.value.value = ""
   if (type === "about" && aboutImageInput.value) aboutImageInput.value.value = ""
   if (type === "contact" && contactImageInput.value) contactImageInput.value.value = ""
 }
 
 const removeLogo = async () => markDeleted("logo")
+const removeFavicon = async () => markDeleted("favicon")
 const removeHeroImage = async () => markDeleted("hero")
 const removeAboutImage = async () => markDeleted("about")
 const removeContactImage = async () => markDeleted("contact")
+
+/** Contact entries helpers */
+const addContactEntry = () => {
+  form.value.contact_entries.push({ label: '', email: '', phone: '' })
+}
+const removeContactEntry = (index: number) => {
+  if (form.value.contact_entries.length <= 1) return
+  form.value.contact_entries.splice(index, 1)
+}
 
 const deleteMedia = async (collection: MediaCollection) => {
   await $apiFetch(`/site-config/media/${collection}`, { method: "DELETE" })
@@ -775,7 +917,7 @@ const saveSettings = async () => {
 
   try {
     // 1) uploads (only the ones user changed)
-    for (const type of ["logo", "hero", "about", "contact"] as MediaCollection[]) {
+    for (const type of ["logo", "favicon", "hero", "about", "contact"] as MediaCollection[]) {
       if (pending[type]) {
         setUploading(type, true)
         const url = await uploadImage(pending[type]!, type)
@@ -791,7 +933,7 @@ const saveSettings = async () => {
     }
 
     // 2) deletions (only if user removed and did NOT upload a new replacement)
-    for (const type of ["logo", "hero", "about", "contact"] as MediaCollection[]) {
+    for (const type of ["logo", "favicon", "hero", "about", "contact"] as MediaCollection[]) {
       if (pendingDelete[type]) {
         await deleteMedia(type)
         pendingDelete[type] = false
@@ -808,6 +950,7 @@ const saveSettings = async () => {
       about_content: form.value.about_content,
       contact_email: form.value.contact_email,
       contact_phone: form.value.contact_phone,
+      contact_entries: form.value.contact_entries,
     }
 
     await $apiFetch("/site-config", {
@@ -825,6 +968,7 @@ const saveSettings = async () => {
   } finally {
     // ensure uploading flags are cleared
     uploadingLogo.value = false
+    uploadingFavicon.value = false
     uploadingHeroImage.value = false
     uploadingAboutImage.value = false
     uploadingContactImage.value = false
@@ -836,6 +980,6 @@ onMounted(loadSettings)
 
 // clean up blob urls when leaving page
 onBeforeUnmount(() => {
-  ;(["logo", "hero", "about"] as MediaCollection[]).forEach(clearPreviewFor)
+  ;(["logo", "favicon", "hero", "about", "contact"] as MediaCollection[]).forEach(clearPreviewFor)
 })
 </script>
