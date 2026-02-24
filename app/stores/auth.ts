@@ -4,6 +4,7 @@ interface User {
   id: number
   name: string
   email: string
+  is_admin?: boolean
   email_verified_at?: string | null
   created_at?: string
   updated_at?: string
@@ -11,7 +12,8 @@ interface User {
 
 interface LoginResponse {
   message: string
-  user: User
+  user?: User
+  two_factor_required?: boolean
 }
 
 interface RegisterData {
@@ -26,14 +28,14 @@ export const useAuthStore = defineStore('auth', {
     user: null as User | null,
     isAuthenticated: false,
     loading: false,
-    error: null as string | null
+    error: null as string | null,
+    twoFactorRequired: false,
+    twoFactorEmail: null as string | null,
   }),
 
   getters: {
     isAdmin: (state) => {
-      // Add your admin check logic here
-      // For example, check if user has admin role
-      return state.user?.email === 'admin@example.com' // Update with your logic
+      return state.user?.is_admin === true
     }
   },
 
@@ -41,6 +43,7 @@ export const useAuthStore = defineStore('auth', {
     async login(email: string, password: string) {
       this.loading = true
       this.error = null
+      this.twoFactorRequired = false
 
       try {
         const { $apiFetch } = useNuxtApp()
@@ -58,12 +61,69 @@ export const useAuthStore = defineStore('auth', {
           body: { email, password }
         })
 
-        this.user = response.user
-        this.isAuthenticated = true
-        
+        if (response.two_factor_required) {
+          this.twoFactorRequired = true
+          this.twoFactorEmail = email
+          return response
+        }
+
+        // Fallback for any non-2FA response
+        if (response.user) {
+          this.user = response.user
+          this.isAuthenticated = true
+        }
+
         return response
       } catch (error: any) {
         this.error = error?.data?.message || 'Login failed'
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async verifyTwoFactor(code: string) {
+      this.loading = true
+      this.error = null
+
+      try {
+        const { $apiFetch } = useNuxtApp()
+
+        const response = await $apiFetch<LoginResponse>('/two-factor/verify', {
+          method: 'POST',
+          body: { code }
+        })
+
+        if (response.user) {
+          this.user = response.user
+          this.isAuthenticated = true
+          this.twoFactorRequired = false
+          this.twoFactorEmail = null
+        }
+
+        return response
+      } catch (error: any) {
+        this.error = error?.data?.message || 'Verification failed'
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async resendTwoFactor() {
+      this.loading = true
+      this.error = null
+
+      try {
+        const { $apiFetch } = useNuxtApp()
+
+        const response = await $apiFetch<{ message: string }>('/two-factor/resend', {
+          method: 'POST'
+        })
+
+        return response
+      } catch (error: any) {
+        this.error = error?.data?.message || 'Failed to resend code'
         throw error
       } finally {
         this.loading = false
@@ -90,8 +150,8 @@ export const useAuthStore = defineStore('auth', {
           body: data
         })
 
-        this.user = response.user
-        this.isAuthenticated = true
+        this.user = response.user ?? null
+        this.isAuthenticated = !!response.user
 
         return response
       } catch (error: any) {
@@ -115,6 +175,8 @@ export const useAuthStore = defineStore('auth', {
 
         this.user = null
         this.isAuthenticated = false
+        this.twoFactorRequired = false
+        this.twoFactorEmail = null
       } catch (error: any) {
         this.error = error?.data?.message || 'Logout failed'
         throw error
@@ -145,6 +207,8 @@ export const useAuthStore = defineStore('auth', {
         // Not authenticated
         this.user = null
         this.isAuthenticated = false
+        this.twoFactorRequired = false
+        this.twoFactorEmail = null
       } finally {
         this.loading = false
       }

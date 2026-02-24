@@ -6,101 +6,85 @@
       <div class="absolute inset-0 bg-gradient-to-b from-[#1a2d5c] via-[#2B437A] to-[#1e3264]"></div>
 
       <!-- Floating e-commerce icons -->
-      <!-- Cart -->
       <div class="float-icon icon-1">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
           <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
         </svg>
       </div>
-      <!-- Bag -->
       <div class="float-icon icon-2">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 01-8 0"/>
         </svg>
       </div>
-      <!-- Tag -->
       <div class="float-icon icon-3">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1"/>
         </svg>
       </div>
-      <!-- Star -->
       <div class="float-icon icon-4">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
         </svg>
       </div>
-      <!-- Box/Package -->
       <div class="float-icon icon-5">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
           <path d="M3.27 6.96L12 12.01l8.73-5.05"/><path d="M12 22.08V12"/>
         </svg>
       </div>
-      <!-- Heart -->
       <div class="float-icon icon-6">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
         </svg>
       </div>
-      <!-- Percent/Discount -->
       <div class="float-icon icon-7">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
         </svg>
       </div>
-      <!-- Credit Card -->
       <div class="float-icon icon-8">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
         </svg>
       </div>
-      <!-- Cart 2 -->
       <div class="float-icon icon-9">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
           <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
         </svg>
       </div>
-      <!-- Bag 2 -->
       <div class="float-icon icon-10">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 01-8 0"/>
         </svg>
       </div>
-      <!-- Star 2 -->
       <div class="float-icon icon-11">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
         </svg>
       </div>
-      <!-- Tag 2 -->
       <div class="float-icon icon-12">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1"/>
         </svg>
       </div>
-      <!-- Percent 2 -->
       <div class="float-icon icon-13">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
         </svg>
       </div>
-      <!-- Heart 2 -->
       <div class="float-icon icon-14">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
         </svg>
       </div>
-      <!-- Box 2 -->
       <div class="float-icon icon-15">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
           <path d="M3.27 6.96L12 12.01l8.73-5.05"/><path d="M12 22.08V12"/>
         </svg>
       </div>
-      <!-- Card 2 -->
       <div class="float-icon icon-16">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
@@ -126,108 +110,111 @@
           :class="mounted ? 'animate-stagger-1' : 'opacity-0 translate-y-4'"
         >
           <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#6898ED]/20 mb-5 ring-1 ring-[#6898ED]/30 animate-icon-glow">
-            <Icon name="mdi:shield-lock-outline" class="w-8 h-8 text-[#6898ED]" />
+            <Icon name="mdi:email-check-outline" class="w-8 h-8 text-[#6898ED]" />
           </div>
-          <h2 class="text-2xl font-bold text-white tracking-tight">Welcome back</h2>
-          <p class="mt-2 text-sm text-white/50">Sign in to access the admin dashboard</p>
+          <h2 class="text-2xl font-bold text-white tracking-tight">Verify your identity</h2>
+          <p class="mt-2 text-sm text-white/50">
+            We sent a 6-digit code to
+            <span class="text-white/70">{{ maskedEmail }}</span>
+          </p>
         </div>
 
         <!-- Form -->
-        <form @submit.prevent="handleLogin" class="space-y-5">
-          <!-- Email field -->
+        <form @submit.prevent="handleVerify" class="space-y-5">
           <div :class="mounted ? 'animate-stagger-2' : 'opacity-0 translate-y-4'">
-            <label class="block text-sm font-medium text-white/70 mb-1.5">Email</label>
-            <div class="relative group">
+            <label class="block text-sm font-medium text-white/70 mb-1.5">Verification Code</label>
+            <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Icon name="mdi:email-outline" class="w-5 h-5 text-white/30 group-focus-within:text-[#6898ED] transition-colors duration-200" />
+                <Icon name="mdi:shield-key-outline" class="w-5 h-5 text-white/30" />
               </div>
               <input
-                v-model="form.email"
-                type="email"
+                v-model="code"
+                type="text"
+                inputmode="numeric"
+                maxlength="6"
+                pattern="[0-9]{6}"
                 required
-                class="w-full pl-11 pr-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-[#6898ED]/50 focus:border-[#6898ED]/50 focus:bg-white/[0.1] transition-all duration-200"
-                placeholder="admin@example.com"
-                autocomplete="email"
+                class="w-full pl-11 pr-4 py-3 text-center tracking-[0.3em] text-lg bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-[#6898ED]/50 focus:border-[#6898ED]/50 transition-all duration-200"
+                placeholder="000000"
+                autocomplete="one-time-code"
               />
-            </div>
-          </div>
-
-          <!-- Password field -->
-          <div :class="mounted ? 'animate-stagger-3' : 'opacity-0 translate-y-4'">
-            <div class="flex items-center justify-between mb-1.5">
-              <label class="block text-sm font-medium text-white/70">Password</label>
-              <NuxtLink to="/admin/forgot-password" class="text-xs text-[#6898ED]/70 hover:text-[#6898ED] transition-colors">Forgot password?</NuxtLink>
-            </div>
-            <div class="relative group">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Icon name="mdi:lock-outline" class="w-5 h-5 text-white/30 group-focus-within:text-[#6898ED] transition-colors duration-200" />
-              </div>
-              <input
-                v-model="form.password"
-                :type="showPassword ? 'text' : 'password'"
-                required
-                class="w-full pl-11 pr-12 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-[#6898ED]/50 focus:border-[#6898ED]/50 focus:bg-white/[0.1] transition-all duration-200"
-                placeholder="Enter your password"
-                autocomplete="current-password"
-              />
-              <button
-                type="button"
-                class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-white/30 hover:text-white/60 transition-colors"
-                @click="showPassword = !showPassword"
-              >
-                <Icon :name="showPassword ? 'mdi:eye-off-outline' : 'mdi:eye-outline'" class="w-5 h-5" />
-              </button>
             </div>
           </div>
 
           <!-- Error message -->
           <Transition
-            enter-active-class="transition duration-300 ease-out"
-            enter-from-class="opacity-0 -translate-y-2 scale-95"
-            enter-to-class="opacity-100 translate-y-0 scale-100"
-            leave-active-class="transition duration-200 ease-in"
-            leave-from-class="opacity-100 translate-y-0 scale-100"
-            leave-to-class="opacity-0 -translate-y-2 scale-95"
+            enter-active-class="transition duration-200 ease-out"
+            enter-from-class="opacity-0 -translate-y-1"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition duration-150 ease-in"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 -translate-y-1"
           >
-            <div v-if="error" class="flex items-start gap-3 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl animate-shake">
+            <div v-if="error" class="flex items-start gap-3 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl">
               <Icon name="mdi:alert-circle-outline" class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
               <p class="text-sm text-red-300">{{ error }}</p>
             </div>
           </Transition>
 
+          <!-- Resend success message -->
+          <Transition
+            enter-active-class="transition duration-200 ease-out"
+            enter-from-class="opacity-0 -translate-y-1"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition duration-150 ease-in"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 -translate-y-1"
+          >
+            <div v-if="resendSuccess" class="flex items-start gap-3 p-3.5 bg-green-500/10 border border-green-500/20 rounded-xl">
+              <Icon name="mdi:check-circle-outline" class="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+              <p class="text-sm text-green-300">{{ resendSuccess }}</p>
+            </div>
+          </Transition>
+
           <!-- Submit button -->
-          <div :class="mounted ? 'animate-stagger-4' : 'opacity-0 translate-y-4'">
-            <button
-              type="submit"
-              class="w-full relative flex items-center justify-center gap-2 bg-[#6898ED] hover:bg-[#7aa4f0] active:scale-[0.97] text-white font-semibold py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#6898ED] disabled:active:scale-100 shadow-lg shadow-[#6898ED]/30 hover:shadow-[#6898ED]/50 hover:shadow-xl"
-              :disabled="loading"
+          <div :class="mounted ? 'animate-stagger-3' : 'opacity-0 translate-y-4'">
+          <button
+            type="submit"
+            class="w-full relative flex items-center justify-center gap-2 bg-[#6898ED] hover:bg-[#7aa4f0] active:scale-[0.97] text-white font-semibold py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#6898ED] disabled:active:scale-100 shadow-lg shadow-[#6898ED]/30 hover:shadow-[#6898ED]/50 hover:shadow-xl"
+            :disabled="loading || code.length !== 6"
+          >
+            <svg
+              v-if="loading"
+              class="animate-spin h-5 w-5"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
             >
-              <svg
-                v-if="loading"
-                class="animate-spin h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              <span>{{ loading ? 'Signing in...' : 'Sign In' }}</span>
-            </button>
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <span>{{ loading ? 'Verifying...' : 'Verify Code' }}</span>
+          </button>
           </div>
         </form>
+
+        <!-- Resend link -->
+        <div class="mt-4 text-center">
+          <button
+            @click="handleResend"
+            :disabled="resendCooldown > 0 || resendLoading"
+            class="text-sm text-[#6898ED]/70 hover:text-[#6898ED] transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {{ resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend code' }}
+          </button>
+        </div>
 
         <!-- Footer -->
         <div
           class="mt-8 pt-6 border-t border-white/[0.08] text-center"
-          :class="mounted ? 'animate-stagger-5' : 'opacity-0'"
+          :class="mounted ? 'animate-stagger-4' : 'opacity-0'"
         >
           <NuxtLink
-            to="/"
+            to="/admin/login"
             class="inline-flex items-center gap-1.5 text-sm text-white/40 hover:text-white hover:gap-2.5 transition-all duration-200"
           >
             <Icon name="mdi:arrow-left" class="w-4 h-4" />
-            Back to Store
+            Back to Sign In
           </NuxtLink>
         </div>
       </div>
@@ -242,46 +229,73 @@ definePageMeta({
 
 const authStore = useAuthStore()
 
-const form = ref({
-  email: '',
-  password: ''
-})
-
-const loading = ref(false)
-const error = ref('')
-const showPassword = ref(false)
 const mounted = ref(false)
 
-const handleLogin = async () => {
+// Redirect to login if no 2FA pending
+onMounted(() => {
+  requestAnimationFrame(() => {
+    mounted.value = true
+  })
+
+  if (!authStore.twoFactorRequired) {
+    navigateTo('/admin/login')
+  }
+})
+
+const code = ref('')
+const loading = ref(false)
+const error = ref('')
+const resendSuccess = ref('')
+const resendLoading = ref(false)
+const resendCooldown = ref(0)
+
+// Masked email display (e.g., "a***@gmail.com")
+const maskedEmail = computed(() => {
+  const email = authStore.twoFactorEmail
+  if (!email) return ''
+  const [local, domain] = email.split('@')
+  if (!local || !domain) return email
+  return `${local.charAt(0)}${'*'.repeat(Math.max(local.length - 1, 2))}@${domain}`
+})
+
+const handleVerify = async () => {
   loading.value = true
   error.value = ''
+  resendSuccess.value = ''
 
   try {
-    const response = await authStore.login(form.value.email, form.value.password)
-
-    if (response.two_factor_required) {
-      navigateTo('/admin/verify-2fa')
-      return
-    }
-
+    await authStore.verifyTwoFactor(code.value)
     navigateTo('/admin')
   } catch (err: any) {
-    error.value = err?.data?.message || 'Invalid credentials or not authorized as admin'
+    error.value = err?.data?.message || 'Invalid code. Please try again.'
   } finally {
     loading.value = false
   }
 }
 
-onMounted(async () => {
-  requestAnimationFrame(() => {
-    mounted.value = true
-  })
+const handleResend = async () => {
+  if (resendCooldown.value > 0) return
+  resendLoading.value = true
+  error.value = ''
+  resendSuccess.value = ''
 
-  await authStore.checkAuth()
-  if (authStore.isAdmin) {
-    navigateTo('/admin')
+  try {
+    const res = await authStore.resendTwoFactor()
+    resendSuccess.value = res.message || 'A new code has been sent!'
+    code.value = ''
+
+    // Start 60-second cooldown
+    resendCooldown.value = 60
+    const interval = setInterval(() => {
+      resendCooldown.value--
+      if (resendCooldown.value <= 0) clearInterval(interval)
+    }, 1000)
+  } catch (err: any) {
+    error.value = err?.data?.message || 'Failed to resend code.'
+  } finally {
+    resendLoading.value = false
   }
-})
+}
 </script>
 
 <style scoped>
@@ -298,7 +312,6 @@ onMounted(async () => {
 .animate-stagger-2 { animation: stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both; }
 .animate-stagger-3 { animation: stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
 .animate-stagger-4 { animation: stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both; }
-.animate-stagger-5 { animation: stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both; }
 @keyframes stagger-in {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -317,7 +330,6 @@ onMounted(async () => {
   height: 100%;
 }
 
-/*        size    opacity  x-pos   animation: duration  delay  */
 .icon-1  { --fi-size: 28px; --fi-opacity: 0.22; left: 4%;   animation: float-up 8s   linear infinite 0s; }
 .icon-2  { --fi-size: 22px; --fi-opacity: 0.18; left: 12%;  animation: float-up 10s  linear infinite 2s; }
 .icon-3  { --fi-size: 18px; --fi-opacity: 0.15; left: 20%;  animation: float-up 12s  linear infinite 4.5s; }
@@ -359,16 +371,5 @@ onMounted(async () => {
 @keyframes icon-glow {
   0%, 100% { box-shadow: 0 0 0 0 rgba(104, 152, 237, 0); }
   50% { box-shadow: 0 0 30px 6px rgba(104, 152, 237, 0.25); }
-}
-
-/* ---- Error shake ---- */
-.animate-shake { animation: shake 0.4s ease-out; }
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  15% { transform: translateX(-5px); }
-  30% { transform: translateX(5px); }
-  45% { transform: translateX(-4px); }
-  60% { transform: translateX(4px); }
-  75% { transform: translateX(-1px); }
 }
 </style>
