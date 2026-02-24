@@ -149,6 +149,7 @@ interface SiteConfig {
   primary_color: string
   secondary_color: string
   logo_url: string
+  favicon_url: string
 }
 
 interface SiteConfigResponse {
@@ -162,14 +163,12 @@ const { $apiFetch } = useNuxtApp()
 const mobileMenuOpen = ref(false)
 const siteConfig = ref<SiteConfig | null>(null)
 
-
 onMounted(async () => {
   try {
     const response = await $apiFetch<SiteConfigResponse>('/site-config')
     siteConfig.value = response.data
   } catch (error) {
     console.warn('Failed to load site config:', error)
-    // Fallback must match SiteConfig shape
     siteConfig.value = {
       id: 0,
       site_name: 'Store',
@@ -177,7 +176,8 @@ onMounted(async () => {
       hero_subtitle: '',
       primary_color: '#6898ED',
       secondary_color: '#4B5979',
-      logo_url: ''
+      logo_url: '',
+      favicon_url: '',
     }
   }
 })
