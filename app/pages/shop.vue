@@ -10,10 +10,89 @@
       </div>
     </div>
 
+    <!-- Category Slider -->
+    <div v-if="categories.length" class="bg-white border-b border-gray-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <!-- Left arrow -->
+        <Transition name="arrow-fade">
+          <button
+            v-if="canScrollLeft"
+            @click="scrollSlider('left')"
+            class="slider-arrow left-3"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+        </Transition>
+
+        <!-- Parent category pills -->
+        <div
+          ref="sliderRef"
+          class="category-slider flex items-center gap-2 py-4 overflow-x-auto"
+          @scroll="updateScrollArrows"
+        >
+          <button
+            @click="selectParent(null)"
+            class="category-pill"
+            :class="!selectedParentId ? 'category-pill-active' : 'category-pill-inactive'"
+          >
+            All
+          </button>
+          <button
+            v-for="cat in categories"
+            :key="cat.id"
+            @click="selectParent(cat.id)"
+            class="category-pill"
+            :class="selectedParentId === cat.id ? 'category-pill-active' : 'category-pill-inactive'"
+          >
+            {{ cat.name }}
+          </button>
+        </div>
+
+        <!-- Right arrow -->
+        <Transition name="arrow-fade">
+          <button
+            v-if="canScrollRight"
+            @click="scrollSlider('right')"
+            class="slider-arrow right-3"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </Transition>
+      </div>
+
+      <!-- Subcategory pills (shown when parent has children) -->
+      <div v-if="activeSubcategories.length" class="border-t border-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex items-center gap-2 py-3 overflow-x-auto category-slider">
+            <button
+              @click="selectSub(null)"
+              class="category-pill text-xs"
+              :class="!selectedSubId ? 'category-pill-active' : 'category-pill-inactive'"
+            >
+              All {{ selectedParentName }}
+            </button>
+            <button
+              v-for="sub in activeSubcategories"
+              :key="sub.id"
+              @click="selectSub(sub.id)"
+              class="category-pill text-xs"
+              :class="selectedSubId === sub.id ? 'category-pill-active' : 'category-pill-inactive'"
+            >
+              {{ sub.name }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Filters -->
     <div class="bg-white border-b border-gray-100">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div class="flex flex-col sm:flex-row gap-3">
+        <div class="flex gap-3">
 
           <!-- Search -->
           <div class="flex-1 flex items-center rounded-xl border border-gray-200 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-400 transition-all bg-white">
@@ -30,18 +109,6 @@
               @input="debouncedFetch"
             />
           </div>
-
-          <!-- Category -->
-          <select
-            v-model="selectedCategory"
-            class="py-2.5 px-3.5 text-sm text-gray-700 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
-            @change="fetchProducts"
-          >
-            <option value="">All Categories</option>
-            <option v-for="category in categories" :key="category" :value="category">
-              {{ category }}
-            </option>
-          </select>
 
           <!-- Sort -->
           <select
@@ -177,28 +244,56 @@ interface Product {
   price: number
   image_url?: string
   category: string
+  category_id: number | null
   stock: number
   is_active: boolean
   created_at: string
   updated_at: string
 }
 
+interface Category {
+  id: number
+  name: string
+  parent_id: number | null
+  sort_order: number
+  children: Category[]
+}
+
 interface ProductsResponse {
   data: Product[]
+}
+
+interface CategoriesResponse {
+  data: Category[]
 }
 
 const { $apiFetch } = useNuxtApp()
 
 const products = ref<Product[]>([])
+const categories = ref<Category[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 const searchQuery = ref('')
-const selectedCategory = ref('')
+const selectedParentId = ref<number | null>(null)
+const selectedSubId = ref<number | null>(null)
 const sortBy = ref('newest')
 
-const categories = computed(() => {
-  const cats = products.value.map(p => p.category)
-  return [...new Set(cats)].filter(Boolean)
+// Category slider refs
+const sliderRef = ref<HTMLElement | null>(null)
+const canScrollLeft = ref(false)
+const canScrollRight = ref(false)
+
+// Computed: subcategories for selected parent
+const activeSubcategories = computed(() => {
+  if (!selectedParentId.value) return []
+  const parent = categories.value.find(c => c.id === selectedParentId.value)
+  return parent?.children ?? []
+})
+
+// Computed: selected parent name for "All X" pill
+const selectedParentName = computed(() => {
+  if (!selectedParentId.value) return ''
+  return categories.value.find(c => c.id === selectedParentId.value)?.name ?? ''
 })
 
 const getSortParams = () => {
@@ -211,11 +306,48 @@ const getSortParams = () => {
   }
 }
 
+const selectParent = (id: number | null) => {
+  selectedParentId.value = id
+  selectedSubId.value = null
+  fetchProducts()
+}
+
+const selectSub = (id: number | null) => {
+  selectedSubId.value = id
+  fetchProducts()
+}
+
 const clearFilters = () => {
   searchQuery.value = ''
-  selectedCategory.value = ''
+  selectedParentId.value = null
+  selectedSubId.value = null
   sortBy.value = 'newest'
   fetchProducts()
+}
+
+// Slider scroll helpers
+const updateScrollArrows = () => {
+  const el = sliderRef.value
+  if (!el) return
+  canScrollLeft.value = el.scrollLeft > 0
+  canScrollRight.value = el.scrollLeft + el.clientWidth < el.scrollWidth - 1
+}
+
+const scrollSlider = (direction: 'left' | 'right') => {
+  const el = sliderRef.value
+  if (!el) return
+  el.scrollBy({ left: direction === 'left' ? -200 : 200, behavior: 'smooth' })
+}
+
+const fetchCategories = async () => {
+  try {
+    const response = await $apiFetch<CategoriesResponse>('/categories', { method: 'GET' })
+    if (response?.data) {
+      categories.value = response.data
+    }
+  } catch (err) {
+    console.error('Error fetching categories:', err)
+  }
 }
 
 const fetchProducts = async () => {
@@ -226,8 +358,10 @@ const fetchProducts = async () => {
     const sortParams = getSortParams()
     const queryParams: Record<string, any> = { is_active: 1, ...sortParams }
 
-    if (selectedCategory.value) queryParams.category = selectedCategory.value
-    if (searchQuery.value)      queryParams.search = searchQuery.value
+    // Use the most specific selection: subcategory > parent category
+    const activeCategoryId = selectedSubId.value ?? selectedParentId.value
+    if (activeCategoryId) queryParams.category_id = activeCategoryId
+    if (searchQuery.value) queryParams.search = searchQuery.value
 
     const response = await $apiFetch<ProductsResponse>('/products', {
       method: 'GET',
@@ -242,6 +376,7 @@ const fetchProducts = async () => {
     error.value = err?.data?.message || 'Failed to load products. Please try again.'
   } finally {
     loading.value = false
+    nextTick(updateScrollArrows)
   }
 }
 
@@ -252,11 +387,82 @@ const debouncedFetch = () => {
 }
 
 onMounted(() => {
+  fetchCategories()
   fetchProducts()
 })
 </script>
 
 <style scoped>
+/* Category slider */
+.category-slider {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+}
+.category-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.category-pill {
+  white-space: nowrap;
+  padding: 6px 18px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.category-pill-active {
+  background-color: #4B5979;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(75, 89, 121, 0.3);
+}
+
+.category-pill-inactive {
+  background-color: #fff;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+.category-pill-inactive:hover {
+  border-color: #93a3c0;
+  color: #4B5979;
+}
+
+.slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.slider-arrow:hover {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  color: #374151;
+}
+
+.arrow-fade-enter-active,
+.arrow-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.arrow-fade-enter-from,
+.arrow-fade-leave-to {
+  opacity: 0;
+}
+
 /* Product card stagger fade-up */
 .card-stagger {
   opacity: 0;
