@@ -233,9 +233,21 @@
                     </div>
                   </div>
 
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
-                    <input v-model="form.category" type="text" class="input-field" placeholder="e.g. Electronics" />
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
+                      <select v-model="selectedParentCategoryId" @change="onParentCategoryChange" class="input-field">
+                        <option :value="null">None</option>
+                        <option v-for="cat in parentCategories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1.5">Subcategory</label>
+                      <select v-model="selectedSubcategoryId" @change="onSubcategoryChange" class="input-field" :disabled="!subcategories.length">
+                        <option :value="null">{{ subcategories.length ? 'None' : 'No subcategories' }}</option>
+                        <option v-for="sub in subcategories" :key="sub.id" :value="sub.id">{{ sub.name }}</option>
+                      </select>
+                    </div>
                   </div>
 
                   <div>
@@ -307,6 +319,13 @@ definePageMeta({
   middleware: 'auth'
 })
 
+interface Category {
+  id: number
+  name: string
+  parent_id: number | null
+  children?: Category[]
+}
+
 interface Product {
   id: number
   name: string
@@ -315,6 +334,7 @@ interface Product {
   stock: number
   weight: number | string
   category: string
+  category_id: number | null
   image_url: string
   is_active: boolean
   created_at: string
@@ -338,6 +358,18 @@ const showDeleteModal = ref(false)
 const deletingId = ref<number | null>(null)
 const deleting = ref(false)
 
+// Categories
+const allCategories = ref<Category[]>([])
+const selectedParentCategoryId = ref<number | null>(null)
+const selectedSubcategoryId = ref<number | null>(null)
+
+const parentCategories = computed(() => allCategories.value)
+const subcategories = computed(() => {
+  if (!selectedParentCategoryId.value) return []
+  const parent = allCategories.value.find(c => c.id === selectedParentCategoryId.value)
+  return parent?.children || []
+})
+
 const form = ref({
   name: '',
   description: '',
@@ -345,9 +377,41 @@ const form = ref({
   stock: 0,
   weight: 0,
   category: 'general',
+  category_id: null as number | null,
   image_url: '',
   is_active: true
 })
+
+const fetchCategories = async () => {
+  try {
+    const res = await $apiFetch<{ data: Category[] }>('/categories', { method: 'GET' })
+    allCategories.value = res.data || []
+  } catch (err) {
+    console.warn('Failed to load categories:', err)
+  }
+}
+
+const onParentCategoryChange = () => {
+  selectedSubcategoryId.value = null
+  // Set category_id to parent if no subcategories, otherwise wait for sub selection
+  form.value.category_id = selectedParentCategoryId.value
+  // Set the category name string for backward compat
+  const parent = allCategories.value.find(c => c.id === selectedParentCategoryId.value)
+  form.value.category = parent?.name || 'general'
+}
+
+const onSubcategoryChange = () => {
+  if (selectedSubcategoryId.value) {
+    form.value.category_id = selectedSubcategoryId.value
+    const parent = allCategories.value.find(c => c.id === selectedParentCategoryId.value)
+    const sub = parent?.children?.find(c => c.id === selectedSubcategoryId.value)
+    form.value.category = sub?.name || parent?.name || 'general'
+  } else {
+    form.value.category_id = selectedParentCategoryId.value
+    const parent = allCategories.value.find(c => c.id === selectedParentCategoryId.value)
+    form.value.category = parent?.name || 'general'
+  }
+}
 
 const loadProducts = async () => {
   loading.value = true
@@ -382,9 +446,12 @@ const openAddModal = () => {
     stock: 0,
     weight: 0,
     category: 'general',
+    category_id: null,
     image_url: '',
     is_active: true
   }
+  selectedParentCategoryId.value = null
+  selectedSubcategoryId.value = null
   formError.value = null
   showModal.value = true
 }
@@ -398,9 +465,32 @@ const editProduct = (product: Product) => {
     stock: product.stock,
     weight: parseFloat(String(product.weight || 0)),
     category: product.category,
+    category_id: product.category_id,
     image_url: product.image_url,
     is_active: product.is_active
   }
+
+  // Resolve category_id to parent/sub selections
+  selectedParentCategoryId.value = null
+  selectedSubcategoryId.value = null
+  if (product.category_id) {
+    // Check if it's a parent category
+    const asParent = allCategories.value.find(c => c.id === product.category_id)
+    if (asParent) {
+      selectedParentCategoryId.value = asParent.id
+    } else {
+      // It's a subcategory — find its parent
+      for (const parent of allCategories.value) {
+        const sub = parent.children?.find(c => c.id === product.category_id)
+        if (sub) {
+          selectedParentCategoryId.value = parent.id
+          selectedSubcategoryId.value = sub.id
+          break
+        }
+      }
+    }
+  }
+
   formError.value = null
   showModal.value = true
 }
@@ -463,5 +553,6 @@ const confirmDelete = async () => {
 
 onMounted(() => {
   loadProducts()
+  fetchCategories()
 })
 </script>

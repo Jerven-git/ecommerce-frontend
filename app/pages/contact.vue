@@ -62,40 +62,32 @@
               </div>
 
               <div v-else class="space-y-2">
-                <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
-                  <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 group-hover:bg-blue-100 transition-colors">
-                    <svg class="w-4.5 h-4.5 w-[18px] h-[18px] text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
+                <template v-if="contactEntries.length">
+                  <div v-for="(entry, i) in contactEntries" :key="i" class="p-3 rounded-xl hover:bg-gray-50 transition-colors group">
+                    <p v-if="entry.label" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{{ entry.label }}</p>
+                    <div class="space-y-1.5">
+                      <div v-if="entry.email" class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 group-hover:bg-blue-100 transition-colors">
+                          <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <a :href="`mailto:${entry.email}`" class="text-sm text-gray-700 hover:text-blue-600 transition-colors">{{ entry.email }}</a>
+                      </div>
+                      <div v-if="entry.phone" class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition-colors">
+                          <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                          </svg>
+                        </div>
+                        <a :href="`tel:${entry.phone}`" class="text-sm text-gray-700 hover:text-emerald-600 transition-colors">{{ entry.phone }}</a>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Email</p>
-                    <p class="text-sm text-gray-700">{{ siteConfig?.contact_email || 'contact@store.com' }}</p>
-                  </div>
-                </div>
+                </template>
 
-                <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
-                  <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition-colors">
-                    <svg class="w-[18px] h-[18px] text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Phone</p>
-                    <p class="text-sm text-gray-700">{{ siteConfig?.contact_phone || '+1234567890' }}</p>
-                  </div>
-                </div>
-
-                <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
-                  <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center shrink-0 group-hover:bg-purple-100 transition-colors">
-                    <svg class="w-[18px] h-[18px] text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Office Hours</p>
-                    <p class="text-sm text-gray-700">Mon – Fri, 9:00 AM – 6:00 PM</p>
-                  </div>
+                <div v-else class="text-sm text-gray-400 text-center py-4">
+                  Contact information not configured yet.
                 </div>
               </div>
             </div>
@@ -156,6 +148,22 @@
                     <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Message</label>
                     <textarea v-model="form.message" required rows="4" class="input-field resize-none" placeholder="Tell us how we can help..."></textarea>
                   </div>
+
+                  <Transition
+                    enter-active-class="transition duration-200 ease-out"
+                    enter-from-class="opacity-0 -translate-y-1"
+                    enter-to-class="opacity-100 translate-y-0"
+                    leave-active-class="transition duration-150 ease-in"
+                    leave-from-class="opacity-100"
+                    leave-to-class="opacity-0"
+                  >
+                    <div v-if="submitError" class="flex items-start gap-2.5 p-3 bg-red-50 border border-red-100 rounded-xl">
+                      <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <p class="text-sm text-red-600">{{ submitError }}</p>
+                    </div>
+                  </Transition>
 
                   <button
                     type="submit"
@@ -259,6 +267,12 @@
 </template>
 
 <script setup lang="ts">
+interface ContactEntry {
+  label: string
+  email: string
+  phone: string
+}
+
 interface SiteConfig {
   id: number
   site_name: string
@@ -270,6 +284,7 @@ interface SiteConfig {
   about_content: string
   contact_email: string
   contact_phone: string
+  contact_entries: ContactEntry[]
   contact_image_url?: string | null
   updated_at: string
 }
@@ -288,6 +303,18 @@ const imageLoaded = ref(false)
 const form = ref({ name: '', email: '', subject: '', message: '' })
 const submitting = ref(false)
 const success = ref(false)
+const submitError = ref('')
+const { execute: executeRecaptcha } = useRecaptcha()
+
+const contactEntries = computed(() => {
+  const entries = siteConfig.value?.contact_entries?.filter(e => e.email || e.phone)
+  if (entries?.length) return entries
+  // Fallback to legacy single fields
+  if (siteConfig.value?.contact_email || siteConfig.value?.contact_phone) {
+    return [{ label: 'General', email: siteConfig.value.contact_email, phone: siteConfig.value.contact_phone }]
+  }
+  return []
+})
 
 const openFaq = ref<number | null>(null)
 const toggleFaq = (i: number) => {
@@ -366,11 +393,36 @@ const fetchSiteConfig = async () => {
 const handleSubmit = async () => {
   submitting.value = true
   success.value = false
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  form.value = { name: '', email: '', subject: '', message: '' }
-  success.value = true
-  submitting.value = false
-  setTimeout(() => { success.value = false }, 5000)
+  submitError.value = ''
+
+  try {
+    let recaptchaToken: string
+    try {
+      recaptchaToken = await executeRecaptcha('contact_form')
+    } catch (recaptchaErr) {
+      console.error('reCAPTCHA error:', recaptchaErr)
+      submitError.value = 'Security verification failed. Please refresh the page and try again.'
+      submitting.value = false
+      return
+    }
+
+    await $apiFetch('/contact', {
+      method: 'POST',
+      body: {
+        ...form.value,
+        recaptcha_token: recaptchaToken,
+      },
+    })
+
+    form.value = { name: '', email: '', subject: '', message: '' }
+    success.value = true
+    setTimeout(() => { success.value = false }, 5000)
+  } catch (err: any) {
+    console.error('Contact form error:', err)
+    submitError.value = err?.data?.message || 'Failed to send message. Please try again.'
+  } finally {
+    submitting.value = false
+  }
 }
 
 onMounted(() => {
