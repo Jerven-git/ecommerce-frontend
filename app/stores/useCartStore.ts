@@ -6,6 +6,11 @@ interface CartItem {
   price: number
   quantity: number
   weight: number
+  length_cm: number
+  width_cm: number
+  height_cm: number
+  volume_cbm: number
+  shipping_calc_type: 'weight' | 'dimensions'
   image_url?: string
 }
 
@@ -21,6 +26,7 @@ interface TaxCalculation {
 interface ShippingCalculation {
   base_shipping: number
   weight_fee: number
+  volume_fee: number
   options_fee: number
   total: number
   free_shipping: boolean
@@ -32,6 +38,7 @@ export const useCartStore = defineStore('cart', {
     taxCalculation: null as TaxCalculation | null,
     shippingCalculation: null as ShippingCalculation | null,
     shippingOptions: [] as string[],
+    shippingAddress: null as { country: string; state: string; city: string } | null,
     loading: false
   }),
 
@@ -41,7 +48,15 @@ export const useCartStore = defineStore('cart', {
     },
 
     totalWeight: (state) => {
-      return state.items.reduce((total, item) => total + (item.weight * item.quantity), 0)
+      return state.items
+        .filter(item => item.shipping_calc_type !== 'dimensions')
+        .reduce((total, item) => total + (item.weight * item.quantity), 0)
+    },
+
+    totalVolumeCbm: (state) => {
+      return state.items
+        .filter(item => item.shipping_calc_type === 'dimensions')
+        .reduce((total, item) => total + (item.volume_cbm * item.quantity), 0)
     },
 
     rawSubtotal: (state) => {
@@ -74,7 +89,7 @@ export const useCartStore = defineStore('cart', {
     },
 
     taxInfo(): { enabled: boolean; rate: number; name: string; mode: string } {
-      if (!this.taxCalculation) {
+      if (!this.taxCalculation || !this.taxCalculation.tax_rate) {
         return { enabled: false, rate: 0, name: 'Tax', mode: 'exclusive' }
       }
       return {
@@ -99,11 +114,17 @@ export const useCartStore = defineStore('cart', {
           price: parseFloat(product.price),
           quantity: 1,
           weight: parseFloat(product.weight || 0),
+          length_cm: parseFloat(product.length_cm || 0),
+          width_cm: parseFloat(product.width_cm || 0),
+          height_cm: parseFloat(product.height_cm || 0),
+          volume_cbm: parseFloat(product.volume_cbm || 0),
+          shipping_calc_type: product.shipping_calc_type || 'weight',
           image_url: product.image_url
         })
       }
 
       this.calculateTax()
+      this.calculateShipping()
     },
 
     removeItem(productId: number) {
@@ -160,16 +181,28 @@ export const useCartStore = defineStore('cart', {
         return
       }
 
+      // Store the address for reuse (e.g. when shipping options change)
+      if (address) {
+        this.shippingAddress = address
+      }
+
+      const addr = address || this.shippingAddress
+
+      if (!addr?.country && !addr?.state && !addr?.city) {
+        return
+      }
+
       try {
         const { $apiFetch } = useNuxtApp()
 
         const response = await $apiFetch<ShippingCalculation>('/shipping/calculate', {
           method: 'POST',
           body: {
-            country: address?.country || '',
-            state: address?.state || '',
-            city: address?.city || '',
+            country: addr?.country || '',
+            state: addr?.state || '',
+            city: addr?.city || '',
             weight: this.totalWeight,
+            volume_cbm: this.totalVolumeCbm,
             order_amount: this.rawSubtotal,
             options: this.shippingOptions
           }
@@ -190,6 +223,7 @@ export const useCartStore = defineStore('cart', {
     clearCart() {
       this.items = []
       this.taxCalculation = null
+      this.shippingAddress = null
       this.shippingCalculation = null
       this.shippingOptions = []
     }
