@@ -93,16 +93,16 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">City *</label>
-                    <input v-model="form.city" type="text" required class="input-field" @change="updateShipping" />
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Country *</label>
+                    <CountrySelect v-model="form.country" placeholder="Select country" required />
                   </div>
                   <div>
                     <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">State / Province *</label>
-                    <input v-model="form.state" type="text" required class="input-field" @change="updateShipping" />
+                    <SearchableSelect v-model="form.state" :options="checkoutStateOptions" placeholder="Select state / province" required allow-free-text />
                   </div>
                   <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Country *</label>
-                    <input v-model="form.country" type="text" required class="input-field" @change="updateShipping" />
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">City *</label>
+                    <SearchableSelect v-model="form.city" :options="checkoutCityOptions" placeholder="Select city" required allow-free-text />
                   </div>
                 </div>
               </div>
@@ -382,6 +382,7 @@
 <script setup lang="ts">
 const cartStore = useCartStore()
 const { $apiFetch } = useNuxtApp()
+const { getStates, getCities } = useRegions()
 
 const deliveryMethod = ref<'delivery' | 'pickup'>('delivery')
 
@@ -393,6 +394,19 @@ const form = ref({
   city: '',
   state: '',
   country: ''
+})
+
+// Dynamic state/city options based on selected country/state
+const checkoutStateOptions = computed(() => getStates(form.value.country))
+const checkoutCityOptions = computed(() => getCities(form.value.country, form.value.state))
+
+// Clear dependent fields when parent changes
+watch(() => form.value.country, () => {
+  form.value.state = ''
+  form.value.city = ''
+})
+watch(() => form.value.state, () => {
+  form.value.city = ''
 })
 
 const shippingOptions = ref<any[]>([])
@@ -489,20 +503,33 @@ const getPaymentConfig = (methodId: string) => {
   return method?.config || null
 }
 
-const updateShipping = async () => {
-  if (deliveryMethod.value === 'pickup') {
-    cartStore.shippingCalculation = null
-    return
-  }
-
-  if (form.value.country && form.value.state && form.value.city) {
-    await cartStore.calculateShipping({
-      country: form.value.country,
-      state: form.value.state,
-      city: form.value.city
-    })
-  }
+let shippingDebounceTimer: ReturnType<typeof setTimeout>
+const debouncedShippingUpdate = () => {
+  clearTimeout(shippingDebounceTimer)
+  shippingDebounceTimer = setTimeout(async () => {
+    if (deliveryMethod.value === 'pickup') {
+      cartStore.shippingCalculation = null
+      return
+    }
+    if (form.value.country && form.value.state && form.value.city) {
+      await cartStore.calculateShipping({
+        country: form.value.country,
+        state: form.value.state,
+        city: form.value.city
+      })
+    }
+  }, 500)
 }
+
+// Watch address fields for changes (handles typing, autofill, paste)
+watch(
+  () => [form.value.city, form.value.state, form.value.country],
+  () => {
+    if (deliveryMethod.value === 'delivery') {
+      debouncedShippingUpdate()
+    }
+  }
+)
 
 const updateShippingOptions = () => {
   if (deliveryMethod.value === 'delivery') {
@@ -668,7 +695,7 @@ watch(deliveryMethod, (newMethod) => {
     selectedShippingOptions.value = []
     cartStore.setShippingOptions([])
   } else {
-    updateShipping()
+    debouncedShippingUpdate()
   }
 })
 

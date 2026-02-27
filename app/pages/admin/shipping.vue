@@ -114,7 +114,7 @@
             </div>
 
             <!-- Rate inputs (visible when enabled) -->
-            <div v-if="zone.enabled" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div v-if="zone.enabled" class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1.5">Base Rate</label>
                 <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
@@ -131,7 +131,18 @@
                   <span class="px-3 flex items-center bg-gray-50 text-gray-500 text-sm border-r border-gray-300 select-none">$</span>
                   <input v-model.number="zone.per_kg_rate" type="number" step="0.01" min="0" class="flex-1 px-3 py-2 text-sm outline-none" placeholder="0.00" />
                 </div>
-                <p class="text-xs text-gray-400 mt-1">Additional charge per kilogram</p>
+                <p class="text-xs text-gray-400 mt-1">Charge per kilogram</p>
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1.5">Per CBM Rate
+                  <span class="ml-1 font-normal text-gray-400">(optional)</span>
+                </label>
+                <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                  <span class="px-3 flex items-center bg-gray-50 text-gray-500 text-sm border-r border-gray-300 select-none">$</span>
+                  <input v-model.number="zone.per_cbm_rate" type="number" step="0.01" min="0" class="flex-1 px-3 py-2 text-sm outline-none" placeholder="0.00" />
+                </div>
+                <p class="text-xs text-gray-400 mt-1">Charge per cubic meter</p>
               </div>
             </div>
           </div>
@@ -139,7 +150,7 @@
       </section>
 
       <!-- Store Location -->
-      <section class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
         <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
             <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -157,15 +168,15 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1.5">Country</label>
-              <input v-model="form.store_country" type="text" class="input-field" placeholder="Philippines" />
+              <CountrySelect v-model="form.store_country" placeholder="Select country" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1.5">State / Province</label>
-              <input v-model="form.store_state" type="text" class="input-field" placeholder="Metro Manila" />
+              <SearchableSelect v-model="form.store_state" :options="stateOptions" placeholder="Select state / province" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1.5">City</label>
-              <input v-model="form.store_city" type="text" class="input-field" placeholder="Manila" />
+              <SearchableSelect v-model="form.store_city" :options="cityOptions" placeholder="Select city" allow-free-text />
             </div>
           </div>
         </div>
@@ -246,9 +257,11 @@ interface ShippingZone {
   enabled: boolean
   base_rate: number
   per_kg_rate: number
+  per_cbm_rate: number
 }
 
 const { $apiFetch } = useNuxtApp()
+const { getStates, getCities } = useRegions()
 
 const loading = ref(true)
 const saving = ref(false)
@@ -266,6 +279,19 @@ const form = ref({
   store_city: ''
 })
 
+// Dynamic state/city options based on selected country/state
+const stateOptions = computed(() => getStates(form.value.store_country))
+const cityOptions = computed(() => getCities(form.value.store_country, form.value.store_state))
+
+// Clear dependent fields when parent changes
+watch(() => form.value.store_country, () => {
+  form.value.store_state = ''
+  form.value.store_city = ''
+})
+watch(() => form.value.store_state, () => {
+  form.value.store_city = ''
+})
+
 const shippingZones = ref<ShippingZone[]>([
   {
     id: 'own_city',
@@ -273,7 +299,8 @@ const shippingZones = ref<ShippingZone[]>([
     description: 'Same city as store location',
     enabled: true,
     base_rate: 0,
-    per_kg_rate: 0
+    per_kg_rate: 0,
+    per_cbm_rate: 0
   },
   {
     id: 'own_state',
@@ -281,7 +308,8 @@ const shippingZones = ref<ShippingZone[]>([
     description: 'Same state/province, different city',
     enabled: true,
     base_rate: 0,
-    per_kg_rate: 0
+    per_kg_rate: 0,
+    per_cbm_rate: 0
   },
   {
     id: 'own_country',
@@ -289,23 +317,8 @@ const shippingZones = ref<ShippingZone[]>([
     description: 'Same country, different state/province',
     enabled: true,
     base_rate: 0,
-    per_kg_rate: 0
-  },
-  {
-    id: 'other_city',
-    label: 'Other City (International)',
-    description: 'Different country, specific city',
-    enabled: false,
-    base_rate: 0,
-    per_kg_rate: 0
-  },
-  {
-    id: 'other_state',
-    label: 'Other State (International)',
-    description: 'Different country, specific state/region',
-    enabled: false,
-    base_rate: 0,
-    per_kg_rate: 0
+    per_kg_rate: 0,
+    per_cbm_rate: 0
   },
   {
     id: 'other_country',
@@ -313,7 +326,8 @@ const shippingZones = ref<ShippingZone[]>([
     description: 'Any international destination',
     enabled: true,
     base_rate: 0,
-    per_kg_rate: 0
+    per_kg_rate: 0,
+    per_cbm_rate: 0
   }
 ])
 
@@ -345,6 +359,7 @@ const loadSettings = async () => {
             existingZone.enabled = zone.enabled
             existingZone.base_rate = parseFloat(zone.base_rate)
             existingZone.per_kg_rate = parseFloat(zone.per_kg_rate)
+            existingZone.per_cbm_rate = parseFloat(zone.per_cbm_rate) || 0
           }
         })
       }
@@ -371,7 +386,8 @@ const saveSettings = async () => {
           zone_type: zone.id,
           enabled: zone.enabled,
           base_rate: zone.base_rate,
-          per_kg_rate: zone.per_kg_rate
+          per_kg_rate: zone.per_kg_rate,
+          per_cbm_rate: zone.per_cbm_rate
         }))
       }
     })

@@ -61,7 +61,7 @@
               <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Product</th>
               <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Price</th>
               <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Stock</th>
-              <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Weight</th>
+              <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Weight / Dims</th>
               <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Category</th>
               <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
               <th class="px-6 py-3.5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
@@ -100,7 +100,12 @@
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                {{ parseFloat(String(product.weight || 0)).toFixed(2) }} kg
+                <template v-if="product.shipping_calc_type === 'dimensions'">
+                  <span class="text-xs">{{ product.volume_cbm?.toFixed(4) }} m³</span>
+                </template>
+                <template v-else>
+                  {{ parseFloat(String(product.weight || 0)).toFixed(2) }} kg
+                </template>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
@@ -212,7 +217,7 @@
                     <textarea v-model="form.description" rows="3" class="input-field resize-none leading-relaxed" placeholder="Brief product description…"></textarea>
                   </div>
 
-                  <div class="grid grid-cols-3 gap-3">
+                  <div class="grid grid-cols-2 gap-3">
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-1.5">Price <span class="text-red-400">*</span></label>
                       <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
@@ -224,12 +229,73 @@
                       <label class="block text-sm font-medium text-gray-700 mb-1.5">Stock <span class="text-red-400">*</span></label>
                       <input v-model.number="form.stock" type="number" min="0" required class="input-field" placeholder="0" />
                     </div>
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1.5">Weight <span class="text-red-400">*</span></label>
-                      <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
-                        <input v-model.number="form.weight" type="number" step="0.01" min="0" required class="flex-1 px-2.5 py-2 text-sm outline-none w-0" placeholder="0.00" />
-                        <span class="px-2.5 flex items-center bg-gray-50 text-gray-500 text-xs border-l border-gray-300 select-none">kg</span>
+                  </div>
+
+                  <!-- Shipping Calculation Type -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Shipping Calculation</label>
+                    <div class="inline-flex rounded-lg border border-gray-200 p-0.5 bg-gray-50">
+                      <button
+                        type="button"
+                        @click="form.shipping_calc_type = 'weight'"
+                        class="px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all duration-150"
+                        :class="form.shipping_calc_type === 'weight' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+                      >
+                        By Weight
+                      </button>
+                      <button
+                        type="button"
+                        @click="form.shipping_calc_type = 'dimensions'"
+                        class="px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all duration-150"
+                        :class="form.shipping_calc_type === 'dimensions' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+                      >
+                        By Dimensions
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Weight (shown when shipping_calc_type is weight) -->
+                  <div v-if="form.shipping_calc_type === 'weight'">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Weight</label>
+                    <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent max-w-xs">
+                      <input v-model.number="form.weight" type="number" step="0.01" min="0" class="flex-1 px-2.5 py-2 text-sm outline-none w-0" placeholder="0.00" />
+                      <span class="px-2.5 flex items-center bg-gray-50 text-gray-500 text-xs border-l border-gray-300 select-none">kg</span>
+                    </div>
+                  </div>
+
+                  <!-- Dimensions (shown when shipping_calc_type is dimensions) -->
+                  <div v-if="form.shipping_calc_type === 'dimensions'" class="space-y-3">
+                    <div class="grid grid-cols-3 gap-3">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Length</label>
+                        <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                          <input v-model.number="form.length_cm" type="number" step="0.01" min="0" class="flex-1 px-2.5 py-2 text-sm outline-none w-0" placeholder="0" />
+                          <span class="px-2 flex items-center bg-gray-50 text-gray-500 text-xs border-l border-gray-300 select-none">cm</span>
+                        </div>
                       </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Width</label>
+                        <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                          <input v-model.number="form.width_cm" type="number" step="0.01" min="0" class="flex-1 px-2.5 py-2 text-sm outline-none w-0" placeholder="0" />
+                          <span class="px-2 flex items-center bg-gray-50 text-gray-500 text-xs border-l border-gray-300 select-none">cm</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Height</label>
+                        <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                          <input v-model.number="form.height_cm" type="number" step="0.01" min="0" class="flex-1 px-2.5 py-2 text-sm outline-none w-0" placeholder="0" />
+                          <span class="px-2 flex items-center bg-gray-50 text-gray-500 text-xs border-l border-gray-300 select-none">cm</span>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Volume CBM info -->
+                    <div v-if="computedVolumeCbm > 0" class="flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg">
+                      <svg class="w-4 h-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span class="text-xs text-blue-700 font-medium">
+                        Volume: {{ computedVolumeCbm.toFixed(6) }} m³ ({{ (computedVolumeCbm * 1000).toFixed(3) }} L)
+                      </span>
                     </div>
                   </div>
 
@@ -333,6 +399,11 @@ interface Product {
   price: number | string
   stock: number
   weight: number | string
+  length_cm: number | string
+  width_cm: number | string
+  height_cm: number | string
+  shipping_calc_type: 'weight' | 'dimensions'
+  volume_cbm: number
   category: string
   category_id: number | null
   image_url: string
@@ -376,10 +447,22 @@ const form = ref({
   price: 0,
   stock: 0,
   weight: 0,
+  length_cm: 0,
+  width_cm: 0,
+  height_cm: 0,
+  shipping_calc_type: 'weight' as 'weight' | 'dimensions',
   category: 'general',
   category_id: null as number | null,
   image_url: '',
   is_active: true
+})
+
+const computedVolumeCbm = computed(() => {
+  const l = Number(form.value.length_cm) || 0
+  const w = Number(form.value.width_cm) || 0
+  const h = Number(form.value.height_cm) || 0
+  if (l <= 0 || w <= 0 || h <= 0) return 0
+  return (l * w * h) / 1000000
 })
 
 const fetchCategories = async () => {
@@ -445,6 +528,10 @@ const openAddModal = () => {
     price: 0,
     stock: 0,
     weight: 0,
+    length_cm: 0,
+    width_cm: 0,
+    height_cm: 0,
+    shipping_calc_type: 'weight',
     category: 'general',
     category_id: null,
     image_url: '',
@@ -464,6 +551,10 @@ const editProduct = (product: Product) => {
     price: parseFloat(product.price as string),
     stock: product.stock,
     weight: parseFloat(String(product.weight || 0)),
+    length_cm: parseFloat(String(product.length_cm || 0)),
+    width_cm: parseFloat(String(product.width_cm || 0)),
+    height_cm: parseFloat(String(product.height_cm || 0)),
+    shipping_calc_type: product.shipping_calc_type || 'weight',
     category: product.category,
     category_id: product.category_id,
     image_url: product.image_url,
