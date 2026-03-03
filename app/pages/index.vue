@@ -212,15 +212,15 @@
     </section>
 
     <!-- Newsletter CTA -->
-    <section class="py-20 bg-[#4B5979] text-white relative overflow-hidden">
+    <section class="py-20 text-white relative overflow-hidden" :style="{ backgroundColor: 'var(--color-secondary)' }">
       <div class="absolute inset-0 opacity-5 pointer-events-none">
         <div class="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-white blur-3xl"></div>
         <div class="absolute bottom-0 right-1/4 w-72 h-72 rounded-full bg-white blur-3xl"></div>
       </div>
       <div class="relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <p class="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">Stay in the loop</p>
+        <p class="text-xs font-semibold uppercase tracking-widest text-white mb-3">Stay in the loop</p>
         <h2 class="text-3xl md:text-4xl font-bold mb-4">Don't miss a deal.</h2>
-        <p class="text-gray-400 text-sm mb-8 max-w-sm mx-auto">Get the latest products, exclusive offers, and updates delivered straight to your inbox.</p>
+        <p class="text-white text-sm mb-8 max-w-sm mx-auto">Get the latest products, exclusive offers, and updates delivered straight to your inbox.</p>
         <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" @submit.prevent>
           <input
             type="email"
@@ -234,7 +234,7 @@
             Subscribe
           </button>
         </form>
-        <p class="text-gray-600 text-xs mt-4">No spam, ever. Unsubscribe anytime.</p>
+        <p class="text-white text-xs mt-4">No spam, ever. Unsubscribe anytime.</p>
       </div>
     </section>
   </div>
@@ -252,15 +252,6 @@ interface Product {
   updated_at: string
 }
 
-interface SiteConfig {
-  id: number
-  hero_title: string
-  hero_subtitle: string
-  primary_color: string
-  secondary_color: string
-  hero_image_url?: string | null
-}
-
 interface ProductsResponse {
   data: Product[]
   meta?: {
@@ -271,11 +262,8 @@ interface ProductsResponse {
   }
 }
 
-interface SiteConfigResponse {
-  data: SiteConfig
-}
-
 const { $apiFetch } = useNuxtApp()
+const { siteConfig } = useSiteConfig()
 
 const stats = [
   { value: '500+', label: 'Products' },
@@ -287,7 +275,6 @@ const stats = [
 const products = ref<Product[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
-const siteConfig = ref<SiteConfig | null>(null)
 const imageLoading = ref(false)
 const imageLoaded = ref(false)
 
@@ -331,31 +318,18 @@ const fetchData = async () => {
   error.value = null
 
   try {
-    const [productsResponse, configResponse] = await Promise.all([
-      $apiFetch<ProductsResponse>('/products', {
-        method: 'GET',
-        query: {
-          is_active: 1,
-          limit: 8,
-          sort: 'created_at',
-          order: 'desc'
-        }
-      }),
-      $apiFetch<SiteConfigResponse>('/site-config', {
-        method: 'GET'
-      }).catch(() => null)
-    ])
+    const productsResponse = await $apiFetch<ProductsResponse>('/products', {
+      method: 'GET',
+      query: {
+        is_active: 1,
+        limit: 8,
+        sort: 'created_at',
+        order: 'desc'
+      }
+    })
 
     if (productsResponse?.data) {
       products.value = productsResponse.data
-    }
-
-    if (configResponse?.data) {
-      siteConfig.value = configResponse.data
-
-      if (configResponse.data.hero_image_url) {
-        preloadImage(configResponse.data.hero_image_url)
-      }
     }
   } catch (err: any) {
     console.error('Error fetching data:', err)
@@ -364,6 +338,11 @@ const fetchData = async () => {
     loading.value = false
   }
 }
+
+// Preload hero image when siteConfig becomes available
+watch(() => siteConfig.value?.hero_image_url, (url) => {
+  if (url) preloadImage(url)
+}, { immediate: true })
 
 onMounted(() => {
   fetchData()

@@ -141,44 +141,8 @@
 </template>
 
 <script setup lang="ts">
-interface SiteConfig {
-  id: number
-  site_name: string
-  hero_title: string
-  hero_subtitle: string
-  primary_color: string
-  secondary_color: string
-  logo_url: string
-  favicon_url: string
-}
-
-interface SiteConfigResponse {
-  data: SiteConfig
-}
-
 const cartStore = useCartStore()
 const authStore = useAuthStore()
-const { $apiFetch } = useNuxtApp()
-
+const { siteConfig } = useSiteConfig()
 const mobileMenuOpen = ref(false)
-const siteConfig = ref<SiteConfig | null>(null)
-
-onMounted(async () => {
-  try {
-    const response = await $apiFetch<SiteConfigResponse>('/site-config')
-    siteConfig.value = response.data
-  } catch (error) {
-    console.warn('Failed to load site config:', error)
-    siteConfig.value = {
-      id: 0,
-      site_name: 'Store',
-      hero_title: '',
-      hero_subtitle: '',
-      primary_color: '#6898ED',
-      secondary_color: '#4B5979',
-      logo_url: '',
-      favicon_url: '',
-    }
-  }
-})
 </script>
