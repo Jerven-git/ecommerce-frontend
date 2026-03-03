@@ -188,7 +188,7 @@
     </section>
 
     <!-- Support Promise Strip -->
-    <section class="bg-[#4B5979] text-white py-14">
+    <section class="text-white py-14" :style="{ backgroundColor: 'var(--color-secondary)' }">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div class="group flex flex-col items-center px-6">
@@ -273,30 +273,9 @@ interface ContactEntry {
   phone: string
 }
 
-interface SiteConfig {
-  id: number
-  site_name: string
-  primary_color: string
-  secondary_color: string
-  logo_url: string
-  hero_title: string
-  hero_subtitle: string
-  about_content: string
-  contact_email: string
-  contact_phone: string
-  contact_entries: ContactEntry[]
-  contact_image_url?: string | null
-  updated_at: string
-}
-
-interface SiteConfigResponse {
-  data: SiteConfig
-}
-
 const { $apiFetch } = useNuxtApp()
 
-const siteConfig = ref<SiteConfig | null>(null)
-const loading = ref(true)
+const { siteConfig, pending: loading } = useSiteConfig()
 const imageLoading = ref(false)
 const imageLoaded = ref(false)
 
@@ -373,22 +352,9 @@ const preloadImage = (url: string) => {
   img.src = url
 }
 
-const fetchSiteConfig = async () => {
-  loading.value = true
-  try {
-    const response = await $apiFetch<SiteConfigResponse>('/site-config', { method: 'GET' })
-    if (response?.data) {
-      siteConfig.value = response.data
-      if (response.data.contact_image_url) {
-        preloadImage(response.data.contact_image_url)
-      }
-    }
-  } catch (err) {
-    console.error('Error fetching site config:', err)
-  } finally {
-    loading.value = false
-  }
-}
+watch(() => siteConfig.value?.contact_image_url, (url) => {
+  if (url) preloadImage(url)
+}, { immediate: true })
 
 const handleSubmit = async () => {
   submitting.value = true
@@ -425,9 +391,6 @@ const handleSubmit = async () => {
   }
 }
 
-onMounted(() => {
-  fetchSiteConfig()
-})
 </script>
 
 <style scoped>

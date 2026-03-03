@@ -84,7 +84,7 @@
         </div>
       </section>
 
-      <!-- Brand Colors -->
+      <!-- Theme -->
       <section class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
@@ -93,12 +93,34 @@
             </svg>
           </div>
           <div>
-            <h2 class="text-sm font-semibold text-gray-900">Brand Colors</h2>
-            <p class="text-xs text-gray-400">Primary and secondary palette</p>
+            <h2 class="text-sm font-semibold text-gray-900">Theme</h2>
+            <p class="text-xs text-gray-400">Colors, fonts, and presets</p>
           </div>
         </div>
 
         <div class="p-6 space-y-5">
+          <!-- Theme Presets -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Theme Presets</label>
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-for="preset in themePresets"
+                :key="preset.name"
+                type="button"
+                class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-all hover:shadow-sm"
+                :class="isActivePreset(preset) ? 'border-gray-400 bg-gray-50 ring-1 ring-gray-300' : 'border-gray-200 hover:border-gray-300'"
+                @click="applyPreset(preset)"
+              >
+                <span class="flex gap-0.5">
+                  <span class="w-4 h-4 rounded-full border border-white shadow-sm" :style="{ backgroundColor: preset.primary }"></span>
+                  <span class="w-4 h-4 rounded-full border border-white shadow-sm" :style="{ backgroundColor: preset.secondary }"></span>
+                </span>
+                {{ preset.name }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Color Pickers -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1.5">Primary Color</label>
@@ -144,6 +166,22 @@
               :style="{ backgroundColor: form.secondary_color }"
             >
               Secondary
+            </div>
+          </div>
+
+          <!-- Fonts -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Heading Font</label>
+              <select v-model="form.heading_font" class="input-field text-sm">
+                <option v-for="font in availableFonts" :key="font" :value="font">{{ font }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Body Font</label>
+              <select v-model="form.body_font" class="input-field text-sm">
+                <option v-for="font in availableFonts" :key="font" :value="font">{{ font }}</option>
+              </select>
             </div>
           </div>
         </div>
@@ -355,6 +393,7 @@
 
 <script setup lang="ts">
 import type { MediaCollection } from '~/composables/useMediaUpload'
+import { AVAILABLE_FONTS } from '~/composables/useTheme'
 
 definePageMeta({ middleware: "auth" })
 
@@ -364,27 +403,35 @@ interface ContactEntry {
   phone: string
 }
 
-interface SiteConfig {
-  id: number
-  site_name: string
-  primary_color: string
-  secondary_color: string
-  logo_url: string
-  favicon_url: string
-  hero_title: string
-  hero_subtitle: string
-  hero_image_url: string
-  about_content: string
-  about_image_url: string
-  contact_image_url: string
-  contact_email: string
-  contact_phone: string
-  contact_entries: ContactEntry[]
-  updated_at: string
+interface SiteConfigResponse {
+  data: Record<string, any>
 }
 
-interface SiteConfigResponse {
-  data: SiteConfig
+// --- Theme presets ---
+interface ThemePreset {
+  name: string
+  primary: string
+  secondary: string
+}
+
+const themePresets: ThemePreset[] = [
+  { name: 'Ocean Blue', primary: '#6898ED', secondary: '#4B5979' },
+  { name: 'Forest Green', primary: '#4CAF50', secondary: '#2E7D32' },
+  { name: 'Warm Sunset', primary: '#FF7043', secondary: '#BF360C' },
+  { name: 'Soft Lavender', primary: '#9575CD', secondary: '#4527A0' },
+  { name: 'Minimal Mono', primary: '#424242', secondary: '#212121' },
+]
+
+const availableFonts = AVAILABLE_FONTS
+
+function applyPreset(preset: ThemePreset) {
+  form.value.primary_color = preset.primary
+  form.value.secondary_color = preset.secondary
+}
+
+function isActivePreset(preset: ThemePreset): boolean {
+  return form.value.primary_color.toLowerCase() === preset.primary.toLowerCase()
+    && form.value.secondary_color.toLowerCase() === preset.secondary.toLowerCase()
 }
 
 const { $apiFetch } = useNuxtApp()
@@ -414,6 +461,8 @@ const form = ref({
   site_name: "",
   primary_color: "#6898ED",
   secondary_color: "#4B5979",
+  heading_font: "Inter",
+  body_font: "Inter",
   logo_url: "",
   favicon_url: "",
   hero_title: "",
@@ -478,6 +527,8 @@ async function loadSettings() {
         site_name: response.data.site_name || "",
         primary_color: response.data.primary_color || "#6898ED",
         secondary_color: response.data.secondary_color || "#4B5979",
+        heading_font: response.data.heading_font || "Inter",
+        body_font: response.data.body_font || "Inter",
         logo_url: response.data.logo_url || "",
         favicon_url: response.data.favicon_url || "",
         hero_title: response.data.hero_title || "",
@@ -524,6 +575,8 @@ async function saveSettings() {
         site_name: form.value.site_name,
         primary_color: form.value.primary_color,
         secondary_color: form.value.secondary_color,
+        heading_font: form.value.heading_font,
+        body_font: form.value.body_font,
         hero_title: form.value.hero_title,
         hero_subtitle: form.value.hero_subtitle,
         about_content: form.value.about_content,
@@ -532,6 +585,11 @@ async function saveSettings() {
         contact_entries: form.value.contact_entries,
       },
     })
+
+    // Refresh shared siteConfig so the theme updates live
+    const { fetchSiteConfig } = useSiteConfig()
+    useState<boolean>('siteConfigFetched').value = false
+    await fetchSiteConfig()
 
     success.value = true
     setTimeout(() => (success.value = false), 3000)

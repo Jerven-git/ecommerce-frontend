@@ -125,29 +125,8 @@
 </template>
 
 <script setup lang="ts">
-interface SiteConfig {
-  id: number
-  site_name: string
-  primary_color: string
-  secondary_color: string
-  logo_url: string
-  hero_title: string
-  hero_subtitle: string
-  about_content: string
-  contact_email: string
-  contact_phone: string
-  about_image_url?: string | null
-  updated_at: string
-}
+const { siteConfig, pending: loading, fetchSiteConfig } = useSiteConfig()
 
-interface SiteConfigResponse {
-  data: SiteConfig
-}
-
-const { $apiFetch } = useNuxtApp()
-
-const siteConfig = ref<SiteConfig | null>(null)
-const loading = ref(true)
 const error = ref<string | null>(null)
 const imageLoading = ref(false)
 const imageLoaded = ref(false)
@@ -187,33 +166,9 @@ const preloadImage = (url: string) => {
   img.src = url
 }
 
-const fetchSiteConfig = async () => {
-  loading.value = true
-  error.value = null
-
-  try {
-    const response = await $apiFetch<SiteConfigResponse>('/site-config', {
-      method: 'GET'
-    })
-
-    if (response?.data) {
-      siteConfig.value = response.data
-
-      if (response.data.about_image_url) {
-        preloadImage(response.data.about_image_url)
-      }
-    }
-  } catch (err: any) {
-    console.error('Error fetching site config:', err)
-    error.value = err?.data?.message || 'Failed to load site configuration.'
-  } finally {
-    loading.value = false
-  }
-}
-
-onMounted(() => {
-  fetchSiteConfig()
-})
+watch(() => siteConfig.value?.about_image_url, (url) => {
+  if (url) preloadImage(url)
+}, { immediate: true })
 </script>
 
 <style scoped>

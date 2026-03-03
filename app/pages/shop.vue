@@ -183,7 +183,7 @@
     </div>
 
     <!-- Promo Banner -->
-    <section class="relative overflow-hidden bg-gradient-to-br from-[#4B5979] via-blue-600 to-blue-400 text-white py-16">
+    <section class="relative overflow-hidden text-white py-16" :style="{ background: `linear-gradient(135deg, var(--color-secondary), var(--color-primary), var(--color-primary-400))` }">
       <!-- Floating orbs -->
       <div class="orb orb-1" />
       <div class="orb orb-2" />
@@ -223,7 +223,8 @@
 
         <NuxtLink
           to="/shop"
-          class="inline-flex items-center gap-2 bg-white text-blue-700 font-bold px-8 py-3.5 rounded-xl shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300"
+          class="inline-flex items-center gap-2 bg-white font-bold px-8 py-3.5 rounded-xl shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300"
+          :style="{ color: 'var(--color-primary-700)' }"
         >
           Shop New Arrivals
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -415,9 +416,9 @@ onMounted(() => {
 }
 
 .category-pill-active {
-  background-color: #4B5979;
+  background-color: var(--color-secondary);
   color: #fff;
-  box-shadow: 0 1px 3px rgba(75, 89, 121, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .category-pill-inactive {
@@ -426,8 +427,8 @@ onMounted(() => {
   border: 1px solid #e5e7eb;
 }
 .category-pill-inactive:hover {
-  border-color: #93a3c0;
-  color: #4B5979;
+  border-color: var(--color-secondary-300);
+  color: var(--color-secondary);
 }
 
 .slider-arrow {
