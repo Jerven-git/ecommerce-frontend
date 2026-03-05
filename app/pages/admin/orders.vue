@@ -67,8 +67,42 @@
             </div>
           </div>
 
-          <!-- Status selector -->
-          <div class="flex items-center gap-2 shrink-0">
+          <!-- Payment badge + Status selector -->
+          <div class="flex items-center gap-2 shrink-0 flex-wrap">
+            <!-- Payment badge -->
+            <span
+              v-if="order.payment"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+              :class="{
+                'bg-green-50 text-green-700': order.payment.status === 'paid',
+                'bg-amber-50 text-amber-700': order.payment.status === 'pending',
+                'bg-red-50 text-red-700': order.payment.status === 'failed',
+              }"
+            >
+              {{ order.payment.provider === 'cash' ? 'COD' : order.payment.provider.charAt(0).toUpperCase() + order.payment.provider.slice(1) }}
+              &middot;
+              {{ order.payment.status.charAt(0).toUpperCase() + order.payment.status.slice(1) }}
+            </span>
+
+            <!-- Confirm Payment button for pending COD -->
+            <button
+              v-if="order.payment?.provider === 'cash' && order.payment?.status === 'pending'"
+              @click="promptConfirmPayment(order.id, order.customer_name)"
+              :disabled="confirmingOrderId === order.id"
+              class="text-xs font-medium px-3 py-1.5 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 transition-colors"
+            >
+              {{ confirmingOrderId === order.id ? 'Confirming...' : 'Confirm Payment' }}
+            </button>
+
+            <!-- Undo Payment button for paid COD -->
+            <button
+              v-if="order.payment?.provider === 'cash' && order.payment?.status === 'paid'"
+              @click="promptUndoPayment(order.id, order.customer_name)"
+              :disabled="undoingOrderId === order.id"
+              class="text-xs font-medium px-3 py-1.5 rounded-lg bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-50 transition-colors"
+            >
+              {{ undoingOrderId === order.id ? 'Reverting...' : 'Undo Payment' }}
+            </button>
             <div class="relative">
               <select
                 v-model="order.status"
@@ -145,15 +179,68 @@
           <p v-else class="text-sm text-gray-400 italic">No items recorded</p>
         </div>
 
-        <!-- Card footer: total -->
-        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between">
-          <p class="text-xs text-gray-400 font-medium uppercase tracking-wider">Order Total</p>
-          <p class="text-lg font-bold text-gray-900">
-            ${{ parseFloat(String(order.total_amount)).toFixed(2) }}
-          </p>
+        <!-- Card footer: breakdown -->
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-gray-400">Subtotal</span>
+            <span class="text-sm text-gray-600">${{ toFixed(order.subtotal) }}</span>
+          </div>
+          <div v-if="parseFloat(String(order.tax_amount)) > 0" class="flex items-center justify-between">
+            <span class="text-xs text-gray-400">Tax</span>
+            <span class="text-sm text-gray-600">${{ toFixed(order.tax_amount) }}</span>
+          </div>
+          <div v-if="parseFloat(String(order.shipping_amount)) > 0" class="flex items-center justify-between">
+            <span class="text-xs text-gray-400">Shipping</span>
+            <span class="text-sm text-gray-600">${{ toFixed(order.shipping_amount) }}</span>
+          </div>
+          <div v-if="parseFloat(String(order.discount_amount)) > 0" class="flex items-center justify-between">
+            <span class="text-xs text-green-500">Discount <span v-if="order.discount_code" class="font-mono">({{ order.discount_code }})</span></span>
+            <span class="text-sm text-green-600">-${{ toFixed(order.discount_amount) }}</span>
+          </div>
+          <div class="flex items-center justify-between pt-1.5 border-t border-gray-200">
+            <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Total</span>
+            <span class="text-lg font-bold text-gray-900">${{ toFixed(order.total_amount) }}</span>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Toast notification -->
+    <Transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="opacity-0 -translate-y-2"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 -translate-y-2"
+    >
+      <div v-if="toast" class="fixed top-4 right-4 z-40 max-w-sm">
+        <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl shadow-lg px-4 py-3 flex items-start gap-3">
+          <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-sm font-medium">{{ toast }}</p>
+          <button @click="toast = null" class="shrink-0 text-red-400 hover:text-red-600">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- Confirm Modal -->
+    <ConfirmModal
+      :open="confirmModal.open"
+      :title="confirmModal.title"
+      :message="confirmModal.message"
+      :confirm-text="confirmModal.confirmText"
+      :loading-text="confirmModal.loadingText"
+      :loading="confirmModal.loading"
+      :variant="confirmModal.variant"
+      @confirm="onModalConfirm"
+      @cancel="confirmModal.open = false"
+    />
   </div>
 </template>
 
@@ -172,6 +259,12 @@ interface OrderItem {
   subtotal: number | string
 }
 
+interface Payment {
+  id: number
+  provider: string
+  status: 'pending' | 'paid' | 'failed'
+}
+
 interface Order {
   id: number
   customer_name: string
@@ -179,9 +272,15 @@ interface Order {
   customer_phone?: string
   shipping_address: string
   total_amount: string | number
+  subtotal: string | number
+  tax_amount: string | number
+  shipping_amount: string | number
+  discount_code?: string | null
+  discount_amount: string | number
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
   created_at: string
   items?: OrderItem[]
+  payment?: Payment | null
 }
 
 interface OrdersResponse {
@@ -194,6 +293,51 @@ const orders = ref<Order[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 const updatingOrderId = ref<number | null>(null)
+const confirmingOrderId = ref<number | null>(null)
+const undoingOrderId = ref<number | null>(null)
+const toast = ref<string | null>(null)
+let toastTimer: ReturnType<typeof setTimeout> | null = null
+
+const showToast = (message: string) => {
+  if (toastTimer) clearTimeout(toastTimer)
+  toast.value = message
+  toastTimer = setTimeout(() => { toast.value = null }, 5000)
+}
+
+const confirmModal = reactive({
+  open: false,
+  title: '',
+  message: '',
+  confirmText: 'Confirm',
+  loadingText: 'Processing…',
+  loading: false,
+  variant: 'success' as 'danger' | 'success' | 'warning',
+  action: null as (() => Promise<void>) | null,
+})
+
+const openConfirmModal = (opts: {
+  title: string
+  message: string
+  confirmText: string
+  loadingText: string
+  variant: 'danger' | 'success' | 'warning'
+  action: () => Promise<void>
+}) => {
+  Object.assign(confirmModal, opts, { open: true, loading: false })
+}
+
+const onModalConfirm = async () => {
+  if (!confirmModal.action) return
+  confirmModal.loading = true
+  try {
+    await confirmModal.action()
+  } finally {
+    confirmModal.loading = false
+    confirmModal.open = false
+  }
+}
+
+const toFixed = (value: string | number) => parseFloat(String(value)).toFixed(2)
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -213,7 +357,7 @@ const loadOrders = async () => {
     const response = await $apiFetch<OrdersResponse>('/orders', {
       method: 'GET',
       query: {
-        include: 'items',
+        include: 'items,payment',
         sort: 'created_at',
         order: 'desc'
       }
@@ -246,10 +390,54 @@ const updateOrderStatus = async (orderId: number, status: string) => {
   } catch (err: any) {
     console.error('Error updating order status:', err)
     await loadOrders()
-    alert(err?.data?.message || 'Failed to update order status')
+    showToast(err?.data?.message || 'Failed to update order status')
   } finally {
     updatingOrderId.value = null
   }
+}
+
+const promptConfirmPayment = (orderId: number, customerName: string) => {
+  openConfirmModal({
+    title: 'Confirm Cash Payment',
+    message: `Mark payment as received for order #${orderId} (${customerName})? This will deduct stock.`,
+    confirmText: 'Confirm Payment',
+    loadingText: 'Confirming…',
+    variant: 'success',
+    action: async () => {
+      confirmingOrderId.value = orderId
+      try {
+        await $apiFetch(`/orders/${orderId}/confirm-payment`, { method: 'POST' })
+        await loadOrders()
+      } catch (err: any) {
+        console.error('Error confirming payment:', err)
+        showToast(err?.data?.message || 'Failed to confirm payment')
+      } finally {
+        confirmingOrderId.value = null
+      }
+    },
+  })
+}
+
+const promptUndoPayment = (orderId: number, customerName: string) => {
+  openConfirmModal({
+    title: 'Undo Payment',
+    message: `Revert payment for order #${orderId} (${customerName}) back to pending? Stock will be restored.`,
+    confirmText: 'Undo Payment',
+    loadingText: 'Reverting…',
+    variant: 'warning',
+    action: async () => {
+      undoingOrderId.value = orderId
+      try {
+        await $apiFetch(`/orders/${orderId}/undo-payment`, { method: 'POST' })
+        await loadOrders()
+      } catch (err: any) {
+        console.error('Error undoing payment:', err)
+        showToast(err?.data?.message || 'Failed to undo payment')
+      } finally {
+        undoingOrderId.value = null
+      }
+    },
+  })
 }
 
 onMounted(() => {

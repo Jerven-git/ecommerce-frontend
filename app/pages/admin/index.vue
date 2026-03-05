@@ -14,7 +14,7 @@
 
     <div v-else class="space-y-6">
       <!-- Stat cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- Total Products -->
         <NuxtLink
           to="/admin/products"
@@ -75,6 +75,20 @@
             </div>
           </div>
           <p class="text-3xl font-bold text-gray-900">${{ stats.totalRevenue.toFixed(2) }}</p>
+        </div>
+
+        <!-- Pending Revenue -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+          <div class="flex items-start justify-between mb-4">
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Pending Revenue</p>
+            <div class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+          <p class="text-3xl font-bold text-gray-900">${{ stats.pendingRevenue.toFixed(2) }}</p>
+          <p v-if="stats.pendingRevenue > 0" class="text-xs text-orange-500 font-medium mt-1">Awaiting payment confirmation</p>
         </div>
       </div>
 
@@ -161,12 +175,19 @@ definePageMeta({
   layout: 'admin'
 })
 
+interface Payment {
+  id: number
+  provider: string
+  status: 'pending' | 'paid' | 'failed'
+}
+
 interface Order {
   id: number
   customer_name: string
   total_amount: string | number
   status: string
   created_at: string
+  payment?: Payment | null
 }
 
 interface ProductsResponse {
@@ -185,7 +206,8 @@ const stats = ref({
   totalProducts: 0,
   totalOrders: 0,
   pendingOrders: 0,
-  totalRevenue: 0
+  totalRevenue: 0,
+  pendingRevenue: 0,
 })
 
 const recentOrders = ref<Order[]>([])
@@ -196,7 +218,7 @@ const loadDashboardData = async () => {
   try {
     const [productsRes, allOrdersRes, pendingOrdersRes, recentOrdersRes] = await Promise.all([
       $apiFetch<ProductsResponse>('/products', { method: 'GET' }),
-      $apiFetch<OrdersResponse>('/orders', { method: 'GET' }),
+      $apiFetch<OrdersResponse>('/orders', { method: 'GET', query: { include: 'payment' } }),
       $apiFetch<OrdersResponse>('/orders', {
         method: 'GET',
         query: { status: 'pending' }
@@ -214,8 +236,11 @@ const loadDashboardData = async () => {
     stats.value.totalOrders = allOrdersRes?.data?.length || 0
     stats.value.pendingOrders = pendingOrdersRes?.data?.length || 0
 
-    stats.value.totalRevenue =
-      allOrdersRes?.data?.reduce((sum, order) => sum + parseFloat(String(order.total_amount)), 0) || 0
+    const paidOrders = allOrdersRes?.data?.filter(o => o.payment?.status === 'paid') || []
+    stats.value.totalRevenue = paidOrders.reduce((sum, o) => sum + parseFloat(String(o.total_amount)), 0) || 0
+
+    const pendingPaymentOrders = allOrdersRes?.data?.filter(o => o.payment?.status === 'pending') || []
+    stats.value.pendingRevenue = pendingPaymentOrders.reduce((sum, o) => sum + parseFloat(String(o.total_amount)), 0) || 0
 
     if (recentOrdersRes?.data) {
       recentOrders.value = recentOrdersRes.data.slice(0, 5)
