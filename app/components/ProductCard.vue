@@ -1,6 +1,7 @@
 <template>
-  <div class="card hover:shadow-xl transition-shadow group">
-    <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200 mb-4">
+  <div class="card hover:shadow-xl transition-shadow group cursor-pointer" @click="showModal = true">
+    <!-- Image with hover overlay -->
+    <div class="relative w-full overflow-hidden rounded-lg bg-gray-200 mb-4">
       <img
         v-if="product.image_url"
         :src="product.image_url"
@@ -11,6 +12,13 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
+      </div>
+
+      <!-- Hover overlay -->
+      <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
+        <span class="opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-sm text-gray-700 text-sm font-semibold shadow-lg">
+          View
+        </span>
       </div>
     </div>
 
@@ -25,13 +33,19 @@
       </div>
 
       <button
-        @click="addToCart"
+        @click.stop="addToCart"
         :disabled="product.stock === 0"
         class="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {{ product.stock === 0 ? 'Out of Stock' : 'Add to Cart' }}
       </button>
     </div>
+
+    <ProductViewModal
+      :open="showModal"
+      :product="product"
+      @close="showModal = false"
+    />
   </div>
 </template>
 
@@ -40,9 +54,10 @@ const props = defineProps<{
   product: any
 }>()
 
-const usecartStore = useCartStore()
+const cartStore = useCartStore()
+const showModal = ref(false)
 
 const addToCart = () => {
-  usecartStore.addItem(props.product)
+  cartStore.addItem(props.product)
 }
 </script>
