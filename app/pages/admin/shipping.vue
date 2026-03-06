@@ -268,6 +268,7 @@ const saving = ref(false)
 const success = ref(false)
 const error = ref<string | null>(null)
 const saveError = ref<string | null>(null)
+const isLoading = ref(false)
 
 const form = ref({
   express_post_fee: 0,
@@ -285,10 +286,12 @@ const cityOptions = computed(() => getCities(form.value.store_country, form.valu
 
 // Clear dependent fields when parent changes
 watch(() => form.value.store_country, () => {
+  if (isLoading.value) return
   form.value.store_state = ''
   form.value.store_city = ''
 })
 watch(() => form.value.store_state, () => {
+  if (isLoading.value) return
   form.value.store_city = ''
 })
 
@@ -341,6 +344,7 @@ const loadSettings = async () => {
     })
 
     if (response?.data) {
+      isLoading.value = true
       form.value = {
         express_post_fee: response.data.express_post_fee || 0,
         registered_post_fee: response.data.registered_post_fee || 0,
@@ -350,7 +354,8 @@ const loadSettings = async () => {
         store_state: response.data.store_state || '',
         store_city: response.data.store_city || ''
       }
-
+      nextTick(() => { isLoading.value = false })
+      
       // Load shipping zones
       if (response.data.zones) {
         response.data.zones.forEach((zone: any) => {

@@ -32,7 +32,12 @@
                 </div>
                 <div class="md:col-span-2">
                   <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Phone</label>
-                  <input v-model="form.customer_phone" type="tel" class="input-field" placeholder="+1 555 000 0000" />
+                  <PhoneInput
+                    v-model="form.customer_phone"
+                    :default-country="storeCountry"
+                    @update:dial-code="phoneDialCode = $event"
+                    placeholder="Phone number"
+                  />
                 </div>
               </div>
             </div>
@@ -345,6 +350,20 @@
                   <span class="text-gray-600">Shipping (Pickup)</span>
                   <span class="font-semibold text-green-600">FREE</span>
                 </div>
+                <div v-else-if="cartStore.shippingError" class="space-y-2">
+                  <div class="flex justify-between text-sm text-red-500">
+                    <span>Shipping</span>
+                    <span class="font-medium">Unavailable</span>
+                  </div>
+                  <div class="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                    <svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p class="text-xs text-amber-800 leading-relaxed">
+                      We don't currently ship to this location. Please try a different address or contact us for assistance.
+                    </p>
+                  </div>
+                </div>
                 <div v-else-if="!cartStore.shippingCalculation" class="flex justify-between text-sm text-gray-400">
                   <span>Shipping</span>
                   <span class="italic">Enter address</span>
@@ -385,6 +404,8 @@ const { $apiFetch } = useNuxtApp()
 const { getStates, getCities } = useRegions()
 
 const deliveryMethod = ref<'delivery' | 'pickup'>('delivery')
+const storeCountry = ref('')
+const phoneDialCode = ref('')
 
 const form = ref({
   customer_name: '',
@@ -438,7 +459,8 @@ const isFormValid = computed(() => {
     !!form.value.shipping_address &&
     !!form.value.city &&
     !!form.value.state &&
-    !!form.value.country
+    !!form.value.country &&
+    !cartStore.shippingError
 })
 
 const canShowPaymentUI = computed(() => isFormValid.value)
@@ -537,6 +559,15 @@ const updateShippingOptions = () => {
   }
 }
 
+const loadStoreCountry = async () => {
+  try {
+    const res = await $apiFetch<any>('/shipping-settings', { method: 'GET' })
+    if (res?.data?.store_country) {
+      storeCountry.value = res.data.store_country
+    }
+  } catch { /* non-critical */ }
+}
+
 const loadShippingOptions = async () => {
   try {
     const response = await $apiFetch<any>('/shipping/options', { method: 'GET' })
@@ -573,7 +604,9 @@ const buildOrderData = () => {
   return {
     customer_name: form.value.customer_name,
     customer_email: form.value.customer_email,
-    customer_phone: form.value.customer_phone,
+    customer_phone: form.value.customer_phone
+      ? `${phoneDialCode.value} ${form.value.customer_phone}`.trim()
+      : '',
     shipping_address: shippingAddress,
 
     country: form.value.country,
@@ -710,6 +743,7 @@ onMounted(() => {
     return
   }
 
+  loadStoreCountry()
   loadShippingOptions()
   loadPaymentMethods()
   cartStore.calculateTax()

@@ -39,6 +39,7 @@ export const useCartStore = defineStore('cart', {
     shippingCalculation: null as ShippingCalculation | null,
     shippingOptions: [] as string[],
     shippingAddress: null as { country: string; state: string; city: string } | null,
+    shippingError: null as string | null,
     loading: false
   }),
 
@@ -208,10 +209,18 @@ export const useCartStore = defineStore('cart', {
           }
         })
 
-        this.shippingCalculation = response
+        const res = response as any
+        if (res?.error) {
+          this.shippingCalculation = null
+          this.shippingError = res.error
+        } else {
+          this.shippingCalculation = response
+          this.shippingError = null
+        }
       } catch (error) {
         console.error('Error calculating shipping:', error)
         this.shippingCalculation = null
+        this.shippingError = null
       }
     },
 
@@ -225,6 +234,7 @@ export const useCartStore = defineStore('cart', {
       this.taxCalculation = null
       this.shippingAddress = null
       this.shippingCalculation = null
+      this.shippingError = null
       this.shippingOptions = []
     }
   }
