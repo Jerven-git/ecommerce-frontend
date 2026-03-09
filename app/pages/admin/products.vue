@@ -317,8 +317,28 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Image URL</label>
-                    <input v-model="form.image_url" type="url" class="input-field" placeholder="https://example.com/image.jpg" />
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Image</label>
+                    <div v-if="imagePreview || (editingProduct && editingProduct.image_url)" class="mb-2 flex items-center gap-3">
+                      <img
+                        :src="imagePreview || editingProduct?.image_url"
+                        alt="Preview"
+                        class="h-16 w-16 rounded-lg object-cover border border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        @click="removeImage"
+                        class="text-xs text-red-500 hover:text-red-700 font-medium"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <input
+                      ref="imageInput"
+                      type="file"
+                      accept="image/*"
+                      @change="onImageSelected"
+                      class="block w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                    />
                   </div>
 
                   <!-- Active toggle -->
@@ -428,6 +448,9 @@ const editingProduct = ref<Product | null>(null)
 const showDeleteModal = ref(false)
 const deletingId = ref<number | null>(null)
 const deleting = ref(false)
+const imageFile = ref<File | null>(null)
+const imagePreview = ref<string | null>(null)
+const imageInput = ref<HTMLInputElement | null>(null)
 
 // Categories
 const allCategories = ref<Category[]>([])
@@ -453,7 +476,6 @@ const form = ref({
   shipping_calc_type: 'weight' as 'weight' | 'dimensions',
   category: 'general',
   category_id: null as number | null,
-  image_url: '',
   is_active: true
 })
 
@@ -464,6 +486,22 @@ const computedVolumeCbm = computed(() => {
   if (l <= 0 || w <= 0 || h <= 0) return 0
   return (l * w * h) / 1000000
 })
+
+const onImageSelected = (event: Event) => {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (file) {
+    imageFile.value = file
+    imagePreview.value = URL.createObjectURL(file)
+  }
+}
+
+const removeImage = () => {
+  imageFile.value = null
+  imagePreview.value = null
+  if (imageInput.value) {
+    imageInput.value.value = ''
+  }
+}
 
 const fetchCategories = async () => {
   try {
@@ -534,9 +572,10 @@ const openAddModal = () => {
     shipping_calc_type: 'weight',
     category: 'general',
     category_id: null,
-    image_url: '',
     is_active: true
   }
+  imageFile.value = null
+  imagePreview.value = null
   selectedParentCategoryId.value = null
   selectedSubcategoryId.value = null
   formError.value = null
@@ -557,9 +596,10 @@ const editProduct = (product: Product) => {
     shipping_calc_type: product.shipping_calc_type || 'weight',
     category: product.category,
     category_id: product.category_id,
-    image_url: product.image_url,
     is_active: product.is_active
   }
+  imageFile.value = null
+  imagePreview.value = null
 
   // Resolve category_id to parent/sub selections
   selectedParentCategoryId.value = null
@@ -597,17 +637,35 @@ const saveProduct = async () => {
   formError.value = null
 
   try {
+    const formData = new FormData()
+    formData.append('name', form.value.name)
+    formData.append('description', form.value.description)
+    formData.append('price', String(form.value.price))
+    formData.append('stock', String(form.value.stock))
+    formData.append('weight', String(form.value.weight))
+    formData.append('length_cm', String(form.value.length_cm))
+    formData.append('width_cm', String(form.value.width_cm))
+    formData.append('height_cm', String(form.value.height_cm))
+    formData.append('shipping_calc_type', form.value.shipping_calc_type)
+    formData.append('category', form.value.category)
+    if (form.value.category_id !== null) {
+      formData.append('category_id', String(form.value.category_id))
+    }
+    formData.append('is_active', form.value.is_active ? '1' : '0')
+    if (imageFile.value) {
+      formData.append('image', imageFile.value)
+    }
+
     if (editingProduct.value) {
-      // Update existing product
+      formData.append('_method', 'PATCH')
       await $apiFetch(`/products/${editingProduct.value.id}`, {
-        method: 'PATCH',
-        body: form.value
+        method: 'POST',
+        body: formData
       })
     } else {
-      // Create new product
       await $apiFetch('/products', {
         method: 'POST',
-        body: form.value
+        body: formData
       })
     }
 
