@@ -21,5 +21,6 @@ useHead({
 
 onMounted(() => {
   fetchSiteConfig()
+  useFavoritesStore().load()
 })
 </script>

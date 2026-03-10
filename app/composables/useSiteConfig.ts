@@ -16,6 +16,7 @@ export interface SiteConfig {
   contact_email: string | null
   contact_phone: string | null
   contact_entries: Array<{ label: string; email: string | null; phone: string | null }> | null
+  favorites_enabled: boolean
   updated_at: string
 }
 

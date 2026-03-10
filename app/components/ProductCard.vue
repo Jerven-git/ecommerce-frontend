@@ -14,6 +14,26 @@
         </svg>
       </div>
 
+      <!-- Favorite button -->
+      <button
+        v-if="favoritesEnabled"
+        @click.stop="toggleFavorite"
+        class="absolute top-2 right-2 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white transition-all duration-200 hover:scale-110"
+        :aria-label="isFavorited ? 'Remove from favorites' : 'Add to favorites'"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-5 h-5 transition-colors duration-200"
+          :class="isFavorited ? 'text-red-500' : 'text-gray-400 hover:text-red-400'"
+          :fill="isFavorited ? 'currentColor' : 'none'"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </button>
+
       <!-- Hover overlay -->
       <div class="absolute inset-0 bg-white/5 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
         <span class="translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-white text-sm font-semibold border border-white/20 shadow-lg">
@@ -55,7 +75,16 @@ const props = defineProps<{
 }>()
 
 const cartStore = useCartStore()
+const favoritesStore = useFavoritesStore()
+const { siteConfig } = useSiteConfig()
 const showModal = ref(false)
+
+const favoritesEnabled = computed(() => siteConfig.value?.favorites_enabled ?? false)
+const isFavorited = computed(() => favoritesStore.isFavorited(props.product.id))
+
+const toggleFavorite = () => {
+  favoritesStore.toggle(props.product.id)
+}
 
 const addToCart = () => {
   cartStore.addItem(props.product)
