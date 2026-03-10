@@ -56,7 +56,7 @@
                 class="absolute inset-0 bg-transparent flex items-center justify-center"
               >
                 <span class="opacity-0 group-hover/img:opacity-100 transition-opacity duration-200 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm text-white shadow-lg">
-                  Full View
+                  View Image
                 </span>
               </div>
             </div>

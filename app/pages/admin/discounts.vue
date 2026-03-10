@@ -22,6 +22,34 @@
       </button>
     </div>
 
+    <!-- Filters -->
+    <div class="mb-6 flex flex-col sm:flex-row gap-3">
+      <div class="relative flex-1">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search by code or description..."
+          class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+        />
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <button
+          v-for="filter in statusFilters"
+          :key="filter.value"
+          @click="selectedStatus = filter.value"
+          class="px-3.5 py-2 text-xs font-semibold rounded-lg border transition-all"
+          :class="selectedStatus === filter.value
+            ? filter.activeClass
+            : 'border-gray-200 text-gray-500 bg-white hover:border-gray-300 hover:text-gray-700'"
+        >
+          {{ filter.label }}
+        </button>
+      </div>
+    </div>
+
     <!-- Loading -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
       <div class="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
@@ -63,7 +91,7 @@
         </div>
         <div>
           <p class="text-sm font-semibold text-gray-900">Discount Codes</p>
-          <p class="text-xs text-gray-400">{{ discounts.length }} code{{ discounts.length !== 1 ? 's' : '' }}</p>
+          <p class="text-xs text-gray-400">{{ totalItems }} code{{ totalItems !== 1 ? 's' : '' }}</p>
         </div>
       </div>
 
@@ -158,6 +186,42 @@
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div v-if="!loading && !error && totalPages > 1" class="mt-6 flex items-center justify-between">
+      <p class="text-sm text-gray-500">
+        Showing {{ ((currentPage - 1) * perPage) + 1 }}–{{ Math.min(currentPage * perPage, totalItems) }} of {{ totalItems }} discounts
+      </p>
+      <div class="flex items-center gap-1">
+        <button
+          @click="goToPage(currentPage - 1)"
+          :disabled="currentPage <= 1"
+          class="px-3 py-1.5 text-sm font-medium rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          Previous
+        </button>
+        <template v-for="page in visiblePages" :key="page">
+          <span v-if="page === '...'" class="px-2 text-gray-400 text-sm">...</span>
+          <button
+            v-else
+            @click="goToPage(page as number)"
+            class="px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
+            :class="page === currentPage
+              ? 'bg-blue-600 text-white border-blue-600'
+              : 'border-gray-200 text-gray-600 hover:bg-gray-50'"
+          >
+            {{ page }}
+          </button>
+        </template>
+        <button
+          @click="goToPage(currentPage + 1)"
+          :disabled="currentPage >= totalPages"
+          class="px-3 py-1.5 text-sm font-medium rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          Next
+        </button>
       </div>
     </div>
 
@@ -383,8 +447,12 @@ interface Discount {
   updated_at: string
 }
 
-interface DiscountsResponse {
+interface PaginatedResponse {
   data: Discount[]
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
 }
 
 const { $apiFetch } = useNuxtApp()
@@ -399,6 +467,39 @@ const editingDiscount = ref<Discount | null>(null)
 const showDeleteModal = ref(false)
 const deletingId = ref<number | null>(null)
 const deleting = ref(false)
+
+const searchQuery = ref('')
+const selectedStatus = ref('all')
+const currentPage = ref(1)
+const totalPages = ref(1)
+const totalItems = ref(0)
+const perPage = 15
+
+const statusFilters = [
+  { label: 'All', value: 'all', activeClass: 'bg-gray-900 text-white border-gray-900' },
+  { label: 'Active', value: 'active', activeClass: 'bg-green-600 text-white border-green-600' },
+  { label: 'Inactive', value: 'inactive', activeClass: 'bg-gray-600 text-white border-gray-600' },
+]
+
+const visiblePages = computed(() => {
+  const total = totalPages.value
+  const current = currentPage.value
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
+  const pages: (number | string)[] = [1]
+  if (current > 3) pages.push('...')
+  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+    pages.push(i)
+  }
+  if (current < total - 2) pages.push('...')
+  pages.push(total)
+  return pages
+})
+
+const goToPage = (page: number) => {
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+  loadDiscounts()
+}
 
 const form = ref({
   code: '',
@@ -416,16 +517,28 @@ const loadDiscounts = async () => {
   error.value = null
 
   try {
-    const response = await $apiFetch<DiscountsResponse>('/discounts', {
+    const query: Record<string, any> = {
+      sort: 'created_at',
+      order: 'desc',
+      page: currentPage.value,
+      per_page: perPage,
+    }
+
+    if (selectedStatus.value === 'active') query.is_active = 1
+    else if (selectedStatus.value === 'inactive') query.is_active = 0
+
+    if (searchQuery.value.trim()) query.search = searchQuery.value.trim()
+
+    const response = await $apiFetch<PaginatedResponse>('/discounts', {
       method: 'GET',
-      query: {
-        sort: 'created_at',
-        order: 'desc'
-      }
+      query,
     })
 
     if (response?.data) {
       discounts.value = response.data
+      currentPage.value = response.current_page
+      totalPages.value = response.last_page
+      totalItems.value = response.total
     }
   } catch (err: any) {
     console.error('Error loading discounts:', err)
@@ -520,6 +633,20 @@ const confirmDelete = async () => {
     deleting.value = false
   }
 }
+
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
+watch(searchQuery, () => {
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    currentPage.value = 1
+    loadDiscounts()
+  }, 400)
+})
+
+watch(selectedStatus, () => {
+  currentPage.value = 1
+  loadDiscounts()
+})
 
 onMounted(() => {
   loadDiscounts()

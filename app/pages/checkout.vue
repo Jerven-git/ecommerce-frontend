@@ -395,6 +395,36 @@
       </div>
     </div>
 
+    <!-- DEV: Test busy overlay button (remove before production) -->
+    <button
+      @click="testBusyOverlay"
+      class="fixed bottom-4 right-4 z-40 px-3 py-2 bg-red-500 text-white text-xs font-bold rounded-lg shadow-lg hover:bg-red-600 transition-colors"
+    >
+      Test Busy Overlay
+    </button>
+
+    <!-- Busy / Queue Overlay -->
+    <Transition name="fade">
+      <div v-if="busyQueue" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center">
+          <div class="flex justify-center mb-5">
+            <div class="relative w-16 h-16">
+              <div class="absolute inset-0 rounded-full border-4 border-blue-100"></div>
+              <div class="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
+              <div class="absolute inset-3 rounded-full border-4 border-blue-300 border-b-transparent animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
+            </div>
+          </div>
+          <h3 class="text-lg font-bold text-gray-900 mb-2">Just a moment...</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">{{ busyMessage }}</p>
+          <div class="mt-4 flex justify-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style="animation-delay: 0s;"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style="animation-delay: 0.15s;"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style="animation-delay: 0.3s;"></span>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
   </div>
 </template>
 
@@ -438,6 +468,8 @@ const loadingPaymentMethods = ref(true)
 
 const submitting = ref(false)
 const error = ref<string | null>(null)
+const busyQueue = ref(false)
+const busyMessage = ref('')
 
 const discountCode = ref('')
 const appliedDiscount = ref<{ code: string; type: 'percentage' | 'fixed'; value: number } | null>(null)
@@ -626,6 +658,34 @@ const buildOrderData = () => {
   }
 }
 
+// DEV: Test the busy overlay (remove before production)
+const testBusyOverlay = () => {
+  busyQueue.value = true
+  busyMessage.value = 'We\'re experiencing high demand. Your order will be placed shortly...'
+  setTimeout(() => { busyQueue.value = false }, 5000)
+}
+
+// Retry-aware fetch: shows busy UI on 429 and auto-retries
+const fetchWithRetry = async <T = any>(url: string, opts: any, maxRetries = 3): Promise<T> => {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await $apiFetch<T>(url, opts)
+    } catch (err: any) {
+      const status = err?.status ?? err?.statusCode ?? err?.response?.status
+      if (status === 429 && attempt < maxRetries) {
+        const retryAfter = parseInt(err?.response?.headers?.get?.('Retry-After') || err?.data?.retry_after || '5', 10)
+        const waitSeconds = Math.min(Math.max(retryAfter, 2), 30)
+        busyQueue.value = true
+        busyMessage.value = 'We\'re experiencing high demand. Your order will be placed shortly...'
+        await new Promise(resolve => setTimeout(resolve, waitSeconds * 1000))
+        continue
+      }
+      throw err
+    }
+  }
+  throw new Error('Server is busy. Please try again in a moment.')
+}
+
 // Stripe: create order first, then show StripePayment UI
 const createOrderOnly = async () => {
   if (!isFormValid.value) return
@@ -634,7 +694,7 @@ const createOrderOnly = async () => {
   error.value = null
 
   try {
-    const orderRes = await $apiFetch<any>('/orders', {
+    const orderRes = await fetchWithRetry<any>('/orders', {
       method: 'POST',
       body: buildOrderData()
     })
@@ -648,6 +708,7 @@ const createOrderOnly = async () => {
     error.value = err?.data?.message || err?.message || 'Failed to create order.'
   } finally {
     submitting.value = false
+    busyQueue.value = false
   }
 }
 
@@ -666,7 +727,7 @@ const placeOrderAndRedirect = async () => {
       if (!createdOrderId.value) return
     }
 
-    const payRes = await $apiFetch<any>(`/orders/${createdOrderId.value}/pay`, {
+    const payRes = await fetchWithRetry<any>(`/orders/${createdOrderId.value}/pay`, {
       method: 'POST',
       body: { provider: selectedPaymentMethod.value } // paypal|square
     })
@@ -689,6 +750,7 @@ const placeOrderAndRedirect = async () => {
     error.value = err?.data?.message || err?.message || 'Failed to start payment.'
   } finally {
     submitting.value = false
+    busyQueue.value = false
   }
 }
 
@@ -708,7 +770,7 @@ const placeCashOrder = async () => {
   error.value = null
 
   try {
-    await $apiFetch('/orders', {
+    await fetchWithRetry('/orders', {
       method: 'POST',
       body: buildOrderData()
     })
@@ -719,6 +781,7 @@ const placeCashOrder = async () => {
     error.value = err?.data?.message || err?.message || 'Failed to place order.'
   } finally {
     submitting.value = false
+    busyQueue.value = false
   }
 }
 
@@ -749,3 +812,14 @@ onMounted(() => {
   cartStore.calculateTax()
 })
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

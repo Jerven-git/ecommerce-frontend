@@ -25,6 +25,9 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'description', content: 'Meta description' },
+        { 'http-equiv': 'pragma', content: 'no-cache' },
+        { 'http-equiv': 'cache-control', content: 'no-cache' },
+        { 'http-equiv': 'expires', content: '0' }
       ],
       link: [],
     },
