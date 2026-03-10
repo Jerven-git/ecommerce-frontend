@@ -11,6 +11,39 @@
       <p class="text-gray-500 text-sm mt-1">View and manage customer orders</p>
     </div>
 
+    <!-- Filters -->
+    <div class="mb-6 flex flex-col sm:flex-row gap-3">
+      <div class="relative flex-1">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search by name, email, or order #"
+          class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+        />
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <button
+          v-for="status in statusFilters"
+          :key="status.value"
+          @click="selectedStatus = status.value"
+          class="px-3.5 py-2 text-xs font-semibold rounded-lg border transition-all"
+          :class="selectedStatus === status.value
+            ? status.activeClass
+            : 'border-gray-200 text-gray-500 bg-white hover:border-gray-300 hover:text-gray-700'"
+        >
+          {{ status.label }}
+          <span
+            v-if="status.value !== 'all' && getStatusCount(status.value) > 0"
+            class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold"
+            :class="selectedStatus === status.value ? 'bg-white/20' : 'bg-gray-100 text-gray-500'"
+          >{{ getStatusCount(status.value) }}</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Loading -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
       <div class="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
@@ -40,10 +73,21 @@
       <p class="text-sm text-gray-400">Orders will appear here once customers start purchasing</p>
     </div>
 
+    <!-- No results for filters -->
+    <div v-else-if="filteredOrders.length === 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
+      <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <svg class="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+      <p class="font-semibold text-gray-700 mb-1">No matching orders</p>
+      <p class="text-sm text-gray-400">Try adjusting your search or filter</p>
+    </div>
+
     <!-- Orders list -->
     <div v-else class="space-y-4">
       <div
-        v-for="order in orders"
+        v-for="order in filteredOrders"
         :key="order.id"
         class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
       >
@@ -205,6 +249,42 @@
       </div>
     </div>
 
+    <!-- Pagination -->
+    <div v-if="!loading && !error && totalPages > 1" class="mt-6 flex items-center justify-between">
+      <p class="text-sm text-gray-500">
+        Showing {{ ((currentPage - 1) * perPage) + 1 }}–{{ Math.min(currentPage * perPage, totalItems) }} of {{ totalItems }} orders
+      </p>
+      <div class="flex items-center gap-1">
+        <button
+          @click="goToPage(currentPage - 1)"
+          :disabled="currentPage <= 1"
+          class="px-3 py-1.5 text-sm font-medium rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          Previous
+        </button>
+        <template v-for="page in visiblePages" :key="page">
+          <span v-if="page === '...'" class="px-2 text-gray-400 text-sm">...</span>
+          <button
+            v-else
+            @click="goToPage(page as number)"
+            class="px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
+            :class="page === currentPage
+              ? 'bg-blue-600 text-white border-blue-600'
+              : 'border-gray-200 text-gray-600 hover:bg-gray-50'"
+          >
+            {{ page }}
+          </button>
+        </template>
+        <button
+          @click="goToPage(currentPage + 1)"
+          :disabled="currentPage >= totalPages"
+          class="px-3 py-1.5 text-sm font-medium rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+
     <!-- Toast notification -->
     <Transition
       enter-active-class="transition duration-300 ease-out"
@@ -285,6 +365,11 @@ interface Order {
 
 interface OrdersResponse {
   data: Order[]
+  status_counts?: Record<string, number>
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
 }
 
 const { $apiFetch } = useNuxtApp()
@@ -292,6 +377,48 @@ const { $apiFetch } = useNuxtApp()
 const orders = ref<Order[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
+const searchQuery = ref('')
+const selectedStatus = ref('all')
+const statusCounts = ref<Record<string, number>>({})
+const currentPage = ref(1)
+const totalPages = ref(1)
+const totalItems = ref(0)
+const perPage = 15
+
+const visiblePages = computed(() => {
+  const total = totalPages.value
+  const current = currentPage.value
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
+
+  const pages: (number | string)[] = [1]
+  if (current > 3) pages.push('...')
+  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+    pages.push(i)
+  }
+  if (current < total - 2) pages.push('...')
+  pages.push(total)
+  return pages
+})
+
+const goToPage = (page: number) => {
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+  loadOrders()
+}
+
+const statusFilters = [
+  { value: 'all', label: 'All', activeClass: 'border-blue-500 bg-blue-50 text-blue-700' },
+  { value: 'pending', label: 'Pending', activeClass: 'border-amber-500 bg-amber-50 text-amber-700' },
+  { value: 'processing', label: 'Processing', activeClass: 'border-blue-500 bg-blue-50 text-blue-700' },
+  { value: 'shipped', label: 'Shipped', activeClass: 'border-purple-500 bg-purple-50 text-purple-700' },
+  { value: 'delivered', label: 'Delivered', activeClass: 'border-green-500 bg-green-50 text-green-700' },
+  { value: 'cancelled', label: 'Cancelled', activeClass: 'border-gray-500 bg-gray-100 text-gray-700' },
+]
+
+const getStatusCount = (status: string) => statusCounts.value[status] ?? 0
+
+// filteredOrders now just returns the server-filtered results directly
+const filteredOrders = computed(() => orders.value)
 const updatingOrderId = ref<number | null>(null)
 const confirmingOrderId = ref<number | null>(null)
 const undoingOrderId = ref<number | null>(null)
@@ -354,17 +481,36 @@ const loadOrders = async () => {
   error.value = null
 
   try {
+    const query: Record<string, string | number> = {
+      include: 'items,payment',
+      sort: 'created_at',
+      order: 'desc',
+      page: currentPage.value,
+      per_page: perPage,
+    }
+
+    if (selectedStatus.value !== 'all') {
+      query.status = selectedStatus.value
+    }
+
+    const q = searchQuery.value.trim()
+    if (q) {
+      query.search = q
+    }
+
     const response = await $apiFetch<OrdersResponse>('/orders', {
       method: 'GET',
-      query: {
-        include: 'items,payment',
-        sort: 'created_at',
-        order: 'desc'
-      }
+      query,
     })
 
     if (response?.data) {
       orders.value = response.data
+      currentPage.value = response.current_page ?? 1
+      totalPages.value = response.last_page ?? 1
+      totalItems.value = response.total ?? 0
+    }
+    if (response?.status_counts) {
+      statusCounts.value = response.status_counts
     }
   } catch (err: any) {
     console.error('Error loading orders:', err)
@@ -373,6 +519,22 @@ const loadOrders = async () => {
     loading.value = false
   }
 }
+
+// Re-fetch when status filter changes
+watch(selectedStatus, () => {
+  currentPage.value = 1
+  loadOrders()
+})
+
+// Debounced re-fetch when search query changes
+let searchTimer: ReturnType<typeof setTimeout>
+watch(searchQuery, () => {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    currentPage.value = 1
+    loadOrders()
+  }, 400)
+})
 
 const updateOrderStatus = async (orderId: number, status: string) => {
   updatingOrderId.value = orderId
