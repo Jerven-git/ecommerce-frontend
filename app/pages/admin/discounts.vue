@@ -476,7 +476,7 @@ const totalItems = ref(0)
 const perPage = 15
 
 const statusFilters = [
-  { label: 'All', value: 'all', activeClass: 'bg-gray-900 text-white border-gray-900' },
+  { label: 'All', value: 'all', activeClass: 'border-blue-500 bg-blue-50 text-blue-700' },
   { label: 'Active', value: 'active', activeClass: 'bg-green-600 text-white border-green-600' },
   { label: 'Inactive', value: 'inactive', activeClass: 'bg-gray-600 text-white border-gray-600' },
 ]
