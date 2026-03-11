@@ -53,7 +53,7 @@
                     ? 'border-blue-500 bg-blue-50/50'
                     : 'border-gray-200 hover:border-gray-300 bg-white'"
                 >
-                  <input v-model="deliveryMethod" type="radio" value="delivery" class="mt-0.5 h-4 w-4 text-blue-600 shrink-0" />
+                  <input v-model="deliveryMethod" type="radio" value="delivery" class="mt-0.5 h-4 w-4 accent-blue-600 shrink-0" />
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between gap-2">
                       <span class="text-sm font-semibold text-gray-900">Delivery</span>
@@ -72,7 +72,7 @@
                     ? 'border-blue-500 bg-blue-50/50'
                     : 'border-gray-200 hover:border-gray-300 bg-white'"
                 >
-                  <input v-model="deliveryMethod" type="radio" value="pickup" class="mt-0.5 h-4 w-4 text-blue-600 shrink-0" />
+                  <input v-model="deliveryMethod" type="radio" value="pickup" class="mt-0.5 h-4 w-4 accent-blue-600 shrink-0" />
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between gap-2">
                       <span class="text-sm font-semibold text-gray-900">Self Pickup</span>
@@ -136,14 +136,14 @@
                     :value="option.id"
                     v-model="selectedShippingOptions"
                     @change="updateShippingOptions"
-                    class="mt-0.5 h-4 w-4 text-blue-600 rounded shrink-0"
+                    class="mt-0.5 h-4 w-4 accent-blue-600 rounded shrink-0"
                   />
                   <div class="flex-1 min-w-0 flex items-start justify-between gap-4">
                     <div>
                       <p class="text-sm font-semibold text-gray-900">{{ option.name }}</p>
                       <p class="text-xs text-gray-500 mt-0.5">{{ option.description }}</p>
                     </div>
-                    <span class="text-sm font-bold text-blue-600 shrink-0">+${{ parseFloat(option.fee || 0).toFixed(2) }}</span>
+                    <span class="text-sm font-bold accent-blue-600 shrink-0">+${{ parseFloat(option.fee || 0).toFixed(2) }}</span>
                   </div>
                 </label>
               </div>
@@ -181,7 +181,7 @@
                     v-model="selectedPaymentMethod"
                     type="radio"
                     :value="method.id"
-                    class="mt-0.5 h-4 w-4 text-blue-600 shrink-0"
+                    class="mt-0.5 h-4 w-4 accent-blue-600 shrink-0"
                   />
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between gap-2">

@@ -150,7 +150,7 @@
             <div class="relative">
               <select
                 v-model="order.status"
-                @change="updateOrderStatus(order.id, order.status)"
+                @change="onOrderStatusChange(order.id, order.status)"
                 :disabled="updatingOrderId === order.id"
                 class="appearance-none text-sm font-medium rounded-lg border px-3 py-1.5 pr-8 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 :class="{
@@ -195,6 +195,82 @@
           <div class="px-6 py-4">
             <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Ship To</p>
             <p class="text-sm text-gray-600 leading-relaxed">{{ order.shipping_address }}</p>
+          </div>
+        </div>
+
+        <!-- Shipment / Tracking -->
+        <div class="px-6 py-4 border-t border-gray-100">
+          <!-- No shipment yet — show Ship button -->
+          <div v-if="!order.shipment" class="flex items-center justify-between">
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Tracking</p>
+            <button
+              v-if="order.status !== 'cancelled'"
+              @click="promptShipOrder(order.id, order.customer_name)"
+              :disabled="shippingOrderId === order.id"
+              class="text-xs font-medium px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 transition-colors"
+            >
+              {{ shippingOrderId === order.id ? 'Creating…' : 'Ship Order' }}
+            </button>
+            <span v-else class="text-xs text-gray-400 italic">N/A</span>
+          </div>
+
+          <!-- Has shipment — show tracking info + barcode -->
+          <div v-else>
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Tracking</p>
+            <div class="bg-gray-50 rounded-xl p-4 space-y-3">
+              <!-- Tracking number + carrier -->
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div>
+                  <p class="text-xs text-gray-400 mb-0.5">Tracking Number</p>
+                  <p class="text-sm font-mono font-semibold text-gray-900">{{ order.shipment.tracking_number }}</p>
+                </div>
+                <div v-if="order.shipment.carrier" class="text-right">
+                  <p class="text-xs text-gray-400 mb-0.5">Carrier</p>
+                  <p class="text-sm font-medium text-gray-700">{{ order.shipment.carrier }}</p>
+                </div>
+              </div>
+
+              <!-- Barcode -->
+              <div class="flex justify-center bg-white rounded-lg p-3 border border-gray-100">
+                <img
+                  :src="barcodeUrl(order.shipment.tracking_number)"
+                  :alt="`Barcode for ${order.shipment.tracking_number}`"
+                  class="h-16"
+                />
+              </div>
+
+              <!-- Shipment status selector -->
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs text-gray-400 mb-0.5">Shipped</p>
+                  <p class="text-xs text-gray-500">{{ formatDate(order.shipment.shipped_at) }}</p>
+                </div>
+                <div class="relative">
+                  <select
+                    v-model="order.shipment.status"
+                    @change="updateShipmentStatus(order.shipment!)"
+                    :disabled="updatingShipmentId === order.shipment.id"
+                    class="appearance-none text-xs font-medium rounded-lg border px-3 py-1.5 pr-7 outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50 cursor-pointer transition-colors"
+                    :class="{
+                      'bg-gray-50 border-gray-200 text-gray-700': order.shipment.status === 'label_created',
+                      'bg-blue-50 border-blue-200 text-blue-700': order.shipment.status === 'in_transit',
+                      'bg-green-50 border-green-200 text-green-700': order.shipment.status === 'delivered',
+                      'bg-red-50 border-red-200 text-red-700': order.shipment.status === 'returned',
+                    }"
+                  >
+                    <option value="label_created">Label Created</option>
+                    <option value="in_transit">In Transit</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="returned">Returned</option>
+                  </select>
+                  <span class="pointer-events-none absolute inset-y-0 right-1.5 flex items-center">
+                    <svg class="w-3 h-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -345,6 +421,15 @@ interface Payment {
   status: 'pending' | 'paid' | 'failed'
 }
 
+interface ShipmentData {
+  id: number
+  tracking_number: string
+  carrier: string | null
+  status: 'label_created' | 'in_transit' | 'delivered' | 'returned'
+  shipped_at: string
+  delivered_at: string | null
+}
+
 interface Order {
   id: number
   customer_name: string
@@ -361,6 +446,7 @@ interface Order {
   created_at: string
   items?: OrderItem[]
   payment?: Payment | null
+  shipment?: ShipmentData | null
 }
 
 interface OrdersResponse {
@@ -482,7 +568,7 @@ const loadOrders = async () => {
 
   try {
     const query: Record<string, string | number> = {
-      include: 'items,payment',
+      include: 'items,payment,shipment',
       sort: 'created_at',
       order: 'desc',
       page: currentPage.value,
@@ -508,6 +594,10 @@ const loadOrders = async () => {
       currentPage.value = response.current_page ?? 1
       totalPages.value = response.last_page ?? 1
       totalItems.value = response.total ?? 0
+      // Track previous statuses for confirm-on-change
+      for (const o of response.data) {
+        previousStatuses.value[o.id] = o.status
+      }
     }
     if (response?.status_counts) {
       statusCounts.value = response.status_counts
@@ -536,7 +626,53 @@ watch(searchQuery, () => {
   }, 400)
 })
 
-const updateOrderStatus = async (orderId: number, status: string) => {
+const previousStatuses = ref<Record<number, string>>({})
+
+const onOrderStatusChange = (orderId: number, newStatus: string) => {
+  const order = orders.value.find(o => o.id === orderId)
+  if (!order) return
+
+  const needsConfirm = ['shipped', 'cancelled', 'delivered']
+  if (needsConfirm.includes(newStatus)) {
+    const oldStatus = previousStatuses.value[orderId] || order.status
+    const labels: Record<string, { title: string; message: string; variant: 'danger' | 'success' | 'warning' }> = {
+      shipped: {
+        title: 'Mark as Shipped',
+        message: `Mark order #${orderId} (${order.customer_name}) as shipped?`,
+        variant: 'success',
+      },
+      delivered: {
+        title: 'Mark as Delivered',
+        message: `Mark order #${orderId} (${order.customer_name}) as delivered?`,
+        variant: 'success',
+      },
+      cancelled: {
+        title: 'Cancel Order',
+        message: `Cancel order #${orderId} (${order.customer_name})? This may affect payment status.`,
+        variant: 'danger',
+      },
+    }
+    const label = labels[newStatus]!
+
+    openConfirmModal({
+      title: label.title,
+      message: label.message,
+      confirmText: label.title,
+      loadingText: 'Updating…',
+      variant: label.variant,
+      action: async () => {
+        await doUpdateOrderStatus(orderId, newStatus)
+      },
+    })
+
+    // Revert the dropdown visually until confirmed
+    order.status = oldStatus as Order['status']
+  } else {
+    doUpdateOrderStatus(orderId, newStatus)
+  }
+}
+
+const doUpdateOrderStatus = async (orderId: number, status: string) => {
   updatingOrderId.value = orderId
 
   try {
@@ -548,6 +684,7 @@ const updateOrderStatus = async (orderId: number, status: string) => {
     const order = orders.value.find(o => o.id === orderId)
     if (order) {
       order.status = status as Order['status']
+      previousStatuses.value[orderId] = status
     }
   } catch (err: any) {
     console.error('Error updating order status:', err)
@@ -601,6 +738,58 @@ const promptUndoPayment = (orderId: number, customerName: string) => {
     },
   })
 }
+
+const shippingOrderId = ref<number | null>(null)
+const shipCarrier = ref('')
+
+const promptShipOrder = (orderId: number, customerName: string) => {
+  shipCarrier.value = ''
+  openConfirmModal({
+    title: 'Ship Order',
+    message: `Create shipment for order #${orderId} (${customerName})? This will generate a tracking number and barcode.`,
+    confirmText: 'Ship Order',
+    loadingText: 'Creating shipment…',
+    variant: 'success',
+    action: async () => {
+      shippingOrderId.value = orderId
+      try {
+        await $apiFetch(`/orders/${orderId}/ship`, {
+          method: 'POST',
+          body: { carrier: shipCarrier.value || null },
+        })
+        await loadOrders()
+      } catch (err: any) {
+        console.error('Error shipping order:', err)
+        showToast(err?.data?.message || 'Failed to create shipment')
+      } finally {
+        shippingOrderId.value = null
+      }
+    },
+  })
+}
+
+const updatingShipmentId = ref<number | null>(null)
+
+const updateShipmentStatus = async (shipment: ShipmentData) => {
+  updatingShipmentId.value = shipment.id
+  try {
+    await $apiFetch(`/shipments/${shipment.id}`, {
+      method: 'PATCH',
+      body: { status: shipment.status },
+    })
+    await loadOrders()
+  } catch (err: any) {
+    console.error('Error updating shipment:', err)
+    await loadOrders()
+    showToast(err?.data?.message || 'Failed to update shipment status')
+  } finally {
+    updatingShipmentId.value = null
+  }
+}
+
+const config = useRuntimeConfig()
+const barcodeUrl = (trackingNumber: string) =>
+  `${config.public.apiBase}${config.public.apiPath}/tracking/${trackingNumber}/barcode`
 
 onMounted(() => {
   loadOrders()

@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss'
 
 export default {
+  content: [],
   theme: {
     extend: {
       colors: {
@@ -24,4 +25,4 @@ export default {
       },
     },
   },
-} satisfies Config
+} satisfies Partial<Config>
