@@ -627,9 +627,12 @@ async function saveSettings() {
     })
 
     // Refresh shared siteConfig so the theme updates live
-    const { fetchSiteConfig } = useSiteConfig()
+    const { fetchSiteConfig, broadcastConfigUpdate } = useSiteConfig()
     useState<boolean>('siteConfigFetched').value = false
     await fetchSiteConfig()
+
+    // Notify other open tabs to re-fetch and apply the new theme
+    broadcastConfigUpdate()
 
     success.value = true
     setTimeout(() => (success.value = false), 3000)

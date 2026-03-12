@@ -198,7 +198,7 @@
               </svg>
             </div>
             <h3 class="text-sm font-semibold mb-1">Fast Response</h3>
-            <p class="text-gray-400 text-sm">We reply to all inquiries within 24 hours, guaranteed.</p>
+            <p class="text-white text-sm">We reply to all inquiries within 24 hours, guaranteed.</p>
           </div>
 
           <div class="group flex flex-col items-center px-6 border-y md:border-y-0 md:border-x border-white/10 py-8 md:py-0">
@@ -208,7 +208,7 @@
               </svg>
             </div>
             <h3 class="text-sm font-semibold mb-1">Expert Help</h3>
-            <p class="text-gray-400 text-sm">Our trained support team is ready to resolve any issue.</p>
+            <p class="text-white text-sm">Our trained support team is ready to resolve any issue.</p>
           </div>
 
           <div class="group flex flex-col items-center px-6">
@@ -218,7 +218,7 @@
               </svg>
             </div>
             <h3 class="text-sm font-semibold mb-1">100% Private</h3>
-            <p class="text-gray-400 text-sm">Your details are always kept safe and never shared.</p>
+            <p class="text-white text-sm">Your details are always kept safe and never shared.</p>
           </div>
         </div>
       </div>

@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-[#2B437A] py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+  <div class="min-h-screen flex items-center justify-center bg-blue-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
     <!-- Animated background -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
       <!-- Base gradient -->
-      <div class="absolute inset-0 bg-gradient-to-b from-[#1a2d5c] via-[#2B437A] to-[#1e3264]"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-blue-950 via-blue-900 to-blue-950"></div>
 
       <!-- Floating e-commerce icons -->
       <div class="float-icon icon-1">
@@ -92,7 +92,7 @@
       </div>
 
       <!-- Soft glow -->
-      <div class="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#6898ED]/[0.06] rounded-full blur-[150px]"></div>
+      <div class="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-600/[0.06] rounded-full blur-[150px]"></div>
 
       <!-- Subtle dot grid -->
       <div class="absolute inset-0 opacity-[0.025]" style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 40px 40px;"></div>
@@ -108,8 +108,8 @@
           class="text-center mb-8"
           :class="mounted ? 'animate-stagger-1' : 'opacity-0 translate-y-4'"
         >
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#6898ED]/20 mb-5 ring-1 ring-[#6898ED]/30 animate-icon-glow">
-            <Icon name="mdi:lock-reset" class="w-8 h-8 text-[#6898ED]" />
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600/20 mb-5 ring-1 ring-blue-600/30 animate-icon-glow">
+            <Icon name="mdi:lock-reset" class="w-8 h-8 text-blue-600" />
           </div>
           <h2 class="text-2xl font-bold text-white tracking-tight">Forgot password?</h2>
           <p class="mt-2 text-sm text-white/50">Enter your email and we'll send you a reset link</p>
@@ -133,13 +133,13 @@
             <label class="block text-sm font-medium text-white/70 mb-1.5">Email</label>
             <div class="relative group">
               <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Icon name="mdi:email-outline" class="w-5 h-5 text-white/30 group-focus-within:text-[#6898ED] transition-colors duration-200" />
+                <Icon name="mdi:email-outline" class="w-5 h-5 text-white/30 group-focus-within:text-blue-600 transition-colors duration-200" />
               </div>
               <input
                 v-model="email"
                 type="email"
                 required
-                class="w-full pl-11 pr-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-[#6898ED]/50 focus:border-[#6898ED]/50 focus:bg-white/[0.1] transition-all duration-200"
+                class="w-full pl-11 pr-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600/50 focus:bg-white/[0.1] transition-all duration-200"
                 placeholder="admin@example.com"
                 autocomplete="email"
               />
@@ -164,7 +164,7 @@
           <div :class="mounted ? 'animate-stagger-3' : 'opacity-0 translate-y-4'">
             <button
               type="submit"
-              class="w-full relative flex items-center justify-center gap-2 bg-[#6898ED] hover:bg-[#7aa4f0] active:scale-[0.97] text-white font-semibold py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#6898ED] disabled:active:scale-100 shadow-lg shadow-[#6898ED]/30 hover:shadow-[#6898ED]/50 hover:shadow-xl"
+              class="w-full relative flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 active:scale-[0.97] text-white font-semibold py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 disabled:active:scale-100 shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 hover:shadow-xl"
               :disabled="loading"
             >
               <svg
@@ -262,7 +262,8 @@ onMounted(() => {
 .float-icon {
   position: absolute;
   bottom: -60px;
-  color: rgba(104, 152, 237, var(--fi-opacity, 0.2));
+  color: var(--color-primary, #6898ED);
+  opacity: var(--fi-opacity, 0.2);
   width: var(--fi-size, 24px);
   height: var(--fi-size, 24px);
 }
@@ -310,8 +311,8 @@ onMounted(() => {
   animation: icon-glow 2.5s ease-in-out infinite;
 }
 @keyframes icon-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(104, 152, 237, 0); }
-  50% { box-shadow: 0 0 30px 6px rgba(104, 152, 237, 0.25); }
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-primary, #6898ED) 0%, transparent); }
+  50% { box-shadow: 0 0 30px 6px color-mix(in srgb, var(--color-primary, #6898ED) 25%, transparent); }
 }
 
 /* ---- Error shake ---- */
