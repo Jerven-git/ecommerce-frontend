@@ -27,6 +27,22 @@ const DEFAULT_CONFIG: Partial<SiteConfig> = {
   body_font: 'Inter',
 }
 
+// BroadcastChannel for cross-tab config sync
+let _channel: BroadcastChannel | null = null
+let _listening = false
+
+function getChannel(): BroadcastChannel | null {
+  if (!import.meta.client) return null
+  if (!_channel) {
+    try {
+      _channel = new BroadcastChannel('ssu-site-config')
+    } catch {
+      // BroadcastChannel not supported
+    }
+  }
+  return _channel
+}
+
 export function useSiteConfig() {
   const siteConfig = useState<SiteConfig | null>('siteConfig', () => null)
   const pending = useState<boolean>('siteConfigPending', () => false)
@@ -48,5 +64,23 @@ export function useSiteConfig() {
     }
   }
 
-  return { siteConfig, pending, fetchSiteConfig }
+  /** Notify other tabs to re-fetch site config */
+  function broadcastConfigUpdate() {
+    getChannel()?.postMessage('config-updated')
+  }
+
+  // Listen for updates from other tabs (register once)
+  if (import.meta.client && !_listening) {
+    _listening = true
+    const ch = getChannel()
+    if (ch) {
+      ch.onmessage = () => {
+        // Force re-fetch in this tab
+        fetched.value = false
+        fetchSiteConfig()
+      }
+    }
+  }
+
+  return { siteConfig, pending, fetchSiteConfig, broadcastConfigUpdate }
 }
