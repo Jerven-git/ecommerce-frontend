@@ -12,79 +12,66 @@
 
     <!-- Category Slider -->
     <div v-if="categories.length" class="bg-white border-b border-gray-100">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <!-- Left arrow -->
-        <Transition name="arrow-fade">
-          <button
-            v-if="canScrollLeft"
-            @click="scrollSlider('left')"
-            class="slider-arrow left-3"
+      <!-- Each level of the category hierarchy -->
+      <div
+        v-for="(level, levelIndex) in categoryLevels"
+        :key="levelIndex"
+        :class="levelIndex > 0 ? 'border-t border-gray-50' : ''"
+      >
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div
+            :ref="el => setSliderRef(el as HTMLElement | null, levelIndex)"
+            class="category-slider flex items-center gap-2 overflow-x-auto"
+            :class="levelIndex === 0 ? 'py-4' : 'py-3'"
+            @scroll="() => updateScrollArrows(levelIndex)"
           >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-        </Transition>
-
-        <!-- Parent category pills -->
-        <div
-          ref="sliderRef"
-          class="category-slider flex items-center gap-2 py-4 overflow-x-auto"
-          @scroll="updateScrollArrows"
-        >
-          <button
-            @click="selectParent(null)"
-            class="category-pill"
-            :class="!selectedParentId ? 'category-pill-active' : 'category-pill-inactive'"
-          >
-            All
-          </button>
-          <button
-            v-for="cat in categories"
-            :key="cat.id"
-            @click="selectParent(cat.id)"
-            class="category-pill"
-            :class="selectedParentId === cat.id ? 'category-pill-active' : 'category-pill-inactive'"
-          >
-            {{ cat.name }}
-          </button>
-        </div>
-
-        <!-- Right arrow -->
-        <Transition name="arrow-fade">
-          <button
-            v-if="canScrollRight"
-            @click="scrollSlider('right')"
-            class="slider-arrow right-3"
-          >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </Transition>
-      </div>
-
-      <!-- Subcategory pills (shown when parent has children) -->
-      <div v-if="activeSubcategories.length" class="border-t border-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex items-center gap-2 py-3 overflow-x-auto category-slider">
             <button
-              @click="selectSub(null)"
-              class="category-pill text-xs"
-              :class="!selectedSubId ? 'category-pill-active' : 'category-pill-inactive'"
+              @click="selectAtLevel(levelIndex, null)"
+              class="category-pill"
+              :class="[
+                levelIndex > 0 ? 'text-xs' : '',
+                !selectedPath[levelIndex] ? 'category-pill-active' : 'category-pill-inactive'
+              ]"
             >
-              All {{ selectedParentName }}
+              {{ levelIndex === 0 ? 'All' : `All ${selectedPath[levelIndex - 1]?.name ?? ''}` }}
             </button>
             <button
-              v-for="sub in activeSubcategories"
-              :key="sub.id"
-              @click="selectSub(sub.id)"
-              class="category-pill text-xs"
-              :class="selectedSubId === sub.id ? 'category-pill-active' : 'category-pill-inactive'"
+              v-for="cat in level"
+              :key="cat.id"
+              @click="selectAtLevel(levelIndex, cat)"
+              class="category-pill"
+              :class="[
+                levelIndex > 0 ? 'text-xs' : '',
+                selectedPath[levelIndex]?.id === cat.id ? 'category-pill-active' : 'category-pill-inactive'
+              ]"
             >
-              {{ sub.name }}
+              {{ cat.name }}
             </button>
           </div>
+
+          <!-- Scroll arrows -->
+          <Transition name="arrow-fade">
+            <button
+              v-if="sliderScrollState[levelIndex]?.left"
+              @click="scrollSlider(levelIndex, 'left')"
+              class="slider-arrow left-3"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          </Transition>
+          <Transition name="arrow-fade">
+            <button
+              v-if="sliderScrollState[levelIndex]?.right"
+              @click="scrollSlider(levelIndex, 'right')"
+              class="slider-arrow right-3"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </Transition>
         </div>
       </div>
     </div>
@@ -275,27 +262,67 @@ const categories = ref<Category[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 const searchQuery = ref('')
-const selectedParentId = ref<number | null>(null)
-const selectedSubId = ref<number | null>(null)
 const sortBy = ref('newest')
 
-// Category slider refs
-const sliderRef = ref<HTMLElement | null>(null)
-const canScrollLeft = ref(false)
-const canScrollRight = ref(false)
+// Multi-level category selection: selectedPath[0] = root selection, [1] = sub, etc.
+const selectedPath = ref<(Category | null)[]>([])
 
-// Computed: subcategories for selected parent
-const activeSubcategories = computed(() => {
-  if (!selectedParentId.value) return []
-  const parent = categories.value.find(c => c.id === selectedParentId.value)
-  return parent?.children ?? []
+// Computed: the levels of category pills to show
+const categoryLevels = computed(() => {
+  const levels: Category[][] = [categories.value]
+  for (const selected of selectedPath.value) {
+    if (!selected || !selected.children?.length) break
+    levels.push(selected.children)
+  }
+  return levels
 })
 
-// Computed: selected parent name for "All X" pill
-const selectedParentName = computed(() => {
-  if (!selectedParentId.value) return ''
-  return categories.value.find(c => c.id === selectedParentId.value)?.name ?? ''
+// The deepest selected category ID (used for API filtering)
+const activeCategoryId = computed(() => {
+  for (let i = selectedPath.value.length - 1; i >= 0; i--) {
+    if (selectedPath.value[i]) return selectedPath.value[i]!.id
+  }
+  return null
 })
+
+const selectAtLevel = (levelIndex: number, cat: Category | null) => {
+  // Truncate path to this level and set selection
+  const newPath = selectedPath.value.slice(0, levelIndex)
+  newPath[levelIndex] = cat
+  selectedPath.value = newPath
+  fetchProducts()
+}
+
+// Slider refs & scroll state per level
+const sliderRefs = ref<Map<number, HTMLElement>>(new Map())
+const sliderScrollState = ref<Record<number, { left: boolean; right: boolean }>>({})
+
+const setSliderRef = (el: HTMLElement | null, index: number) => {
+  if (el) {
+    sliderRefs.value.set(index, el)
+    nextTick(() => updateScrollArrows(index))
+  } else {
+    sliderRefs.value.delete(index)
+  }
+}
+
+const updateScrollArrows = (index: number) => {
+  const el = sliderRefs.value.get(index)
+  if (!el) return
+  sliderScrollState.value = {
+    ...sliderScrollState.value,
+    [index]: {
+      left: el.scrollLeft > 0,
+      right: el.scrollLeft + el.clientWidth < el.scrollWidth - 1,
+    },
+  }
+}
+
+const scrollSlider = (index: number, direction: 'left' | 'right') => {
+  const el = sliderRefs.value.get(index)
+  if (!el) return
+  el.scrollBy({ left: direction === 'left' ? -200 : 200, behavior: 'smooth' })
+}
 
 const getSortParams = () => {
   switch (sortBy.value) {
@@ -307,44 +334,27 @@ const getSortParams = () => {
   }
 }
 
-const selectParent = (id: number | null) => {
-  selectedParentId.value = id
-  selectedSubId.value = null
-  fetchProducts()
-}
-
-const selectSub = (id: number | null) => {
-  selectedSubId.value = id
-  fetchProducts()
-}
-
 const clearFilters = () => {
   searchQuery.value = ''
-  selectedParentId.value = null
-  selectedSubId.value = null
+  selectedPath.value = []
   sortBy.value = 'newest'
   fetchProducts()
 }
 
-// Slider scroll helpers
-const updateScrollArrows = () => {
-  const el = sliderRef.value
-  if (!el) return
-  canScrollLeft.value = el.scrollLeft > 0
-  canScrollRight.value = el.scrollLeft + el.clientWidth < el.scrollWidth - 1
-}
-
-const scrollSlider = (direction: 'left' | 'right') => {
-  const el = sliderRef.value
-  if (!el) return
-  el.scrollBy({ left: direction === 'left' ? -200 : 200, behavior: 'smooth' })
+function normalizeCategories(cats: any[]): Category[] {
+  return (cats || []).map(c => ({
+    ...c,
+    id: Number(c.id),
+    parent_id: c.parent_id != null ? Number(c.parent_id) : null,
+    children: normalizeCategories(c.children || c.children_recursive || []),
+  }))
 }
 
 const fetchCategories = async () => {
   try {
     const response = await $apiFetch<CategoriesResponse>('/categories', { method: 'GET' })
     if (response?.data) {
-      categories.value = response.data
+      categories.value = normalizeCategories(response.data)
     }
   } catch (err) {
     console.error('Error fetching categories:', err)
@@ -359,9 +369,7 @@ const fetchProducts = async () => {
     const sortParams = getSortParams()
     const queryParams: Record<string, any> = { is_active: 1, ...sortParams }
 
-    // Use the most specific selection: subcategory > parent category
-    const activeCategoryId = selectedSubId.value ?? selectedParentId.value
-    if (activeCategoryId) queryParams.category_id = activeCategoryId
+    if (activeCategoryId.value) queryParams.category_id = activeCategoryId.value
     if (searchQuery.value) queryParams.search = searchQuery.value
 
     const response = await $apiFetch<ProductsResponse>('/products', {
@@ -377,7 +385,11 @@ const fetchProducts = async () => {
     error.value = err?.data?.message || 'Failed to load products. Please try again.'
   } finally {
     loading.value = false
-    nextTick(updateScrollArrows)
+    nextTick(() => {
+      for (const idx of sliderRefs.value.keys()) {
+        updateScrollArrows(idx)
+      }
+    })
   }
 }
 
