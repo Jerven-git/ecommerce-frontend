@@ -44,7 +44,8 @@
               </svg>
             </div>
           </div>
-          <p class="text-3xl font-bold text-gray-900">{{ stats.totalOrders }}</p>
+          <p class="text-3xl font-bold text-gray-900 truncate">{{ formatCompact(stats.totalOrders) }}</p>
+          <p class="text-xs text-gray-400 mt-1 truncate">{{ stats.totalOrders.toLocaleString() }} orders</p>
         </NuxtLink>
 
         <!-- Pending Orders -->
@@ -60,8 +61,8 @@
               </svg>
             </div>
           </div>
-          <p class="text-3xl font-bold text-gray-900">{{ stats.pendingOrders }}</p>
-          <p v-if="stats.pendingOrders > 0" class="text-xs text-amber-500 font-medium mt-1">Needs attention</p>
+          <p class="text-3xl font-bold text-gray-900 truncate">{{ formatCompact(stats.pendingOrders) }}</p>
+          <p v-if="stats.pendingOrders > 0" class="text-xs text-amber-500 font-medium mt-1">{{ stats.pendingOrders.toLocaleString() }} needs attention</p>
         </NuxtLink>
 
         <!-- Total Revenue -->
@@ -74,7 +75,8 @@
               </svg>
             </div>
           </div>
-          <p class="text-3xl font-bold text-gray-900">${{ stats.totalRevenue.toFixed(2) }}</p>
+          <p class="text-3xl font-bold text-gray-900 truncate">{{ formatCurrency(stats.totalRevenue) }}</p>
+          <p class="text-xs text-gray-400 mt-1 truncate">${{ stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
         </div>
 
         <!-- Pending Revenue -->
@@ -87,8 +89,8 @@
               </svg>
             </div>
           </div>
-          <p class="text-3xl font-bold text-gray-900">${{ stats.pendingRevenue.toFixed(2) }}</p>
-          <p v-if="stats.pendingRevenue > 0" class="text-xs text-orange-500 font-medium mt-1">Awaiting payment confirmation</p>
+          <p class="text-3xl font-bold text-gray-900 truncate">{{ formatCurrency(stats.pendingRevenue) }}</p>
+          <p v-if="stats.pendingRevenue > 0" class="text-xs text-orange-500 font-medium mt-1">${{ stats.pendingRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
         </div>
       </div>
 
@@ -175,27 +177,12 @@ definePageMeta({
   layout: 'admin'
 })
 
-interface Payment {
-  id: number
-  provider: string
-  status: 'pending' | 'paid' | 'failed'
-}
-
 interface Order {
   id: number
   customer_name: string
   total_amount: string | number
   status: string
   created_at: string
-  payment?: Payment | null
-}
-
-interface ProductsResponse {
-  data: any[]
-}
-
-interface OrdersResponse {
-  data: Order[]
 }
 
 const { $apiFetch } = useNuxtApp()
@@ -212,38 +199,35 @@ const stats = ref({
 
 const recentOrders = ref<Order[]>([])
 
+const formatCompact = (num: number): string => {
+  if (num >= 1_000_000) return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M'
+  if (num >= 1_000) return (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'K'
+  return num.toLocaleString()
+}
+
+const formatCurrency = (num: number): string => {
+  if (num >= 1_000_000) return '$' + (num / 1_000_000).toFixed(2) + 'M'
+  if (num >= 1_000) return '$' + (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'K'
+  return '$' + num.toFixed(2)
+}
+
 const loadDashboardData = async () => {
   loading.value = true
 
   try {
-    const [productsRes, allOrdersRes, pendingOrdersRes, recentOrdersRes] = await Promise.all([
-      $apiFetch<ProductsResponse>('/products', { method: 'GET' }),
-      $apiFetch<OrdersResponse>('/orders', { method: 'GET', query: { include: 'payment' } }),
-      $apiFetch<OrdersResponse>('/orders', {
-        method: 'GET',
-        query: { status: 'pending' }
-      }),
-      $apiFetch<OrdersResponse>('/orders', {
-        method: 'GET',
-        query: {
-          sort: 'created_at',
-          order: 'desc'
-        }
-      })
-    ])
+    const res = await $apiFetch<any>('/dashboard/stats', { method: 'GET' })
+    const data = res?.data
 
-    stats.value.totalProducts = productsRes?.data?.length || 0
-    stats.value.totalOrders = allOrdersRes?.data?.length || 0
-    stats.value.pendingOrders = pendingOrdersRes?.data?.length || 0
+    if (data?.stats) {
+      stats.value.totalProducts = data.stats.total_products ?? 0
+      stats.value.totalOrders = data.stats.total_orders ?? 0
+      stats.value.pendingOrders = data.stats.pending_orders ?? 0
+      stats.value.totalRevenue = data.stats.total_revenue ?? 0
+      stats.value.pendingRevenue = data.stats.pending_revenue ?? 0
+    }
 
-    const paidOrders = allOrdersRes?.data?.filter(o => o.payment?.status === 'paid') || []
-    stats.value.totalRevenue = paidOrders.reduce((sum, o) => sum + parseFloat(String(o.total_amount)), 0) || 0
-
-    const pendingPaymentOrders = allOrdersRes?.data?.filter(o => o.payment?.status === 'pending') || []
-    stats.value.pendingRevenue = pendingPaymentOrders.reduce((sum, o) => sum + parseFloat(String(o.total_amount)), 0) || 0
-
-    if (recentOrdersRes?.data) {
-      recentOrders.value = recentOrdersRes.data.slice(0, 5)
+    if (data?.recent_orders) {
+      recentOrders.value = data.recent_orders
     }
   } catch (err: any) {
     console.error('Error loading dashboard data:', err)
