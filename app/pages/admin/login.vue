@@ -273,14 +273,15 @@ const handleLogin = async () => {
 }
 
 onMounted(async () => {
-  requestAnimationFrame(() => {
-    mounted.value = true
-  })
-
   await authStore.checkAuth()
   if (authStore.isAdmin) {
     navigateTo('/admin')
+    return
   }
+
+  requestAnimationFrame(() => {
+    mounted.value = true
+  })
 })
 </script>
 
