@@ -246,9 +246,9 @@
             leave-from-class="opacity-100 scale-100 translate-y-0"
             leave-to-class="opacity-0 scale-95 translate-y-2"
           >
-            <div v-if="showModal" class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col">
+            <div v-if="showModal" class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
               <!-- Modal header -->
-              <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between shrink-0">
+              <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-3">
                   <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :class="editingProduct ? 'bg-blue-50' : 'bg-green-50'">
                     <svg class="w-4 h-4" :class="editingProduct ? 'text-blue-600' : 'text-green-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -270,172 +270,229 @@
 
               <!-- Modal body (scrollable) -->
               <div class="overflow-y-auto flex-1 px-6 py-5">
-                <form id="productForm" @submit.prevent="saveProduct" class="space-y-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Product Name <span class="text-red-400">*</span></label>
-                    <input v-model="form.name" type="text" required class="input-field" placeholder="e.g. Wireless Headphones" />
-                  </div>
+                <form id="productForm" @submit.prevent="saveProduct" class="space-y-5">
 
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
-                    <textarea v-model="form.description" rows="3" class="input-field resize-none leading-relaxed" placeholder="Brief product description…"></textarea>
-                  </div>
-
-                  <div class="grid grid-cols-2 gap-3">
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1.5">Price <span class="text-red-400">*</span></label>
-                      <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
-                        <span class="px-2.5 flex items-center bg-gray-50 text-gray-500 text-sm border-r border-gray-300 select-none">$</span>
-                        <input v-model.number="form.price" type="number" step="0.01" min="0" required class="flex-1 px-2.5 py-2 text-sm outline-none w-0" placeholder="0.00" />
+                  <!-- Section: Basic Info -->
+                  <fieldset class="space-y-3">
+                    <legend class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Basic Info</legend>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div class="sm:col-span-2">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Product Name <span class="text-red-400">*</span></label>
+                        <input v-model="form.name" type="text" required class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-blue-400 focus:ring-1 focus:ring-blue-400 outline-none transition-all" placeholder="e.g. Wireless Headphones" />
                       </div>
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1.5">Stock <span class="text-red-400">*</span></label>
-                      <input v-model.number="form.stock" type="number" min="0" required class="input-field" placeholder="0" />
-                    </div>
-                  </div>
-
-                  <!-- Shipping Calculation Type -->
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Shipping Calculation</label>
-                    <div class="inline-flex rounded-lg border border-gray-200 p-0.5 bg-gray-50">
-                      <button
-                        type="button"
-                        @click="form.shipping_calc_type = 'weight'"
-                        class="px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all duration-150"
-                        :class="form.shipping_calc_type === 'weight' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
-                      >
-                        By Weight
-                      </button>
-                      <button
-                        type="button"
-                        @click="form.shipping_calc_type = 'dimensions'"
-                        class="px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all duration-150"
-                        :class="form.shipping_calc_type === 'dimensions' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
-                      >
-                        By Dimensions
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Weight (shown when shipping_calc_type is weight) -->
-                  <div v-if="form.shipping_calc_type === 'weight'">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Weight</label>
-                    <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent max-w-xs">
-                      <input v-model.number="form.weight" type="number" step="0.01" min="0" class="flex-1 px-2.5 py-2 text-sm outline-none w-0" placeholder="0.00" />
-                      <span class="px-2.5 flex items-center bg-gray-50 text-gray-500 text-xs border-l border-gray-300 select-none">kg</span>
-                    </div>
-                  </div>
-
-                  <!-- Dimensions (shown when shipping_calc_type is dimensions) -->
-                  <div v-if="form.shipping_calc_type === 'dimensions'" class="space-y-3">
-                    <div class="grid grid-cols-3 gap-3">
+                      <div class="sm:col-span-2">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Description</label>
+                        <textarea v-model="form.description" rows="2" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-blue-400 focus:ring-1 focus:ring-blue-400 outline-none transition-all resize-none leading-relaxed" placeholder="Brief product description..."></textarea>
+                      </div>
                       <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Length</label>
-                        <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
-                          <input v-model.number="form.length_cm" type="number" step="0.01" min="0" class="flex-1 px-2.5 py-2 text-sm outline-none w-0" placeholder="0" />
-                          <span class="px-2 flex items-center bg-gray-50 text-gray-500 text-xs border-l border-gray-300 select-none">cm</span>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Price <span class="text-red-400">*</span></label>
+                        <div class="flex rounded-lg border border-gray-200 overflow-hidden focus-within:ring-1 focus-within:ring-blue-400 focus-within:border-blue-400 transition-all">
+                          <span class="px-2.5 flex items-center bg-gray-50 text-gray-400 text-sm border-r border-gray-200 select-none">$</span>
+                          <input v-model.number="form.price" type="number" step="0.01" min="0" required class="flex-1 px-2.5 py-2 text-sm outline-none w-0" placeholder="0.00" />
                         </div>
                       </div>
                       <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Width</label>
-                        <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
-                          <input v-model.number="form.width_cm" type="number" step="0.01" min="0" class="flex-1 px-2.5 py-2 text-sm outline-none w-0" placeholder="0" />
-                          <span class="px-2 flex items-center bg-gray-50 text-gray-500 text-xs border-l border-gray-300 select-none">cm</span>
-                        </div>
-                      </div>
-                      <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Height</label>
-                        <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
-                          <input v-model.number="form.height_cm" type="number" step="0.01" min="0" class="flex-1 px-2.5 py-2 text-sm outline-none w-0" placeholder="0" />
-                          <span class="px-2 flex items-center bg-gray-50 text-gray-500 text-xs border-l border-gray-300 select-none">cm</span>
-                        </div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Stock <span class="text-red-400">*</span></label>
+                        <input v-model.number="form.stock" type="number" min="0" required class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-blue-400 focus:ring-1 focus:ring-blue-400 outline-none transition-all" placeholder="0" />
                       </div>
                     </div>
-                    <!-- Volume CBM info -->
-                    <div v-if="computedVolumeCbm > 0" class="flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg">
-                      <svg class="w-4 h-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span class="text-xs text-blue-700 font-medium">
-                        Volume: {{ computedVolumeCbm.toFixed(6) }} m³ ({{ (computedVolumeCbm * 1000).toFixed(3) }} L)
-                      </span>
-                    </div>
-                  </div>
+                  </fieldset>
 
-                  <div class="grid grid-cols-2 gap-3">
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
-                      <select v-model="selectedParentCategoryId" @change="onParentCategoryChange" class="input-field">
-                        <option :value="null">None</option>
-                        <option v-for="cat in parentCategories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1.5">Subcategory</label>
-                      <select v-model="selectedSubcategoryId" @change="onSubcategoryChange" class="input-field" :disabled="!subcategories.length">
-                        <option :value="null">{{ subcategories.length ? 'None' : 'No subcategories' }}</option>
-                        <option v-for="sub in subcategories" :key="sub.id" :value="sub.id">{{ sub.name }}</option>
-                      </select>
-                    </div>
-                  </div>
+                  <div class="border-t border-gray-100"></div>
 
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Image</label>
-                    <div v-if="imagePreview || (editingProduct && editingProduct.image_url)" class="mb-2 flex items-center gap-3">
-                      <img
-                        :src="imagePreview || editingProduct?.image_url"
-                        alt="Preview"
-                        class="h-16 w-16 rounded-lg object-cover border border-gray-200"
-                      />
-                      <button
-                        type="button"
-                        @click="removeImage"
-                        class="text-xs text-red-500 hover:text-red-700 font-medium"
-                      >
-                        Remove
-                      </button>
+                  <!-- Section: Shipping -->
+                  <fieldset class="space-y-3">
+                    <legend class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Shipping</legend>
+                    <div class="flex items-center gap-2">
+                      <div class="inline-flex rounded-lg border border-gray-200 p-0.5 bg-gray-50">
+                        <button
+                          type="button"
+                          @click="form.shipping_calc_type = 'weight'"
+                          class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-150"
+                          :class="form.shipping_calc_type === 'weight' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+                        >
+                          By Weight
+                        </button>
+                        <button
+                          type="button"
+                          @click="form.shipping_calc_type = 'dimensions'"
+                          class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-150"
+                          :class="form.shipping_calc_type === 'dimensions' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+                        >
+                          By Dimensions
+                        </button>
+                      </div>
                     </div>
-                    <input
-                      ref="imageInput"
-                      type="file"
-                      accept="image/*"
-                      @change="onImageSelected"
-                      class="block w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
-                    />
-                  </div>
 
-                  <!-- Active toggle -->
-                  <div class="flex items-center justify-between py-1">
-                    <div>
-                      <p class="text-sm font-medium text-gray-700">Active</p>
-                      <p class="text-xs text-gray-400">Visible to customers in the store</p>
-                    </div>
-                    <button
-                      type="button"
-                      @click="form.is_active = !form.is_active"
-                      class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                      :class="form.is_active ? 'bg-blue-600' : 'bg-gray-200'"
+                    <Transition
+                      enter-active-class="transition-all duration-200 ease-out"
+                      leave-active-class="transition-all duration-150 ease-in"
+                      enter-from-class="opacity-0 -translate-y-1"
+                      enter-to-class="opacity-100 translate-y-0"
+                      leave-from-class="opacity-100 translate-y-0"
+                      leave-to-class="opacity-0 -translate-y-1"
+                      mode="out-in"
                     >
-                      <span
-                        class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-200"
-                        :class="form.is_active ? 'translate-x-[18px]' : 'translate-x-[3px]'"
+                      <!-- Weight -->
+                      <div v-if="form.shipping_calc_type === 'weight'" key="weight">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Weight</label>
+                        <div class="flex rounded-lg border border-gray-200 overflow-hidden focus-within:ring-1 focus-within:ring-blue-400 focus-within:border-blue-400 transition-all max-w-[200px]">
+                          <input v-model.number="form.weight" type="number" step="0.01" min="0" class="flex-1 px-2.5 py-2 text-sm outline-none w-0" placeholder="0.00" />
+                          <span class="px-2.5 flex items-center bg-gray-50 text-gray-400 text-xs border-l border-gray-200 select-none">kg</span>
+                        </div>
+                      </div>
+
+                      <!-- Dimensions -->
+                      <div v-else key="dimensions" class="space-y-2">
+                        <div class="grid grid-cols-3 gap-2">
+                          <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Length</label>
+                            <div class="flex rounded-lg border border-gray-200 overflow-hidden focus-within:ring-1 focus-within:ring-blue-400 focus-within:border-blue-400 transition-all">
+                              <input v-model.number="form.length_cm" type="number" step="0.01" min="0" class="flex-1 px-2 py-2 text-sm outline-none w-0" placeholder="0" />
+                              <span class="px-1.5 flex items-center bg-gray-50 text-gray-400 text-xs border-l border-gray-200 select-none">cm</span>
+                            </div>
+                          </div>
+                          <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Width</label>
+                            <div class="flex rounded-lg border border-gray-200 overflow-hidden focus-within:ring-1 focus-within:ring-blue-400 focus-within:border-blue-400 transition-all">
+                              <input v-model.number="form.width_cm" type="number" step="0.01" min="0" class="flex-1 px-2 py-2 text-sm outline-none w-0" placeholder="0" />
+                              <span class="px-1.5 flex items-center bg-gray-50 text-gray-400 text-xs border-l border-gray-200 select-none">cm</span>
+                            </div>
+                          </div>
+                          <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Height</label>
+                            <div class="flex rounded-lg border border-gray-200 overflow-hidden focus-within:ring-1 focus-within:ring-blue-400 focus-within:border-blue-400 transition-all">
+                              <input v-model.number="form.height_cm" type="number" step="0.01" min="0" class="flex-1 px-2 py-2 text-sm outline-none w-0" placeholder="0" />
+                              <span class="px-1.5 flex items-center bg-gray-50 text-gray-400 text-xs border-l border-gray-200 select-none">cm</span>
+                            </div>
+                          </div>
+                        </div>
+                        <Transition
+                          enter-active-class="transition-all duration-200"
+                          enter-from-class="opacity-0 scale-95"
+                          enter-to-class="opacity-100 scale-100"
+                          leave-active-class="transition-all duration-150"
+                          leave-from-class="opacity-100 scale-100"
+                          leave-to-class="opacity-0 scale-95"
+                        >
+                          <div v-if="computedVolumeCbm > 0" class="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-lg">
+                            <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="text-xs text-blue-700 font-medium">
+                              Volume: {{ computedVolumeCbm.toFixed(6) }} m&sup3; ({{ (computedVolumeCbm * 1000).toFixed(3) }} L)
+                            </span>
+                          </div>
+                        </Transition>
+                      </div>
+                    </Transition>
+                  </fieldset>
+
+                  <div class="border-t border-gray-100"></div>
+
+                  <!-- Section: Category -->
+                  <fieldset class="space-y-2">
+                    <legend class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Category</legend>
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                      <!-- Selected display / clear -->
+                      <div class="flex items-center justify-between px-3 py-2 bg-gray-50 border-b border-gray-200">
+                        <p v-if="categoryBreadcrumb" class="text-xs text-gray-600 flex items-center gap-1.5">
+                          <svg class="w-3 h-3 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                          {{ categoryBreadcrumb }}
+                        </p>
+                        <p v-else class="text-xs text-gray-400">No category selected</p>
+                        <button v-if="form.category_id" type="button" @click="clearCategorySelection" class="text-xs text-gray-400 hover:text-red-500 transition-colors">Clear</button>
+                      </div>
+                      <!-- Tree -->
+                      <div class="max-h-48 overflow-y-auto py-1">
+                        <template v-for="cat in allCategories" :key="cat.id">
+                          <CategoryTreeItem
+                            :category="cat"
+                            :depth="0"
+                            :selected-id="form.category_id"
+                            :expanded-ids="catPickerExpanded"
+                            @select="selectCategory"
+                            @toggle="toggleCatPickerExpand"
+                          />
+                        </template>
+                        <p v-if="!allCategories.length" class="text-xs text-gray-400 text-center py-3">No categories available</p>
+                      </div>
+                    </div>
+                  </fieldset>
+
+                  <div class="border-t border-gray-100"></div>
+
+                  <!-- Section: Media & Status -->
+                  <fieldset class="space-y-3">
+                    <legend class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Media & Status</legend>
+
+                    <!-- Image -->
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1.5">Image</label>
+                      <div v-if="imagePreview || (editingProduct && editingProduct.image_url)" class="mb-2 flex items-center gap-3">
+                        <img
+                          :src="imagePreview || editingProduct?.image_url"
+                          alt="Preview"
+                          class="h-14 w-14 rounded-lg object-cover border border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          @click="removeImage"
+                          class="text-xs text-red-500 hover:text-red-700 font-medium px-2 py-1 rounded-md hover:bg-red-50 transition-colors"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <input
+                        ref="imageInput"
+                        type="file"
+                        accept="image/*"
+                        @change="onImageSelected"
+                        class="block w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
                       />
-                    </button>
-                  </div>
+                    </div>
+
+                    <!-- Active toggle -->
+                    <div class="flex items-center justify-between py-1.5 px-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <p class="text-sm font-medium text-gray-700">Active</p>
+                        <p class="text-xs text-gray-400">Visible to customers</p>
+                      </div>
+                      <button
+                        type="button"
+                        @click="form.is_active = !form.is_active"
+                        class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                        :class="form.is_active ? 'bg-blue-600' : 'bg-gray-300'"
+                      >
+                        <span
+                          class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-200"
+                          :class="form.is_active ? 'translate-x-[18px]' : 'translate-x-[3px]'"
+                        />
+                      </button>
+                    </div>
+                  </fieldset>
 
                   <!-- Form error -->
-                  <div v-if="formError" class="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-lg text-sm text-red-700">
-                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {{ formError }}
-                  </div>
+                  <Transition
+                    enter-active-class="transition-all duration-200"
+                    enter-from-class="opacity-0 -translate-y-1"
+                    enter-to-class="opacity-100 translate-y-0"
+                    leave-active-class="transition-all duration-150"
+                    leave-from-class="opacity-100"
+                    leave-to-class="opacity-0"
+                  >
+                    <div v-if="formError" class="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-lg text-sm text-red-700">
+                      <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {{ formError }}
+                    </div>
+                  </Transition>
                 </form>
               </div>
 
               <!-- Modal footer -->
-              <div class="px-6 py-4 border-t border-gray-100 flex items-center gap-3 shrink-0">
+              <div class="px-6 py-3.5 border-t border-gray-100 flex items-center gap-3 shrink-0">
                 <button
                   type="button"
                   @click="closeModal"
@@ -453,7 +510,7 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  {{ submitting ? 'Saving…' : (editingProduct ? 'Save Changes' : 'Add Product') }}
+                  {{ submitting ? 'Saving...' : (editingProduct ? 'Save Changes' : 'Add Product') }}
                 </button>
               </div>
             </div>
@@ -553,16 +610,73 @@ const imageFile = ref<File | null>(null)
 const imagePreview = ref<string | null>(null)
 const imageInput = ref<HTMLInputElement | null>(null)
 
-// Categories
+// Categories — tree picker
 const allCategories = ref<Category[]>([])
-const selectedParentCategoryId = ref<number | null>(null)
-const selectedSubcategoryId = ref<number | null>(null)
+const categorySelections = ref<(number | null)[]>([])
+const catPickerExpanded = ref<Set<number>>(new Set())
 
-const parentCategories = computed(() => allCategories.value)
-const subcategories = computed(() => {
-  if (!selectedParentCategoryId.value) return []
-  const parent = allCategories.value.find(c => c.id === selectedParentCategoryId.value)
-  return parent?.children || []
+function toggleCatPickerExpand(id: number) {
+  const s = new Set(catPickerExpanded.value)
+  if (s.has(id)) s.delete(id)
+  else s.add(id)
+  catPickerExpanded.value = s
+}
+
+function selectCategory(id: number) {
+  // Toggle: if already selected, deselect
+  if (form.value.category_id === id) {
+    form.value.category_id = null
+    form.value.category = 'general'
+    categorySelections.value = []
+    return
+  }
+  form.value.category_id = id
+  const cat = findCategoryById(allCategories.value, id)
+  form.value.category = cat?.name || 'general'
+  // Update selections path for breadcrumb
+  const path = findCategoryPath(allCategories.value, id)
+  categorySelections.value = path.map(c => c.id)
+  // Auto-expand parent path
+  const parentIds = path.slice(0, -1).map(c => c.id)
+  catPickerExpanded.value = new Set([...catPickerExpanded.value, ...parentIds])
+}
+
+function clearCategorySelection() {
+  form.value.category_id = null
+  form.value.category = 'general'
+  categorySelections.value = []
+}
+
+function findCategoryById(cats: Category[], id: number): Category | null {
+  for (const cat of cats) {
+    if (Number(cat.id) === Number(id)) return cat
+    if (cat.children?.length) {
+      const found = findCategoryById(cat.children, id)
+      if (found) return found
+    }
+  }
+  return null
+}
+
+function findCategoryPath(cats: Category[], id: number): Category[] {
+  for (const cat of cats) {
+    if (Number(cat.id) === Number(id)) return [cat]
+    if (cat.children?.length) {
+      const path = findCategoryPath(cat.children, id)
+      if (path.length) return [cat, ...path]
+    }
+  }
+  return []
+}
+
+const categoryBreadcrumb = computed(() => {
+  const names: string[] = []
+  for (const selId of categorySelections.value) {
+    if (selId == null) break
+    const cat = findCategoryById(allCategories.value, selId)
+    if (cat) names.push(cat.name)
+  }
+  return names.length > 1 ? names.join(' > ') : ''
 })
 
 const form = ref({
@@ -604,34 +718,21 @@ const removeImage = () => {
   }
 }
 
+function normalizeCategories(cats: any[]): Category[] {
+  return (cats || []).map(c => ({
+    ...c,
+    id: Number(c.id),
+    parent_id: c.parent_id != null ? Number(c.parent_id) : null,
+    children: normalizeCategories(c.children || c.children_recursive || []),
+  }))
+}
+
 const fetchCategories = async () => {
   try {
-    const res = await $apiFetch<{ data: Category[] }>('/categories', { method: 'GET' })
-    allCategories.value = res.data || []
+    const res = await $apiFetch<{ data: any[] }>('/categories', { method: 'GET' })
+    allCategories.value = normalizeCategories(res.data || [])
   } catch (err) {
     console.warn('Failed to load categories:', err)
-  }
-}
-
-const onParentCategoryChange = () => {
-  selectedSubcategoryId.value = null
-  // Set category_id to parent if no subcategories, otherwise wait for sub selection
-  form.value.category_id = selectedParentCategoryId.value
-  // Set the category name string for backward compat
-  const parent = allCategories.value.find(c => c.id === selectedParentCategoryId.value)
-  form.value.category = parent?.name || 'general'
-}
-
-const onSubcategoryChange = () => {
-  if (selectedSubcategoryId.value) {
-    form.value.category_id = selectedSubcategoryId.value
-    const parent = allCategories.value.find(c => c.id === selectedParentCategoryId.value)
-    const sub = parent?.children?.find(c => c.id === selectedSubcategoryId.value)
-    form.value.category = sub?.name || parent?.name || 'general'
-  } else {
-    form.value.category_id = selectedParentCategoryId.value
-    const parent = allCategories.value.find(c => c.id === selectedParentCategoryId.value)
-    form.value.category = parent?.name || 'general'
   }
 }
 
@@ -706,8 +807,8 @@ const openAddModal = () => {
   }
   imageFile.value = null
   imagePreview.value = null
-  selectedParentCategoryId.value = null
-  selectedSubcategoryId.value = null
+  categorySelections.value = []
+  catPickerExpanded.value = new Set()
   formError.value = null
   showModal.value = true
 }
@@ -731,25 +832,17 @@ const editProduct = (product: Product) => {
   imageFile.value = null
   imagePreview.value = null
 
-  // Resolve category_id to parent/sub selections
-  selectedParentCategoryId.value = null
-  selectedSubcategoryId.value = null
-  if (product.category_id) {
-    // Check if it's a parent category
-    const asParent = allCategories.value.find(c => c.id === product.category_id)
-    if (asParent) {
-      selectedParentCategoryId.value = asParent.id
-    } else {
-      // It's a subcategory — find its parent
-      for (const parent of allCategories.value) {
-        const sub = parent.children?.find(c => c.id === product.category_id)
-        if (sub) {
-          selectedParentCategoryId.value = parent.id
-          selectedSubcategoryId.value = sub.id
-          break
-        }
-      }
-    }
+  // Resolve category_id into cascading selections
+  const catId = product.category_id ? Number(product.category_id) : null
+  form.value.category_id = catId
+  if (catId) {
+    const path = findCategoryPath(allCategories.value, catId)
+    categorySelections.value = path.map(c => Number(c.id))
+    // Auto-expand parent path in tree picker
+    catPickerExpanded.value = new Set(path.slice(0, -1).map(c => Number(c.id)))
+  } else {
+    categorySelections.value = []
+    catPickerExpanded.value = new Set()
   }
 
   formError.value = null
