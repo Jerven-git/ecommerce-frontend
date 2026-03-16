@@ -106,7 +106,15 @@ const loadStripe = async () => {
       appearance: { theme: 'stripe' }
     })
 
-    paymentElementInstance = elements.create('payment')
+    paymentElementInstance = elements.create('payment', {
+      fields: {
+        billingDetails: {
+          address: {
+            country: 'never',
+          },
+        },
+      },
+    })
     paymentElementInstance.mount(paymentEl.value)
 
     stripeLoaded.value = true

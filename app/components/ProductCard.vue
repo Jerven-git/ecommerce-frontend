@@ -1,5 +1,5 @@
 <template>
-  <div class="card hover:shadow-xl transition-shadow group cursor-pointer" @click="showModal = true">
+  <NuxtLink :to="`/product/${product.id}`" class="card hover:shadow-xl transition-shadow group cursor-pointer block">
     <!-- Image with hover overlay -->
     <div class="relative w-full overflow-hidden rounded-lg bg-gray-200 mb-4">
       <img
@@ -61,12 +61,7 @@
       </button>
     </div>
 
-    <ProductViewModal
-      :open="showModal"
-      :product="product"
-      @close="showModal = false"
-    />
-  </div>
+  </NuxtLink>
 </template>
 
 <script setup lang="ts">
@@ -77,7 +72,7 @@ const props = defineProps<{
 const cartStore = useCartStore()
 const favoritesStore = useFavoritesStore()
 const { siteConfig } = useSiteConfig()
-const showModal = ref(false)
+
 
 const favoritesEnabled = computed(() => siteConfig.value?.favorites_enabled ?? false)
 const isFavorited = computed(() => favoritesStore.isFavorited(props.product.id))

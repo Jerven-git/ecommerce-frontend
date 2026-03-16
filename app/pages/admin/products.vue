@@ -236,7 +236,9 @@
         <div
           v-if="showModal"
           class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-          @click.self="closeModal"
+          @mousedown.self="backdropMouseDown = true"
+          @mouseup.self="if (backdropMouseDown) closeModal(); backdropMouseDown = false"
+          @mouseup.capture="backdropMouseDown = false"
         >
           <Transition
             enter-active-class="transition-all duration-200"
@@ -282,7 +284,12 @@
                       </div>
                       <div class="sm:col-span-2">
                         <label class="block text-xs font-medium text-gray-600 mb-1">Description</label>
-                        <textarea v-model="form.description" rows="2" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-blue-400 focus:ring-1 focus:ring-blue-400 outline-none transition-all resize-none leading-relaxed" placeholder="Brief product description..."></textarea>
+                        <textarea
+                          v-model="form.description"
+                          rows="2"
+                          class="w-full h-[200px] px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-blue-400 focus:ring-1 focus:ring-blue-400 outline-none transition-all resize-none leading-relaxed overflow-y-auto"
+                          placeholder="Brief product description..."
+                        ></textarea>
                       </div>
                       <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Price <span class="text-red-400">*</span></label>
@@ -426,12 +433,12 @@
                   <fieldset class="space-y-3">
                     <legend class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Media & Status</legend>
 
-                    <!-- Image -->
-                    <div>
+                    <!-- Main Image (for new products) -->
+                    <div v-if="!editingProduct">
                       <label class="block text-xs font-medium text-gray-600 mb-1.5">Image</label>
-                      <div v-if="imagePreview || (editingProduct && editingProduct.image_url)" class="mb-2 flex items-center gap-3">
+                      <div v-if="imagePreview" class="mb-2 flex items-center gap-3">
                         <img
-                          :src="imagePreview || editingProduct?.image_url"
+                          :src="imagePreview"
                           alt="Preview"
                           class="h-14 w-14 rounded-lg object-cover border border-gray-200"
                         />
@@ -450,6 +457,58 @@
                         @change="onImageSelected"
                         class="block w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
                       />
+                    </div>
+
+                    <!-- Gallery Images (for editing existing products) -->
+                    <div v-if="editingProduct">
+                      <label class="block text-xs font-medium text-gray-600 mb-1.5">Product Images</label>
+
+                      <!-- Existing gallery images -->
+                      <div v-if="galleryImages.length" class="flex flex-wrap gap-2 mb-3">
+                        <div
+                          v-for="img in galleryImages"
+                          :key="img.id"
+                          class="relative group"
+                        >
+                          <img
+                            :src="img.url"
+                            alt="Product image"
+                            class="h-20 w-20 rounded-lg object-cover border border-gray-200"
+                          />
+                          <button
+                            type="button"
+                            @click="deleteGalleryImage(img.id)"
+                            class="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                            title="Remove image"
+                          >
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                      <p v-else class="text-xs text-gray-400 mb-2">No images uploaded yet.</p>
+
+                      <!-- Upload new gallery images -->
+                      <div class="flex items-center gap-3">
+                        <input
+                          ref="galleryInput"
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          @change="onGallerySelected"
+                          class="block w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                        />
+                        <button
+                          v-if="galleryFiles.length"
+                          type="button"
+                          @click="uploadGalleryImages"
+                          :disabled="uploadingGallery"
+                          class="shrink-0 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"
+                        >
+                          {{ uploadingGallery ? 'Uploading...' : `Upload (${galleryFiles.length})` }}
+                        </button>
+                      </div>
                     </div>
 
                     <!-- Active toggle -->
@@ -492,18 +551,18 @@
               </div>
 
               <!-- Modal footer -->
-              <div class="px-6 py-3.5 border-t border-gray-100 flex items-center gap-3 shrink-0">
+              <div class="px-6 py-3.5 border-t border-gray-100 flex items-center justify-end gap-3 shrink-0">
                 <button
                   type="button"
                   @click="closeModal"
-                  class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   form="productForm"
-                  class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   :disabled="submitting"
                 >
                   <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -600,6 +659,7 @@ const goToPage = (page: number) => {
   loadProducts()
 }
 const showModal = ref(false)
+const backdropMouseDown = ref(false)
 const submitting = ref(false)
 const formError = ref<string | null>(null)
 const editingProduct = ref<Product | null>(null)
@@ -609,6 +669,68 @@ const deleting = ref(false)
 const imageFile = ref<File | null>(null)
 const imagePreview = ref<string | null>(null)
 const imageInput = ref<HTMLInputElement | null>(null)
+
+// Gallery images (for editing existing products)
+const galleryImages = ref<{ id: number; url: string }[]>([])
+const galleryFiles = ref<File[]>([])
+const galleryInput = ref<HTMLInputElement | null>(null)
+const uploadingGallery = ref(false)
+
+const onGallerySelected = (event: Event) => {
+  const files = (event.target as HTMLInputElement).files
+  if (files) {
+    galleryFiles.value = Array.from(files)
+  }
+}
+
+const uploadGalleryImages = async () => {
+  if (!editingProduct.value || !galleryFiles.value.length) return
+  uploadingGallery.value = true
+  try {
+    const formData = new FormData()
+    for (const file of galleryFiles.value) {
+      formData.append('images[]', file)
+    }
+    const res = await $apiFetch<{ data: any }>(`/products/${editingProduct.value.id}/images`, {
+      method: 'POST',
+      body: formData,
+    })
+    // Refresh gallery from response
+    if (res?.data?.media) {
+      galleryImages.value = res.data.media
+        .filter((m: any) => m.collection === 'gallery')
+        .map((m: any) => ({ id: m.id, url: m.url }))
+    }
+    galleryFiles.value = []
+    if (galleryInput.value) galleryInput.value.value = ''
+    // Reload product list to update thumbnails
+    await loadProducts()
+  } catch (err: any) {
+    console.error('Error uploading gallery images:', err)
+    formError.value = err?.data?.message || 'Failed to upload images'
+  } finally {
+    uploadingGallery.value = false
+  }
+}
+
+const deleteGalleryImage = async (mediaId: number) => {
+  if (!editingProduct.value) return
+  try {
+    const res = await $apiFetch<{ data: any }>(`/products/${editingProduct.value.id}/images/${mediaId}`, {
+      method: 'DELETE',
+    })
+    if (res?.data?.media) {
+      galleryImages.value = res.data.media
+        .filter((m: any) => m.collection === 'gallery')
+        .map((m: any) => ({ id: m.id, url: m.url }))
+    } else {
+      galleryImages.value = galleryImages.value.filter(img => img.id !== mediaId)
+    }
+    await loadProducts()
+  } catch (err: any) {
+    console.error('Error deleting gallery image:', err)
+  }
+}
 
 // Categories — tree picker
 const allCategories = ref<Category[]>([])
@@ -813,7 +935,7 @@ const openAddModal = () => {
   showModal.value = true
 }
 
-const editProduct = (product: Product) => {
+const editProduct = async (product: Product) => {
   editingProduct.value = product
   form.value = {
     name: product.name,
@@ -831,6 +953,20 @@ const editProduct = (product: Product) => {
   }
   imageFile.value = null
   imagePreview.value = null
+  galleryFiles.value = []
+  galleryImages.value = []
+
+  // Fetch product with media to populate gallery
+  try {
+    const res = await $apiFetch<{ data: any }>(`/products/${product.id}`, { method: 'GET' })
+    if (res?.data?.media) {
+      galleryImages.value = res.data.media
+        .filter((m: any) => m.collection === 'gallery')
+        .map((m: any) => ({ id: m.id, url: m.url }))
+    }
+  } catch {
+    // Silently fail — gallery just won't show existing images
+  }
 
   // Resolve category_id into cascading selections
   const catId = product.category_id ? Number(product.category_id) : null
@@ -854,6 +990,13 @@ const closeModal = () => {
   editingProduct.value = null
   formError.value = null
 }
+
+const onEscape = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && showModal.value) closeModal()
+}
+
+onMounted(() => window.addEventListener('keydown', onEscape))
+onBeforeUnmount(() => window.removeEventListener('keydown', onEscape))
 
 const saveProduct = async () => {
   submitting.value = true
