@@ -12,68 +12,92 @@
 
     <!-- Category Slider -->
     <div v-if="categories.length" class="bg-white border-b border-gray-100">
-      <!-- Each level of the category hierarchy -->
-      <div
-        v-for="(level, levelIndex) in categoryLevels"
-        :key="levelIndex"
-        :class="levelIndex > 0 ? 'border-t border-gray-50' : ''"
-      >
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div
-            :ref="el => setSliderRef(el as HTMLElement | null, levelIndex)"
-            class="category-slider flex items-center gap-2 overflow-x-auto"
-            :class="levelIndex === 0 ? 'py-4' : 'py-3'"
-            @scroll="() => updateScrollArrows(levelIndex)"
+      <!-- Root level categories -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div
+          :ref="el => setSliderRef(el as HTMLElement | null, 0)"
+          class="category-slider flex items-center gap-2 sm:gap-3 overflow-x-auto py-3 sm:py-4"
+          @scroll="() => updateScrollArrows(0)"
+        >
+          <button
+            @click="selectAtLevel(0, null)"
+            class="whitespace-nowrap px-4 sm:px-5 py-[7px] sm:py-2 rounded-full text-[13px] font-medium transition-all duration-200 shrink-0 cursor-pointer select-none"
+            :class="!selectedPath[0]
+              ? 'bg-[var(--color-secondary)] text-white shadow-md'
+              : 'bg-white text-gray-600 border border-gray-200 hover:border-[var(--color-secondary-300)] hover:text-[var(--color-secondary)] hover:-translate-y-px'"
           >
-            <button
-              @click="selectAtLevel(levelIndex, null)"
-              class="category-pill"
-              :class="[
-                levelIndex > 0 ? 'text-xs' : '',
-                !selectedPath[levelIndex] ? 'category-pill-active' : 'category-pill-inactive'
-              ]"
-            >
-              {{ levelIndex === 0 ? 'All' : `All ${selectedPath[levelIndex - 1]?.name ?? ''}` }}
-            </button>
-            <button
-              v-for="cat in level"
-              :key="cat.id"
-              @click="selectAtLevel(levelIndex, cat)"
-              class="category-pill"
-              :class="[
-                levelIndex > 0 ? 'text-xs' : '',
-                selectedPath[levelIndex]?.id === cat.id ? 'category-pill-active' : 'category-pill-inactive'
-              ]"
-            >
-              {{ cat.name }}
-            </button>
-          </div>
-
-          <!-- Scroll arrows -->
-          <Transition name="arrow-fade">
-            <button
-              v-if="sliderScrollState[levelIndex]?.left"
-              @click="scrollSlider(levelIndex, 'left')"
-              class="slider-arrow left-3"
-            >
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-          </Transition>
-          <Transition name="arrow-fade">
-            <button
-              v-if="sliderScrollState[levelIndex]?.right"
-              @click="scrollSlider(levelIndex, 'right')"
-              class="slider-arrow right-3"
-            >
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </Transition>
+            All
+          </button>
+          <button
+            v-for="cat in categoryLevels[0]"
+            :key="cat.id"
+            @click="selectAtLevel(0, cat)"
+            class="whitespace-nowrap px-4 sm:px-5 py-[7px] sm:py-2 rounded-full text-[13px] font-medium transition-all duration-200 shrink-0 cursor-pointer select-none"
+            :class="selectedPath[0]?.id === cat.id
+              ? 'bg-[var(--color-secondary)] text-white shadow-md'
+              : 'bg-white text-gray-600 border border-gray-200 hover:border-[var(--color-secondary-300)] hover:text-[var(--color-secondary)] hover:-translate-y-px'"
+          >
+            {{ cat.name }}
+          </button>
         </div>
+
+        <!-- Scroll arrows for root -->
+        <ShopScrollArrow :visible="!!sliderScrollState[0]?.left" direction="left" @scroll="scrollSlider(0, 'left')" />
+        <ShopScrollArrow :visible="!!sliderScrollState[0]?.right" direction="right" @scroll="scrollSlider(0, 'right')" />
       </div>
+
+      <!-- Subcategory levels with line connector -->
+      <TransitionGroup name="sublevel">
+        <div
+          v-for="(level, idx) in subCategoryLevels"
+          :key="'sub-' + idx + '-' + (selectedPath[idx]?.id ?? 'none')"
+          class="bg-gradient-to-b from-gray-50 to-white border-t border-gray-100"
+        >
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <!-- Connecting line & label -->
+            <div class="flex items-center gap-2 pt-2 sm:pt-3 pb-1">
+              <div class="w-1.5 h-1.5 rounded-full bg-[var(--color-secondary)] shadow-[0_0_0_3px_rgba(var(--color-secondary-rgb,99,102,241),0.15)] shrink-0" />
+              <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+              <span class="text-[10px] sm:text-xs font-medium text-gray-400 uppercase tracking-wider shrink-0 px-1">
+                {{ selectedPath[idx]?.name }}
+              </span>
+              <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+            </div>
+
+            <!-- Subcategory pills -->
+            <div
+              :ref="el => setSliderRef(el as HTMLElement | null, idx + 1)"
+              class="category-slider flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-3 sm:pb-4 pt-1"
+              @scroll="() => updateScrollArrows(idx + 1)"
+            >
+              <button
+                @click="selectAtLevel(idx + 1, null)"
+                class="whitespace-nowrap px-3.5 sm:px-4 py-[5px] sm:py-1.5 rounded-lg text-xs font-medium transition-all duration-200 shrink-0 cursor-pointer select-none"
+                :class="!selectedPath[idx + 1]
+                  ? 'bg-[var(--color-secondary)] text-white shadow-sm'
+                  : 'bg-gray-50 text-gray-500 border border-gray-200 hover:bg-white hover:border-[var(--color-secondary-300)] hover:text-[var(--color-secondary)]'"
+              >
+                All {{ selectedPath[idx]?.name ?? '' }}
+              </button>
+              <button
+                v-for="cat in level"
+                :key="cat.id"
+                @click="selectAtLevel(idx + 1, cat)"
+                class="whitespace-nowrap px-3.5 sm:px-4 py-[5px] sm:py-1.5 rounded-lg text-xs font-medium transition-all duration-200 shrink-0 cursor-pointer select-none"
+                :class="selectedPath[idx + 1]?.id === cat.id
+                  ? 'bg-[var(--color-secondary)] text-white shadow-sm'
+                  : 'bg-gray-50 text-gray-500 border border-gray-200 hover:bg-white hover:border-[var(--color-secondary-300)] hover:text-[var(--color-secondary)]'"
+              >
+                {{ cat.name }}
+              </button>
+            </div>
+
+            <!-- Scroll arrows for subcategory -->
+            <ShopScrollArrow :visible="!!sliderScrollState[idx + 1]?.left" direction="left" small @scroll="scrollSlider(idx + 1, 'left')" />
+            <ShopScrollArrow :visible="!!sliderScrollState[idx + 1]?.right" direction="right" small @scroll="scrollSlider(idx + 1, 'right')" />
+          </div>
+        </div>
+      </TransitionGroup>
     </div>
 
     <!-- Filters -->
@@ -117,20 +141,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
 
         <!-- Skeleton -->
-        <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <div v-for="i in 8" :key="i" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden animate-pulse">
-            <div class="h-48 bg-gray-100"></div>
-            <div class="p-4 space-y-3">
-              <div class="h-4 bg-gray-100 rounded-lg w-3/4"></div>
-              <div class="h-3 bg-gray-100 rounded-lg w-full"></div>
-              <div class="h-3 bg-gray-100 rounded-lg w-2/3"></div>
-              <div class="flex items-center justify-between mt-2">
-                <div class="h-5 bg-gray-100 rounded-lg w-16"></div>
-                <div class="h-8 bg-gray-100 rounded-lg w-24"></div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ShopProductSkeleton v-if="loading" />
 
         <!-- Error -->
         <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center max-w-sm mx-auto mt-8">
@@ -170,56 +181,7 @@
     </div>
 
     <!-- Promo Banner -->
-    <section class="relative overflow-hidden text-white py-16" :style="{ background: `linear-gradient(135deg, var(--color-secondary), var(--color-primary), var(--color-primary-400))` }">
-      <!-- Floating orbs -->
-      <div class="orb orb-1" />
-      <div class="orb orb-2" />
-      <div class="orb orb-3" />
-
-      <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <span class="inline-block bg-white/20 backdrop-blur-sm text-xs font-semibold px-4 py-1.5 rounded-full mb-5 tracking-widest uppercase">
-          Members get more
-        </span>
-        <h2 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-          New arrivals<br />every single week.
-        </h2>
-        <p class="text-base text-white/75 mb-8 max-w-lg mx-auto">
-          Stay ahead of the trend. Fresh drops, exclusive deals, and hand-picked collections — updated weekly just for you.
-        </p>
-
-        <div class="flex flex-wrap justify-center gap-3 mb-10">
-          <div class="flex items-center gap-2 bg-white/15 backdrop-blur-sm px-5 py-2.5 rounded-full text-sm font-medium">
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            Free Shipping
-          </div>
-          <div class="flex items-center gap-2 bg-white/15 backdrop-blur-sm px-5 py-2.5 rounded-full text-sm font-medium">
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            Easy Returns
-          </div>
-          <div class="flex items-center gap-2 bg-white/15 backdrop-blur-sm px-5 py-2.5 rounded-full text-sm font-medium">
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-            Secure Checkout
-          </div>
-        </div>
-
-        <NuxtLink
-          to="/shop"
-          class="inline-flex items-center gap-2 bg-white font-bold px-8 py-3.5 rounded-xl shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300"
-          :style="{ color: 'var(--color-primary-700)' }"
-        >
-          Shop New Arrivals
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
-        </NuxtLink>
-      </div>
-    </section>
+    <ShopPromoBanner />
 
   </div>
 </template>
@@ -277,6 +239,9 @@ const categoryLevels = computed(() => {
   return levels
 })
 
+// Subcategory levels only (excludes root level)
+const subCategoryLevels = computed(() => categoryLevels.value.slice(1))
+
 // The deepest selected category ID (used for API filtering)
 const activeCategoryId = computed(() => {
   for (let i = selectedPath.value.length - 1; i >= 0; i--) {
@@ -293,33 +258,34 @@ const selectAtLevel = (levelIndex: number, cat: Category | null) => {
   fetchProducts()
 }
 
-// Slider refs & scroll state per level
-const sliderRefs = ref<Map<number, HTMLElement>>(new Map())
+// Slider refs (non-reactive — never read in template, only used in handlers)
+const sliderRefs = new Map<number, HTMLElement>()
 const sliderScrollState = ref<Record<number, { left: boolean; right: boolean }>>({})
 
 const setSliderRef = (el: HTMLElement | null, index: number) => {
   if (el) {
-    sliderRefs.value.set(index, el)
+    sliderRefs.set(index, el)
     nextTick(() => updateScrollArrows(index))
   } else {
-    sliderRefs.value.delete(index)
+    sliderRefs.delete(index)
   }
 }
 
 const updateScrollArrows = (index: number) => {
-  const el = sliderRefs.value.get(index)
+  const el = sliderRefs.get(index)
   if (!el) return
+  const left = el.scrollLeft > 0
+  const right = el.scrollLeft + el.clientWidth < el.scrollWidth - 1
+  const current = sliderScrollState.value[index]
+  if (current?.left === left && current?.right === right) return
   sliderScrollState.value = {
     ...sliderScrollState.value,
-    [index]: {
-      left: el.scrollLeft > 0,
-      right: el.scrollLeft + el.clientWidth < el.scrollWidth - 1,
-    },
+    [index]: { left, right },
   }
 }
 
 const scrollSlider = (index: number, direction: 'left' | 'right') => {
-  const el = sliderRefs.value.get(index)
+  const el = sliderRefs.get(index)
   if (!el) return
   el.scrollBy({ left: direction === 'left' ? -200 : 200, behavior: 'smooth' })
 }
@@ -386,7 +352,7 @@ const fetchProducts = async () => {
   } finally {
     loading.value = false
     nextTick(() => {
-      for (const idx of sliderRefs.value.keys()) {
+      for (const idx of sliderRefs.keys()) {
         updateScrollArrows(idx)
       }
     })
@@ -406,74 +372,45 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Category slider */
+/* Hidden scrollbar for category sliders */
 .category-slider {
   scrollbar-width: none;
   -ms-overflow-style: none;
   scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 .category-slider::-webkit-scrollbar {
   display: none;
 }
 
-.category-pill {
-  white-space: nowrap;
-  padding: 6px 18px;
-  border-radius: 9999px;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  cursor: pointer;
+/* Sublevel transition */
+.sublevel-enter-active {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
-
-.category-pill-active {
-  background-color: var(--color-secondary);
-  color: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+.sublevel-leave-active {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
-
-.category-pill-inactive {
-  background-color: #fff;
-  color: #4b5563;
-  border: 1px solid #e5e7eb;
-}
-.category-pill-inactive:hover {
-  border-color: var(--color-secondary-300);
-  color: var(--color-secondary);
-}
-
-.slider-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-  color: #6b7280;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.slider-arrow:hover {
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  color: #374151;
-}
-
-.arrow-fade-enter-active,
-.arrow-fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-.arrow-fade-enter-from,
-.arrow-fade-leave-to {
+.sublevel-enter-from {
   opacity: 0;
+  max-height: 0;
+  transform: translateY(-8px);
+}
+.sublevel-enter-to {
+  opacity: 1;
+  max-height: 120px;
+  transform: translateY(0);
+}
+.sublevel-leave-from {
+  opacity: 1;
+  max-height: 120px;
+  transform: translateY(0);
+}
+.sublevel-leave-to {
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(-8px);
 }
 
 /* Product card stagger fade-up */
@@ -491,45 +428,5 @@ onMounted(() => {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-/* Promo banner floating orbs */
-.orb {
-  position: absolute;
-  border-radius: 9999px;
-  opacity: 0.15;
-  animation: float 6s ease-in-out infinite;
-}
-
-.orb-1 {
-  width: 280px;
-  height: 280px;
-  background: white;
-  top: -80px;
-  left: -60px;
-  animation-delay: 0s;
-}
-
-.orb-2 {
-  width: 200px;
-  height: 200px;
-  background: white;
-  bottom: -60px;
-  right: 10%;
-  animation-delay: 2s;
-}
-
-.orb-3 {
-  width: 140px;
-  height: 140px;
-  background: white;
-  top: 30%;
-  right: -40px;
-  animation-delay: 4s;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px) scale(1); }
-  50%       { transform: translateY(-18px) scale(1.04); }
 }
 </style>
