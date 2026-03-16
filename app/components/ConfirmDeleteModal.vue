@@ -70,15 +70,24 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   open: boolean
   title: string
   message: string
   deleting?: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   confirm: []
   cancel: []
 }>()
+
+const onEscape = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && props.open) {
+    emit('cancel')
+  }
+}
+
+onMounted(() => window.addEventListener('keydown', onEscape))
+onBeforeUnmount(() => window.removeEventListener('keydown', onEscape))
 </script>

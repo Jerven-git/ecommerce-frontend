@@ -303,11 +303,12 @@
 
                 <!-- Description -->
                 <div>
-                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Description</label>
+                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                    Description
+                  </label>
                   <textarea
                     v-model="form.description"
-                    rows="2"
-                    class="input-field resize-none"
+                    class="w-full h-[200px] px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-blue-400 focus:ring-1 focus:ring-blue-400 outline-none transition-all leading-relaxed overflow-y-auto input-field resize-none"
                     placeholder="Summer sale discount"
                   ></textarea>
                 </div>
@@ -585,6 +586,16 @@ const closeModal = () => {
   editingDiscount.value = null
   formError.value = null
 }
+
+const onEscape = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') {
+    if (showDeleteModal.value) { showDeleteModal.value = false; return }
+    if (showModal.value) closeModal()
+  }
+}
+
+onMounted(() => window.addEventListener('keydown', onEscape))
+onBeforeUnmount(() => window.removeEventListener('keydown', onEscape))
 
 const saveDiscount = async () => {
   submitting.value = true

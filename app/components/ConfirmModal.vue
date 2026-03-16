@@ -95,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   open: boolean
   title: string
   message: string
@@ -110,8 +110,17 @@ withDefaults(defineProps<{
   variant: 'danger',
 })
 
-defineEmits<{
+const emit = defineEmits<{
   confirm: []
   cancel: []
 }>()
+
+const onEscape = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && props.open) {
+    emit('cancel')
+  }
+}
+
+onMounted(() => window.addEventListener('keydown', onEscape))
+onBeforeUnmount(() => window.removeEventListener('keydown', onEscape))
 </script>
