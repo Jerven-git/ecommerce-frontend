@@ -332,17 +332,26 @@
               <div class="space-y-2.5 py-4 border-b border-gray-100">
                 <div class="flex justify-between text-sm text-gray-600">
                   <span>Subtotal</span>
-                  <span class="font-medium text-gray-900">${{ cartStore.subtotal.toFixed(2) }}</span>
+                  <span class="font-medium text-gray-900">${{ cartStore.rawSubtotal.toFixed(2) }}</span>
                 </div>
 
+                <!-- Tax Breakdown -->
                 <template v-if="cartStore.taxInfo.enabled">
-                  <div v-if="cartStore.taxInfo.mode === 'inclusive'" class="text-xs text-gray-400">
-                    Includes {{ cartStore.taxInfo.name }} {{ cartStore.taxInfo.rate }}%:
-                    <span class="font-medium">${{ cartStore.taxAmount.toFixed(2) }}</span>
-                  </div>
-                  <div v-else class="flex justify-between text-sm text-gray-600">
-                    <span>{{ cartStore.taxInfo.name }} ({{ cartStore.taxInfo.rate }}%)</span>
-                    <span class="font-medium text-gray-900">${{ cartStore.taxAmount.toFixed(2) }}</span>
+                  <div class="bg-gray-50 rounded-lg px-3 py-2.5 space-y-1.5">
+                    <div class="flex justify-between text-xs text-gray-500">
+                      <span>Net price</span>
+                      <span class="font-medium text-gray-700">${{ cartStore.subtotal.toFixed(2) }}</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-gray-500">
+                      <span>{{ cartStore.taxInfo.name }} ({{ cartStore.taxInfo.rate }}%)</span>
+                      <span class="font-medium text-gray-700">+ ${{ cartStore.taxAmount.toFixed(2) }}</span>
+                    </div>
+                    <p v-if="cartStore.taxInfo.mode === 'inclusive'" class="text-[10px] text-gray-400 pt-0.5">
+                      Tax is included in the displayed price
+                    </p>
+                    <p v-else class="text-[10px] text-gray-400 pt-0.5">
+                      Tax is added to the displayed price
+                    </p>
                   </div>
                 </template>
 
