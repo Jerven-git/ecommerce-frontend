@@ -158,6 +158,13 @@
               In Stock ({{ product.stock }})
             </span>
             <span
+              v-else-if="product.can_backorder"
+              class="inline-flex items-center gap-1.5 text-sm font-medium text-amber-600"
+            >
+              <span class="w-2 h-2 rounded-full bg-amber-500" />
+              Out of Stock — Available on Backorder
+            </span>
+            <span
               v-else
               class="inline-flex items-center gap-1.5 text-sm font-medium text-red-600"
             >
@@ -183,8 +190,8 @@
                 {{ quantity }}
               </span>
               <button
-                @click="quantity < product.stock && quantity++"
-                :disabled="quantity >= product.stock"
+                @click="quantity++"
+                :disabled="!product.can_backorder && quantity >= product.stock"
                 class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -197,10 +204,10 @@
           <!-- Add to Cart -->
           <button
             @click="addToCart"
-            :disabled="product.stock === 0"
+            :disabled="product.stock === 0 && !product.can_backorder"
             class="w-full py-3.5 px-6 text-sm font-bold uppercase tracking-wider text-white bg-[var(--color-secondary)] hover:bg-[var(--color-secondary-600)] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {{ product.stock === 0 ? 'Out of Stock' : 'Add to Cart' }}
+            {{ product.stock === 0 && !product.can_backorder ? 'Out of Stock' : 'Add to Cart' }}
           </button>
 
         </div>
@@ -296,6 +303,8 @@ interface Product {
   category_id: number | null
   stock: number
   is_active: boolean
+  can_backorder: boolean
+  backorder_charge_policy?: 'charged_now' | 'charged_later' | 'charged_invoice'
   media?: MediaItem[]
   created_at: string
   updated_at: string
@@ -346,8 +355,13 @@ const toggleFavorite = () => {
   }
 }
 
+const canOrder = computed(() => {
+  if (!product.value) return false
+  return product.value.stock > 0 || product.value.can_backorder
+})
+
 const addToCart = () => {
-  if (!product.value || product.value.stock === 0) return
+  if (!product.value || !canOrder.value) return
   for (let i = 0; i < quantity.value; i++) {
     cartStore.addItem(product.value)
   }

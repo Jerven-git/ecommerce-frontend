@@ -120,12 +120,19 @@
                 ${{ parseFloat(String(product.price)).toFixed(2) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span
-                  class="text-sm font-medium"
-                  :class="product.stock === 0 ? 'text-red-500' : product.stock <= 5 ? 'text-amber-600' : 'text-gray-800'"
-                >
-                  {{ product.stock }}
-                </span>
+                <div class="flex items-center gap-2">
+                  <span
+                    class="text-sm font-medium"
+                    :class="product.stock === 0 ? 'text-red-500' : product.stock <= 5 ? 'text-amber-600' : 'text-gray-800'"
+                  >
+                    {{ product.stock }}
+                  </span>
+                  <span
+                    v-if="product.allow_backorder"
+                    class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-50 text-blue-600"
+                    title="Backorder enabled"
+                  >BO</span>
+                </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                 <template v-if="product.shipping_calc_type === 'dimensions'">
@@ -529,6 +536,40 @@
                         />
                       </button>
                     </div>
+
+                    <!-- Backorder toggle -->
+                    <div class="flex items-center justify-between py-1.5 px-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <p class="text-sm font-medium text-gray-700">Allow Backorder</p>
+                        <p class="text-xs text-gray-400">Accept orders for this product when out of stock</p>
+                        <p class="text-[11px] text-amber-600 mt-0.5">Requires the global backorder setting to also be enabled in Backorders &rarr; Settings</p>
+                      </div>
+                      <button
+                        type="button"
+                        @click="form.allow_backorder = !form.allow_backorder"
+                        class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                        :class="form.allow_backorder ? 'bg-blue-600' : 'bg-gray-300'"
+                      >
+                        <span
+                          class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-200"
+                          :class="form.allow_backorder ? 'translate-x-[18px]' : 'translate-x-[3px]'"
+                        />
+                      </button>
+                    </div>
+
+                    <!-- Backorder charge policy (only visible when backorder enabled) -->
+                    <div v-if="form.allow_backorder" class="px-3">
+                      <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Charge Policy</label>
+                      <select
+                        v-model="form.backorder_charge_policy"
+                        class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="charged_now">Charged at checkout</option>
+                        <option value="charged_later">Charged when available</option>
+                        <option value="charged_invoice">Charged via invoice</option>
+                      </select>
+                      <p class="text-xs text-gray-400 mt-1">When to charge the customer for backordered items</p>
+                    </div>
                   </fieldset>
 
                   <!-- Form error -->
@@ -608,6 +649,8 @@ interface Product {
   category_id: number | null
   image_url: string
   is_active: boolean
+  allow_backorder: boolean
+  backorder_charge_policy: 'charged_now' | 'charged_later' | 'charged_invoice'
   created_at: string
   updated_at: string
 }
@@ -813,7 +856,9 @@ const form = ref({
   shipping_calc_type: 'weight' as 'weight' | 'dimensions',
   category: 'general',
   category_id: null as number | null,
-  is_active: true
+  is_active: true,
+  allow_backorder: false,
+  backorder_charge_policy: 'charged_later' as 'charged_now' | 'charged_later' | 'charged_invoice',
 })
 
 const computedVolumeCbm = computed(() => {
@@ -925,7 +970,9 @@ const openAddModal = () => {
     shipping_calc_type: 'weight',
     category: 'general',
     category_id: null,
-    is_active: true
+    is_active: true,
+    allow_backorder: false,
+    backorder_charge_policy: 'charged_later',
   }
   imageFile.value = null
   imagePreview.value = null
@@ -949,7 +996,9 @@ const editProduct = async (product: Product) => {
     shipping_calc_type: product.shipping_calc_type || 'weight',
     category: product.category,
     category_id: product.category_id,
-    is_active: product.is_active
+    is_active: product.is_active,
+    allow_backorder: product.allow_backorder ?? false,
+    backorder_charge_policy: product.backorder_charge_policy ?? 'charged_later',
   }
   imageFile.value = null
   imagePreview.value = null
@@ -1018,6 +1067,8 @@ const saveProduct = async () => {
       formData.append('category_id', String(form.value.category_id))
     }
     formData.append('is_active', form.value.is_active ? '1' : '0')
+    formData.append('allow_backorder', form.value.allow_backorder ? '1' : '0')
+    formData.append('backorder_charge_policy', form.value.backorder_charge_policy)
     if (imageFile.value) {
       formData.append('image', imageFile.value)
     }

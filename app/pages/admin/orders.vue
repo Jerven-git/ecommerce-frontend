@@ -103,10 +103,17 @@
                 'bg-purple-500': order.status === 'shipped',
                 'bg-green-500': order.status === 'delivered',
                 'bg-gray-400': order.status === 'cancelled',
+                'bg-orange-500': order.status === 'backorder_awaiting_stock',
+                'bg-yellow-500': order.status === 'backorder_notified',
+                'bg-red-400': order.status === 'backorder_expired',
+                'bg-red-500': order.status === 'backorder_cancelled',
               }"
             />
             <div>
-              <p class="text-sm font-semibold text-gray-900">Order #{{ order.id }}</p>
+              <p class="text-sm font-semibold text-gray-900">
+                Order #{{ order.id }}
+                <span v-if="isBackorderStatus(order.status)" class="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-orange-100 text-orange-700 border border-orange-200">Backorder</span>
+              </p>
               <p class="text-xs text-gray-400">{{ formatDate(order.created_at) }}</p>
             </div>
           </div>
@@ -130,7 +137,7 @@
 
             <!-- Confirm Payment button for pending COD -->
             <button
-              v-if="order.payment?.provider === 'cash' && order.payment?.status === 'pending'"
+              v-if="order.payment?.provider === 'cash' && order.payment?.status === 'pending' && order.status !== 'cancelled' && order.status !== 'backorder_cancelled'"
               @click="promptConfirmPayment(order.id, order.customer_name)"
               :disabled="confirmingOrderId === order.id"
               class="text-xs font-medium px-3 py-1.5 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 transition-colors"
@@ -140,7 +147,7 @@
 
             <!-- Undo Payment button for paid COD -->
             <button
-              v-if="order.payment?.provider === 'cash' && order.payment?.status === 'paid'"
+              v-if="order.payment?.provider === 'cash' && order.payment?.status === 'paid' && order.status !== 'cancelled' && order.status !== 'backorder_cancelled'"
               @click="promptUndoPayment(order.id, order.customer_name)"
               :disabled="undoingOrderId === order.id"
               class="text-xs font-medium px-3 py-1.5 rounded-lg bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-50 transition-colors"
@@ -151,21 +158,24 @@
               <select
                 v-model="order.status"
                 @change="onOrderStatusChange(order.id, order.status)"
-                :disabled="updatingOrderId === order.id"
+                :disabled="updatingOrderId === order.id || isLockedBackorderStatus(order.status)"
                 class="appearance-none text-sm font-medium rounded-lg border px-3 py-1.5 pr-8 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                :class="{
-                  'bg-amber-50 border-amber-200 text-amber-800': order.status === 'pending',
-                  'bg-blue-50 border-blue-200 text-blue-800': order.status === 'processing',
-                  'bg-purple-50 border-purple-200 text-purple-800': order.status === 'shipped',
-                  'bg-green-50 border-green-200 text-green-800': order.status === 'delivered',
-                  'bg-gray-100 border-gray-200 text-gray-600': order.status === 'cancelled',
-                }"
+                :class="orderStatusClass(order.status)"
               >
-                <option value="pending">Pending</option>
-                <option value="processing">Processing</option>
-                <option value="shipped">Shipped</option>
-                <option value="delivered">Delivered</option>
-                <option value="cancelled">Cancelled</option>
+                <template v-if="isBackorderStatus(order.status)">
+                  <option value="backorder_awaiting_stock">Awaiting Stock</option>
+                  <option value="backorder_notified">Notified</option>
+                  <option value="backorder_expired">Expired</option>
+                  <option value="backorder_cancelled">Cancelled</option>
+                  <option v-if="!isLockedBackorderStatus(order.status)" value="pending">→ Move to Pending</option>
+                </template>
+                <template v-else>
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="shipped">Shipped</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="cancelled">Cancelled</option>
+                </template>
               </select>
               <!-- Custom chevron -->
               <span class="pointer-events-none absolute inset-y-0 right-2 flex items-center">
@@ -204,7 +214,7 @@
           <div v-if="!order.shipment" class="flex items-center justify-between">
             <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Tracking</p>
             <button
-              v-if="order.status !== 'cancelled'"
+              v-if="order.status !== 'cancelled' && order.status !== 'backorder_cancelled' && order.status !== 'backorder_expired'"
               @click="promptShipOrder(order.id, order.customer_name)"
               :disabled="shippingOrderId === order.id"
               class="text-xs font-medium px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 transition-colors"
@@ -442,7 +452,7 @@ interface Order {
   shipping_amount: string | number
   discount_code?: string | null
   discount_amount: string | number
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'backorder_awaiting_stock' | 'backorder_notified' | 'backorder_expired' | 'backorder_cancelled'
   created_at: string
   items?: OrderItem[]
   payment?: Payment | null
@@ -499,9 +509,26 @@ const statusFilters = [
   { value: 'shipped', label: 'Shipped', activeClass: 'border-purple-500 bg-purple-50 text-purple-700' },
   { value: 'delivered', label: 'Delivered', activeClass: 'border-green-500 bg-green-50 text-green-700' },
   { value: 'cancelled', label: 'Cancelled', activeClass: 'border-gray-500 bg-gray-100 text-gray-700' },
+  { value: 'backorder_awaiting_stock', label: 'Backorder', activeClass: 'border-orange-500 bg-orange-50 text-orange-700' },
 ]
 
 const getStatusCount = (status: string) => statusCounts.value[status] ?? 0
+
+const isBackorderStatus = (status: string) => status.startsWith('backorder_')
+
+const isLockedBackorderStatus = (status: string) => status === 'backorder_cancelled' || status === 'backorder_expired'
+
+const orderStatusClass = (status: string) => ({
+  'bg-amber-50 border-amber-200 text-amber-800': status === 'pending',
+  'bg-blue-50 border-blue-200 text-blue-800': status === 'processing',
+  'bg-purple-50 border-purple-200 text-purple-800': status === 'shipped',
+  'bg-green-50 border-green-200 text-green-800': status === 'delivered',
+  'bg-gray-100 border-gray-200 text-gray-600': status === 'cancelled',
+  'bg-orange-50 border-orange-200 text-orange-800': status === 'backorder_awaiting_stock',
+  'bg-yellow-50 border-yellow-200 text-yellow-800': status === 'backorder_notified',
+  'bg-red-50 border-red-200 text-red-800': status === 'backorder_expired',
+  'bg-red-100 border-red-300 text-red-700': status === 'backorder_cancelled',
+})
 
 // filteredOrders now just returns the server-filtered results directly
 const filteredOrders = computed(() => orders.value)
@@ -598,6 +625,7 @@ const loadOrders = async () => {
       for (const o of response.data) {
         previousStatuses.value[o.id] = o.status
       }
+      console.log(orders.value)
     }
     if (response?.status_counts) {
       statusCounts.value = response.status_counts
