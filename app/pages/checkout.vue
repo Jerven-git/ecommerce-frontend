@@ -149,8 +149,8 @@
               </div>
             </div>
 
-            <!-- Payment Method -->
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <!-- Payment Method (hidden when nothing to pay now) -->
+            <div v-if="!allDeferredBackorder" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Payment Method</h2>
 
               <!-- Loading -->
@@ -194,6 +194,33 @@
                     <p class="text-xs text-gray-500 mt-0.5">{{ method.description }}</p>
                   </div>
                 </label>
+              </div>
+            </div>
+
+            <!-- Deferred Backorder: no payment needed now -->
+            <div v-if="allDeferredBackorder" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Place Order</h2>
+              <div class="flex items-start gap-2.5 p-3.5 bg-blue-50 border border-blue-100 rounded-xl mb-5">
+                <svg class="w-4 h-4 text-blue-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-xs text-blue-800 leading-relaxed">
+                  All items in your cart are on backorder and will be charged later. No payment is required now — you'll receive a payment link when your items become available.
+                </p>
+              </div>
+              <button
+                @click="placeDeferredBackorder"
+                :disabled="submitting || !isFormValid"
+                class="btn-primary w-full"
+              >
+                {{ submitting ? 'Processing…' : 'Place Backorder' }}
+              </button>
+
+              <div v-if="error" class="mt-4 flex items-start gap-2.5 p-3.5 bg-red-50 border border-red-100 rounded-xl">
+                <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-sm text-red-700">{{ error }}</p>
               </div>
             </div>
 
@@ -275,9 +302,29 @@
 
               <!-- Item list -->
               <div class="space-y-2.5 pb-4 border-b border-gray-100 max-h-60 overflow-y-auto">
-                <div v-for="item in cartStore.items" :key="item.id" class="flex justify-between items-start gap-2">
-                  <span class="text-sm text-gray-600 leading-snug">{{ item.name }} <span class="text-gray-400">×{{ item.quantity }}</span></span>
-                  <span class="text-sm font-medium text-gray-900 shrink-0">${{ (item.price * item.quantity).toFixed(2) }}</span>
+                <div v-for="item in cartStore.items" :key="item.id">
+                  <div class="flex justify-between items-start gap-2">
+                    <span class="text-sm text-gray-600 leading-snug">{{ item.name }} <span class="text-gray-400">×{{ item.quantity }}</span></span>
+                    <span class="text-sm font-medium text-gray-900 shrink-0">${{ (item.price * item.quantity).toFixed(2) }}</span>
+                  </div>
+                  <div v-if="item.quantity > item.stock && item.can_backorder" class="mt-1">
+                    <span class="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                      {{ item.stock > 0 ? `${item.quantity - item.stock} backordered` : 'Backorder' }}
+                      &middot; {{ chargePolicyLabel(item.backorder_charge_policy) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Backorder notice -->
+              <div v-if="cartStore.hasBackorderItems" class="py-3 border-b border-gray-100">
+                <div class="flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl">
+                  <svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p class="text-xs text-amber-800 leading-relaxed">
+                    Some items are out of stock and will be placed on backorder. You'll be notified when they're available.
+                  </p>
                 </div>
               </div>
 
@@ -442,6 +489,15 @@ const cartStore = useCartStore()
 const { $apiFetch } = useNuxtApp()
 const { getStates, getCities } = useRegions()
 
+const chargePolicyLabel = (policy?: string) => {
+  const labels: Record<string, string> = {
+    charged_now: 'Charged now',
+    charged_later: 'Charged when available',
+    charged_invoice: 'Charged via invoice',
+  }
+  return labels[policy || ''] || 'Charged when available'
+}
+
 const deliveryMethod = ref<'delivery' | 'pickup'>('delivery')
 const storeCountry = ref('')
 const phoneDialCode = ref('')
@@ -488,11 +544,21 @@ const discountError = ref<string | null>(null)
 // store created order id (so Stripe can mount after order exists)
 const createdOrderId = ref<number | null>(null)
 
+// True when every cart item is fully backordered with a deferred charge policy (charged_later or charged_invoice)
+const allDeferredBackorder = computed(() => {
+  if (cartStore.items.length === 0) return false
+  return cartStore.items.every(item => {
+    const isFullBackorder = item.stock === 0
+    const isDeferred = item.backorder_charge_policy === 'charged_later' || item.backorder_charge_policy === 'charged_invoice'
+    return item.can_backorder && isFullBackorder && isDeferred
+  })
+})
+
 const isFormValid = computed(() => {
   const basicInfo =
     form.value.customer_name &&
     form.value.customer_email &&
-    selectedPaymentMethod.value
+    (selectedPaymentMethod.value || allDeferredBackorder.value)
 
   if (deliveryMethod.value === 'pickup') return !!basicInfo
 
@@ -770,6 +836,28 @@ const handleStripeSuccess = async (paymentId: string) => {
 
 const handlePaymentError = (errorMessage: string) => {
   error.value = errorMessage
+}
+
+const placeDeferredBackorder = async () => {
+  if (!isFormValid.value) return
+
+  submitting.value = true
+  error.value = null
+
+  try {
+    await fetchWithRetry('/orders', {
+      method: 'POST',
+      body: buildOrderData()
+    })
+
+    cartStore.clearCart()
+    navigateTo('/order-success')
+  } catch (err: any) {
+    error.value = err?.data?.message || err?.message || 'Failed to place order.'
+  } finally {
+    submitting.value = false
+    busyQueue.value = false
+  }
 }
 
 const placeCashOrder = async () => {

@@ -12,6 +12,9 @@ interface CartItem {
   volume_cbm: number
   shipping_calc_type: 'weight' | 'dimensions'
   image_url?: string
+  stock: number
+  can_backorder: boolean
+  backorder_charge_policy?: 'charged_now' | 'charged_later' | 'charged_invoice'
 }
 
 interface TaxCalculation {
@@ -62,6 +65,14 @@ export const useCartStore = defineStore('cart', {
 
     rawSubtotal: (state) => {
       return state.items.reduce((total, item) => total + (item.price * item.quantity), 0)
+    },
+
+    hasBackorderItems: (state) => {
+      return state.items.some(item => item.quantity > item.stock && item.can_backorder)
+    },
+
+    backorderItems: (state) => {
+      return state.items.filter(item => item.quantity > item.stock && item.can_backorder)
     },
 
     subtotal(): number {
@@ -120,7 +131,10 @@ export const useCartStore = defineStore('cart', {
           height_cm: parseFloat(product.height_cm || 0),
           volume_cbm: parseFloat(product.volume_cbm || 0),
           shipping_calc_type: product.shipping_calc_type || 'weight',
-          image_url: product.image_url
+          image_url: product.image_url,
+          stock: parseInt(product.stock || 0),
+          can_backorder: !!product.can_backorder,
+          backorder_charge_policy: product.backorder_charge_policy || 'charged_later',
         })
       }
 

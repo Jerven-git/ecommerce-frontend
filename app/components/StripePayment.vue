@@ -33,6 +33,8 @@ const props = defineProps<{
   publishableKey: string
   customerEmail: string
   orderId: string | number
+  clientSecret?: string
+  paymentId?: string | number
 }>()
 
 const emit = defineEmits<{
@@ -86,17 +88,26 @@ const loadStripe = async () => {
 
     stripe = (window as any).Stripe(props.publishableKey)
 
-    // ✅ Create PaymentIntent for this order (server decides amount)
-    const response = await $apiFetch<any>(`/orders/${props.orderId}/stripe/intent`, {
-      method: 'POST'
-    })
+    let clientSecret: string
+    let paymentId: string | number
 
-    const payload = response?.data ?? response
-    const clientSecret = payload?.client_secret
-    const paymentId = payload?.payment_id
+    if (props.clientSecret && props.paymentId) {
+      // Use pre-created intent (e.g. backorder payments)
+      clientSecret = props.clientSecret
+      paymentId = props.paymentId
+    } else {
+      // Create PaymentIntent for this order (server decides amount)
+      const response = await $apiFetch<any>(`/orders/${props.orderId}/stripe/intent`, {
+        method: 'POST'
+      })
 
-    if (!clientSecret || !paymentId) {
-      throw new Error('Failed to create payment intent')
+      const payload = response?.data ?? response
+      clientSecret = payload?.client_secret
+      paymentId = payload?.payment_id
+
+      if (!clientSecret || !paymentId) {
+        throw new Error('Failed to create payment intent')
+      }
     }
 
     backendPaymentId.value = String(paymentId)
@@ -141,7 +152,16 @@ const handleSubmit = async () => {
 
     const { error: submitError } = await stripe.confirmPayment({
       elements,
-      confirmParams: { return_url: returnUrl },
+      confirmParams: {
+        return_url: returnUrl,
+        payment_method_data: {
+          billing_details: {
+            address: {
+              country: 'US',
+            },
+          },
+        },
+      },
       redirect: 'if_required'
     })
 

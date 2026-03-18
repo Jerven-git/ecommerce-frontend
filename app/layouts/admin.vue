@@ -105,6 +105,18 @@
           </NuxtLink>
 
           <NuxtLink
+            to="/admin/backorders"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
+            :class="linkClass('/admin/backorders')"
+            @click="closeSidebarOnMobile"
+          >
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="font-medium">Backorders</span>
+          </NuxtLink>
+
+          <NuxtLink
             to="/admin/discounts"
             class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
             :class="linkClass('/admin/discounts')"
@@ -278,6 +290,7 @@ const handleLogout = async () => {
 const pageTitle = computed(() => {
   if (route.path === '/admin') return 'Admin Dashboard'
   if (route.path.startsWith('/admin/products')) return 'Products'
+  if (route.path.startsWith('/admin/backorders')) return 'Backorders'
   if (route.path.startsWith('/admin/orders')) return 'Orders'
   if (route.path.startsWith('/admin/settings')) return 'Settings'
   if (route.path.startsWith('/admin/discounts')) return 'Discount Codes'

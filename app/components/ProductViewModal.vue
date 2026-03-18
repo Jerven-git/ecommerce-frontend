@@ -74,6 +74,12 @@
                   In Stock ({{ product.stock }})
                 </span>
                 <span
+                  v-else-if="product.can_backorder"
+                  class="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-600"
+                >
+                  Backorder
+                </span>
+                <span
                   v-else
                   class="text-xs font-semibold px-2.5 py-1 rounded-full bg-red-50 text-red-600"
                 >
@@ -85,10 +91,10 @@
 
               <button
                 @click="addToCart"
-                :disabled="product.stock === 0"
+                :disabled="product.stock === 0 && !product.can_backorder"
                 class="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {{ product.stock === 0 ? 'Out of Stock' : 'Add to Cart' }}
+                {{ product.stock === 0 && !product.can_backorder ? 'Out of Stock' : 'Add to Cart' }}
               </button>
             </div>
           </div>

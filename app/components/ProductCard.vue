@@ -49,15 +49,16 @@
       <div class="flex items-center justify-between mb-4">
         <span class="text-2xl font-bold text-blue-600">${{ product.price }}</span>
         <span v-if="product.stock > 0" class="text-sm text-green-600">In Stock</span>
+        <span v-else-if="product.can_backorder" class="text-sm text-amber-600">Backorder</span>
         <span v-else class="text-sm text-red-600">Out of Stock</span>
       </div>
 
       <button
         @click.stop="addToCart"
-        :disabled="product.stock === 0"
+        :disabled="product.stock === 0 && !product.can_backorder"
         class="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {{ product.stock === 0 ? 'Out of Stock' : 'Add to Cart' }}
+        {{ product.stock === 0 && !product.can_backorder ? 'Out of Stock' : 'Add to Cart' }}
       </button>
     </div>
 
