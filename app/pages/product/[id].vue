@@ -207,7 +207,7 @@
             :disabled="product.stock === 0 && !product.can_backorder"
             class="w-full py-3.5 px-6 text-sm font-bold uppercase tracking-wider text-white bg-[var(--color-secondary)] hover:bg-[var(--color-secondary-600)] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {{ product.stock === 0 && !product.can_backorder ? 'Out of Stock' : 'Add to Cart' }}
+            {{ product.stock === 0 && !product.can_backorder ? 'Out of Stock' : 'Proceed to Cart' }}
           </button>
 
         </div>
@@ -304,7 +304,7 @@ interface Product {
   stock: number
   is_active: boolean
   can_backorder: boolean
-  backorder_charge_policy?: 'charged_now' | 'charged_later' | 'charged_invoice'
+  backorder_charge_policy?: 'charged_now' | 'charged_later'
   media?: MediaItem[]
   created_at: string
   updated_at: string
@@ -365,6 +365,7 @@ const addToCart = () => {
   for (let i = 0; i < quantity.value; i++) {
     cartStore.addItem(product.value)
   }
+  navigateTo('/cart')
 }
 
 const fetchProduct = async () => {

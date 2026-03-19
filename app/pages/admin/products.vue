@@ -566,7 +566,6 @@
                       >
                         <option value="charged_now">Charged at checkout</option>
                         <option value="charged_later">Charged when available</option>
-                        <option value="charged_invoice">Charged via invoice</option>
                       </select>
                       <p class="text-xs text-gray-400 mt-1">When to charge the customer for backordered items</p>
                     </div>
@@ -650,7 +649,7 @@ interface Product {
   image_url: string
   is_active: boolean
   allow_backorder: boolean
-  backorder_charge_policy: 'charged_now' | 'charged_later' | 'charged_invoice'
+  backorder_charge_policy: 'charged_now' | 'charged_later'
   created_at: string
   updated_at: string
 }
@@ -858,7 +857,7 @@ const form = ref({
   category_id: null as number | null,
   is_active: true,
   allow_backorder: false,
-  backorder_charge_policy: 'charged_later' as 'charged_now' | 'charged_later' | 'charged_invoice',
+  backorder_charge_policy: 'charged_later' as 'charged_now' | 'charged_later',
 })
 
 const computedVolumeCbm = computed(() => {

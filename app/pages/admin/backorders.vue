@@ -18,6 +18,14 @@
       </div>
     </div>
 
+    <!-- Order filter banner -->
+    <div v-if="filterOrderId" class="mb-4 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
+      <p class="text-sm text-blue-700 font-medium">Showing backorders for Order #{{ filterOrderId }}</p>
+      <button @click="clearOrderFilter" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
+        Show All
+      </button>
+    </div>
+
     <!-- Filters -->
     <div class="mb-6 flex flex-col sm:flex-row gap-3">
       <div class="relative flex-1">
@@ -344,12 +352,20 @@ interface BackorderData {
 }
 
 const { $apiFetch } = useNuxtApp()
+const route = useRoute()
 
 const backorders = ref<BackorderData[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 const searchQuery = ref('')
 const selectedStatus = ref('all')
+const filterOrderId = ref<number | null>(route.query.order_id ? Number(route.query.order_id) : null)
+
+const clearOrderFilter = () => {
+  filterOrderId.value = null
+  navigateTo('/admin/backorders', { replace: true })
+  loadBackorders()
+}
 const statusCounts = ref<Record<string, number>>({})
 const currentPage = ref(1)
 const totalPages = ref(1)
@@ -450,7 +466,6 @@ const chargePolicyLabel = (policy: string) => {
   const labels: Record<string, string> = {
     charged_now: 'Charged at checkout',
     charged_later: 'Charged when available',
-    charged_invoice: 'Charged via invoice',
   }
   return labels[policy] ?? policy
 }
@@ -488,6 +503,10 @@ const loadBackorders = async () => {
     const q = searchQuery.value.trim()
     if (q) {
       query.search = q
+    }
+
+    if (filterOrderId.value) {
+      query.order_id = filterOrderId.value
     }
 
     const response = await $apiFetch<any>('/backorders', {

@@ -73,8 +73,18 @@
               </div>
             </div>
 
+            <!-- Out of stock warning -->
+            <div v-if="backorderData.stock_available === false" class="mt-4 flex items-start gap-2 p-3 bg-red-50 border border-red-100 rounded-xl">
+              <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p class="text-xs text-red-800 leading-relaxed">
+                This item is currently out of stock and cannot be purchased at this time. Please contact us for assistance.
+              </p>
+            </div>
+
             <!-- Expiry warning -->
-            <div class="mt-4 flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl">
+            <div v-else class="mt-4 flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl">
               <svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -119,7 +129,7 @@
             <template v-if="selectedMethod !== 'stripe'">
               <button
                 @click="initiatePayment"
-                :disabled="!selectedMethod || submitting"
+                :disabled="!selectedMethod || submitting || backorderData.stock_available === false"
                 class="btn-primary w-full mt-5"
               >
                 {{ submitting ? 'Processing...' : `Pay $${backorderData.total.toFixed(2)}` }}
@@ -131,7 +141,7 @@
               <div v-if="!stripeOrderId" class="mt-5">
                 <button
                   @click="prepareStripePayment"
-                  :disabled="submitting"
+                  :disabled="submitting || backorderData.stock_available === false"
                   class="btn-primary w-full"
                 >
                   {{ submitting ? 'Processing...' : 'Continue to Card Payment' }}
@@ -199,6 +209,7 @@ const backorderData = ref<{
   customer_email: string
   order_id: number
   expires_at: string
+  stock_available: boolean
 } | null>(null)
 
 const paymentMethods = ref<any[]>([])
@@ -267,11 +278,41 @@ const loadPaymentMethods = async () => {
   }
 }
 
+const recheckStock = async (): Promise<boolean> => {
+  try {
+    const response = await $apiFetch<any>(`/backorders/pay/${token}`, { method: 'GET' })
+    if (backorderData.value && response?.data) {
+      backorderData.value.stock_available = response.data.stock_available
+    }
+    if (response?.data?.stock_available === false) {
+      payError.value = 'This item is no longer in stock. Payment cannot be processed.'
+      return false
+    }
+    return true
+  } catch {
+    payError.value = 'Unable to verify stock availability. Please refresh the page.'
+    return false
+  }
+}
+
+const handlePaymentError = (err: any) => {
+  const status = err?.status ?? err?.statusCode ?? err?.response?.status
+  if (status === 409 && backorderData.value) {
+    backorderData.value.stock_available = false
+  }
+  payError.value = err?.data?.message || 'Failed to process payment. Please try again.'
+}
+
 const initiatePayment = async () => {
   if (!selectedMethod.value || !backorderData.value) return
 
   submitting.value = true
   payError.value = null
+
+  if (!await recheckStock()) {
+    submitting.value = false
+    return
+  }
 
   try {
     const response = await $apiFetch<any>(`/backorders/pay/${token}`, {
@@ -289,7 +330,7 @@ const initiatePayment = async () => {
       }
     }
   } catch (err: any) {
-    payError.value = err?.data?.message || 'Failed to initiate payment. Please try again.'
+    handlePaymentError(err)
   } finally {
     submitting.value = false
   }
@@ -300,6 +341,11 @@ const prepareStripePayment = async () => {
 
   submitting.value = true
   payError.value = null
+
+  if (!await recheckStock()) {
+    submitting.value = false
+    return
+  }
 
   try {
     const response = await $apiFetch<any>(`/backorders/pay/${token}`, {
@@ -316,7 +362,7 @@ const prepareStripePayment = async () => {
       throw new Error('Failed to prepare payment')
     }
   } catch (err: any) {
-    payError.value = err?.data?.message || 'Failed to prepare payment. Please try again.'
+    handlePaymentError(err)
   } finally {
     submitting.value = false
   }
