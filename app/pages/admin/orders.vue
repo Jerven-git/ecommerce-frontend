@@ -102,11 +102,10 @@
                 'bg-blue-500': order.status === 'processing',
                 'bg-purple-500': order.status === 'shipped',
                 'bg-green-500': order.status === 'delivered',
-                'bg-gray-400': order.status === 'cancelled',
                 'bg-orange-500': order.status === 'backorder_awaiting_stock',
                 'bg-yellow-500': order.status === 'backorder_notified',
                 'bg-red-400': order.status === 'backorder_expired',
-                'bg-red-500': order.status === 'backorder_cancelled',
+                'bg-red-500': order.status === 'cancelled' || order.status === 'backorder_cancelled',
               }"
             />
             <div>
@@ -128,6 +127,7 @@
                 'bg-green-50 text-green-700': order.payment.status === 'paid',
                 'bg-amber-50 text-amber-700': order.payment.status === 'pending',
                 'bg-red-50 text-red-700': order.payment.status === 'failed',
+                'bg-orange-50 text-orange-700': order.payment.status === 'refunded',
               }"
             >
               {{ order.payment.provider === 'cash' ? 'COD' : order.payment.provider.charAt(0).toUpperCase() + order.payment.provider.slice(1) }}
@@ -154,27 +154,35 @@
             >
               {{ undoingOrderId === order.id ? 'Reverting...' : 'Undo Payment' }}
             </button>
+
+            <!-- Cancel & Refund button for paid online orders -->
+            <button
+              v-if="order.payment?.status === 'paid' && ['processing', 'shipped'].includes(order.status)"
+              @click="promptCancelRefund(order.id, order.customer_name, order.payment.provider)"
+              :disabled="cancelRefundOrderId === order.id"
+              class="text-xs font-medium px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50 transition-colors"
+            >
+              {{ cancelRefundOrderId === order.id ? 'Processing...' : 'Cancel & Refund' }}
+            </button>
             <div class="relative">
               <select
                 v-model="order.status"
                 @change="onOrderStatusChange(order.id, order.status)"
-                :disabled="updatingOrderId === order.id || isLockedBackorderStatus(order.status)"
+                :disabled="updatingOrderId === order.id || isLockedStatus(order.status)"
                 class="appearance-none text-sm font-medium rounded-lg border px-3 py-1.5 pr-8 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 :class="orderStatusClass(order.status)"
               >
                 <template v-if="isBackorderStatus(order.status)">
-                  <option value="backorder_awaiting_stock">Awaiting Stock</option>
-                  <option value="backorder_notified">Notified</option>
-                  <option value="backorder_expired">Expired</option>
-                  <option value="backorder_cancelled">Cancelled</option>
-                  <option v-if="!isLockedBackorderStatus(order.status)" value="pending">→ Move to Pending</option>
+                  <option :value="order.status">{{ backorderStatusLabel(order.status) }}</option>
+                  <option v-if="!isLockedBackorderStatus(order.status)" value="__go_to_backorders">→ Manage in Backorders</option>
                 </template>
                 <template v-else>
-                  <option value="pending">Pending</option>
-                  <option value="processing">Processing</option>
-                  <option value="shipped">Shipped</option>
-                  <option value="delivered">Delivered</option>
-                  <option value="cancelled">Cancelled</option>
+                  <option :value="order.status">{{ statusLabel(order.status) }}</option>
+                  <option
+                    v-for="next in allowedTransitions[order.status] || []"
+                    :key="next"
+                    :value="next"
+                  >{{ statusLabel(next) }}</option>
                 </template>
               </select>
               <!-- Custom chevron -->
@@ -428,7 +436,7 @@ interface OrderItem {
 interface Payment {
   id: number
   provider: string
-  status: 'pending' | 'paid' | 'failed'
+  status: 'pending' | 'paid' | 'failed' | 'refunded'
 }
 
 interface ShipmentData {
@@ -508,22 +516,63 @@ const statusFilters = [
   { value: 'processing', label: 'Processing', activeClass: 'border-blue-500 bg-blue-50 text-blue-700' },
   { value: 'shipped', label: 'Shipped', activeClass: 'border-purple-500 bg-purple-50 text-purple-700' },
   { value: 'delivered', label: 'Delivered', activeClass: 'border-green-500 bg-green-50 text-green-700' },
-  { value: 'cancelled', label: 'Cancelled', activeClass: 'border-gray-500 bg-gray-100 text-gray-700' },
-  { value: 'backorder_awaiting_stock', label: 'Backorder', activeClass: 'border-orange-500 bg-orange-50 text-orange-700' },
+  { value: 'cancelled', label: 'Cancelled', activeClass: 'border-red-500 bg-red-50 text-red-700' },
+  { value: 'backorder', label: 'Backorder', activeClass: 'border-orange-500 bg-orange-50 text-orange-700' },
 ]
 
-const getStatusCount = (status: string) => statusCounts.value[status] ?? 0
+const getStatusCount = (status: string) => {
+  if (status === 'cancelled') {
+    return (statusCounts.value['cancelled'] ?? 0) + (statusCounts.value['backorder_cancelled'] ?? 0)
+  }
+  if (status === 'backorder') {
+    return Object.entries(statusCounts.value)
+      .filter(([k]) => k.startsWith('backorder_'))
+      .reduce((sum, [, v]) => sum + v, 0)
+  }
+  return statusCounts.value[status] ?? 0
+}
 
 const isBackorderStatus = (status: string) => status.startsWith('backorder_')
 
 const isLockedBackorderStatus = (status: string) => status === 'backorder_cancelled' || status === 'backorder_expired'
+
+const isLockedStatus = (status: string) => isLockedBackorderStatus(status)
+
+const allowedTransitions: Record<string, string[]> = {
+  pending: ['processing', 'cancelled'],
+  processing: ['shipped', 'cancelled'],
+  shipped: ['delivered'],
+  delivered: ['processing'],
+  cancelled: ['pending'],
+}
+
+const statusLabel = (status: string) => {
+  const labels: Record<string, string> = {
+    pending: 'Pending',
+    processing: 'Processing',
+    shipped: 'Shipped',
+    delivered: 'Delivered',
+    cancelled: 'Cancelled',
+  }
+  return labels[status] ?? status
+}
+
+const backorderStatusLabel = (status: string) => {
+  const labels: Record<string, string> = {
+    backorder_awaiting_stock: 'Awaiting Stock',
+    backorder_notified: 'Notified',
+    backorder_expired: 'Expired',
+    backorder_cancelled: 'Cancelled',
+  }
+  return labels[status] ?? status
+}
 
 const orderStatusClass = (status: string) => ({
   'bg-amber-50 border-amber-200 text-amber-800': status === 'pending',
   'bg-blue-50 border-blue-200 text-blue-800': status === 'processing',
   'bg-purple-50 border-purple-200 text-purple-800': status === 'shipped',
   'bg-green-50 border-green-200 text-green-800': status === 'delivered',
-  'bg-gray-100 border-gray-200 text-gray-600': status === 'cancelled',
+  'bg-red-50 border-red-200 text-red-700': status === 'cancelled',
   'bg-orange-50 border-orange-200 text-orange-800': status === 'backorder_awaiting_stock',
   'bg-yellow-50 border-yellow-200 text-yellow-800': status === 'backorder_notified',
   'bg-red-50 border-red-200 text-red-800': status === 'backorder_expired',
@@ -535,6 +584,7 @@ const filteredOrders = computed(() => orders.value)
 const updatingOrderId = ref<number | null>(null)
 const confirmingOrderId = ref<number | null>(null)
 const undoingOrderId = ref<number | null>(null)
+const cancelRefundOrderId = ref<number | null>(null)
 const toast = ref<string | null>(null)
 let toastTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -660,24 +710,42 @@ const onOrderStatusChange = (orderId: number, newStatus: string) => {
   const order = orders.value.find(o => o.id === orderId)
   if (!order) return
 
-  const needsConfirm = ['shipped', 'cancelled', 'delivered']
+  // Redirect to backorders page for managing backorder cancellations
+  if (newStatus === '__go_to_backorders') {
+    order.status = previousStatuses.value[orderId] as Order['status']
+    navigateTo(`/admin/backorders?order_id=${orderId}`)
+    return
+  }
+
+  const oldStatus = previousStatuses.value[orderId] || order.status
+
+  const needsConfirm = ['shipped', 'cancelled', 'delivered', 'pending', 'processing']
   if (needsConfirm.includes(newStatus)) {
-    const oldStatus = previousStatuses.value[orderId] || order.status
     const labels: Record<string, { title: string; message: string; variant: 'danger' | 'success' | 'warning' }> = {
       shipped: {
         title: 'Mark as Shipped',
-        message: `Mark order #${orderId} (${order.customer_name}) as shipped?`,
+        message: `Mark order #${orderId} (${order.customer_name}) as shipped? This status indicates the order has left the warehouse.`,
         variant: 'success',
       },
       delivered: {
         title: 'Mark as Delivered',
-        message: `Mark order #${orderId} (${order.customer_name}) as delivered?`,
+        message: `Mark order #${orderId} (${order.customer_name}) as delivered? This confirms the customer has received the order.`,
         variant: 'success',
       },
       cancelled: {
         title: 'Cancel Order',
-        message: `Cancel order #${orderId} (${order.customer_name})? This may affect payment status.`,
+        message: `Cancel order #${orderId} (${order.customer_name})? This will mark any pending payment as failed.`,
         variant: 'danger',
+      },
+      pending: {
+        title: 'Revert to Pending',
+        message: `Revert order #${orderId} (${order.customer_name}) back to pending? Only do this if the cancellation was a mistake.`,
+        variant: 'warning',
+      },
+      processing: {
+        title: 'Revert to Processing',
+        message: `Move order #${orderId} (${order.customer_name}) back to processing? Only do this if the delivery status was set by mistake.`,
+        variant: 'warning',
       },
     }
     const label = labels[newStatus]!
@@ -709,11 +777,8 @@ const doUpdateOrderStatus = async (orderId: number, status: string) => {
       body: { status }
     })
 
-    const order = orders.value.find(o => o.id === orderId)
-    if (order) {
-      order.status = status as Order['status']
-      previousStatuses.value[orderId] = status
-    }
+    // Reload to get updated payment status (e.g. pending → failed on cancel)
+    await loadOrders()
   } catch (err: any) {
     console.error('Error updating order status:', err)
     await loadOrders()
@@ -762,6 +827,29 @@ const promptUndoPayment = (orderId: number, customerName: string) => {
         showToast(err?.data?.message || 'Failed to undo payment')
       } finally {
         undoingOrderId.value = null
+      }
+    },
+  })
+}
+
+const promptCancelRefund = (orderId: number, customerName: string, provider: string) => {
+  const providerName = provider.charAt(0).toUpperCase() + provider.slice(1)
+  openConfirmModal({
+    title: 'Cancel & Refund',
+    message: `Cancel order #${orderId} (${customerName}) and mark for refund? Stock will be restored and the customer will be notified. You will need to process the refund manually through ${providerName}.`,
+    confirmText: 'Cancel & Refund',
+    loadingText: 'Processing…',
+    variant: 'danger',
+    action: async () => {
+      cancelRefundOrderId.value = orderId
+      try {
+        const res = await $apiFetch<any>(`/orders/${orderId}/cancel-refund`, { method: 'POST' })
+        showToast(res?.message || 'Order cancelled — process refund in your payment provider')
+        await loadOrders()
+      } catch (err: any) {
+        showToast(err?.data?.message || 'Failed to cancel order')
+      } finally {
+        cancelRefundOrderId.value = null
       }
     },
   })

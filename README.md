@@ -23,6 +23,7 @@ Storefront and admin dashboard for Shop System United, built with Nuxt 4, Vue 3,
 | `/order-success`   | Order confirmation                 |
 | `/payment/complete`| Payment callback (Stripe, PayPal)  |
 | `/tracking`        | Order tracking                     |
+| `/backorder/pay/:token` | Backorder payment page        |
 | `/about`           | About page                         |
 | `/contact`         | Contact page                       |
 
@@ -38,6 +39,7 @@ Storefront and admin dashboard for Shop System United, built with Nuxt 4, Vue 3,
 | `/admin/shipping`           | Shipping settings         |
 | `/admin/tax-settings`       | Tax configuration         |
 | `/admin/payment-settings`   | Payment providers         |
+| `/admin/backorders`         | Backorder management      |
 | `/admin/settings`           | Store settings            |
 | `/admin/login`              | Admin login               |
 | `/admin/verify-2fa`         | Two-factor verification   |
@@ -91,6 +93,26 @@ Storefront and admin dashboard for Shop System United, built with Nuxt 4, Vue 3,
 - Provider redirects back to `/payment/complete` on success
 
 6. If the server returns **429 (Too Many Requests)**, a busy overlay appears and the request retries automatically (up to 3 times with `Retry-After` header support)
+
+### Order Confirmation Email
+
+After a successful payment, the backend sends an order confirmation email to the customer with:
+- Order number and itemized list (product name, quantity, price)
+- Subtotal, discount (if applied), tax, shipping, and total
+- Shipping address or pickup note
+
+### Backorder Payment
+
+1. When backordered items are back in stock, admin sends a payment link from `/admin/backorders`
+2. Customer receives an email with a tokenized link to `/backorder/pay/:token`
+3. The page verifies the token, shows order details with itemized breakdown (subtotal, tax, shipping, total)
+4. **Stock is re-verified** when the customer clicks "Pay" — if stock has since been depleted, the UI immediately shows an out-of-stock warning and disables payment
+5. Customer selects a payment method (Stripe, PayPal, or Square) and completes payment
+6. On success, redirected to `/payment/complete`
+
+**Charge policies:**
+- `charged_now` — customer pays for backorder items at checkout (included in order total)
+- `charged_later` — customer pays later via the payment link when stock arrives
 
 ### Order Tracking
 

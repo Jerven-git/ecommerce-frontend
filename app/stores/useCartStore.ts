@@ -14,7 +14,7 @@ interface CartItem {
   image_url?: string
   stock: number
   can_backorder: boolean
-  backorder_charge_policy?: 'charged_now' | 'charged_later' | 'charged_invoice'
+  backorder_charge_policy?: 'charged_now' | 'charged_later'
 }
 
 interface TaxCalculation {

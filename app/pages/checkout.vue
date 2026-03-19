@@ -493,7 +493,6 @@ const chargePolicyLabel = (policy?: string) => {
   const labels: Record<string, string> = {
     charged_now: 'Charged now',
     charged_later: 'Charged when available',
-    charged_invoice: 'Charged via invoice',
   }
   return labels[policy || ''] || 'Charged when available'
 }
@@ -544,12 +543,12 @@ const discountError = ref<string | null>(null)
 // store created order id (so Stripe can mount after order exists)
 const createdOrderId = ref<number | null>(null)
 
-// True when every cart item is fully backordered with a deferred charge policy (charged_later or charged_invoice)
+// True when every cart item is fully backordered with a deferred charge policy
 const allDeferredBackorder = computed(() => {
   if (cartStore.items.length === 0) return false
   return cartStore.items.every(item => {
     const isFullBackorder = item.stock === 0
-    const isDeferred = item.backorder_charge_policy === 'charged_later' || item.backorder_charge_policy === 'charged_invoice'
+    const isDeferred = item.backorder_charge_policy === 'charged_later'
     return item.can_backorder && isFullBackorder && isDeferred
   })
 })
