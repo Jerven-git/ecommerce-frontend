@@ -146,7 +146,7 @@ const error = ref(false)
 
 const statusSteps = [
   { value: 'label_created', label: 'Label Created', activeClass: 'bg-gray-700 text-white' },
-  { value: 'in_transit', label: 'In Transit', activeClass: 'bg-blue-600 text-white' },
+  { value: 'in_transit', label: 'In Transit', activeClass: 'bg-primary-600 text-white' },
   { value: 'delivered', label: 'Delivered', activeClass: 'bg-green-600 text-white' },
 ]
 

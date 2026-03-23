@@ -21,7 +21,7 @@
           v-model="searchQuery"
           type="text"
           placeholder="Search by name, email, or order #"
-          class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+          class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow"
         />
       </div>
       <div class="flex gap-2 flex-wrap">
@@ -46,7 +46,7 @@
 
     <!-- Loading -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
-      <div class="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
+      <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
       <p class="text-sm text-gray-500">Loading orders…</p>
     </div>
 
@@ -99,7 +99,7 @@
               class="w-2.5 h-2.5 rounded-full shrink-0"
               :class="{
                 'bg-amber-400': order.status === 'pending',
-                'bg-blue-500': order.status === 'processing',
+                'bg-primary-500': order.status === 'processing',
                 'bg-purple-500': order.status === 'shipped',
                 'bg-green-500': order.status === 'delivered',
                 'bg-orange-500': order.status === 'backorder_awaiting_stock',
@@ -169,7 +169,7 @@
                 v-model="order.status"
                 @change="onOrderStatusChange(order.id, order.status)"
                 :disabled="updatingOrderId === order.id || isLockedStatus(order.status)"
-                class="appearance-none text-sm font-medium rounded-lg border px-3 py-1.5 pr-8 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                class="appearance-none text-sm font-medium rounded-lg border px-3 py-1.5 pr-8 outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 :class="orderStatusClass(order.status)"
               >
                 <template v-if="isBackorderStatus(order.status)">
@@ -271,7 +271,7 @@
                     class="appearance-none text-xs font-medium rounded-lg border px-3 py-1.5 pr-7 outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50 cursor-pointer transition-colors"
                     :class="{
                       'bg-gray-50 border-gray-200 text-gray-700': order.shipment.status === 'label_created',
-                      'bg-blue-50 border-blue-200 text-blue-700': order.shipment.status === 'in_transit',
+                      'bg-primary-50 border-primary-200 text-primary-700': order.shipment.status === 'in_transit',
                       'bg-green-50 border-green-200 text-green-700': order.shipment.status === 'delivered',
                       'bg-red-50 border-red-200 text-red-700': order.shipment.status === 'returned',
                     }"
@@ -363,7 +363,7 @@
             @click="goToPage(page as number)"
             class="px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
             :class="page === currentPage
-              ? 'bg-blue-600 text-white border-blue-600'
+              ? 'bg-primary-600 text-white border-primary-600'
               : 'border-gray-200 text-gray-600 hover:bg-gray-50'"
           >
             {{ page }}
@@ -511,9 +511,9 @@ const goToPage = (page: number) => {
 }
 
 const statusFilters = [
-  { value: 'all', label: 'All', activeClass: 'border-blue-500 bg-blue-50 text-blue-700' },
+  { value: 'all', label: 'All', activeClass: 'border-primary-500 bg-primary-50 text-primary-700' },
   { value: 'pending', label: 'Pending', activeClass: 'border-amber-500 bg-amber-50 text-amber-700' },
-  { value: 'processing', label: 'Processing', activeClass: 'border-blue-500 bg-blue-50 text-blue-700' },
+  { value: 'processing', label: 'Processing', activeClass: 'border-primary-500 bg-primary-50 text-primary-700' },
   { value: 'shipped', label: 'Shipped', activeClass: 'border-purple-500 bg-purple-50 text-purple-700' },
   { value: 'delivered', label: 'Delivered', activeClass: 'border-green-500 bg-green-50 text-green-700' },
   { value: 'cancelled', label: 'Cancelled', activeClass: 'border-red-500 bg-red-50 text-red-700' },
@@ -569,7 +569,7 @@ const backorderStatusLabel = (status: string) => {
 
 const orderStatusClass = (status: string) => ({
   'bg-amber-50 border-amber-200 text-amber-800': status === 'pending',
-  'bg-blue-50 border-blue-200 text-blue-800': status === 'processing',
+  'bg-primary-50 border-primary-200 text-primary-800': status === 'processing',
   'bg-purple-50 border-purple-200 text-purple-800': status === 'shipped',
   'bg-green-50 border-green-200 text-green-800': status === 'delivered',
   'bg-red-50 border-red-200 text-red-700': status === 'cancelled',

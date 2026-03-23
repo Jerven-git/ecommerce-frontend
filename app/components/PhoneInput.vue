@@ -27,7 +27,7 @@
             v-model="search"
             type="text"
             placeholder="Search country..."
-            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             @keydown="onKeydown"
           />
         </div>
@@ -38,7 +38,7 @@
             v-for="(entry, index) in filtered"
             :key="entry.code"
             class="flex items-center gap-2.5 px-3 py-2 text-sm cursor-pointer transition-colors"
-            :class="index === highlightedIndex ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'"
+            :class="index === highlightedIndex ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50'"
             @mousedown.prevent="selectEntry(entry)"
             @mouseenter="highlightedIndex = index"
           >
@@ -118,18 +118,26 @@ function onKeydown(e: KeyboardEvent) {
   switch (e.key) {
     case 'ArrowDown':
       e.preventDefault()
-      highlightedIndex.value = Math.min(highlightedIndex.value + 1, filtered.value.length - 1)
+      highlightedIndex.value = Math.min(
+        highlightedIndex.value + 1,
+        filtered.value.length - 1
+      )
       break
+
     case 'ArrowUp':
       e.preventDefault()
       highlightedIndex.value = Math.max(highlightedIndex.value - 1, 0)
       break
+
     case 'Enter':
       e.preventDefault()
-      if (filtered.value[highlightedIndex.value]) {
-        selectEntry(filtered.value[highlightedIndex.value])
+      const entry = filtered.value[highlightedIndex.value]
+
+      if (entry) {
+        selectEntry(entry)
       }
       break
+
     case 'Escape':
       isOpen.value = false
       break

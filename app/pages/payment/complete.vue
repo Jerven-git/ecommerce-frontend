@@ -39,31 +39,31 @@
 
           <!-- Background glow -->
           <div class="absolute inset-0 pointer-events-none">
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-blue-500/5 blur-3xl animate-pulse"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-primary-500/5 blur-3xl animate-pulse"></div>
           </div>
 
           <!-- Orbit rings + icon -->
           <div class="relative flex items-center justify-center mx-auto mb-8 w-28 h-28">
 
             <!-- Outermost ring -->
-            <div class="absolute inset-0 rounded-full border border-blue-200/60 animate-spin-very-slow"></div>
+            <div class="absolute inset-0 rounded-full border border-primary-200/60 animate-spin-very-slow"></div>
             <!-- Orbiting dot on outer ring -->
             <div class="absolute inset-0 animate-spin-very-slow">
-              <div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-blue-400 shadow-md shadow-blue-300"></div>
+              <div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-primary-400 shadow-md shadow-primary-300"></div>
             </div>
 
             <!-- Middle ring -->
-            <div class="absolute inset-3 rounded-full border border-blue-200/70 animate-spin-slow-reverse"></div>
+            <div class="absolute inset-3 rounded-full border border-primary-200/70 animate-spin-slow-reverse"></div>
             <!-- Orbiting dot on middle ring -->
             <div class="absolute inset-3 animate-spin-slow-reverse">
-              <div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-blue-400 shadow-sm shadow-blue-300"></div>
+              <div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary-400 shadow-sm shadow-primary-300"></div>
             </div>
 
             <!-- Inner pulse ring -->
-            <div class="absolute inset-6 rounded-full bg-blue-50 animate-ping-slow opacity-70"></div>
+            <div class="absolute inset-6 rounded-full bg-primary-50 animate-ping-slow opacity-70"></div>
 
             <!-- Icon container -->
-            <div class="relative z-10 w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-200">
+            <div class="relative z-10 w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-200">
               <svg class="w-7 h-7 text-white animate-pulse-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
@@ -79,14 +79,14 @@
 
           <!-- Animated dots progress bar -->
           <div class="flex items-center justify-center gap-2 mb-8">
-            <div class="w-2 h-2 rounded-full bg-blue-500 animate-bounce" style="animation-delay: 0ms;"></div>
-            <div class="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style="animation-delay: 150ms;"></div>
-            <div class="w-2 h-2 rounded-full bg-blue-300 animate-bounce" style="animation-delay: 300ms;"></div>
+            <div class="w-2 h-2 rounded-full bg-primary-500 animate-bounce" style="animation-delay: 0ms;"></div>
+            <div class="w-2 h-2 rounded-full bg-primary-400 animate-bounce" style="animation-delay: 150ms;"></div>
+            <div class="w-2 h-2 rounded-full bg-primary-300 animate-bounce" style="animation-delay: 300ms;"></div>
           </div>
 
           <!-- Progress track -->
           <div class="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
-            <div class="h-full bg-gradient-to-r from-blue-400 via-blue-500 to-blue-400 rounded-full animate-progress-slide"></div>
+            <div class="h-full bg-gradient-to-r from-primary-400 via-primary-500 to-primary-400 rounded-full animate-progress-slide"></div>
           </div>
 
           <!-- Footer note -->

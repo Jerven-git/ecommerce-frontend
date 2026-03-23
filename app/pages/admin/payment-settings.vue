@@ -13,7 +13,7 @@
 
     <!-- Loading -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
-      <div class="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
+      <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
       <p class="text-sm text-gray-500">Loading payment settings…</p>
     </div>
 
@@ -60,8 +60,8 @@
               <button
                 type="button"
                 @click="form.cash_enabled = !form.cash_enabled"
-                class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                :class="form.cash_enabled ? 'bg-blue-600' : 'bg-gray-200'"
+                class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                :class="form.cash_enabled ? 'bg-primary-600' : 'bg-gray-200'"
                 :aria-checked="form.cash_enabled"
                 role="switch"
               >
@@ -77,8 +77,8 @@
           <div class="px-6 py-5">
             <div class="flex items-center justify-between gap-4">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                  <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+                <div class="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-primary-600" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/>
                   </svg>
                 </div>
@@ -90,8 +90,8 @@
               <button
                 type="button"
                 @click="form.stripe_enabled = !form.stripe_enabled"
-                class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                :class="form.stripe_enabled ? 'bg-blue-600' : 'bg-gray-200'"
+                class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                :class="form.stripe_enabled ? 'bg-primary-600' : 'bg-gray-200'"
                 :aria-checked="form.stripe_enabled"
                 role="switch"
               >
@@ -109,8 +109,8 @@
               leave-from-class="opacity-100"
               leave-to-class="opacity-0"
             >
-              <div v-if="form.stripe_enabled" class="mt-3 ml-[52px] px-3 py-2 bg-blue-50 rounded-lg">
-                <p class="text-xs text-blue-700">
+              <div v-if="form.stripe_enabled" class="mt-3 ml-[52px] px-3 py-2 bg-primary-50 rounded-lg">
+                <p class="text-xs text-primary-700">
                   Set <code class="font-mono font-semibold">STRIPE_SECRET_KEY</code> in your server environment variables.
                 </p>
               </div>
@@ -121,8 +121,8 @@
           <div class="px-6 py-5">
             <div class="flex items-center justify-between gap-4">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                  <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+                <div class="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-primary-600" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M20.067 8.478c.492.88.556 2.014.3 3.327-.74 3.806-3.276 5.12-6.514 5.12h-.5a.805.805 0 00-.794.68l-.04.22-.63 3.993-.028.15a.805.805 0 01-.794.68H7.72a.483.483 0 01-.476-.558L8.926 9.306a.946.946 0 01.934-.807h2.094c4.066 0 6.826-1.676 7.69-6.51a5.47 5.47 0 00.05-.434.183.183 0 01.305-.142 3.994 3.994 0 011.645 2.32c.339.966.442 2.061.305 3.228z"/>
                     <path d="M8.926 9.306h2.094c4.066 0 6.826-1.676 7.69-6.51a5.47 5.47 0 00.05-.434.183.183 0 01.305-.142 3.994 3.994 0 011.645 2.32c.34.966.442 2.061.305 3.228.492.88.556 2.014.3 3.327-.74 3.806-3.276 5.12-6.514 5.12h-.5a.805.805 0 00-.794.68l-.04.22-.63 3.993-.028.15a.805.805 0 01-.794.68H7.72a.483.483 0 01-.476-.558L8.926 9.306z" opacity="0.7"/>
                   </svg>
@@ -135,8 +135,8 @@
               <button
                 type="button"
                 @click="form.paypal_enabled = !form.paypal_enabled"
-                class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                :class="form.paypal_enabled ? 'bg-blue-600' : 'bg-gray-200'"
+                class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                :class="form.paypal_enabled ? 'bg-primary-600' : 'bg-gray-200'"
                 :aria-checked="form.paypal_enabled"
                 role="switch"
               >
@@ -154,8 +154,8 @@
               leave-from-class="opacity-100"
               leave-to-class="opacity-0"
             >
-              <div v-if="form.paypal_enabled" class="mt-3 ml-[52px] px-3 py-2 bg-blue-50 rounded-lg">
-                <p class="text-xs text-blue-700">
+              <div v-if="form.paypal_enabled" class="mt-3 ml-[52px] px-3 py-2 bg-primary-50 rounded-lg">
+                <p class="text-xs text-primary-700">
                   Set <code class="font-mono font-semibold">PAYPAL_CLIENT_ID</code> in your server environment variables.
                 </p>
               </div>
@@ -179,8 +179,8 @@
               <button
                 type="button"
                 @click="form.square_enabled = !form.square_enabled"
-                class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                :class="form.square_enabled ? 'bg-blue-600' : 'bg-gray-200'"
+                class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                :class="form.square_enabled ? 'bg-primary-600' : 'bg-gray-200'"
                 :aria-checked="form.square_enabled"
                 role="switch"
               >
@@ -270,7 +270,7 @@
           <button
             @click="saveSettings"
             :disabled="saving"
-            class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
+            class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
           >
             <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />

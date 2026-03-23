@@ -25,22 +25,22 @@
           <NuxtLink
             to="/"
             class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-            active-class="!text-blue-600 !bg-blue-50 hover:!bg-blue-50"
+            active-class="!text-primary-600 !bg-primary-50 hover:!bg-primary-50"
           >Home</NuxtLink>
           <NuxtLink
             to="/shop"
             class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-            active-class="!text-blue-600 !bg-blue-50 hover:!bg-blue-50"
+            active-class="!text-primary-600 !bg-primary-50 hover:!bg-primary-50"
           >Shop</NuxtLink>
           <NuxtLink
             to="/about"
             class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-            active-class="!text-blue-600 !bg-blue-50 hover:!bg-blue-50"
+            active-class="!text-primary-600 !bg-primary-50 hover:!bg-primary-50"
           >About</NuxtLink>
           <NuxtLink
             to="/contact"
             class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-            active-class="!text-blue-600 !bg-blue-50 hover:!bg-blue-50"
+            active-class="!text-primary-600 !bg-primary-50 hover:!bg-primary-50"
           >Contact</NuxtLink>
         </nav>
 
@@ -70,7 +70,7 @@
             </svg>
             <span
               v-if="cartStore.itemCount > 0"
-              class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-blue-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none"
+              class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-primary-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none"
             >
               {{ cartStore.itemCount }}
             </span>
@@ -106,25 +106,25 @@
             <NuxtLink
               to="/"
               class="px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-              active-class="!text-blue-600 !bg-blue-50"
+              active-class="!text-primary-600 !bg-primary-50"
               @click="mobileMenuOpen = false"
             >Home</NuxtLink>
             <NuxtLink
               to="/shop"
               class="px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-              active-class="!text-blue-600 !bg-blue-50"
+              active-class="!text-primary-600 !bg-primary-50"
               @click="mobileMenuOpen = false"
             >Shop</NuxtLink>
             <NuxtLink
               to="/about"
               class="px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-              active-class="!text-blue-600 !bg-blue-50"
+              active-class="!text-primary-600 !bg-primary-50"
               @click="mobileMenuOpen = false"
             >About</NuxtLink>
             <NuxtLink
               to="/contact"
               class="px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-              active-class="!text-blue-600 !bg-blue-50"
+              active-class="!text-primary-600 !bg-primary-50"
               @click="mobileMenuOpen = false"
             >Contact</NuxtLink>
             <NuxtLink

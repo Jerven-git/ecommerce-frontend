@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        blue: {
+        primary: {
           50: 'var(--color-primary-50, #eef4fd)',
           100: 'var(--color-primary-100, #d9e6fb)',
           200: 'var(--color-primary-200, #b8d0f7)',

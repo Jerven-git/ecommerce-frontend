@@ -66,7 +66,7 @@
               <h2 class="text-xl font-bold text-gray-900 mb-1">{{ product.name }}</h2>
 
               <div class="flex items-center gap-3 mb-4">
-                <span class="text-2xl font-bold text-blue-600">${{ product.price }}</span>
+                <span class="text-2xl font-bold text-primary-600">${{ product.price }}</span>
                 <span
                   v-if="product.stock > 0"
                   class="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-50 text-green-700"

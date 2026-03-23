@@ -52,7 +52,7 @@
 
       <div class="mt-auto">
         <div class="flex items-center justify-between mb-4">
-          <span class="text-2xl font-bold text-blue-600">${{ product.price }}</span>
+          <span class="text-2xl font-bold text-primary-600">${{ product.price }}</span>
           <span v-if="product.stock > 0" class="text-sm text-green-600">In Stock</span>
           <span v-else-if="product.can_backorder" class="text-sm text-amber-600">Backorder</span>
           <span v-else class="text-sm text-red-600">Out of Stock</span>

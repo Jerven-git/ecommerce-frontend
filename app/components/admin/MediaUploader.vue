@@ -38,8 +38,8 @@
     :class="[
       dropzoneClass || 'h-36',
       isDragging
-        ? 'bg-blue-50 border-2 border-blue-400 border-dashed'
-        : 'bg-gray-50 border-2 border-gray-200 border-dashed hover:border-blue-300 hover:bg-blue-50/40'
+        ? 'bg-primary-50 border-2 border-primary-400 border-dashed'
+        : 'bg-gray-50 border-2 border-gray-200 border-dashed hover:border-primary-300 hover:bg-primary-50/40'
     ]"
     @dragenter.prevent="onDragEnter"
     @dragover.prevent
@@ -50,8 +50,8 @@
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
     </svg>
     <p class="text-sm text-gray-500">
-      <span v-if="uploading" class="text-blue-600 font-medium">Uploading…</span>
-      <template v-else>Drop {{ label.toLowerCase() }} here or <span class="text-blue-600 font-medium">browse</span></template>
+      <span v-if="uploading" class="text-primary-600 font-medium">Uploading…</span>
+      <template v-else>Drop {{ label.toLowerCase() }} here or <span class="text-primary-600 font-medium">browse</span></template>
     </p>
     <p class="text-xs text-gray-400 mt-1">{{ hint }}</p>
     <input :id="inputId" ref="fileInput" type="file" class="hidden" accept="image/*" @change="onInputChange" />

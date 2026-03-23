@@ -16,7 +16,7 @@
 
         <!-- Loading -->
         <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
-          <div class="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
+          <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
           <p class="text-sm text-gray-500">Verifying your payment link...</p>
         </div>
 
@@ -99,7 +99,7 @@
             <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Payment Method</h2>
 
             <div v-if="loadingPaymentMethods" class="flex items-center gap-3 py-4">
-              <div class="w-5 h-5 rounded-full border-2 border-blue-500 border-t-transparent animate-spin shrink-0"></div>
+              <div class="w-5 h-5 rounded-full border-2 border-primary-500 border-t-transparent animate-spin shrink-0"></div>
               <p class="text-sm text-gray-500">Loading payment methods...</p>
             </div>
 
@@ -109,14 +109,14 @@
                 :key="method.id"
                 class="flex items-start gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all"
                 :class="selectedMethod === method.id
-                  ? 'border-blue-500 bg-blue-50/50'
+                  ? 'border-primary-500 bg-primary-50/50'
                   : 'border-gray-200 hover:border-gray-300 bg-white'"
               >
                 <input
                   v-model="selectedMethod"
                   type="radio"
                   :value="method.id"
-                  class="mt-0.5 h-4 w-4 accent-blue-600 shrink-0"
+                  class="mt-0.5 h-4 w-4 accent-primary-600 shrink-0"
                 />
                 <div class="flex-1 min-w-0">
                   <span class="text-sm font-semibold text-gray-900">{{ method.name }}</span>

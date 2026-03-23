@@ -19,9 +19,9 @@
     </div>
 
     <!-- Order filter banner -->
-    <div v-if="filterOrderId" class="mb-4 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
-      <p class="text-sm text-blue-700 font-medium">Showing backorders for Order #{{ filterOrderId }}</p>
-      <button @click="clearOrderFilter" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
+    <div v-if="filterOrderId" class="mb-4 flex items-center justify-between bg-primary-50 border border-primary-200 rounded-xl px-4 py-3">
+      <p class="text-sm text-primary-700 font-medium">Showing backorders for Order #{{ filterOrderId }}</p>
+      <button @click="clearOrderFilter" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-primary-100 text-primary-700 hover:bg-primary-200 transition-colors">
         Show All
       </button>
     </div>
@@ -36,7 +36,7 @@
           v-model="searchQuery"
           type="text"
           placeholder="Search by customer name or email"
-          class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+          class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow"
         />
       </div>
       <div class="flex gap-2 flex-wrap">
@@ -61,7 +61,7 @@
 
     <!-- Loading -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
-      <div class="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
+      <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
       <p class="text-sm text-gray-500">Loading backorders...</p>
     </div>
 
@@ -123,7 +123,7 @@
               v-if="bo.status === 'awaiting_stock' || bo.status === 'expired'"
               @click="promptNotify(bo)"
               :disabled="actionId === bo.id"
-              class="text-xs font-medium px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              class="text-xs font-medium px-3 py-1.5 rounded-lg bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50 transition-colors"
             >
               {{ bo.status === 'expired' ? 'Resend Link' : 'Send Payment Link' }}
             </button>
@@ -133,7 +133,7 @@
               v-if="bo.status === 'notified'"
               @click="promptResend(bo)"
               :disabled="actionId === bo.id"
-              class="text-xs font-medium px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              class="text-xs font-medium px-3 py-1.5 rounded-lg bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50 transition-colors"
             >
               Resend Link
             </button>
@@ -231,7 +231,7 @@
               <button
                 @click="settings.backorder_enabled = !settings.backorder_enabled"
                 class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
-                :class="settings.backorder_enabled ? 'bg-blue-600' : 'bg-gray-200'"
+                :class="settings.backorder_enabled ? 'bg-primary-600' : 'bg-gray-200'"
               >
                 <span
                   class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm"
@@ -256,7 +256,7 @@
                 type="number"
                 min="1"
                 max="720"
-                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
               <p class="text-xs text-gray-400 mt-1">How long the payment link stays active after sending</p>
             </div>
@@ -267,7 +267,7 @@
             <button
               @click="saveSettings"
               :disabled="savingSettings"
-              class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50 transition-colors"
+              class="px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg disabled:opacity-50 transition-colors"
             >
               {{ savingSettings ? 'Saving...' : 'Save Settings' }}
             </button>
@@ -425,9 +425,9 @@ const onModalConfirm = async () => {
 }
 
 const statusFilters = [
-  { value: 'all', label: 'All', activeClass: 'border-blue-500 bg-blue-50 text-blue-700' },
+  { value: 'all', label: 'All', activeClass: 'border-primary-500 bg-primary-50 text-primary-700' },
   { value: 'awaiting_stock', label: 'Awaiting Stock', activeClass: 'border-amber-500 bg-amber-50 text-amber-700' },
-  { value: 'notified', label: 'Notified', activeClass: 'border-blue-500 bg-blue-50 text-blue-700' },
+  { value: 'notified', label: 'Notified', activeClass: 'border-primary-500 bg-primary-50 text-primary-700' },
   { value: 'expired', label: 'Expired', activeClass: 'border-orange-500 bg-orange-50 text-orange-700' },
   { value: 'paid', label: 'Paid', activeClass: 'border-green-500 bg-green-50 text-green-700' },
   { value: 'cancelled', label: 'Cancelled', activeClass: 'border-gray-500 bg-gray-100 text-gray-700' },
@@ -437,7 +437,7 @@ const getStatusCount = (status: string) => statusCounts.value[status] ?? 0
 
 const statusDotClass = (status: string) => ({
   'bg-amber-400': status === 'awaiting_stock',
-  'bg-blue-500': status === 'notified',
+  'bg-primary-500': status === 'notified',
   'bg-orange-400': status === 'expired',
   'bg-green-500': status === 'paid',
   'bg-gray-400': status === 'cancelled',
@@ -445,7 +445,7 @@ const statusDotClass = (status: string) => ({
 
 const statusBadgeClass = (status: string) => ({
   'bg-amber-50 text-amber-700': status === 'awaiting_stock',
-  'bg-blue-50 text-blue-700': status === 'notified',
+  'bg-primary-50 text-primary-700': status === 'notified',
   'bg-orange-50 text-orange-700': status === 'expired',
   'bg-green-50 text-green-700': status === 'paid',
   'bg-gray-100 text-gray-600': status === 'cancelled',

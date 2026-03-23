@@ -50,16 +50,16 @@
                 <label
                   class="relative flex items-start gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all"
                   :class="deliveryMethod === 'delivery'
-                    ? 'border-blue-500 bg-blue-50/50'
+                    ? 'border-primary-500 bg-primary-50/50'
                     : 'border-gray-200 hover:border-gray-300 bg-white'"
                 >
-                  <input v-model="deliveryMethod" type="radio" value="delivery" class="mt-0.5 h-4 w-4 accent-blue-600 shrink-0" />
+                  <input v-model="deliveryMethod" type="radio" value="delivery" class="mt-0.5 h-4 w-4 accent-primary-600 shrink-0" />
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between gap-2">
                       <span class="text-sm font-semibold text-gray-900">Delivery</span>
                       <span
                         v-if="deliveryMethod === 'delivery'"
-                        class="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full font-medium shrink-0"
+                        class="text-xs bg-primary-500 text-white px-2 py-0.5 rounded-full font-medium shrink-0"
                       >Selected</span>
                     </div>
                     <p class="text-xs text-gray-500 mt-0.5">Delivered to your address</p>
@@ -69,16 +69,16 @@
                 <label
                   class="relative flex items-start gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all"
                   :class="deliveryMethod === 'pickup'
-                    ? 'border-blue-500 bg-blue-50/50'
+                    ? 'border-primary-500 bg-primary-50/50'
                     : 'border-gray-200 hover:border-gray-300 bg-white'"
                 >
-                  <input v-model="deliveryMethod" type="radio" value="pickup" class="mt-0.5 h-4 w-4 accent-blue-600 shrink-0" />
+                  <input v-model="deliveryMethod" type="radio" value="pickup" class="mt-0.5 h-4 w-4 accent-primary-600 shrink-0" />
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between gap-2">
                       <span class="text-sm font-semibold text-gray-900">Self Pickup</span>
                       <span
                         v-if="deliveryMethod === 'pickup'"
-                        class="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full font-medium shrink-0"
+                        class="text-xs bg-primary-500 text-white px-2 py-0.5 rounded-full font-medium shrink-0"
                       >Selected</span>
                     </div>
                     <p class="text-xs text-gray-500 mt-0.5">Collect in-store · No shipping fee</p>
@@ -136,14 +136,14 @@
                     :value="option.id"
                     v-model="selectedShippingOptions"
                     @change="updateShippingOptions"
-                    class="mt-0.5 h-4 w-4 accent-blue-600 rounded shrink-0"
+                    class="mt-0.5 h-4 w-4 accent-primary-600 rounded shrink-0"
                   />
                   <div class="flex-1 min-w-0 flex items-start justify-between gap-4">
                     <div>
                       <p class="text-sm font-semibold text-gray-900">{{ option.name }}</p>
                       <p class="text-xs text-gray-500 mt-0.5">{{ option.description }}</p>
                     </div>
-                    <span class="text-sm font-bold accent-blue-600 shrink-0">+${{ parseFloat(option.fee || 0).toFixed(2) }}</span>
+                    <span class="text-sm font-bold accent-primary-600 shrink-0">+${{ parseFloat(option.fee || 0).toFixed(2) }}</span>
                   </div>
                 </label>
               </div>
@@ -155,7 +155,7 @@
 
               <!-- Loading -->
               <div v-if="loadingPaymentMethods" class="flex items-center gap-3 py-4">
-                <div class="w-5 h-5 rounded-full border-2 border-blue-500 border-t-transparent animate-spin shrink-0"></div>
+                <div class="w-5 h-5 rounded-full border-2 border-primary-500 border-t-transparent animate-spin shrink-0"></div>
                 <p class="text-sm text-gray-500">Loading payment methods…</p>
               </div>
 
@@ -174,21 +174,21 @@
                   :key="method.id"
                   class="flex items-start gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all"
                   :class="selectedPaymentMethod === method.id
-                    ? 'border-blue-500 bg-blue-50/50'
+                    ? 'border-primary-500 bg-primary-50/50'
                     : 'border-gray-200 hover:border-gray-300 bg-white'"
                 >
                   <input
                     v-model="selectedPaymentMethod"
                     type="radio"
                     :value="method.id"
-                    class="mt-0.5 h-4 w-4 accent-blue-600 shrink-0"
+                    class="mt-0.5 h-4 w-4 accent-primary-600 shrink-0"
                   />
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between gap-2">
                       <span class="text-sm font-semibold text-gray-900">{{ method.name }}</span>
                       <span
                         v-if="selectedPaymentMethod === method.id"
-                        class="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full font-medium shrink-0"
+                        class="text-xs bg-primary-500 text-white px-2 py-0.5 rounded-full font-medium shrink-0"
                       >Selected</span>
                     </div>
                     <p class="text-xs text-gray-500 mt-0.5">{{ method.description }}</p>
@@ -200,11 +200,11 @@
             <!-- Deferred Backorder: no payment needed now -->
             <div v-if="allDeferredBackorder" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Place Order</h2>
-              <div class="flex items-start gap-2.5 p-3.5 bg-blue-50 border border-blue-100 rounded-xl mb-5">
-                <svg class="w-4 h-4 text-blue-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div class="flex items-start gap-2.5 p-3.5 bg-primary-50 border border-primary-100 rounded-xl mb-5">
+                <svg class="w-4 h-4 text-primary-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p class="text-xs text-blue-800 leading-relaxed">
+                <p class="text-xs text-primary-800 leading-relaxed">
                   All items in your cart are on backorder and will be charged later. No payment is required now — you'll receive a payment link when your items become available.
                 </p>
               </div>
@@ -343,7 +343,7 @@
                     type="button"
                     @click="applyDiscount"
                     :disabled="applyingDiscount || !discountCode.trim()"
-                    class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg transition-colors shrink-0"
+                    class="px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-50 rounded-lg transition-colors shrink-0"
                   >
                     <span v-if="applyingDiscount" class="flex items-center gap-1.5">
                       <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -465,17 +465,17 @@
         <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center">
           <div class="flex justify-center mb-5">
             <div class="relative w-16 h-16">
-              <div class="absolute inset-0 rounded-full border-4 border-blue-100"></div>
-              <div class="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
-              <div class="absolute inset-3 rounded-full border-4 border-blue-300 border-b-transparent animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
+              <div class="absolute inset-0 rounded-full border-4 border-primary-100"></div>
+              <div class="absolute inset-0 rounded-full border-4 border-primary-500 border-t-transparent animate-spin"></div>
+              <div class="absolute inset-3 rounded-full border-4 border-primary-300 border-b-transparent animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
             </div>
           </div>
           <h3 class="text-lg font-bold text-gray-900 mb-2">Just a moment...</h3>
           <p class="text-sm text-gray-500 leading-relaxed">{{ busyMessage }}</p>
           <div class="mt-4 flex justify-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style="animation-delay: 0s;"></span>
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style="animation-delay: 0.15s;"></span>
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style="animation-delay: 0.3s;"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-primary-400 animate-bounce" style="animation-delay: 0s;"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-primary-400 animate-bounce" style="animation-delay: 0.15s;"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-primary-400 animate-bounce" style="animation-delay: 0.3s;"></span>
           </div>
         </div>
       </div>
