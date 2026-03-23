@@ -128,8 +128,9 @@ function onKeydown(e: KeyboardEvent) {
       break
     case 'Enter':
       e.preventDefault()
-      if (filtered.value[highlightedIndex.value]) {
-        select(filtered.value[highlightedIndex.value])
+      const country = filtered.value[highlightedIndex.value]
+      if (country) {
+        select(country)
       }
       break
     case 'Escape':

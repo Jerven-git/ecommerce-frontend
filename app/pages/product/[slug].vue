@@ -296,6 +296,7 @@ interface MediaItem {
 interface Product {
   id: number
   name: string
+  slug: string
   description: string
   price: number
   image_url?: string
@@ -372,7 +373,7 @@ const fetchProduct = async () => {
   loading.value = true
   error.value = null
   try {
-    const response = await $apiFetch<{ data: Product }>(`/products/${route.params.id}`, { method: 'GET' })
+    const response = await $apiFetch<{ data: Product }>(`/products/${route.params.slug}`, { method: 'GET' })
     if (response?.data) {
       product.value = response.data
     }
