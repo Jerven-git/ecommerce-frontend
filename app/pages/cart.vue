@@ -69,7 +69,7 @@
                   <h3 class="font-semibold text-gray-900 truncate">{{ item.name }}</h3>
                   <p class="text-sm text-gray-400 mt-0.5">${{ item.price.toFixed(2) }} each &middot; {{ item.weight }} kg</p>
                   <!-- Backorder indicator -->
-                  <div v-if="item.quantity > item.stock && item.allow_backorder" class="mt-1.5 flex items-center gap-1.5">
+                  <div v-if="item.quantity > item.stock && item.can_backorder" class="mt-1.5 flex items-center gap-1.5">
                     <span class="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">
                       <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />

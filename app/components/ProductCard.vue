@@ -1,7 +1,7 @@
 <template>
   <div class="card hover:shadow-xl transition-shadow group cursor-pointer flex flex-col h-full">
     <!-- Image with hover overlay -->
-    <NuxtLink :to="`/product/${product.id}`" class="block">
+    <NuxtLink :to="`/product/${product.slug}`" class="block">
       <div class="relative w-full overflow-hidden rounded-lg bg-gray-200 mb-4">
         <img
           v-if="product.image_url"
@@ -45,7 +45,7 @@
     </NuxtLink>
 
     <div class="flex flex-col flex-1">
-      <NuxtLink :to="`/product/${product.id}`" class="block">
+      <NuxtLink :to="`/product/${product.slug}`" class="block">
         <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">{{ product.name }}</h3>
         <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ product.description }}</p>
       </NuxtLink>
