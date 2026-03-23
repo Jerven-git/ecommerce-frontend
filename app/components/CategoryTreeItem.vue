@@ -26,7 +26,7 @@
       <!-- Radio circle -->
       <div
         class="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors duration-150"
-        :class="isSelected ? 'border-blue-500 bg-blue-500' : 'border-gray-300 bg-white'"
+        :class="isSelected ? 'border-primary-500 bg-primary-500' : 'border-gray-300 bg-white'"
       >
         <div v-if="isSelected" class="w-1.5 h-1.5 rounded-full bg-white"></div>
       </div>
@@ -34,7 +34,7 @@
       <!-- Name -->
       <span
         class="text-sm truncate transition-colors duration-100"
-        :class="isSelected ? 'text-blue-700 font-medium' : 'text-gray-700'"
+        :class="isSelected ? 'text-primary-700 font-medium' : 'text-gray-700'"
       >{{ category.name }}</span>
 
       <!-- Child count -->

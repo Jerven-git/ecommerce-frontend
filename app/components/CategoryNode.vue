@@ -50,7 +50,7 @@
             @keydown.escape="$emit('cancel-edit')"
             autofocus
           />
-          <button @click="$emit('save-edit', category)" class="p-1 rounded-lg text-blue-600 hover:text-blue-800 hover:bg-blue-50 transition-colors">
+          <button @click="$emit('save-edit', category)" class="p-1 rounded-lg text-primary-600 hover:text-primary-800 hover:bg-primary-50 transition-colors">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
           </button>
           <button @click="$emit('cancel-edit')" class="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
@@ -75,7 +75,7 @@
         <button @click="$emit('start-add', category.id)" class="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors" title="Add subcategory">
           <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
         </button>
-        <button @click="$emit('start-edit', category)" class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Rename">
+        <button @click="$emit('start-edit', category)" class="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors" title="Rename">
           <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
         </button>
         <button @click="$emit('confirm-delete', category)" class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Delete">
@@ -100,7 +100,7 @@
         @keydown.escape="$emit('cancel-add')"
         autofocus
       />
-      <button @click="$emit('save-add', category.id)" class="p-1.5 rounded-lg text-blue-600 hover:text-blue-800 hover:bg-blue-50 transition-colors" :disabled="!addingName.trim() || saving">
+      <button @click="$emit('save-add', category.id)" class="p-1.5 rounded-lg text-primary-600 hover:text-primary-800 hover:bg-primary-50 transition-colors" :disabled="!addingName.trim() || saving">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
       </button>
       <button @click="$emit('cancel-add')" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">

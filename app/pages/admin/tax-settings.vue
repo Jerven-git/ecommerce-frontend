@@ -13,7 +13,7 @@
 
     <!-- Loading -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
-      <div class="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
+      <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
       <p class="text-sm text-gray-500">Loading tax settings…</p>
     </div>
 
@@ -42,8 +42,8 @@
             <button
               type="button"
               @click="form.tax_enabled = !form.tax_enabled"
-              class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              :class="form.tax_enabled ? 'bg-blue-600' : 'bg-gray-200'"
+              class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+              :class="form.tax_enabled ? 'bg-primary-600' : 'bg-gray-200'"
               :aria-checked="form.tax_enabled"
               role="switch"
             >
@@ -58,7 +58,7 @@
             <!-- Tax Rate -->
             <div>
               <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Tax Rate</label>
-              <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent max-w-xs">
+              <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent max-w-xs">
                 <input
                   v-model.number="form.tax_rate"
                   type="number"
@@ -84,11 +84,11 @@
                   type="button"
                   @click="form.tax_display_mode = 'inclusive'"
                   class="w-full text-left flex items-start gap-3 p-4 rounded-xl border-2 transition-colors"
-                  :class="form.tax_display_mode === 'inclusive' ? 'border-blue-500 bg-blue-50/60' : 'border-gray-100 hover:border-gray-200 bg-gray-50/50'"
+                  :class="form.tax_display_mode === 'inclusive' ? 'border-primary-500 bg-primary-50/60' : 'border-gray-100 hover:border-gray-200 bg-gray-50/50'"
                 >
                   <span
                     class="mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors"
-                    :class="form.tax_display_mode === 'inclusive' ? 'border-blue-600 bg-blue-600' : 'border-gray-300'"
+                    :class="form.tax_display_mode === 'inclusive' ? 'border-primary-600 bg-primary-600' : 'border-gray-300'"
                   >
                     <span v-if="form.tax_display_mode === 'inclusive'" class="w-1.5 h-1.5 rounded-full bg-white"></span>
                   </span>
@@ -108,11 +108,11 @@
                   type="button"
                   @click="form.tax_display_mode = 'exclusive'"
                   class="w-full text-left flex items-start gap-3 p-4 rounded-xl border-2 transition-colors"
-                  :class="form.tax_display_mode === 'exclusive' ? 'border-blue-500 bg-blue-50/60' : 'border-gray-100 hover:border-gray-200 bg-gray-50/50'"
+                  :class="form.tax_display_mode === 'exclusive' ? 'border-primary-500 bg-primary-50/60' : 'border-gray-100 hover:border-gray-200 bg-gray-50/50'"
                 >
                   <span
                     class="mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors"
-                    :class="form.tax_display_mode === 'exclusive' ? 'border-blue-600 bg-blue-600' : 'border-gray-300'"
+                    :class="form.tax_display_mode === 'exclusive' ? 'border-primary-600 bg-primary-600' : 'border-gray-300'"
                   >
                     <span v-if="form.tax_display_mode === 'exclusive'" class="w-1.5 h-1.5 rounded-full bg-white"></span>
                   </span>
@@ -148,8 +148,8 @@
       <!-- Tax Calculation Preview -->
       <section v-if="form.tax_enabled" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
           </div>
@@ -162,7 +162,7 @@
         <div class="px-6 py-5">
           <div class="mb-4">
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Sample Product Price</label>
-            <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent max-w-xs">
+            <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent max-w-xs">
               <span class="px-3 flex items-center bg-gray-50 border-r border-gray-300 text-gray-500 text-sm select-none">$</span>
               <input
                 v-model.number="previewPrice"
@@ -248,7 +248,7 @@
           <button
             @click="saveSettings"
             :disabled="saving"
-            class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
+            class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
           >
             <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />

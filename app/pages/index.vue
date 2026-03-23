@@ -119,12 +119,12 @@
 
           <!-- Step 1 -->
           <div class="relative z-10 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col items-center">
-            <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center mb-5 ring-4 ring-white shadow-sm">
-              <svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="w-12 h-12 rounded-2xl bg-primary-50 flex items-center justify-center mb-5 ring-4 ring-white shadow-sm">
+              <svg class="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
               </svg>
             </div>
-            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">Step 1</span>
+            <span class="text-xs font-bold text-primary-600 uppercase tracking-wider mb-2">Step 1</span>
             <h3 class="text-base font-semibold text-gray-900 mb-1.5">Browse Products</h3>
             <p class="text-gray-500 text-sm leading-relaxed">Explore our wide selection of quality items across all categories.</p>
           </div>
@@ -166,9 +166,9 @@
     <section class="bg-gray-50 border-t border-gray-100 py-16">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div class="group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-blue-100 transition-all duration-300">
-            <div class="w-12 h-12 mb-4 rounded-2xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors duration-300">
-              <svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-primary-100 transition-all duration-300">
+            <div class="w-12 h-12 mb-4 rounded-2xl bg-primary-50 flex items-center justify-center group-hover:bg-primary-100 transition-colors duration-300">
+              <svg class="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
               </svg>
             </div>
@@ -225,11 +225,11 @@
           <input
             type="email"
             placeholder="Enter your email"
-            class="flex-1 px-5 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-blue-400 transition text-sm"
+            class="flex-1 px-5 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary-400 transition text-sm"
           />
           <button
             type="submit"
-            class="px-6 py-3 rounded-xl text-sm font-semibold text-white bg-blue-500 hover:bg-blue-400 hover:scale-105 transition-all duration-200 shadow-lg shrink-0"
+            class="px-6 py-3 rounded-xl text-sm font-semibold text-white bg-primary-500 hover:bg-primary-400 hover:scale-105 transition-all duration-200 shadow-lg shrink-0"
           >
             Subscribe
           </button>

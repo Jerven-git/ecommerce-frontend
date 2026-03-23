@@ -31,8 +31,8 @@
           <!-- Contact Info card -->
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
@@ -45,8 +45,8 @@
             <div class="px-6 py-5">
               <p class="text-sm text-gray-500 leading-relaxed mb-5">Have a question or need assistance? Fill out the form and we'll get back to you as soon as possible.</p>
 
-              <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-xs font-semibold px-3.5 py-2 rounded-lg mb-6">
-                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+              <div class="inline-flex items-center gap-2 bg-primary-50 text-primary-700 text-xs font-semibold px-3.5 py-2 rounded-lg mb-6">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse"></span>
                 Usually responds within 24 hours
               </div>
 
@@ -67,12 +67,12 @@
                     <p v-if="entry.label" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{{ entry.label }}</p>
                     <div class="space-y-1.5">
                       <div v-if="entry.email" class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 group-hover:bg-blue-100 transition-colors">
-                          <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0 group-hover:bg-primary-100 transition-colors">
+                          <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                           </svg>
                         </div>
-                        <a :href="`mailto:${entry.email}`" class="text-sm text-gray-700 hover:text-blue-600 transition-colors">{{ entry.email }}</a>
+                        <a :href="`mailto:${entry.email}`" class="text-sm text-gray-700 hover:text-primary-600 transition-colors">{{ entry.email }}</a>
                       </div>
                       <div v-if="entry.phone" class="flex items-center gap-3">
                         <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition-colors">
@@ -96,8 +96,8 @@
           <!-- Contact Form card -->
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                 </svg>
               </div>
@@ -192,8 +192,8 @@
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div class="group flex flex-col items-center px-6">
-            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-blue-500 transition-colors duration-300">
-              <svg class="w-6 h-6 text-blue-400 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-primary-500 transition-colors duration-300">
+              <svg class="w-6 h-6 text-primary-400 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
@@ -202,8 +202,8 @@
           </div>
 
           <div class="group flex flex-col items-center px-6 border-y md:border-y-0 md:border-x border-white/10 py-8 md:py-0">
-            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-blue-500 transition-colors duration-300">
-              <svg class="w-6 h-6 text-blue-400 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-primary-500 transition-colors duration-300">
+              <svg class="w-6 h-6 text-primary-400 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
@@ -212,8 +212,8 @@
           </div>
 
           <div class="group flex flex-col items-center px-6">
-            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-blue-500 transition-colors duration-300">
-              <svg class="w-6 h-6 text-blue-400 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-primary-500 transition-colors duration-300">
+              <svg class="w-6 h-6 text-primary-400 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>

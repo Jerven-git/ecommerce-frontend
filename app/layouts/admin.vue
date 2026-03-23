@@ -201,8 +201,8 @@
 
           <!-- Account row -->
           <div class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-gray-50">
-            <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-              <span class="text-xs font-bold text-blue-600">
+            <div class="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
+              <span class="text-xs font-bold text-primary-600">
                 {{ (authStore.user?.name || 'A').charAt(0).toUpperCase() }}
               </span>
             </div>
@@ -304,7 +304,7 @@ const linkClass = (path: string) => {
     ? (route.path === '/admin' || route.path === '/admin/')
     : (route.path === path || route.path.startsWith(path + '/'))
 
-  const active = 'bg-blue-50 ring-1 ring-blue-200 text-blue-800'
+  const active = 'bg-primary-50 ring-1 ring-primary-200 text-primary-800'
   const inactive = 'bg-white hover:bg-gray-100 text-gray-700'
 
   return isActive ? active : inactive

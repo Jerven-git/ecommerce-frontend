@@ -1,7 +1,7 @@
 <template>
   <div class="paypal-payment">
     <div v-if="!paypalLoaded" class="text-center py-4">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
       <p class="text-sm text-gray-600 mt-2">Loading PayPal...</p>
     </div>
 

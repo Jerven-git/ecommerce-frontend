@@ -28,7 +28,7 @@
         v-for="(country, index) in filtered"
         :key="country.code"
         class="px-4 py-2 text-sm cursor-pointer transition-colors"
-        :class="index === highlightedIndex ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'"
+        :class="index === highlightedIndex ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50'"
         @mousedown.prevent="select(country)"
         @mouseenter="highlightedIndex = index"
       >

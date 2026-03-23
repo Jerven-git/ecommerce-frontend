@@ -13,7 +13,7 @@
 
     <!-- Loading -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
-      <div class="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
+      <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
       <p class="text-sm text-gray-500">Loading shipping settings…</p>
     </div>
 
@@ -22,8 +22,8 @@
       <!-- General Shipping Options -->
       <section class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
@@ -37,7 +37,7 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1.5">Express Post Fee</label>
-              <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+              <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent">
                 <span class="px-3 flex items-center bg-gray-50 text-gray-500 text-sm border-r border-gray-300 select-none">$</span>
                 <input v-model.number="form.express_post_fee" type="number" step="0.01" min="0" class="flex-1 px-3 py-2 text-sm outline-none" placeholder="0.00" />
               </div>
@@ -46,7 +46,7 @@
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1.5">Registered Post Fee</label>
-              <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+              <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent">
                 <span class="px-3 flex items-center bg-gray-50 text-gray-500 text-sm border-r border-gray-300 select-none">$</span>
                 <input v-model.number="form.registered_post_fee" type="number" step="0.01" min="0" class="flex-1 px-3 py-2 text-sm outline-none" placeholder="0.00" />
               </div>
@@ -55,7 +55,7 @@
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1.5">Insurance Fee</label>
-              <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+              <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent">
                 <span class="px-3 flex items-center bg-gray-50 text-gray-500 text-sm border-r border-gray-300 select-none">$</span>
                 <input v-model.number="form.insurance_fee" type="number" step="0.01" min="0" class="flex-1 px-3 py-2 text-sm outline-none" placeholder="0.00" />
               </div>
@@ -67,7 +67,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-1.5">Free Shipping Threshold
               <span class="ml-1.5 text-xs font-normal text-gray-400">(optional)</span>
             </label>
-            <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent max-w-xs">
+            <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent max-w-xs">
               <span class="px-3 flex items-center bg-gray-50 text-gray-500 text-sm border-r border-gray-300 select-none">$</span>
               <input v-model.number="form.free_shipping_threshold" type="number" step="0.01" min="0" class="flex-1 px-3 py-2 text-sm outline-none" placeholder="0.00" />
             </div>
@@ -102,8 +102,8 @@
               <button
                 type="button"
                 @click="zone.enabled = !zone.enabled"
-                class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                :class="zone.enabled ? 'bg-blue-600' : 'bg-gray-200'"
+                class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                :class="zone.enabled ? 'bg-primary-600' : 'bg-gray-200'"
                 :aria-label="`Toggle ${zone.label}`"
               >
                 <span
@@ -117,7 +117,7 @@
             <div v-if="zone.enabled" class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1.5">Base Rate</label>
-                <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent">
                   <span class="px-3 flex items-center bg-gray-50 text-gray-500 text-sm border-r border-gray-300 select-none">$</span>
                   <input v-model.number="zone.base_rate" type="number" step="0.01" min="0" class="flex-1 px-3 py-2 text-sm outline-none" placeholder="0.00" />
                 </div>
@@ -127,7 +127,7 @@
                 <label class="block text-xs font-medium text-gray-600 mb-1.5">Per KG Rate
                   <span class="ml-1 font-normal text-gray-400">(optional)</span>
                 </label>
-                <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent">
                   <span class="px-3 flex items-center bg-gray-50 text-gray-500 text-sm border-r border-gray-300 select-none">$</span>
                   <input v-model.number="zone.per_kg_rate" type="number" step="0.01" min="0" class="flex-1 px-3 py-2 text-sm outline-none" placeholder="0.00" />
                 </div>
@@ -138,7 +138,7 @@
                 <label class="block text-xs font-medium text-gray-600 mb-1.5">Per CBM Rate
                   <span class="ml-1 font-normal text-gray-400">(optional)</span>
                 </label>
-                <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent">
                   <span class="px-3 flex items-center bg-gray-50 text-gray-500 text-sm border-r border-gray-300 select-none">$</span>
                   <input v-model.number="zone.per_cbm_rate" type="number" step="0.01" min="0" class="flex-1 px-3 py-2 text-sm outline-none" placeholder="0.00" />
                 </div>
@@ -229,7 +229,7 @@
           </button>
           <button
             type="button"
-            class="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            class="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             :disabled="saving"
             @click="saveSettings"
           >

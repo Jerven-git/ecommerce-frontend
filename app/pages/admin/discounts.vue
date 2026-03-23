@@ -13,7 +13,7 @@
       </div>
       <button
         @click="openAddModal"
-        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shrink-0"
+        class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors shrink-0"
       >
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -32,7 +32,7 @@
           v-model="searchQuery"
           type="text"
           placeholder="Search by code or description..."
-          class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+          class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow"
         />
       </div>
       <div class="flex gap-2 flex-wrap">
@@ -52,7 +52,7 @@
 
     <!-- Loading -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
-      <div class="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
+      <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
       <p class="text-sm text-gray-500">Loading discounts…</p>
     </div>
 
@@ -124,7 +124,7 @@
               <td class="px-6 py-4 whitespace-nowrap">
                 <span
                   class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
-                  :class="discount.type === 'percentage' ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-700'"
+                  :class="discount.type === 'percentage' ? 'bg-primary-50 text-primary-700' : 'bg-emerald-50 text-emerald-700'"
                 >
                   {{ discount.type === 'percentage' ? 'Percentage' : 'Fixed' }}
                 </span>
@@ -165,7 +165,7 @@
                 <div class="flex items-center justify-end gap-1">
                   <button
                     @click="editDiscount(discount)"
-                    class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                    class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
                     title="Edit discount"
                   >
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -209,7 +209,7 @@
             @click="goToPage(page as number)"
             class="px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
             :class="page === currentPage
-              ? 'bg-blue-600 text-white border-blue-600'
+              ? 'bg-primary-600 text-white border-primary-600'
               : 'border-gray-200 text-gray-600 hover:bg-gray-50'"
           >
             {{ page }}
@@ -308,7 +308,7 @@
                   </label>
                   <textarea
                     v-model="form.description"
-                    class="w-full h-[200px] px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-blue-400 focus:ring-1 focus:ring-blue-400 outline-none transition-all leading-relaxed overflow-y-auto input-field resize-none"
+                    class="w-full h-[200px] px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-primary-400 focus:ring-1 focus:ring-primary-400 outline-none transition-all leading-relaxed overflow-y-auto input-field resize-none"
                     placeholder="Summer sale discount"
                   ></textarea>
                 </div>
@@ -324,7 +324,7 @@
                   </div>
                   <div>
                     <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Value *</label>
-                    <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                    <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent">
                       <span v-if="form.type === 'fixed'" class="px-3 flex items-center bg-gray-50 border-r border-gray-300 text-gray-500 text-sm select-none">$</span>
                       <input
                         v-model.number="form.value"
@@ -344,7 +344,7 @@
                 <div class="grid grid-cols-2 gap-4">
                   <div>
                     <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Min. Order Amount</label>
-                    <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                    <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent">
                       <span class="px-3 flex items-center bg-gray-50 border-r border-gray-300 text-gray-500 text-sm select-none">$</span>
                       <input
                         v-model.number="form.min_order_amount"
@@ -383,8 +383,8 @@
                   <button
                     type="button"
                     @click="form.is_active = !form.is_active"
-                    class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    :class="form.is_active ? 'bg-blue-600' : 'bg-gray-200'"
+                    class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                    :class="form.is_active ? 'bg-primary-600' : 'bg-gray-200'"
                     :aria-checked="form.is_active"
                     role="switch"
                   >
@@ -411,7 +411,7 @@
                   type="submit"
                   form="discount-form"
                   :disabled="submitting"
-                  class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
+                  class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
                 >
                   <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -477,7 +477,7 @@ const totalItems = ref(0)
 const perPage = 15
 
 const statusFilters = [
-  { label: 'All', value: 'all', activeClass: 'border-blue-500 bg-blue-50 text-blue-700' },
+  { label: 'All', value: 'all', activeClass: 'border-primary-500 bg-primary-50 text-primary-700' },
   { label: 'Active', value: 'active', activeClass: 'bg-green-600 text-white border-green-600' },
   { label: 'Inactive', value: 'inactive', activeClass: 'bg-gray-600 text-white border-gray-600' },
 ]

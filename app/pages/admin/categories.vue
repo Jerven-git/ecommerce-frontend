@@ -23,8 +23,8 @@
       <div class="px-6 py-4 border-b border-gray-100">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-              <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
               </svg>
             </div>
@@ -51,7 +51,7 @@
           <input
             v-model="searchQuery"
             type="text"
-            class="w-full pl-9 pr-8 py-1.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:border-blue-300 focus:ring-1 focus:ring-blue-300 outline-none transition-all placeholder-gray-400"
+            class="w-full pl-9 pr-8 py-1.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:border-primary-300 focus:ring-1 focus:ring-primary-300 outline-none transition-all placeholder-gray-400"
             placeholder="Search categories..."
           />
           <button
@@ -74,12 +74,12 @@
             <input
               v-model="newName"
               type="text"
-              class="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:border-blue-300 focus:ring-1 focus:ring-blue-300 outline-none transition-all placeholder-gray-400"
+              class="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:border-primary-300 focus:ring-1 focus:ring-primary-300 outline-none transition-all placeholder-gray-400"
               placeholder="New root category..."
               :disabled="saving"
             />
           </div>
-          <button type="submit" class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap disabled:opacity-50" :disabled="!newName.trim() || saving || addingParentId !== null">
+          <button type="submit" class="px-3 py-1.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors whitespace-nowrap disabled:opacity-50" :disabled="!newName.trim() || saving || addingParentId !== null">
             Add
           </button>
         </form>

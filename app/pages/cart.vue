@@ -167,7 +167,7 @@
               </NuxtLink>
 
               <!-- Tax Notice -->
-              <div v-if="cartStore.taxInfo.enabled" class="mt-5 p-3 bg-blue-50 rounded-xl text-xs text-blue-700">
+              <div v-if="cartStore.taxInfo.enabled" class="mt-5 p-3 bg-primary-50 rounded-xl text-xs text-primary-700">
                 <p v-if="cartStore.taxInfo.mode === 'inclusive'">
                   * Prices are tax inclusive — {{ cartStore.taxInfo.name }} ({{ cartStore.taxInfo.rate }}%) is already included
                 </p>

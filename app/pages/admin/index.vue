@@ -8,7 +8,7 @@
 
     <!-- Loading -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
-      <div class="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
+      <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
       <p class="text-sm text-gray-500">Loading dashboard…</p>
     </div>
 
@@ -18,12 +18,12 @@
         <!-- Total Products -->
         <NuxtLink
           to="/admin/products"
-          class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-blue-100 transition-all group"
+          class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-primary-100 transition-all group"
         >
           <div class="flex items-start justify-between mb-4">
             <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Products</p>
-            <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 group-hover:bg-blue-100 transition-colors">
-              <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0 group-hover:bg-primary-100 transition-colors">
+              <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
             </div>
@@ -110,7 +110,7 @@
           </div>
           <NuxtLink
             to="/admin/orders"
-            class="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors shrink-0"
+            class="text-xs font-medium text-primary-600 hover:text-primary-700 transition-colors shrink-0"
           >
             View all →
           </NuxtLink>
@@ -146,7 +146,7 @@
               class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold shrink-0"
               :class="{
                 'bg-amber-50 text-amber-700': order.status === 'pending',
-                'bg-blue-50 text-blue-700': order.status === 'processing',
+                'bg-primary-50 text-primary-700': order.status === 'processing',
                 'bg-purple-50 text-purple-700': order.status === 'shipped',
                 'bg-green-50 text-green-700': order.status === 'delivered',
                 'bg-gray-100 text-gray-500': order.status === 'cancelled',
@@ -156,7 +156,7 @@
                 class="w-1.5 h-1.5 rounded-full"
                 :class="{
                   'bg-amber-400': order.status === 'pending',
-                  'bg-blue-500': order.status === 'processing',
+                  'bg-primary-500': order.status === 'processing',
                   'bg-purple-500': order.status === 'shipped',
                   'bg-green-500': order.status === 'delivered',
                   'bg-gray-400': order.status === 'cancelled',
