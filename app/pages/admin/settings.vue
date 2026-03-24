@@ -52,7 +52,7 @@
             <input v-model="form.site_name" type="text" class="input-field" placeholder="My Awesome Store" />
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1.5">Logo</label>
               <AdminMediaUploader
@@ -78,6 +78,20 @@
                 preview-class="h-16 w-16 rounded-lg object-contain"
                 @select="(f) => onMediaSelect(f, 'favicon')"
                 @remove="onMediaRemove('favicon')"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Cart Icon</label>
+              <AdminMediaUploader
+                :url="form.cart_icon_url"
+                :uploading="media.uploading.cart_icon"
+                label="Cart Icon"
+                hint="PNG, SVG — max 2 MB · 24×24 px recommended"
+                input-id="cartIconInput"
+                preview-class="h-16 w-16 rounded-lg object-contain"
+                @select="(f) => onMediaSelect(f, 'cart_icon')"
+                @remove="onMediaRemove('cart_icon')"
               />
             </div>
           </div>
@@ -552,10 +566,11 @@ const { $apiFetch } = useNuxtApp()
 
 // --- Media upload composable ---
 const media = useMediaUpload({
-  collections: ['logo', 'favicon', 'hero', 'about', 'contact'],
+  collections: ['logo', 'favicon', 'cart_icon', 'hero', 'about', 'contact'],
   limits: {
-    logo:    { maxMB: 2,  label: 'Logo' },
-    favicon: { maxMB: 2,  label: 'Site icon' },
+    logo:      { maxMB: 2,  label: 'Logo' },
+    favicon:   { maxMB: 2,  label: 'Site icon' },
+    cart_icon: { maxMB: 2,  label: 'Cart icon' },
     hero:    { maxMB: 10, label: 'Hero image' },
     about:   { maxMB: 10, label: 'About image' },
     contact: { maxMB: 10, label: 'Contact image' },
@@ -583,6 +598,7 @@ const form = ref({
   },
   logo_url: "",
   favicon_url: "",
+  cart_icon_url: "",
   hero_title: "",
   hero_subtitle: "",
   hero_image_url: "",
@@ -599,6 +615,7 @@ const form = ref({
 const urlFields: Record<MediaCollection, keyof typeof form.value> = {
   logo: 'logo_url',
   favicon: 'favicon_url',
+  cart_icon: 'cart_icon_url',
   hero: 'hero_image_url',
   about: 'about_image_url',
   contact: 'contact_image_url',
@@ -654,6 +671,7 @@ async function loadSettings() {
         },
         logo_url: response.data.logo_url || "",
         favicon_url: response.data.favicon_url || "",
+        cart_icon_url: response.data.cart_icon_url || "",
         hero_title: response.data.hero_title || "",
         hero_subtitle: response.data.hero_subtitle || "",
         hero_image_url: response.data.hero_image_url || "",
