@@ -190,7 +190,7 @@ export const useCartStore = defineStore('cart', {
       }
     },
 
-    async calculateShipping(address?: { country: string; state: string; city: string }) {
+    async calculateShipping(address?: { country: string; state: string; city: string; postcode?: string }) {
       if (this.items.length === 0) {
         this.shippingCalculation = null
         return
@@ -216,6 +216,7 @@ export const useCartStore = defineStore('cart', {
             country: addr?.country || '',
             state: addr?.state || '',
             city: addr?.city || '',
+            postcode: addr?.postcode || '',
             weight: this.totalWeight,
             volume_cbm: this.totalVolumeCbm,
             order_amount: this.rawSubtotal,

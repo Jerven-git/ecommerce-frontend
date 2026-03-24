@@ -36,12 +36,14 @@
       </li>
     </ul>
 
-    <!-- No results -->
+    <!-- Hint / No results -->
     <div
-      v-if="isOpen && search && filtered.length === 0"
+      v-if="isOpen && filtered.length === 0 && (search || minSearchLength > 0)"
       class="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg py-3 px-4"
     >
-      <p class="text-sm text-gray-400">No results found</p>
+      <p class="text-sm text-gray-400">
+        {{ !search || search.length < minSearchLength ? 'Start typing to search...' : 'No results found' }}
+      </p>
     </div>
   </div>
 </template>
@@ -55,10 +57,12 @@ const props = withDefaults(defineProps<{
   placeholder?: string
   required?: boolean
   allowFreeText?: boolean
+  minSearchLength?: number
 }>(), {
   placeholder: 'Select...',
   required: false,
-  allowFreeText: false
+  allowFreeText: false,
+  minSearchLength: 0
 })
 
 const emit = defineEmits<{
@@ -79,7 +83,10 @@ watch(() => props.modelValue, (val) => {
 }, { immediate: true })
 
 const filtered = computed(() => {
-  if (!search.value) return props.options
+  if (!search.value) {
+    return props.minSearchLength > 0 ? [] : props.options
+  }
+  if (search.value.length < props.minSearchLength) return []
   const q = search.value.toLowerCase()
   return props.options.filter(item => item.toLowerCase().includes(q))
 })

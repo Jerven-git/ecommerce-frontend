@@ -32,6 +32,13 @@
     --color-secondary-900: #2a3244;
     --color-secondary-950: #1c2130;
 
+    /* Accent / surface */
+    --color-accent: #F3F4F6;
+
+    /* Texture */
+    --texture-pattern: none;
+    --texture-size: auto;
+
     /* Fonts */
     --font-heading: 'Inter', sans-serif;
     --font-body: 'Inter', sans-serif;
@@ -48,6 +55,27 @@
 }
 
 @layer components {
+    /* Themed section: accent background + optional texture overlay */
+    .section-accent {
+        background-color: var(--color-accent);
+        position: relative;
+    }
+    .section-accent::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: var(--texture-pattern);
+        background-size: var(--texture-size);
+        color: var(--color-primary);
+        opacity: 0.04;
+        pointer-events: none;
+        z-index: 0;
+    }
+    .section-accent > * {
+        position: relative;
+        z-index: 1;
+    }
+
     .btn-primary {
         @apply px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium;
     }

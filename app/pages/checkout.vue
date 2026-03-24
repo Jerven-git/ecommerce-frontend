@@ -11,7 +11,7 @@
     </div>
 
     <!-- Main Content -->
-    <div class="flex-1 bg-gray-50">
+    <div class="flex-1 section-accent">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -33,9 +33,21 @@
               v-model:country="form.country"
               v-model:state="form.state"
               v-model:city="form.city"
+              v-model:postcode="form.postcode"
               :state-options="checkoutStateOptions"
               :city-options="checkoutCityOptions"
             />
+
+            <!-- Inline shipping error near address -->
+            <div v-if="deliveryMethod === 'delivery' && cartStore.shippingError" class="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-2xl">
+              <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p class="text-sm font-semibold text-red-800">Shipping unavailable to this address</p>
+                <p class="text-xs text-red-600 mt-0.5">{{ cartStore.shippingError }}</p>
+              </div>
+            </div>
 
             <CheckoutShippingOptions
               v-if="deliveryMethod === 'delivery'"

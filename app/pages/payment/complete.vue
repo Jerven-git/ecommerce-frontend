@@ -184,6 +184,7 @@ const verifyAndFinish = async () => {
           cartStore.clearCart()
           localStorage.removeItem('last_payment_id')
           localStorage.removeItem('last_order_id')
+          sessionStorage.setItem('order_completed', '1')
           await navigateTo('/order-success')
           return
         }
@@ -218,6 +219,7 @@ const verifyAndFinish = async () => {
     cartStore.clearCart()
     localStorage.removeItem('last_payment_id')
     localStorage.removeItem('last_order_id')
+    sessionStorage.setItem('order_completed', '1')
     await navigateTo('/order-success')
   } finally {
     running.value = false

@@ -26,7 +26,7 @@
     </section>
 
     <!-- Content Section -->
-    <section class="bg-gray-50 py-16">
+    <section class="section-accent py-16">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <!-- Skeleton -->
@@ -69,8 +69,8 @@
           <!-- Our Story card -->
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :style="{ backgroundColor: (siteConfig?.primary_color || '#6898ED') + '18' }">
-                <svg class="w-4 h-4" :style="{ color: siteConfig?.primary_color || '#6898ED' }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :style="{ backgroundColor: (siteConfig?.theme?.primary_color || '#6898ED') + '18' }">
+                <svg class="w-4 h-4" :style="{ color: siteConfig?.theme?.primary_color || '#6898ED' }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </div>
@@ -145,8 +145,8 @@ const heroStyle = computed(() => {
   }
 
   return {
-    backgroundImage: `linear-gradient(135deg, ${siteConfig.value?.primary_color || '#6898ED'}, ${
-      siteConfig.value?.secondary_color || '#4B5979'
+    backgroundImage: `linear-gradient(135deg, ${siteConfig.value?.theme?.primary_color || '#6898ED'}, ${
+      siteConfig.value?.theme?.secondary_color || '#4B5979'
     })`,
   }
 })

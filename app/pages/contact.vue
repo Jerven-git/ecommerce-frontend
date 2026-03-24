@@ -24,7 +24,7 @@
     </section>
 
     <!-- Main Contact Section -->
-    <section class="bg-gray-50 py-16">
+    <section class="section-accent py-16">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
 
@@ -225,7 +225,7 @@
     </section>
 
     <!-- FAQ Section -->
-    <section class="bg-gray-50 border-t border-gray-100 py-16">
+    <section class="section-accent border-t border-gray-100 py-16">
       <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10">
           <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">FAQ</p>
@@ -337,8 +337,8 @@ const heroStyle = computed(() => {
   }
 
   return {
-    backgroundImage: `linear-gradient(135deg, ${siteConfig.value?.primary_color || '#6898ED'}, ${
-      siteConfig.value?.secondary_color || '#4B5979'
+    backgroundImage: `linear-gradient(135deg, ${siteConfig.value?.theme?.primary_color || '#6898ED'}, ${
+      siteConfig.value?.theme?.secondary_color || '#4B5979'
     })`,
   }
 })

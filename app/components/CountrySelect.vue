@@ -36,12 +36,12 @@
       </li>
     </ul>
 
-    <!-- No results -->
+    <!-- Hint / No results -->
     <div
-      v-if="isOpen && search && filtered.length === 0"
+      v-if="isOpen && filtered.length === 0"
       class="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg py-3 px-4"
     >
-      <p class="text-sm text-gray-400">No countries found</p>
+      <p class="text-sm text-gray-400">{{ !search ? 'Start typing to search...' : 'No countries found' }}</p>
     </div>
   </div>
 </template>
@@ -79,7 +79,7 @@ watch(() => props.modelValue, (val) => {
 }, { immediate: true })
 
 const filtered = computed(() => {
-  if (!search.value) return countries
+  if (!search.value) return []
   const q = search.value.toLowerCase()
   return countries.filter(c => c.name.toLowerCase().includes(q))
 })
