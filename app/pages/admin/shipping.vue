@@ -20,7 +20,7 @@
     <div v-else class="space-y-5 pb-24">
 
       <!-- General Shipping Options -->
-      <section class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <section data-guide="shipping-fees" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
             <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -77,7 +77,7 @@
       </section>
 
       <!-- Shipping Zones -->
-      <section class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <section data-guide="shipping-zones" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
             <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
