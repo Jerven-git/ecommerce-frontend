@@ -5,7 +5,7 @@
         <div>
           <NuxtLink to="/" class="inline-block mb-4">
             <img v-if="siteConfig?.logo_url" :src="siteConfig.logo_url" :alt="siteConfig.site_name" class="h-32 w-auto object-contain" />
-            <span v-else class="text-2xl font-bold tracking-tight" :style="{ color: siteConfig?.primary_color || '#6898ED' }">
+            <span v-else class="text-2xl font-bold tracking-tight" :style="{ color: siteConfig?.theme?.primary_color || '#6898ED' }">
               {{ siteConfig?.site_name || 'Store' }}
             </span>
           </NuxtLink>

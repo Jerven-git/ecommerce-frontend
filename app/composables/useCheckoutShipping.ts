@@ -23,7 +23,8 @@ export function useCheckoutShipping(
         await cartStore.calculateShipping({
           country: form.value.country,
           state: form.value.state,
-          city: form.value.city
+          city: form.value.city,
+          postcode: form.value.postcode
         })
       }
     }, 500)
@@ -31,7 +32,7 @@ export function useCheckoutShipping(
 
   // Watch address fields for changes
   watch(
-    () => [form.value.city, form.value.state, form.value.country],
+    () => [form.value.city, form.value.state, form.value.country, form.value.postcode],
     () => {
       if (deliveryMethod.value === 'delivery') {
         debouncedShippingUpdate()

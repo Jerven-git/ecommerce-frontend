@@ -39,15 +39,15 @@
     </section>
 
     <!-- Featured Products -->
-    <section class="bg-gray-50 py-20">
+    <section class="section-accent py-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
           <p
             class="text-xs font-semibold uppercase tracking-widest mb-2"
-            :style="{ color: siteConfig?.primary_color || '#6898ED' }"
+            :style="{ color: siteConfig?.theme?.primary_color || '#6898ED' }"
           >New Arrivals</p>
           <h2 class="text-3xl font-bold text-gray-900">Featured Products</h2>
-          <div class="mt-3 mx-auto w-12 h-1 rounded-full" :style="{ backgroundColor: siteConfig?.primary_color || '#6898ED' }"></div>
+          <div class="mt-3 mx-auto w-12 h-1 rounded-full" :style="{ backgroundColor: siteConfig?.theme?.primary_color || '#6898ED' }"></div>
         </div>
 
         <!-- Skeleton -->
@@ -109,7 +109,7 @@
     <!-- How It Works -->
     <section class="py-20 bg-white">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <p class="text-xs font-semibold uppercase tracking-widest mb-2" :style="{ color: siteConfig?.primary_color || '#6898ED' }">Simple & Easy</p>
+        <p class="text-xs font-semibold uppercase tracking-widest mb-2" :style="{ color: siteConfig?.theme?.primary_color || '#6898ED' }">Simple & Easy</p>
         <h2 class="text-3xl font-bold text-gray-900 mb-3">How It Works</h2>
         <p class="text-gray-500 text-sm mb-14 max-w-md mx-auto">Start shopping in just three easy steps — no hassle, no confusion.</p>
 
@@ -163,7 +163,7 @@
     </section>
 
     <!-- Feature Strip -->
-    <section class="bg-gray-50 border-t border-gray-100 py-16">
+    <section class="section-accent border-t border-gray-100 py-16">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div class="group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-primary-100 transition-all duration-300">
@@ -200,7 +200,7 @@
     </section>
 
     <!-- Stats Banner -->
-    <section class="py-16 text-white" :style="{ background: `linear-gradient(135deg, ${siteConfig?.primary_color || '#6898ED'}, ${siteConfig?.secondary_color || '#4B5979'})` }">
+    <section class="py-16 text-white" :style="{ background: `linear-gradient(135deg, ${siteConfig?.theme?.primary_color || '#6898ED'}, ${siteConfig?.theme?.secondary_color || '#4B5979'})` }">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           <div v-for="stat in stats" :key="stat.label" class="group">
@@ -292,8 +292,8 @@ const heroStyle = computed(() => {
   }
 
   return {
-    backgroundImage: `linear-gradient(135deg, ${siteConfig.value?.primary_color || '#6898ED'}, ${
-      siteConfig.value?.secondary_color || '#4B5979'
+    backgroundImage: `linear-gradient(135deg, ${siteConfig.value?.theme?.primary_color || '#6898ED'}, ${
+      siteConfig.value?.theme?.secondary_color || '#4B5979'
     })`,
   }
 })

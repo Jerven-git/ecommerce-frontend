@@ -110,6 +110,8 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ layout: false })
+
 const cartStore = useCartStore()
 
 interface ConfettiPiece {
@@ -156,6 +158,11 @@ const buildConfetti = () => {
 }
 
 onMounted(() => {
+  if (!sessionStorage.getItem('order_completed')) {
+    navigateTo('/shop')
+    return
+  }
+  sessionStorage.removeItem('order_completed')
   cartStore.clearCart()
   buildConfetti()
 })

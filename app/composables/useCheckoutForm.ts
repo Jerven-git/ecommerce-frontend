@@ -6,6 +6,7 @@ export interface CheckoutFormData {
   city: string
   state: string
   country: string
+  postcode: string
 }
 
 export function useCheckoutForm() {
@@ -23,7 +24,8 @@ export function useCheckoutForm() {
     shipping_address: '',
     city: '',
     state: '',
-    country: ''
+    country: '',
+    postcode: ''
   })
 
   const checkoutStateOptions = computed(() => getStates(form.value.country))

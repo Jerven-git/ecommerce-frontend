@@ -103,7 +103,7 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
   const buildOrderData = () => {
     const shippingAddress = deliveryMethod.value === 'pickup'
       ? 'Self Pickup'
-      : `${form.value.shipping_address}, ${form.value.city}, ${form.value.state}, ${form.value.country}`
+      : `${form.value.shipping_address}, ${form.value.city}, ${form.value.state}${form.value.postcode ? ' ' + form.value.postcode : ''}, ${form.value.country}`
 
     return {
       customer_name: form.value.customer_name,
@@ -115,6 +115,7 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
       country: form.value.country,
       state: form.value.state,
       city: form.value.city,
+      postcode: form.value.postcode,
       delivery_method: deliveryMethod.value,
       payment_method: selectedPaymentMethod.value,
       items: cartStore.items.map(item => ({
@@ -234,6 +235,7 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
       })
 
       cartStore.clearCart()
+      sessionStorage.setItem('order_completed', '1')
       navigateTo('/order-success')
     } catch (err: any) {
       error.value = err?.data?.message || err?.message || 'Failed to place order.'
@@ -256,6 +258,7 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
       })
 
       cartStore.clearCart()
+      sessionStorage.setItem('order_completed', '1')
       navigateTo('/order-success')
     } catch (err: any) {
       error.value = err?.data?.message || err?.message || 'Failed to place order.'

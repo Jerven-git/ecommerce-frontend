@@ -1,4 +1,4 @@
-import { useSiteConfig } from './useSiteConfig'
+import { useSiteConfig, DEFAULT_THEME } from './useSiteConfig'
 
 /**
  * Converts a hex color string to HSL components.
@@ -104,6 +104,101 @@ export const AVAILABLE_FONTS = [
   'Merriweather',
 ]
 
+// Available texture patterns (CSS-only, no images)
+export interface TextureOption {
+  id: string
+  name: string
+  css: string // CSS background value
+}
+
+export const AVAILABLE_TEXTURES: TextureOption[] = [
+  { id: 'none', name: 'None', css: 'none' },
+  {
+    id: 'dots',
+    name: 'Dots',
+    css: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
+  },
+  {
+    id: 'grid',
+    name: 'Grid',
+    css: 'linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)',
+  },
+  {
+    id: 'diagonal',
+    name: 'Diagonal Lines',
+    css: 'repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)',
+  },
+  {
+    id: 'cross',
+    name: 'Crosshatch',
+    css: 'repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px), repeating-linear-gradient(-45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)',
+  },
+  {
+    id: 'waves',
+    name: 'Waves',
+    css: 'radial-gradient(ellipse at 50% 0%, transparent 60%, currentColor 61%, transparent 62%), radial-gradient(ellipse at 50% 100%, transparent 60%, currentColor 61%, transparent 62%)',
+  },
+]
+
+// Complete theme presets
+export interface ThemePreset {
+  name: string
+  primary: string
+  secondary: string
+  accent: string
+  headingFont: string
+  bodyFont: string
+  texture: string
+}
+
+export const THEME_PRESETS: ThemePreset[] = [
+  {
+    name: 'Ocean Blue',
+    primary: '#6898ED',
+    secondary: '#4B5979',
+    accent: '#EEF2FF',
+    headingFont: 'Inter',
+    bodyFont: 'Inter',
+    texture: 'none',
+  },
+  {
+    name: 'Forest Green',
+    primary: '#4CAF50',
+    secondary: '#2E7D32',
+    accent: '#ECFDF5',
+    headingFont: 'Montserrat',
+    bodyFont: 'Open Sans',
+    texture: 'dots',
+  },
+  {
+    name: 'Warm Sunset',
+    primary: '#FF7043',
+    secondary: '#BF360C',
+    accent: '#FFF7ED',
+    headingFont: 'Poppins',
+    bodyFont: 'Lato',
+    texture: 'none',
+  },
+  {
+    name: 'Soft Lavender',
+    primary: '#9575CD',
+    secondary: '#4527A0',
+    accent: '#F5F3FF',
+    headingFont: 'Playfair Display',
+    bodyFont: 'Lato',
+    texture: 'dots',
+  },
+  {
+    name: 'Minimal Mono',
+    primary: '#424242',
+    secondary: '#212121',
+    accent: '#F5F5F5',
+    headingFont: 'Inter',
+    bodyFont: 'Inter',
+    texture: 'grid',
+  },
+]
+
 let fontLinkEl: HTMLLinkElement | null = null
 
 function loadGoogleFonts(fonts: string[]) {
@@ -134,8 +229,10 @@ export function useTheme() {
     if (!import.meta.client) return
 
     const config = siteConfig.value
-    const primary = config?.primary_color || '#6898ED'
-    const secondary = config?.secondary_color || '#4B5979'
+    const theme = config?.theme ?? DEFAULT_THEME
+    const primary = theme.primary_color || '#6898ED'
+    const secondary = theme.secondary_color || '#4B5979'
+    const accent = theme.accent_color || '#F3F4F6'
 
     const root = document.documentElement.style
 
@@ -153,9 +250,31 @@ export function useTheme() {
     }
     root.setProperty('--color-secondary', String(secondaryPalette['600']))
 
+    // Accent / surface color
+    root.setProperty('--color-accent', accent)
+
+    // Texture
+    const textureId = theme.texture || 'none'
+    const texture = AVAILABLE_TEXTURES.find(t => t.id === textureId)
+    if (texture && texture.id !== 'none') {
+      root.setProperty('--texture-pattern', texture.css)
+      // Texture sizing per pattern
+      const sizeMap: Record<string, string> = {
+        dots: '20px 20px',
+        grid: '20px 20px',
+        diagonal: 'auto',
+        cross: 'auto',
+        waves: '40px 20px',
+      }
+      root.setProperty('--texture-size', sizeMap[texture.id] || 'auto')
+    } else {
+      root.setProperty('--texture-pattern', 'none')
+      root.setProperty('--texture-size', 'auto')
+    }
+
     // Fonts
-    const headingFont = config?.heading_font || 'Inter'
-    const bodyFont = config?.body_font || 'Inter'
+    const headingFont = theme.heading_font || 'Inter'
+    const bodyFont = theme.body_font || 'Inter'
     root.setProperty('--font-heading', `'${headingFont}', sans-serif`)
     root.setProperty('--font-body', `'${bodyFont}', sans-serif`)
 

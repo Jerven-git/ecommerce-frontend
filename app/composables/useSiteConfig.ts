@@ -1,10 +1,16 @@
+export interface SiteTheme {
+  primary_color: string
+  secondary_color: string
+  accent_color: string
+  heading_font: string
+  body_font: string
+  texture: string
+}
+
 export interface SiteConfig {
   id: number
   site_name: string
-  primary_color: string
-  secondary_color: string
-  heading_font: string | null
-  body_font: string | null
+  theme: SiteTheme
   logo_url: string | null
   favicon_url: string | null
   hero_title: string | null
@@ -20,11 +26,17 @@ export interface SiteConfig {
   updated_at: string
 }
 
-const DEFAULT_CONFIG: Partial<SiteConfig> = {
+export const DEFAULT_THEME: SiteTheme = {
   primary_color: '#6898ED',
   secondary_color: '#4B5979',
+  accent_color: '#F3F4F6',
   heading_font: 'Inter',
   body_font: 'Inter',
+  texture: 'none',
+}
+
+const DEFAULT_CONFIG: Partial<SiteConfig> = {
+  theme: { ...DEFAULT_THEME },
 }
 
 // BroadcastChannel for cross-tab config sync
@@ -54,7 +66,10 @@ export function useSiteConfig() {
     try {
       const { $apiFetch } = useNuxtApp()
       const res = await $apiFetch<{ data: SiteConfig }>('/site-config')
-      siteConfig.value = { ...DEFAULT_CONFIG, ...res.data } as SiteConfig
+      // Merge theme defaults so missing keys are always present
+      const data = res.data
+      data.theme = { ...DEFAULT_THEME, ...(data.theme ?? {}) }
+      siteConfig.value = { ...DEFAULT_CONFIG, ...data } as SiteConfig
       fetched.value = true
     } catch {
       // Use defaults on failure

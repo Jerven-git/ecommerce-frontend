@@ -14,7 +14,7 @@
           <span
             v-else
             class="text-xl font-bold tracking-tight"
-            :style="{ color: siteConfig?.primary_color || '#6898ED' }"
+            :style="{ color: siteConfig?.theme?.primary_color || '#6898ED' }"
           >
             {{ siteConfig?.site_name || 'Store' }}
           </span>
