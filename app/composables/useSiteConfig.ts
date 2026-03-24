@@ -13,6 +13,7 @@ export interface SiteConfig {
   theme: SiteTheme
   logo_url: string | null
   favicon_url: string | null
+  cart_icon_url: string | null
   hero_title: string | null
   hero_subtitle: string | null
   hero_image_url: string | null
