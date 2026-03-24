@@ -1,5 +1,5 @@
 <template>
-  <section class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+  <section data-guide="settings-about" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
         <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
