@@ -64,9 +64,9 @@
         </div>
       </div>
 
-      <div class="p-5 space-y-3">
+      <div data-guide="category-tree" class="p-5 space-y-3">
         <!-- Add root category -->
-        <form @submit.prevent="addCategory(null)" class="flex gap-2 items-center">
+        <form data-guide="add-category" @submit.prevent="addCategory(null)" class="flex gap-2 items-center">
           <div class="relative flex-1">
             <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />

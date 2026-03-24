@@ -12,6 +12,7 @@
         <p class="text-gray-500 text-sm mt-1">Manage your store's product catalogue</p>
       </div>
       <button
+        data-guide="add-product-btn"
         @click="productForm.openAddModal(); categories.initCategoryForProduct(null)"
         class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shrink-0"
       >
@@ -24,6 +25,7 @@
 
     <!-- Filters -->
     <AdminProductsProductFilters
+      data-guide="product-filters"
       :search-query="products.searchQuery.value"
       :selected-status="products.selectedStatus.value"
       :status-filters="products.statusFilters"
@@ -64,6 +66,7 @@
     <!-- Products table -->
     <AdminProductsProductTable
       v-else
+      data-guide="product-table"
       :products="products.products.value"
       @edit="handleEdit"
       @delete="products.deleteProduct"

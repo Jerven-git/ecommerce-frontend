@@ -14,7 +14,7 @@
 
     <div v-else class="space-y-6">
       <!-- Stat cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div data-guide="stats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- Total Products -->
         <NuxtLink
           to="/admin/products"
@@ -95,7 +95,7 @@
       </div>
 
       <!-- Recent Orders -->
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div data-guide="recent-orders" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
