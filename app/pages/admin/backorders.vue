@@ -138,6 +138,16 @@
               Resend Link
             </button>
 
+            <!-- Mark as Paid button (confirmed backorders) -->
+            <button
+              v-if="bo.status === 'confirmed'"
+              @click="promptMarkAsPaid(bo)"
+              :disabled="actionId === bo.id"
+              class="text-xs font-medium px-3 py-1.5 rounded-lg border border-green-200 text-green-600 hover:bg-green-50 disabled:opacity-50 transition-colors"
+            >
+              Mark as Paid
+            </button>
+
             <!-- Cancel button -->
             <button
               v-if="!['paid', 'cancelled'].includes(bo.status)"
@@ -429,6 +439,7 @@ const statusFilters = [
   { value: 'awaiting_stock', label: 'Awaiting Stock', activeClass: 'border-amber-500 bg-amber-50 text-amber-700' },
   { value: 'notified', label: 'Notified', activeClass: 'border-primary-500 bg-primary-50 text-primary-700' },
   { value: 'expired', label: 'Expired', activeClass: 'border-orange-500 bg-orange-50 text-orange-700' },
+  { value: 'confirmed', label: 'Confirmed', activeClass: 'border-blue-500 bg-blue-50 text-blue-700' },
   { value: 'paid', label: 'Paid', activeClass: 'border-green-500 bg-green-50 text-green-700' },
   { value: 'cancelled', label: 'Cancelled', activeClass: 'border-gray-500 bg-gray-100 text-gray-700' },
 ]
@@ -439,6 +450,7 @@ const statusDotClass = (status: string) => ({
   'bg-amber-400': status === 'awaiting_stock',
   'bg-primary-500': status === 'notified',
   'bg-orange-400': status === 'expired',
+  'bg-blue-500': status === 'confirmed',
   'bg-green-500': status === 'paid',
   'bg-gray-400': status === 'cancelled',
 })
@@ -447,6 +459,7 @@ const statusBadgeClass = (status: string) => ({
   'bg-amber-50 text-amber-700': status === 'awaiting_stock',
   'bg-primary-50 text-primary-700': status === 'notified',
   'bg-orange-50 text-orange-700': status === 'expired',
+  'bg-blue-50 text-blue-700': status === 'confirmed',
   'bg-green-50 text-green-700': status === 'paid',
   'bg-gray-100 text-gray-600': status === 'cancelled',
 })
@@ -456,6 +469,7 @@ const statusLabel = (status: string) => {
     awaiting_stock: 'Awaiting Stock',
     notified: 'Notified',
     expired: 'Expired',
+    confirmed: 'Confirmed',
     paid: 'Paid',
     cancelled: 'Cancelled',
   }
@@ -618,6 +632,28 @@ const promptCancel = (bo: BackorderData) => {
         await loadBackorders()
       } catch (err: any) {
         showToast(err?.data?.message || 'Failed to cancel backorder', 'error')
+      } finally {
+        actionId.value = null
+      }
+    },
+  })
+}
+
+const promptMarkAsPaid = (bo: BackorderData) => {
+  openConfirmModal({
+    title: 'Mark as Paid',
+    message: `Mark backorder for "${bo.product?.name}" x${bo.quantity} (${bo.order?.customer_name}) as paid? This confirms that manual payment has been received.`,
+    confirmText: 'Mark as Paid',
+    loadingText: 'Updating...',
+    variant: 'success',
+    action: async () => {
+      actionId.value = bo.id
+      try {
+        await $apiFetch(`/backorders/${bo.id}/mark-paid`, { method: 'POST' })
+        showToast('Backorder marked as paid')
+        await loadBackorders()
+      } catch (err: any) {
+        showToast(err?.data?.message || 'Failed to mark as paid', 'error')
       } finally {
         actionId.value = null
       }
