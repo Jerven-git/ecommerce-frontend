@@ -168,9 +168,40 @@
               <p class="text-sm text-red-700">{{ payError }}</p>
             </div>
           </div>
+
+          <!-- Confirm without paying option -->
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="h-px flex-1 bg-gray-200"></div>
+              <span class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Or</span>
+              <div class="h-px flex-1 bg-gray-200"></div>
+            </div>
+            <p class="text-sm text-gray-500 mb-4">
+              Confirm your order and arrange payment later with the store directly.
+            </p>
+            <button
+              @click="confirmWithoutPayment"
+              :disabled="submitting || confirming"
+              class="w-full py-3 px-4 border-2 border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-all disabled:opacity-50"
+            >
+              {{ confirming ? 'Confirming...' : 'Confirm Order Without Paying' }}
+            </button>
+          </div>
         </div>
 
-        <!-- Success state -->
+        <!-- Confirm without paying success state -->
+        <div v-else-if="confirmSuccess" class="bg-white rounded-2xl border border-blue-100 shadow-sm p-10 text-center">
+          <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-7 h-7 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <p class="font-semibold text-gray-800 mb-2">Order Confirmed!</p>
+          <p class="text-sm text-gray-500">Your order has been confirmed. The store will contact you to arrange payment.</p>
+          <NuxtLink to="/" class="inline-block mt-6 btn-primary">Return to Store</NuxtLink>
+        </div>
+
+        <!-- Payment success state -->
         <div v-else-if="paymentSuccess" class="bg-white rounded-2xl border border-green-100 shadow-sm p-10 text-center">
           <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <svg class="w-7 h-7 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -218,6 +249,8 @@ const selectedMethod = ref('')
 const submitting = ref(false)
 const payError = ref<string | null>(null)
 const paymentSuccess = ref(false)
+const confirming = ref(false)
+const confirmSuccess = ref(false)
 const stripeOrderId = ref<number | null>(null)
 const stripeClientSecret = ref('')
 const stripePaymentId = ref<string | undefined>(undefined)
@@ -375,6 +408,19 @@ const handleStripeSuccess = (paymentId: string) => {
 
 const handleStripeError = (errorMessage: string) => {
   payError.value = errorMessage
+}
+
+const confirmWithoutPayment = async () => {
+  confirming.value = true
+  payError.value = null
+  try {
+    await $apiFetch(`/backorders/pay/${token}/confirm`, { method: 'POST' })
+    confirmSuccess.value = true
+  } catch (err: any) {
+    payError.value = err?.data?.message || 'Failed to confirm order. Please try again.'
+  } finally {
+    confirming.value = false
+  }
 }
 
 onMounted(() => {
