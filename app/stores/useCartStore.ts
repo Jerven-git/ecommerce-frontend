@@ -24,6 +24,12 @@ interface TaxCalculation {
   tax_rate: number
   tax_name: string
   tax_display_mode: 'inclusive' | 'exclusive'
+  // Extended fields from calculateOrderTotals
+  raw_subtotal?: number
+  ex_tax_subtotal?: number
+  discounted_subtotal?: number
+  shipping?: number
+  taxable_amount?: number
 }
 
 interface ShippingCalculation {
@@ -38,6 +44,7 @@ interface ShippingCalculation {
 export const useCartStore = defineStore('cart', {
   state: () => ({
     items: [] as CartItem[],
+    _taxRequestId: 0,
     taxCalculation: null as TaxCalculation | null,
     shippingCalculation: null as ShippingCalculation | null,
     shippingOptions: [] as string[],
@@ -75,6 +82,11 @@ export const useCartStore = defineStore('cart', {
       return state.items.filter(item => item.quantity > item.stock && item.can_backorder)
     },
 
+    exTaxSubtotal(): number {
+      if (!this.taxCalculation) return this.rawSubtotal
+      return this.taxCalculation.ex_tax_subtotal ?? this.taxCalculation.subtotal
+    },
+
     subtotal(): number {
       if (!this.taxCalculation) return this.rawSubtotal
       return this.taxCalculation.subtotal
@@ -93,11 +105,13 @@ export const useCartStore = defineStore('cart', {
         return this.rawSubtotal + this.shippingCost
       }
 
-      if (this.taxCalculation.tax_display_mode === 'inclusive') {
-        return this.taxCalculation.total + this.shippingCost
-      } else {
-        return this.taxCalculation.subtotal + this.taxCalculation.tax_amount + this.shippingCost
+      // When full order totals are available (includes shipping + discount), use directly
+      if (this.taxCalculation.taxable_amount !== undefined) {
+        return this.taxCalculation.total
       }
+
+      // Fallback for basic cart tax (no discount/shipping in calculation)
+      return this.taxCalculation.subtotal + this.taxCalculation.tax_amount + this.shippingCost
     },
 
     taxInfo(): { enabled: boolean; rate: number; name: string; mode: string } {
@@ -164,11 +178,13 @@ export const useCartStore = defineStore('cart', {
       }
     },
 
-    async calculateTax() {
+    async calculateTax(discountAmount?: number, shippingAmount?: number) {
       if (this.items.length === 0) {
         this.taxCalculation = null
         return
       }
+
+      const requestId = ++this._taxRequestId
 
       try {
         const { $apiFetch } = useNuxtApp()
@@ -178,13 +194,21 @@ export const useCartStore = defineStore('cart', {
           quantity: item.quantity
         }))
 
+        const body: Record<string, any> = { items: cartItems }
+        if (discountAmount && discountAmount > 0) body.discount_amount = discountAmount
+        if (shippingAmount && shippingAmount > 0) body.shipping_amount = shippingAmount
+
         const response = await $apiFetch<TaxCalculation>('/tax/calculate-cart', {
           method: 'POST',
-          body: { items: cartItems }
+          body
         })
+
+        // Ignore stale responses from earlier requests
+        if (requestId !== this._taxRequestId) return
 
         this.taxCalculation = response
       } catch (error) {
+        if (requestId !== this._taxRequestId) return
         console.error('Error calculating tax:', error)
         this.taxCalculation = null
       }

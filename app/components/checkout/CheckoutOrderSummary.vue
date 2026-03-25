@@ -81,31 +81,38 @@
 
       <!-- Totals -->
       <div class="space-y-2.5 py-4 border-b border-gray-100">
+        <!-- Subtotal with tax info -->
         <div class="flex justify-between text-sm text-gray-600">
           <span>Subtotal</span>
           <span class="font-medium text-gray-900">${{ rawSubtotal.toFixed(2) }}</span>
         </div>
 
-        <!-- Tax Breakdown -->
         <template v-if="taxInfo.enabled">
           <div class="bg-gray-50 rounded-lg px-3 py-2.5 space-y-1.5">
-            <div class="flex justify-between text-xs text-gray-500">
-              <span>Net price</span>
+            <div v-if="taxInfo.mode === 'inclusive'" class="flex justify-between text-xs text-gray-500">
+              <span>Excluding tax</span>
               <span class="font-medium text-gray-700">${{ subtotal.toFixed(2) }}</span>
             </div>
-            <div class="flex justify-between text-xs text-gray-500">
-              <span>{{ taxInfo.name }} ({{ taxInfo.rate }}%)</span>
-              <span class="font-medium text-gray-700">+ ${{ taxAmount.toFixed(2) }}</span>
+            <div v-else class="flex justify-between text-xs text-gray-500">
+              <span>Including tax</span>
+              <span class="font-medium text-gray-700">${{ (subtotal + taxAmount).toFixed(2) }}</span>
             </div>
             <p v-if="taxInfo.mode === 'inclusive'" class="text-[10px] text-gray-400 pt-0.5">
-              Tax is included in the displayed price
+              Prices include tax — tax is calculated on the ex-tax amount
             </p>
             <p v-else class="text-[10px] text-gray-400 pt-0.5">
-              Tax is added to the displayed price
+              Prices exclude tax — tax is added at checkout
             </p>
           </div>
         </template>
 
+        <!-- Discount (applied before tax) -->
+        <div v-if="appliedDiscount" class="flex justify-between text-sm text-green-700">
+          <span>Discount ({{ appliedDiscount.code }})</span>
+          <span class="font-semibold">-${{ discountAmount.toFixed(2) }}</span>
+        </div>
+
+        <!-- Shipping -->
         <div v-if="deliveryMethod === 'pickup'" class="flex justify-between text-sm">
           <span class="text-gray-600">Shipping (Pickup)</span>
           <span class="font-semibold text-green-600">FREE</span>
@@ -134,9 +141,10 @@
           <span v-else class="font-medium text-gray-900">${{ shippingCost.toFixed(2) }}</span>
         </div>
 
-        <div v-if="appliedDiscount" class="flex justify-between text-sm text-green-700">
-          <span>Discount ({{ appliedDiscount.code }})</span>
-          <span class="font-semibold">-${{ discountAmount.toFixed(2) }}</span>
+        <!-- Tax line -->
+        <div v-if="taxInfo.enabled" class="flex justify-between text-sm text-gray-600">
+          <span>{{ taxInfo.name }} ({{ taxInfo.rate }}%)</span>
+          <span class="font-medium text-gray-900">+ ${{ taxAmount.toFixed(2) }}</span>
         </div>
       </div>
 

@@ -57,11 +57,15 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
   const canShowPaymentUI = computed(() => isFormValid.value)
 
   const finalTotal = computed(() => {
+    // When full order totals are calculated (includes discount + shipping), use directly
+    if (cartStore.taxCalculation?.taxable_amount !== undefined) {
+      return cartStore.taxCalculation.total
+    }
+
+    // Fallback: basic calculation
     const base = (() => {
       if (deliveryMethod.value === 'pickup') {
-        return cartStore.taxInfo.mode === 'inclusive'
-          ? cartStore.subtotal
-          : cartStore.subtotal + cartStore.taxAmount
+        return cartStore.subtotal + cartStore.taxAmount
       }
       return cartStore.grandTotal
     })()
@@ -77,6 +81,15 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
   watch(selectedPaymentMethod, () => {
     createdOrderId.value = null
   })
+
+  // Recalculate tax when discount or shipping changes
+  watch(
+    [discountAmount, () => cartStore.shippingCost],
+    () => {
+      cartStore.calculateTax(discountAmount.value, cartStore.shippingCost)
+    },
+    { immediate: false }
+  )
 
   // --- API helpers ---
 
