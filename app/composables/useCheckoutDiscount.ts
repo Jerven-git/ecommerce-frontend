@@ -15,8 +15,8 @@ export function useCheckoutDiscount() {
 
   const discountAmount = computed(() => {
     if (!appliedDiscount.value) return 0
-    // Use rawSubtotal to match backend's discount calculation basis
-    const base = cartStore.rawSubtotal
+    // Use ex-tax subtotal to match backend's discount calculation basis
+    const base = cartStore.exTaxSubtotal
     if (appliedDiscount.value.type === 'percentage') {
       return Math.round(Math.min(base * (appliedDiscount.value.value / 100), base) * 100) / 100
     }
@@ -33,7 +33,7 @@ export function useCheckoutDiscount() {
     try {
       const res = await $apiFetch<any>('/discounts/validate', {
         method: 'POST',
-        body: { code, order_amount: cartStore.rawSubtotal }
+        body: { code, order_amount: cartStore.exTaxSubtotal }
       })
 
       const unwrapped = res?.data ?? res
