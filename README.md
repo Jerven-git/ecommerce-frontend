@@ -114,6 +114,15 @@ After a successful payment, the backend sends an order confirmation email to the
 - `charged_now` — customer pays for backorder items at checkout (included in order total)
 - `charged_later` — customer pays later via the payment link when stock arrives
 
+### Stock Display
+
+Product stock visibility is controlled by the `show_stock_quantity` setting in site config (managed from admin Settings > Features):
+
+- **Off (default):** Customers see "In Stock", "Out of Stock", or "Backorder" — no specific number shown
+- **On:** Customers see the exact count, e.g. "In Stock (23)"
+
+This applies to the product detail page (`/product/:slug`), product cards on `/shop`, and the product quick-view modal. The admin product table always shows the exact stock number regardless of this setting.
+
 ### Order Tracking
 
 - Customer visits `/tracking` and enters their order ID or email to check order status
@@ -131,7 +140,7 @@ After a successful payment, the backend sends an order confirmation email to the
 | `stores/useFavoritesStore.ts` | Product favorites/wishlist |
 | `middleware/auth.ts` | Route guard for admin pages |
 | `composables/useTheme.ts` | Applies dynamic theme CSS variables |
-| `composables/useSiteConfig.ts` | Loads store config (name, logo, etc.) |
+| `composables/useSiteConfig.ts` | Loads store config (name, logo, feature toggles, etc.) |
 | `composables/useRegions.ts` | Country/state/city data for address forms |
 | `composables/useRecaptcha.ts` | Google reCAPTCHA integration |
 

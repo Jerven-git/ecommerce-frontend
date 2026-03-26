@@ -71,7 +71,7 @@
                   v-if="product.stock > 0"
                   class="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-50 text-green-700"
                 >
-                  In Stock ({{ product.stock }})
+                  In Stock<template v-if="siteConfig?.show_stock_quantity"> ({{ product.stock }})</template>
                 </span>
                 <span
                   v-else-if="product.can_backorder"
@@ -161,6 +161,7 @@ const emit = defineEmits<{
 }>()
 
 const cartStore = useCartStore()
+const { siteConfig } = useSiteConfig()
 const showLightbox = ref(false)
 
 const addToCart = () => {

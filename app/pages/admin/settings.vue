@@ -60,7 +60,10 @@
       />
 
       <AdminSettingsFeatures
-        v-model="form.favorites_enabled"
+        :favorites-enabled="form.favorites_enabled"
+        :show-stock-quantity="form.show_stock_quantity"
+        @update:favorites-enabled="form.favorites_enabled = $event"
+        @update:show-stock-quantity="form.show_stock_quantity = $event"
       />
 
       <AdminSettingsContact
@@ -146,6 +149,7 @@ const form = ref({
   contact_phone: "",
   contact_entries: [{ label: '', email: '', phone: '' }] as ContactEntry[],
   favorites_enabled: false,
+  show_stock_quantity: false,
 })
 
 // Map collection -> form field
@@ -221,6 +225,7 @@ async function loadSettings() {
           ? response.data.contact_entries
           : [{ label: '', email: '', phone: '' }],
         favorites_enabled: response.data.favorites_enabled ?? false,
+        show_stock_quantity: response.data.show_stock_quantity ?? false,
       }
     }
   } catch (err: any) {
@@ -260,6 +265,7 @@ async function saveSettings() {
         contact_phone: form.value.contact_phone,
         contact_entries: form.value.contact_entries,
         favorites_enabled: form.value.favorites_enabled,
+        show_stock_quantity: form.value.show_stock_quantity,
       },
     })
 

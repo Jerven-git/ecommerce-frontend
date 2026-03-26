@@ -8,6 +8,7 @@ interface UseCheckoutOrderOptions {
   selectedShippingOptions: Ref<string[]>
   appliedDiscount: Ref<AppliedDiscount | null>
   discountAmount: ComputedRef<number>
+  saveDetailsToStorage?: () => void
 }
 
 export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
@@ -16,7 +17,8 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
 
   const {
     form, deliveryMethod, phoneDialCode,
-    selectedShippingOptions, appliedDiscount, discountAmount
+    selectedShippingOptions, appliedDiscount, discountAmount,
+    saveDetailsToStorage
   } = opts
 
   const paymentMethods = ref<any[]>([])
@@ -39,18 +41,22 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
   })
 
   const isFormValid = computed(() => {
-    const basicInfo =
-      form.value.customer_name &&
-      form.value.customer_email &&
-      (selectedPaymentMethod.value || allDeferredBackorder.value)
+    const hasPayment = selectedPaymentMethod.value || allDeferredBackorder.value
+    const baseInfo = form.value.customer_name && form.value.customer_email && hasPayment
 
-    if (deliveryMethod.value === 'pickup') return !!basicInfo
+    if (deliveryMethod.value === 'pickup') {
+      // Country/state only required when regional tax rules exist
+      if (cartStore.hasRegionalTaxRules) {
+        return !!baseInfo && !!form.value.country && !!form.value.state
+      }
+      return !!baseInfo
+    }
 
-    return !!basicInfo &&
+    return !!baseInfo &&
+      !!form.value.country &&
+      !!form.value.state &&
       !!form.value.shipping_address &&
       !!form.value.city &&
-      !!form.value.state &&
-      !!form.value.country &&
       !cartStore.shippingError
   })
 
@@ -82,11 +88,16 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
     createdOrderId.value = null
   })
 
-  // Recalculate tax when discount or shipping changes
+  // Recalculate tax when discount, shipping, or buyer region changes
   watch(
-    [discountAmount, () => cartStore.shippingCost],
+    [discountAmount, () => cartStore.shippingCost, () => form.value.country, () => form.value.state],
     () => {
-      cartStore.calculateTax(discountAmount.value, cartStore.shippingCost)
+      cartStore.calculateTax(
+        discountAmount.value,
+        cartStore.shippingCost,
+        form.value.country,
+        form.value.state
+      )
     },
     { immediate: false }
   )
@@ -227,6 +238,7 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
   }
 
   const handleStripeSuccess = async (paymentId: string) => {
+    saveDetailsToStorage?.()
     localStorage.setItem('last_payment_id', paymentId)
     navigateTo(`/payment/complete?payment_id=${paymentId}`)
   }
@@ -247,6 +259,7 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
         body: buildOrderData()
       })
 
+      saveDetailsToStorage?.()
       cartStore.clearCart()
       sessionStorage.setItem('order_completed', '1')
       navigateTo('/order-success')
@@ -270,6 +283,7 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
         body: buildOrderData()
       })
 
+      saveDetailsToStorage?.()
       cartStore.clearCart()
       sessionStorage.setItem('order_completed', '1')
       navigateTo('/order-success')

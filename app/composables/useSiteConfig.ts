@@ -24,6 +24,7 @@ export interface SiteConfig {
   contact_phone: string | null
   contact_entries: Array<{ label: string; email: string | null; phone: string | null }> | null
   favorites_enabled: boolean
+  show_stock_quantity: boolean
   updated_at: string
 }
 
