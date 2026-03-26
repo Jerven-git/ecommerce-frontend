@@ -66,7 +66,7 @@
               }"
             />
 
-            <div class="bg-white rounded-2xl shadow-2xl border border-gray-200 w-[380px] max-w-[88vw] overflow-hidden">
+            <div ref="tooltipCardRef" class="bg-white rounded-2xl shadow-2xl border border-gray-200 w-[380px] max-w-[88vw] max-h-[70vh] overflow-y-auto overflow-x-hidden">
               <!-- Progress bar -->
               <div class="h-1 bg-gray-100">
                 <div
@@ -108,6 +108,18 @@
                 </ul>
               </div>
 
+              <!-- Keyboard hint -->
+              <div class="px-5 pb-2 flex items-center gap-1.5 text-[11px] text-gray-400">
+                <kbd class="inline-flex items-center justify-center w-5 h-5 rounded border border-gray-200 bg-gray-50 text-[10px] font-mono leading-none">&larr;</kbd>
+                <kbd class="inline-flex items-center justify-center w-5 h-5 rounded border border-gray-200 bg-gray-50 text-[10px] font-mono leading-none">&rarr;</kbd>
+                <span>or</span>
+                <kbd class="inline-flex items-center justify-center h-5 px-1.5 rounded border border-gray-200 bg-gray-50 text-[10px] font-mono leading-none">Enter</kbd>
+                <span>to navigate</span>
+                <span class="mx-0.5">&middot;</span>
+                <kbd class="inline-flex items-center justify-center h-5 px-1.5 rounded border border-gray-200 bg-gray-50 text-[10px] font-mono leading-none">Esc</kbd>
+                <span>to close</span>
+              </div>
+
               <!-- Footer -->
               <div class="px-5 pb-4 flex items-center justify-between gap-3">
                 <!-- Dots -->
@@ -130,7 +142,6 @@
                     Back
                   </button>
                   <button
-                    v-if="step === 0"
                     @click="dismiss"
                     class="px-3 py-1.5 text-xs font-semibold text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
                   >
@@ -172,6 +183,7 @@ const transitioning = ref(false)
 const spotlight = ref<SpotlightRect | null>(null)
 const arrowSide = ref<'top' | 'bottom' | 'left' | 'right' | null>(null)
 const tooltipPos = ref<{ top: string; left: string }>({ top: '50%', left: '50%' })
+const tooltipCardRef = ref<HTMLElement | null>(null)
 
 const steps = guideSteps
 
@@ -183,7 +195,8 @@ const computePosition = (targetRect: DOMRect, prefer: string) => {
   const vw = window.innerWidth
   const vh = window.innerHeight
   const tw = 380
-  const th = 320
+  const maxTh = Math.min(vh * 0.7, 400) // max-h-[70vh] capped at 400
+  const th = tooltipCardRef.value?.offsetHeight ?? maxTh
   const pad = PAD
   const gap = GAP
 
@@ -233,6 +246,10 @@ const computePosition = (targetRect: DOMRect, prefer: string) => {
     left = Math.max(16, Math.min(sx, vw - tw - 16))
     arrowSide.value = 'bottom'
   }
+
+  // Clamp to viewport
+  top = Math.max(16, Math.min(top, vh - th - 16))
+  left = Math.max(16, Math.min(left, vw - tw - 16))
 
   tooltipPos.value = { top: top + 'px', left: left + 'px' }
 }
@@ -332,6 +349,10 @@ const focusStep = async () => {
       await scrollToTarget(el)
       const rect = el.getBoundingClientRect()
       computePosition(rect, s.prefer || 'right')
+      // Recompute after tooltip renders to get actual height
+      await nextTick()
+      const rect2 = el.getBoundingClientRect()
+      computePosition(rect2, s.prefer || 'right')
     } else {
       centerTooltip()
     }
@@ -398,6 +419,23 @@ onMounted(async () => {
   }
 })
 
+// ── Keyboard navigation ──
+
+const onKeydown = (e: KeyboardEvent) => {
+  if (!visible.value) return
+
+  if (e.key === 'ArrowRight' || e.key === 'Enter') {
+    e.preventDefault()
+    next()
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault()
+    prev()
+  } else if (e.key === 'Escape') {
+    e.preventDefault()
+    dismiss()
+  }
+}
+
 // Re-calculate position on resize or scroll
 const recalculate = () => {
   if (visible.value && currentStep.value.target) {
@@ -412,6 +450,7 @@ let scrollContainer: Element | null = null
 
 onMounted(() => {
   window.addEventListener('resize', recalculate)
+  window.addEventListener('keydown', onKeydown)
   scrollContainer = getScrollContainer()
   if (scrollContainer) {
     scrollContainer.addEventListener('scroll', recalculate, { passive: true })
@@ -419,6 +458,7 @@ onMounted(() => {
 })
 onUnmounted(() => {
   window.removeEventListener('resize', recalculate)
+  window.removeEventListener('keydown', onKeydown)
   if (scrollContainer) {
     scrollContainer.removeEventListener('scroll', recalculate)
   }

@@ -272,10 +272,17 @@ export const guideSteps: GuideStep[] = [
   // ── Tax ──────────────────────────────────────────────────
   {
     title: 'Tax Configuration',
-    description: 'Enable tax and set the rate. Choose whether prices include or exclude tax.',
+    description: 'Enable tax and set your default rate. Choose whether prices include or exclude tax.',
     icon: icons.calc, iconBg: 'bg-amber-50',
     route: '/admin/tax-settings', target: '[data-guide="tax-config"]', prefer: 'right',
-    tips: ['Toggle to enable/disable tax globally', 'Set a percentage rate (e.g., 10% for GST)', 'Choose inclusive (tax baked into price) or exclusive (added at checkout)', 'Customize the tax label (VAT, GST, Sales Tax, etc.)'],
+    tips: ['Toggle to enable/disable tax globally', 'Set a percentage rate (e.g., 12% VAT, 10% GST)', 'Choose inclusive (tax baked into price) or exclusive (added at checkout)', 'Customize the tax label shown to customers'],
+  },
+  {
+    title: 'Regional Tax Rules',
+    description: 'Selling to multiple countries? Set different tax rates per country or state.',
+    icon: icons.globe, iconBg: 'bg-blue-50',
+    route: '/admin/tax-settings', target: '[data-guide="tax-regional"]', prefer: 'right',
+    tips: ['Optional — skip this if you only sell in one country', 'Add country rules with their own rate, name, and mode', 'Expand a country to add state-level overrides', 'Most specific rule wins: state > country > all regions > global default'],
   },
   {
     title: 'Tax Preview',
@@ -283,6 +290,15 @@ export const guideSteps: GuideStep[] = [
     icon: icons.eye, iconBg: 'bg-amber-50',
     route: '/admin/tax-settings', target: '[data-guide="tax-preview"]', prefer: 'left',
     tips: ['Enter any price to preview the tax breakdown', 'Shows base price, tax amount, and total', 'Updates live as you change the rate or mode'],
+  },
+
+  // ── Tax Report ─────────────────────────────────────────
+  {
+    title: 'Tax Report',
+    description: 'View tax collected by region and export the data for your accountant.',
+    icon: icons.doc, iconBg: 'bg-green-50',
+    route: '/admin/tax-report', target: '[data-guide="tax-report"]', prefer: 'bottom',
+    tips: ['Filter by date range and order status', 'See orders, subtotal, tax collected, and total per region', 'Export to CSV for accounting and tax filing'],
   },
 
   // ── Payments ─────────────────────────────────────────────

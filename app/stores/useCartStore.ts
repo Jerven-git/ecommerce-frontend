@@ -30,6 +30,7 @@ interface TaxCalculation {
   discounted_subtotal?: number
   shipping?: number
   taxable_amount?: number
+  has_regional_rules?: boolean
 }
 
 interface ShippingCalculation {
@@ -48,7 +49,7 @@ export const useCartStore = defineStore('cart', {
     taxCalculation: null as TaxCalculation | null,
     shippingCalculation: null as ShippingCalculation | null,
     shippingOptions: [] as string[],
-    shippingAddress: null as { country: string; state: string; city: string } | null,
+    shippingAddress: null as { country: string; state: string; city: string; postcode?: string } | null,
     shippingError: null as string | null,
     loading: false
   }),
@@ -112,6 +113,10 @@ export const useCartStore = defineStore('cart', {
 
       // Fallback for basic cart tax (no discount/shipping in calculation)
       return this.taxCalculation.subtotal + this.taxCalculation.tax_amount + this.shippingCost
+    },
+
+    hasRegionalTaxRules(): boolean {
+      return this.taxCalculation?.has_regional_rules ?? false
     },
 
     taxInfo(): { enabled: boolean; rate: number; name: string; mode: string } {
@@ -178,7 +183,7 @@ export const useCartStore = defineStore('cart', {
       }
     },
 
-    async calculateTax(discountAmount?: number, shippingAmount?: number) {
+    async calculateTax(discountAmount?: number, shippingAmount?: number, country?: string, state?: string) {
       if (this.items.length === 0) {
         this.taxCalculation = null
         return
@@ -197,6 +202,8 @@ export const useCartStore = defineStore('cart', {
         const body: Record<string, any> = { items: cartItems }
         if (discountAmount && discountAmount > 0) body.discount_amount = discountAmount
         if (shippingAmount && shippingAmount > 0) body.shipping_amount = shippingAmount
+        if (country) body.country = country
+        if (state) body.state = state
 
         const response = await $apiFetch<TaxCalculation>('/tax/calculate-cart', {
           method: 'POST',

@@ -155,7 +155,7 @@
               class="inline-flex items-center gap-1.5 text-sm font-medium text-green-700"
             >
               <span class="w-2 h-2 rounded-full bg-green-500" />
-              In Stock ({{ product.stock }})
+              In Stock<template v-if="siteConfig?.show_stock_quantity"> ({{ product.stock }})</template>
             </span>
             <span
               v-else-if="product.can_backorder"

@@ -38,6 +38,38 @@
               :city-options="checkoutCityOptions"
             />
 
+            <!-- Billing Region for Pickup (needed for tax determination, only when regional tax rules exist) -->
+            <div v-if="deliveryMethod === 'pickup' && cartStore.hasRegionalTaxRules" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h3 class="text-sm font-bold text-gray-900 mb-1">Your Location</h3>
+              <p class="text-xs text-gray-400 mb-4">Required to determine applicable tax for your order</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Country</label>
+                  <CountrySelect v-model="form.country" placeholder="Select country" required />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">State / Region</label>
+                  <select v-model="form.state" class="input-field" required :disabled="!form.country">
+                    <option value="">Select state</option>
+                    <option v-for="s in checkoutStateOptions" :key="s" :value="s">{{ s }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Remember details toggle -->
+            <div class="flex items-center gap-3 px-1">
+              <input
+                id="remember-details"
+                type="checkbox"
+                v-model="rememberDetails"
+                class="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              />
+              <label for="remember-details" class="text-sm text-gray-600 cursor-pointer">
+                Remember my details for faster checkout
+              </label>
+            </div>
+
             <!-- Inline shipping error near address -->
             <div v-if="deliveryMethod === 'delivery' && cartStore.shippingError" class="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-2xl">
               <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -134,8 +166,8 @@
 const cartStore = useCartStore()
 
 const {
-  form, deliveryMethod, storeCountry, phoneDialCode,
-  checkoutStateOptions, checkoutCityOptions, loadStoreCountry
+  form, deliveryMethod, storeCountry, phoneDialCode, rememberDetails,
+  checkoutStateOptions, checkoutCityOptions, loadStoreCountry, saveDetailsToStorage
 } = useCheckoutForm()
 
 const {
@@ -158,7 +190,8 @@ const {
   placeDeferredBackorder, placeCashOrder
 } = useCheckoutOrder({
   form, deliveryMethod, phoneDialCode,
-  selectedShippingOptions, appliedDiscount, discountAmount
+  selectedShippingOptions, appliedDiscount, discountAmount,
+  saveDetailsToStorage
 })
 
 onMounted(() => {

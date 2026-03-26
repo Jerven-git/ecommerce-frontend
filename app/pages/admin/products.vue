@@ -133,6 +133,7 @@ const products = useProducts()
 const productForm = useProductForm()
 const categories = useProductCategories()
 
+
 const handleEdit = async (product: Product) => {
   await productForm.openEditModal(product)
   categories.initCategoryForProduct(product.category_id ? Number(product.category_id) : null)
