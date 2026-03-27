@@ -62,8 +62,8 @@ export function useSiteConfig() {
   const pending = useState<boolean>('siteConfigPending', () => false)
   const fetched = useState<boolean>('siteConfigFetched', () => false)
 
-  async function fetchSiteConfig() {
-    if (fetched.value || pending.value) return
+  async function fetchSiteConfig(force = false) {
+    if ((!force && fetched.value) || pending.value) return
     pending.value = true
     try {
       const { $apiFetch } = useNuxtApp()
@@ -93,8 +93,7 @@ export function useSiteConfig() {
     if (ch) {
       ch.onmessage = () => {
         // Force re-fetch in this tab
-        fetched.value = false
-        fetchSiteConfig()
+        fetchSiteConfig(true)
       }
     }
   }

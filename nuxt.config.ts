@@ -61,7 +61,11 @@ export default defineNuxtConfig({
       apiBase: process.env.NUXT_PUBLIC_API_BASE,
       apiPath: process.env.NUXT_PUBLIC_API_PATH,
       baseURL: process.env.NUXT_PUBLIC_BASE_URL || '',
-      recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || ''
+      recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
+      reverbAppKey: process.env.NUXT_PUBLIC_REVERB_APP_KEY || '',
+      reverbHost: process.env.NUXT_PUBLIC_REVERB_HOST || 'localhost',
+      reverbPort: process.env.NUXT_PUBLIC_REVERB_PORT || '8080',
+      reverbScheme: process.env.NUXT_PUBLIC_REVERB_SCHEME || 'http'
     }
   },
   

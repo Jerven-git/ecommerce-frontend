@@ -1,5 +1,6 @@
 <template>
   <div>
+    <UpdateBanner />
     <NuxtRouteAnnouncer />
     <NuxtLayout>
       <NuxtPage />
@@ -10,6 +11,14 @@
 <script setup lang="ts">
 const { siteConfig, fetchSiteConfig } = useSiteConfig()
 useTheme()
+
+useRealtime({
+  onModelChanged(data) {
+    if (data.model === 'SiteConfig') {
+      fetchSiteConfig(true)
+    }
+  },
+})
 
 useHead({
   link: computed(() =>

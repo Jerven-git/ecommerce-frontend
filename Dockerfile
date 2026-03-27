@@ -1,5 +1,5 @@
 # Use specific Bun version
-FROM oven/bun:1.3.6
+FROM oven/bun:1.3.11
 
 LABEL maintainer="tech7@sumomedia.co"
 LABEL app_environment="development"
