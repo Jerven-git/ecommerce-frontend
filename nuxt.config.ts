@@ -51,7 +51,8 @@ export default defineNuxtConfig({
       },
       watch: {
         usePolling: true,
-        interval: 1000,
+        interval: 2000,
+        ignored: ['**/node_modules/**', '**/.nuxt/**', '**/.output/**'],
       },
     },
   },

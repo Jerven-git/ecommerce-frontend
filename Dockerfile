@@ -19,5 +19,5 @@ COPY . .
 # Expose Nuxt dev port AND HMR port
 EXPOSE 3000 24678
 
-# Generate types and start dev server
-CMD ["sh", "-c", "bun run nuxt prepare && bun run dev --host 0.0.0.0"]
+# Install deps into the named volume (if needed) and start dev server
+CMD ["sh", "-c", "bun install --frozen-lockfile 2>/dev/null || bun install && bun run dev --host 0.0.0.0"]

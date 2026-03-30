@@ -99,7 +99,7 @@
               :error="error"
               :created-order-id="createdOrderId"
               :final-total="finalTotal"
-              :stripe-publishable-key="getPaymentConfig('stripe')?.publishable_key"
+              :stripe-publishable-key="getPaymentConfig('stripe')?.publishable_key ?? null"
               :customer-email="form.customer_email"
               @update:selected-method="selectedPaymentMethod = $event"
               @create-order="createOrderOnly"

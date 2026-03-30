@@ -391,6 +391,32 @@ const handleSubmit = async () => {
   }
 }
 
+// JSON-LD structured data for local SEO (NAP)
+useHead({
+  script: computed(() => {
+    const config = siteConfig.value
+    if (!config) return []
+
+    const entry = contactEntries.value[0]
+
+    return [{
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'LocalBusiness',
+        'name': config.site_name,
+        ...(entry?.email || config.contact_email
+          ? { email: entry?.email || config.contact_email }
+          : {}),
+        ...(entry?.phone || config.contact_phone
+          ? { telephone: entry?.phone || config.contact_phone }
+          : {}),
+        'url': useRequestURL().origin,
+      }),
+    }]
+  }),
+})
+
 </script>
 
 <style scoped>
