@@ -94,7 +94,7 @@
           v-else
           :order-id="String(createdOrderId)"
           :amount="finalTotal"
-          :publishable-key="stripePublishableKey"
+          :publishable-key="stripePublishableKey ?? ''"
           :customer-email="customerEmail"
           @success="$emit('stripeSuccess', $event)"
           @error="$emit('paymentError', $event)"
