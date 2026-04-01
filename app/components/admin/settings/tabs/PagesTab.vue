@@ -8,6 +8,13 @@
       @media-remove="(c: MediaCollection) => emit('media-remove', c)"
     />
 
+    <AdminSettingsShop
+      :header="form.shop_header"
+      :promo="form.shop_promo"
+      @update:header="form.shop_header = $event"
+      @update:promo="form.shop_promo = $event"
+    />
+
     <AdminSettingsContact
       :image-url="form.contact_image_url"
       :entries="form.contact_entries"
