@@ -8,7 +8,7 @@
       </div>
       <div>
         <h2 class="text-sm font-semibold text-gray-900">Homepage</h2>
-        <p class="text-xs text-gray-400">Hero banner title, subtitle, and image</p>
+        <p class="text-xs text-gray-400">Hero banner title, subtitle, and media</p>
       </div>
     </div>
 
@@ -25,13 +25,15 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Hero Image</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Hero Media</label>
         <AdminMediaUploader
           :url="modelValue.hero_image_url"
           :uploading="mediaUploading.hero"
-          label="Image"
-          hint="JPG, PNG, GIF — max 5 MB · 1920×600 px recommended"
-          input-id="heroImageInput"
+          :video="isHeroVideo"
+          accept="image/*,video/mp4,video/webm"
+          label="Image or video"
+          hint="JPG, PNG, GIF, MP4, WebM — max 10 MB · 1920×600 px recommended"
+          input-id="heroMediaInput"
           preview-class="w-full h-44 object-cover"
           dropzone-class="h-40"
           overlay
@@ -50,6 +52,7 @@ export interface HomepageForm {
   hero_title: string
   hero_subtitle: string
   hero_image_url: string
+  hero_media_mime: string
 }
 
 interface Props {
@@ -63,6 +66,8 @@ const emit = defineEmits<{
   'media-select': [file: File, collection: MediaCollection]
   'media-remove': [collection: MediaCollection]
 }>()
+
+const isHeroVideo = computed(() => props.modelValue.hero_media_mime?.startsWith('video/'))
 
 function update(key: keyof HomepageForm, value: string) {
   emit('update:modelValue', { ...props.modelValue, [key]: value })

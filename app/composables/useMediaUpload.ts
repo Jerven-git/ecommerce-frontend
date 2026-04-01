@@ -3,6 +3,7 @@ export type MediaCollection = 'logo' | 'favicon' | 'cart_icon' | 'hero' | 'about
 export interface UploadLimits {
   maxMB: number
   label: string
+  accept?: string[] // MIME type prefixes, defaults to ['image/']
 }
 
 export interface UseMediaUploadOptions {
@@ -38,10 +39,14 @@ export function useMediaUpload(options: UseMediaUploadOptions) {
 
   function queueFile(file: File, collection: MediaCollection): string | null {
     lastError.value = null
-    const { maxMB, label } = limits[collection]
+    const { maxMB, label, accept } = limits[collection]
+    const acceptPrefixes = accept || ['image/']
 
-    if (!file.type.startsWith('image/')) {
-      lastError.value = `${label}: Please upload a valid image file (PNG, JPG, SVG, GIF)`
+    if (!acceptPrefixes.some(prefix => file.type.startsWith(prefix))) {
+      const types = acceptPrefixes.includes('video/')
+        ? 'PNG, JPG, GIF, MP4, WebM'
+        : 'PNG, JPG, SVG, GIF'
+      lastError.value = `${label}: Please upload a valid file (${types})`
       return null
     }
 
