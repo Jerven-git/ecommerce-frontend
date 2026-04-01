@@ -12,15 +12,13 @@
         <div v-if="imageLoaded" class="absolute inset-0 bg-black/45" />
       </Transition>
 
-      <Transition name="hero-up" appear>
-        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span class="inline-block bg-white/15 backdrop-blur-sm text-xs font-semibold px-4 py-1.5 rounded-full mb-5 tracking-widest uppercase">
-            We're here to help
-          </span>
-          <h1 class="text-5xl font-bold mb-4 leading-tight drop-shadow-md">Contact Us</h1>
-          <p class="text-lg text-white/80 drop-shadow max-w-lg mx-auto">Have a question or need support? We'd love to hear from you and will get back to you promptly.</p>
-        </div>
-      </Transition>
+      <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <span class="hero-stagger inline-block bg-white/15 backdrop-blur-sm text-xs font-semibold px-4 py-1.5 rounded-full mb-5 tracking-widest uppercase" style="animation-delay: 0.15s">
+          We're here to help
+        </span>
+        <h1 class="hero-stagger text-5xl font-bold mb-4 leading-tight drop-shadow-md" style="animation-delay: 0.35s">Contact Us</h1>
+        <p class="hero-stagger text-lg text-white/80 drop-shadow max-w-lg mx-auto" style="animation-delay: 0.55s">Have a question or need support? We'd love to hear from you and will get back to you promptly.</p>
+      </div>
     </section>
 
     <!-- Main Contact Section -->
@@ -29,7 +27,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
 
           <!-- Contact Info card -->
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div :ref="addRevealRef" class="reveal bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" style="transition-delay: 0.1s">
             <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
               <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -94,7 +92,7 @@
           </div>
 
           <!-- Contact Form card -->
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div :ref="addRevealRef" class="reveal bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" style="transition-delay: 0.25s">
             <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
               <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -191,7 +189,7 @@
     <section class="text-white py-14" :style="{ backgroundColor: 'var(--color-secondary)' }">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-          <div class="group flex flex-col items-center px-6">
+          <div :ref="addRevealRef" class="reveal group flex flex-col items-center px-6" style="transition-delay: 0.1s">
             <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-primary-500 transition-colors duration-300">
               <svg class="w-6 h-6 text-primary-400 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -201,7 +199,7 @@
             <p class="text-white text-sm">We reply to all inquiries within 24 hours, guaranteed.</p>
           </div>
 
-          <div class="group flex flex-col items-center px-6 border-y md:border-y-0 md:border-x border-white/10 py-8 md:py-0">
+          <div :ref="addRevealRef" class="reveal group flex flex-col items-center px-6 border-y md:border-y-0 md:border-x border-white/10 py-8 md:py-0" style="transition-delay: 0.25s">
             <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-primary-500 transition-colors duration-300">
               <svg class="w-6 h-6 text-primary-400 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -211,7 +209,7 @@
             <p class="text-white text-sm">Our trained support team is ready to resolve any issue.</p>
           </div>
 
-          <div class="group flex flex-col items-center px-6">
+          <div :ref="addRevealRef" class="reveal group flex flex-col items-center px-6" style="transition-delay: 0.4s">
             <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-primary-500 transition-colors duration-300">
               <svg class="w-6 h-6 text-primary-400 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -227,7 +225,7 @@
     <!-- FAQ Section -->
     <section class="section-accent border-t border-gray-100 py-16">
       <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-10">
+        <div ref="faqHeadingRef" class="reveal text-center mb-10">
           <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">FAQ</p>
           <h2 class="text-3xl font-bold text-gray-900 mb-2">Common Questions</h2>
           <p class="text-sm text-gray-500">Can't find what you need? Use the form above to reach us directly.</p>
@@ -276,6 +274,10 @@ interface ContactEntry {
 const { $apiFetch } = useNuxtApp()
 
 const { siteConfig, pending: loading } = useSiteConfig()
+
+// Scroll reveal
+const { revealRef: faqHeadingRef } = useScrollReveal()
+const { addRevealRef } = useScrollRevealAll()
 const imageLoading = ref(false)
 const imageLoaded = ref(false)
 
@@ -433,12 +435,21 @@ useHead({
   100% { transform: translateX(200%); }
 }
 
-.hero-up-enter-active {
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-.hero-up-enter-from {
+/* Hero text staggered entrance */
+.hero-stagger {
   opacity: 0;
-  transform: translateY(28px);
+  animation: hero-fade-up 0.7s ease forwards;
+}
+
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .fade-enter-active,

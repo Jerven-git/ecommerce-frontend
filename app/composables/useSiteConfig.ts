@@ -17,6 +17,7 @@ export interface SiteConfig {
   hero_title: string | null
   hero_subtitle: string | null
   hero_image_url: string | null
+  hero_media_mime: string | null
   about_content: string | null
   about_image_url: string | null
   contact_image_url: string | null
@@ -25,6 +26,10 @@ export interface SiteConfig {
   contact_entries: Array<{ label: string; email: string | null; phone: string | null }> | null
   favorites_enabled: boolean
   show_stock_quantity: boolean
+  welcome_popup_enabled: boolean
+  welcome_popup_heading: string | null
+  welcome_popup_body: string | null
+  welcome_popup_discount_id: number | null
   updated_at: string
 }
 

@@ -4,9 +4,9 @@
     <!-- Page Header -->
     <div class="bg-white border-b border-gray-100">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Store</p>
-        <h1 class="text-3xl font-bold text-gray-900">Shop All Products</h1>
-        <p class="text-sm text-gray-500 mt-1">Browse our full collection of quality items</p>
+        <p class="hero-stagger text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1" style="animation-delay: 0.1s">Store</p>
+        <h1 class="hero-stagger text-3xl font-bold text-gray-900" style="animation-delay: 0.25s">Shop All Products</h1>
+        <p class="hero-stagger text-sm text-gray-500 mt-1" style="animation-delay: 0.4s">Browse our full collection of quality items</p>
       </div>
     </div>
 
@@ -181,7 +181,9 @@
     </div>
 
     <!-- Promo Banner -->
-    <ShopPromoBanner />
+    <div ref="promoRef" class="reveal">
+      <ShopPromoBanner />
+    </div>
 
   </div>
 </template>
@@ -218,6 +220,9 @@ interface CategoriesResponse {
 }
 
 const { $apiFetch } = useNuxtApp()
+
+// Scroll reveal
+const { revealRef: promoRef } = useScrollReveal()
 
 const products = ref<Product[]>([])
 const categories = ref<Category[]>([])
@@ -372,6 +377,23 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* Page header staggered entrance */
+.hero-stagger {
+  opacity: 0;
+  animation: hero-fade-up 0.7s ease forwards;
+}
+
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Hidden scrollbar for category sliders */
 .category-slider {
   scrollbar-width: none;

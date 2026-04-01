@@ -1,5 +1,13 @@
 <template>
-  <header class="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
+  <header
+    :class="[
+      isHomepage ? 'fixed w-full' : 'sticky',
+      'top-0 z-50 transition-all duration-300',
+      isTransparent
+        ? 'bg-transparent border-b border-transparent'
+        : 'bg-white/80 backdrop-blur-md border-b border-gray-100'
+    ]"
+  >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16 gap-4">
 
@@ -13,8 +21,8 @@
           />
           <span
             v-else
-            class="text-xl font-bold tracking-tight"
-            :style="{ color: siteConfig?.theme?.primary_color || '#6898ED' }"
+            class="text-xl font-bold tracking-tight transition-colors duration-300"
+            :style="{ color: isTransparent ? '#fff' : (siteConfig?.theme?.primary_color || '#6898ED') }"
           >
             {{ siteConfig?.site_name || 'Store' }}
           </span>
@@ -23,25 +31,13 @@
         <!-- Desktop nav -->
         <nav class="hidden md:flex items-center gap-0.5">
           <NuxtLink
-            to="/"
-            class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-            active-class="!text-primary-600 !bg-primary-50 hover:!bg-primary-50"
-          >Home</NuxtLink>
-          <NuxtLink
-            to="/shop"
-            class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-            active-class="!text-primary-600 !bg-primary-50 hover:!bg-primary-50"
-          >Shop</NuxtLink>
-          <NuxtLink
-            to="/about"
-            class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-            active-class="!text-primary-600 !bg-primary-50 hover:!bg-primary-50"
-          >About</NuxtLink>
-          <NuxtLink
-            to="/contact"
-            class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-            active-class="!text-primary-600 !bg-primary-50 hover:!bg-primary-50"
-          >Contact</NuxtLink>
+            v-for="link in navLinks"
+            :key="link.to"
+            :to="link.to"
+            class="px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+            :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+            :active-class="isTransparent ? '!text-white !bg-white/15' : '!text-primary-600 !bg-primary-50 hover:!bg-primary-50'"
+          >{{ link.label }}</NuxtLink>
         </nav>
 
         <!-- Right actions -->
@@ -51,7 +47,8 @@
           <NuxtLink
             v-if="authStore.isAdmin"
             to="/admin"
-            class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+            class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+            :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'"
           >
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -63,7 +60,8 @@
           <!-- Cart -->
           <NuxtLink
             to="/cart"
-            class="relative p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+            class="relative p-2 rounded-lg transition-colors"
+            :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
           >
             <img v-if="siteConfig?.cart_icon_url" :src="siteConfig.cart_icon_url" alt="Cart" class="w-5 h-5 object-contain" />
             <svg v-else class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -80,7 +78,8 @@
           <!-- Mobile hamburger / close -->
           <button
             @click="mobileMenuOpen = !mobileMenuOpen"
-            class="md:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+            class="md:hidden p-2 rounded-lg transition-colors"
+            :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
             :aria-label="mobileMenuOpen ? 'Close menu' : 'Open menu'"
           >
             <svg v-if="!mobileMenuOpen" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -105,29 +104,13 @@
         <div v-if="mobileMenuOpen" class="md:hidden border-t border-gray-100 py-2">
           <nav class="flex flex-col gap-0.5">
             <NuxtLink
-              to="/"
+              v-for="link in navLinks"
+              :key="link.to"
+              :to="link.to"
               class="px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
               active-class="!text-primary-600 !bg-primary-50"
               @click="mobileMenuOpen = false"
-            >Home</NuxtLink>
-            <NuxtLink
-              to="/shop"
-              class="px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-              active-class="!text-primary-600 !bg-primary-50"
-              @click="mobileMenuOpen = false"
-            >Shop</NuxtLink>
-            <NuxtLink
-              to="/about"
-              class="px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-              active-class="!text-primary-600 !bg-primary-50"
-              @click="mobileMenuOpen = false"
-            >About</NuxtLink>
-            <NuxtLink
-              to="/contact"
-              class="px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-              active-class="!text-primary-600 !bg-primary-50"
-              @click="mobileMenuOpen = false"
-            >Contact</NuxtLink>
+            >{{ link.label }}</NuxtLink>
             <NuxtLink
               v-if="authStore.isAdmin"
               to="/admin"
@@ -142,8 +125,35 @@
 </template>
 
 <script setup lang="ts">
+const route = useRoute()
 const cartStore = useCartStore()
 const authStore = useAuthStore()
 const { siteConfig } = useSiteConfig()
 const mobileMenuOpen = ref(false)
+
+const navLinks = [
+  { to: '/', label: 'Home' },
+  { to: '/shop', label: 'Shop' },
+  { to: '/about', label: 'About' },
+  { to: '/contact', label: 'Contact' },
+]
+
+// Transparent header on homepage only
+const isHomepage = computed(() => route.path === '/')
+const scrollY = ref(0)
+const isTransparent = computed(() =>
+  isHomepage.value && scrollY.value < 50 && !mobileMenuOpen.value
+)
+
+function onScroll() {
+  scrollY.value = window.scrollY
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', onScroll, { passive: true })
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', onScroll)
+})
 </script>

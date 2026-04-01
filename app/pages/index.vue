@@ -1,47 +1,60 @@
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="relative h-[600px] flex items-center justify-center text-white overflow-hidden" :style="heroStyle">
-      <!-- Slide progress bar while hero image loads -->
+    <section class="relative h-screen flex items-center justify-center text-white overflow-hidden" :style="heroStyle">
+      <!-- Video background (autoplay, muted, loop for performance) -->
+      <video
+        v-if="isHeroVideo && siteConfig?.hero_image_url"
+        ref="heroVideoRef"
+        class="absolute inset-0 w-full h-full object-cover"
+        autoplay
+        loop
+        muted
+        playsinline
+        preload="metadata"
+        @canplay="videoReady = true"
+      >
+        <source :src="siteConfig.hero_image_url" />
+      </video>
+
+      <!-- Slide progress bar while hero media loads -->
       <Transition name="fade">
-        <div v-if="imageLoading" class="absolute bottom-0 left-0 right-0 h-0.5 overflow-hidden z-20">
+        <div v-if="mediaLoading" class="absolute bottom-0 left-0 right-0 h-0.5 overflow-hidden z-20">
           <div class="slide-bar h-full" />
         </div>
       </Transition>
 
-      <!-- Dark scrim fades in once image is ready -->
+      <!-- Dark scrim fades in once media is ready -->
       <Transition name="fade">
-        <div v-if="imageLoaded || !siteConfig?.hero_image_url" class="absolute inset-0 bg-black/45" />
+        <div v-if="mediaReady || !siteConfig?.hero_image_url" class="absolute inset-0 bg-black/45" />
       </Transition>
 
-      <!-- Hero text slides up on mount -->
-      <Transition name="hero-up" appear>
-        <div class="relative z-10 text-center px-6 max-w-3xl">
-          <h1 class="text-5xl md:text-6xl font-bold mb-5 leading-tight drop-shadow-lg">
-            {{ siteConfig?.hero_title || 'Welcome to Our Store' }}
-          </h1>
-          <p class="text-lg md:text-xl mb-10 text-white/85 drop-shadow max-w-xl mx-auto">
-            {{ siteConfig?.hero_subtitle || 'Discover amazing products' }}
-          </p>
-          <div class="flex items-center justify-center gap-3 flex-wrap">
-            <NuxtLink
-              to="/shop"
-              class="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold bg-white text-gray-900 hover:bg-gray-50 shadow-lg hover:scale-105 transition-all duration-200"
-            >
-              Shop Now
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </NuxtLink>
-          </div>
+      <!-- Hero text staggers in on mount -->
+      <div class="relative z-10 text-center px-6 max-w-3xl">
+        <h1 class="hero-stagger text-5xl md:text-6xl font-bold mb-5 leading-tight drop-shadow-lg" style="animation-delay: 0.2s">
+          {{ siteConfig?.hero_title || 'Welcome to Our Store' }}
+        </h1>
+        <p class="hero-stagger text-lg md:text-xl mb-10 text-white/85 drop-shadow max-w-xl mx-auto" style="animation-delay: 0.5s">
+          {{ siteConfig?.hero_subtitle || 'Discover amazing products' }}
+        </p>
+        <div class="hero-stagger flex items-center justify-center gap-3 flex-wrap" style="animation-delay: 0.8s">
+          <NuxtLink
+            to="/shop"
+            class="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold bg-white text-gray-900 hover:bg-gray-50 shadow-lg hover:scale-105 transition-all duration-200"
+          >
+            Shop Now
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </NuxtLink>
         </div>
-      </Transition>
+      </div>
     </section>
 
     <!-- Featured Products -->
     <section class="section-accent py-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
+        <div ref="featuredHeadingRef" class="text-center mb-12 reveal">
           <p
             class="text-xs font-semibold uppercase tracking-widest mb-2"
             :style="{ color: siteConfig?.theme?.primary_color || '#6898ED' }"
@@ -95,7 +108,7 @@
           </div>
         </div>
 
-        <div class="text-center mt-12">
+        <div :ref="addRevealRef" class="reveal text-center mt-12">
           <NuxtLink to="/shop" class="btn-secondary inline-flex items-center gap-2 hover:scale-105 transition-transform duration-200">
             View All Products
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -109,16 +122,18 @@
     <!-- How It Works -->
     <section class="py-20 bg-white">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <p class="text-xs font-semibold uppercase tracking-widest mb-2" :style="{ color: siteConfig?.theme?.primary_color || '#6898ED' }">Simple & Easy</p>
-        <h2 class="text-3xl font-bold text-gray-900 mb-3">How It Works</h2>
-        <p class="text-gray-500 text-sm mb-14 max-w-md mx-auto">Start shopping in just three easy steps — no hassle, no confusion.</p>
+        <div ref="howItWorksHeadingRef" class="reveal">
+          <p class="text-xs font-semibold uppercase tracking-widest mb-2" :style="{ color: siteConfig?.theme?.primary_color || '#6898ED' }">Simple & Easy</p>
+          <h2 class="text-3xl font-bold text-gray-900 mb-3">How It Works</h2>
+          <p class="text-gray-500 text-sm mb-14 max-w-md mx-auto">Start shopping in just three easy steps — no hassle, no confusion.</p>
+        </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
           <!-- Connector line desktop -->
           <div class="hidden md:block absolute top-10 left-[calc(16.66%+3rem)] right-[calc(16.66%+3rem)] h-px bg-gray-200 z-0"></div>
 
           <!-- Step 1 -->
-          <div class="relative z-10 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col items-center">
+          <div :ref="addRevealRef" class="reveal relative z-10 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col items-center" style="transition-delay: 0.1s">
             <div class="w-12 h-12 rounded-2xl bg-primary-50 flex items-center justify-center mb-5 ring-4 ring-white shadow-sm">
               <svg class="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
@@ -130,7 +145,7 @@
           </div>
 
           <!-- Step 2 -->
-          <div class="relative z-10 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col items-center">
+          <div :ref="addRevealRef" class="reveal relative z-10 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col items-center" style="transition-delay: 0.25s">
             <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center mb-5 ring-4 ring-white shadow-sm">
               <svg class="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13M7 13L5.4 5M17 21a1 1 0 100-2 1 1 0 000 2zm-10 0a1 1 0 100-2 1 1 0 000 2z" />
@@ -142,7 +157,7 @@
           </div>
 
           <!-- Step 3 -->
-          <div class="relative z-10 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col items-center">
+          <div :ref="addRevealRef" class="reveal relative z-10 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col items-center" style="transition-delay: 0.4s">
             <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center mb-5 ring-4 ring-white shadow-sm">
               <svg class="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -154,7 +169,7 @@
           </div>
         </div>
 
-        <div class="mt-10">
+        <div :ref="addRevealRef" class="reveal mt-10" style="transition-delay: 0.5s">
           <NuxtLink to="/shop" class="btn-primary inline-flex items-center gap-2 hover:scale-105 transition-transform duration-200">
             Start Shopping
           </NuxtLink>
@@ -166,7 +181,7 @@
     <section class="section-accent border-t border-gray-100 py-16">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div class="group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-primary-100 transition-all duration-300">
+          <div :ref="addRevealRef" class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-primary-100 transition-all duration-300" style="transition-delay: 0.1s">
             <div class="w-12 h-12 mb-4 rounded-2xl bg-primary-50 flex items-center justify-center group-hover:bg-primary-100 transition-colors duration-300">
               <svg class="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
@@ -176,7 +191,7 @@
             <p class="text-gray-500 text-sm">Carefully curated selection of premium items.</p>
           </div>
 
-          <div class="group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-emerald-100 transition-all duration-300">
+          <div :ref="addRevealRef" class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-emerald-100 transition-all duration-300" style="transition-delay: 0.25s">
             <div class="w-12 h-12 mb-4 rounded-2xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 transition-colors duration-300">
               <svg class="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -186,7 +201,7 @@
             <p class="text-gray-500 text-sm">Competitive pricing on all our products.</p>
           </div>
 
-          <div class="group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-purple-100 transition-all duration-300">
+          <div :ref="addRevealRef" class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-purple-100 transition-all duration-300" style="transition-delay: 0.4s">
             <div class="w-12 h-12 mb-4 rounded-2xl bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition-colors duration-300">
               <svg class="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -203,7 +218,7 @@
     <section class="py-16 text-white" :style="{ background: `linear-gradient(135deg, ${siteConfig?.theme?.primary_color || '#6898ED'}, ${siteConfig?.theme?.secondary_color || '#4B5979'})` }">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          <div v-for="stat in stats" :key="stat.label" class="group">
+          <div v-for="(stat, i) in stats" :key="stat.label" :ref="addRevealRef" class="reveal group" :style="{ transitionDelay: `${i * 0.15}s` }">
             <div class="text-4xl font-extrabold mb-1 drop-shadow group-hover:scale-110 transition-transform duration-300">{{ stat.value }}</div>
             <div class="text-white/70 text-xs font-semibold uppercase tracking-widest">{{ stat.label }}</div>
           </div>
@@ -217,7 +232,7 @@
         <div class="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-white blur-3xl"></div>
         <div class="absolute bottom-0 right-1/4 w-72 h-72 rounded-full bg-white blur-3xl"></div>
       </div>
-      <div class="relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div ref="newsletterRef" class="reveal relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <p class="text-xs font-semibold uppercase tracking-widest text-white mb-3">Stay in the loop</p>
         <h2 class="text-3xl md:text-4xl font-bold mb-4">Don't miss a deal.</h2>
         <p class="text-white text-sm mb-8 max-w-sm mx-auto">Get the latest products, exclusive offers, and updates delivered straight to your inbox.</p>
@@ -265,6 +280,12 @@ interface ProductsResponse {
 const { $apiFetch } = useNuxtApp()
 const { siteConfig } = useSiteConfig()
 
+// Scroll reveal
+const { revealRef: featuredHeadingRef } = useScrollReveal()
+const { revealRef: howItWorksHeadingRef } = useScrollReveal()
+const { revealRef: newsletterRef } = useScrollReveal()
+const { addRevealRef } = useScrollRevealAll()
+
 const stats = [
   { value: '500+', label: 'Products' },
   { value: '1,200+', label: 'Happy Customers' },
@@ -277,9 +298,19 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 const imageLoading = ref(false)
 const imageLoaded = ref(false)
+const videoReady = ref(false)
+const heroVideoRef = ref<HTMLVideoElement | null>(null)
+
+const isHeroVideo = computed(() => siteConfig.value?.hero_media_mime?.startsWith('video/'))
+const mediaLoading = computed(() => isHeroVideo.value ? !videoReady.value && !!siteConfig.value?.hero_image_url : imageLoading.value)
+const mediaReady = computed(() => isHeroVideo.value ? videoReady.value : imageLoaded.value)
 
 const heroStyle = computed(() => {
   const imageUrl = siteConfig.value?.hero_image_url
+
+  if (imageUrl && isHeroVideo.value) {
+    return { backgroundColor: '#1e293b' }
+  }
 
   if (imageUrl) {
     return {
@@ -339,9 +370,10 @@ const fetchData = async () => {
   }
 }
 
-// Preload hero image when siteConfig becomes available
+// Preload hero media when siteConfig becomes available
 watch(() => siteConfig.value?.hero_image_url, (url) => {
-  if (url) preloadImage(url)
+  videoReady.value = false
+  if (url && !isHeroVideo.value) preloadImage(url)
 }, { immediate: true })
 
 onMounted(() => {
@@ -364,13 +396,21 @@ onMounted(() => {
   100% { transform: translateX(200%); }
 }
 
-/* Hero text slide-up on appear */
-.hero-up-enter-active {
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-.hero-up-enter-from {
+/* Hero text staggered entrance */
+.hero-stagger {
   opacity: 0;
-  transform: translateY(28px);
+  animation: hero-fade-up 0.7s ease forwards;
+}
+
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Product cards stagger fade-up */

@@ -16,7 +16,8 @@
 
   <!-- Preview: overlay style (hero/about/contact) -->
   <div v-else-if="url && overlay" class="relative rounded-xl overflow-hidden border border-gray-200">
-    <img :src="url" :alt="label" :class="previewClass || 'w-full h-44 object-cover'" />
+    <video v-if="video" :src="url" :class="previewClass || 'w-full h-44 object-cover'" muted autoplay loop playsinline />
+    <img v-else :src="url" :alt="label" :class="previewClass || 'w-full h-44 object-cover'" />
     <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
     <button
       @click="$emit('remove')"
@@ -54,20 +55,22 @@
       <template v-else>Drop {{ label.toLowerCase() }} here or <span class="text-primary-600 font-medium">browse</span></template>
     </p>
     <p class="text-xs text-gray-400 mt-1">{{ hint }}</p>
-    <input :id="inputId" ref="fileInput" type="file" class="hidden" accept="image/*" @change="onInputChange" />
+    <input :id="inputId" ref="fileInput" type="file" class="hidden" :accept="accept || 'image/*'" @change="onInputChange" />
   </label>
 </template>
 
 <script setup lang="ts">
 defineProps<{
   url: string
-  uploading: boolean
+  uploading: boolean | undefined
   label: string
   hint: string
   inputId: string
   previewClass?: string
   overlay?: boolean
   dropzoneClass?: string
+  accept?: string
+  video?: boolean
 }>()
 
 const emit = defineEmits<{

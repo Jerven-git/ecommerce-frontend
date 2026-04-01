@@ -239,6 +239,13 @@ export const guideSteps: GuideStep[] = [
     tips: ['Favorites: let customers heart products they love', 'More toggles coming soon — reviews, wishlists, and more'],
   },
   {
+    title: 'Welcome Popup',
+    description: 'Show a discount popup to first-time visitors. They enter their email and get a unique single-use discount code instantly.',
+    icon: icons.tagPink, iconBg: 'bg-amber-50',
+    route: '/admin/settings', target: '[data-guide="settings-welcome-popup"]', prefer: 'right',
+    tips: ['Toggle the popup on or off', 'Customize the heading and body text', 'Link a discount — each subscriber gets a unique single-use code cloned from it', 'The popup shows once per visitor (stored in browser)'],
+  },
+  {
     title: 'Contact & Social',
     description: 'Add your contact details and social media links so customers can reach you.',
     icon: icons.mail, iconBg: 'bg-blue-50',

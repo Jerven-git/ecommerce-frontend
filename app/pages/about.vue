@@ -14,15 +14,13 @@
         <div v-if="imageLoaded" class="absolute inset-0 bg-black/45" />
       </Transition>
 
-      <Transition name="hero-up" appear>
-        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span class="inline-block bg-white/15 backdrop-blur-sm text-xs font-semibold px-4 py-1.5 rounded-full mb-5 tracking-widest uppercase">
-            Our Company
-          </span>
-          <h1 class="text-5xl font-bold mb-4 leading-tight drop-shadow-md">About Us</h1>
-          <p class="text-lg text-white/80 drop-shadow max-w-lg mx-auto">Learn more about our story and mission</p>
-        </div>
-      </Transition>
+      <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <span class="hero-stagger inline-block bg-white/15 backdrop-blur-sm text-xs font-semibold px-4 py-1.5 rounded-full mb-5 tracking-widest uppercase" style="animation-delay: 0.15s">
+          Our Company
+        </span>
+        <h1 class="hero-stagger text-5xl font-bold mb-4 leading-tight drop-shadow-md" style="animation-delay: 0.35s">About Us</h1>
+        <p class="hero-stagger text-lg text-white/80 drop-shadow max-w-lg mx-auto" style="animation-delay: 0.55s">Learn more about our story and mission</p>
+      </div>
     </section>
 
     <!-- Content Section -->
@@ -67,7 +65,7 @@
         <div v-else class="space-y-6">
 
           <!-- Our Story card -->
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div ref="storyCardRef" class="reveal bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
               <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :style="{ backgroundColor: (siteConfig?.theme?.primary_color || '#6898ED') + '18' }">
                 <svg class="w-4 h-4" :style="{ color: siteConfig?.theme?.primary_color || '#6898ED' }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -88,7 +86,7 @@
 
           <!-- Feature Cards -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div class="group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-primary-100 transition-all duration-300">
+            <div :ref="addRevealRef" class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-primary-100 transition-all duration-300" style="transition-delay: 0.1s">
               <div class="w-12 h-12 mb-4 rounded-2xl bg-primary-50 flex items-center justify-center group-hover:bg-primary-100 transition-colors duration-300">
                 <svg class="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -98,7 +96,7 @@
               <p class="text-sm text-gray-500">Every product is carefully selected and tested.</p>
             </div>
 
-            <div class="group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-emerald-100 transition-all duration-300">
+            <div :ref="addRevealRef" class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-emerald-100 transition-all duration-300" style="transition-delay: 0.25s">
               <div class="w-12 h-12 mb-4 rounded-2xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 transition-colors duration-300">
                 <svg class="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -108,7 +106,7 @@
               <p class="text-sm text-gray-500">Quick delivery straight to your doorstep.</p>
             </div>
 
-            <div class="group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-purple-100 transition-all duration-300">
+            <div :ref="addRevealRef" class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-purple-100 transition-all duration-300" style="transition-delay: 0.4s">
               <div class="w-12 h-12 mb-4 rounded-2xl bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition-colors duration-300">
                 <svg class="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -126,6 +124,10 @@
 
 <script setup lang="ts">
 const { siteConfig, pending: loading, fetchSiteConfig } = useSiteConfig()
+
+// Scroll reveal
+const { revealRef: storyCardRef } = useScrollReveal()
+const { addRevealRef } = useScrollRevealAll()
 
 const error = ref<string | null>(null)
 const imageLoading = ref(false)
@@ -183,6 +185,23 @@ watch(() => siteConfig.value?.about_image_url, (url) => {
   0%   { transform: translateX(-100%); }
   50%  { transform: translateX(200%); }
   100% { transform: translateX(200%); }
+}
+
+/* Hero text staggered entrance */
+.hero-stagger {
+  opacity: 0;
+  animation: hero-fade-up 0.7s ease forwards;
+}
+
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .fade-enter-active,

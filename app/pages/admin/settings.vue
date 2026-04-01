@@ -44,7 +44,7 @@
       />
 
       <AdminSettingsHomepage
-        :model-value="{ hero_title: form.hero_title, hero_subtitle: form.hero_subtitle, hero_image_url: form.hero_image_url }"
+        :model-value="{ hero_title: form.hero_title, hero_subtitle: form.hero_subtitle, hero_image_url: form.hero_image_url, hero_media_mime: form.hero_media_mime }"
         :media-uploading="media.uploading"
         @update:model-value="Object.assign(form, $event)"
         @media-select="onMediaSelect"
@@ -64,6 +64,10 @@
         :show-stock-quantity="form.show_stock_quantity"
         @update:favorites-enabled="form.favorites_enabled = $event"
         @update:show-stock-quantity="form.show_stock_quantity = $event"
+      />
+
+      <AdminSettingsWelcomePopup
+        v-model="form.welcome_popup"
       />
 
       <AdminSettingsContact
@@ -111,7 +115,7 @@ const media = useMediaUpload({
     logo:      { maxMB: 2,  label: 'Logo' },
     favicon:   { maxMB: 2,  label: 'Site icon' },
     cart_icon: { maxMB: 2,  label: 'Cart icon' },
-    hero:    { maxMB: 10, label: 'Hero image' },
+    hero:    { maxMB: 10, label: 'Hero media', accept: ['image/', 'video/'] },
     about:   { maxMB: 10, label: 'About image' },
     contact: { maxMB: 10, label: 'Contact image' },
   },
@@ -142,6 +146,7 @@ const form = ref({
   hero_title: "",
   hero_subtitle: "",
   hero_image_url: "",
+  hero_media_mime: "",
   about_content: "",
   about_image_url: "",
   contact_image_url: "",
@@ -150,6 +155,12 @@ const form = ref({
   contact_entries: [{ label: '', email: '', phone: '' }] as ContactEntry[],
   favorites_enabled: false,
   show_stock_quantity: false,
+  welcome_popup: {
+    welcome_popup_enabled: false,
+    welcome_popup_heading: '',
+    welcome_popup_body: '',
+    welcome_popup_discount_id: null as number | null,
+  },
 })
 
 // Map collection -> form field
@@ -167,6 +178,7 @@ function onMediaSelect(file: File, collection: MediaCollection) {
   const url = media.queueFile(file, collection)
   if (url) {
     ;(form.value[urlFields[collection]] as string) = url
+    if (collection === 'hero') form.value.hero_media_mime = file.type
     saveError.value = null
   } else {
     saveError.value = media.lastError.value
@@ -176,6 +188,7 @@ function onMediaSelect(file: File, collection: MediaCollection) {
 function onMediaRemove(collection: MediaCollection) {
   media.markDeleted(collection)
   ;(form.value[urlFields[collection]] as string) = ''
+  if (collection === 'hero') form.value.hero_media_mime = ''
 }
 
 // --- Contact entries ---
@@ -216,6 +229,7 @@ async function loadSettings() {
         hero_title: response.data.hero_title || "",
         hero_subtitle: response.data.hero_subtitle || "",
         hero_image_url: response.data.hero_image_url || "",
+        hero_media_mime: response.data.hero_media_mime || "",
         about_content: response.data.about_content || "",
         about_image_url: response.data.about_image_url || "",
         contact_image_url: response.data.contact_image_url || "",
@@ -226,6 +240,12 @@ async function loadSettings() {
           : [{ label: '', email: '', phone: '' }],
         favorites_enabled: response.data.favorites_enabled ?? false,
         show_stock_quantity: response.data.show_stock_quantity ?? false,
+        welcome_popup: {
+          welcome_popup_enabled: response.data.welcome_popup_enabled ?? false,
+          welcome_popup_heading: response.data.welcome_popup_heading || '',
+          welcome_popup_body: response.data.welcome_popup_body || '',
+          welcome_popup_discount_id: response.data.welcome_popup_discount_id ?? null,
+        },
       }
     }
   } catch (err: any) {
@@ -266,6 +286,10 @@ async function saveSettings() {
         contact_entries: form.value.contact_entries,
         favorites_enabled: form.value.favorites_enabled,
         show_stock_quantity: form.value.show_stock_quantity,
+        welcome_popup_enabled: form.value.welcome_popup.welcome_popup_enabled,
+        welcome_popup_heading: form.value.welcome_popup.welcome_popup_heading,
+        welcome_popup_body: form.value.welcome_popup.welcome_popup_body,
+        welcome_popup_discount_id: form.value.welcome_popup.welcome_popup_discount_id,
       },
     })
 
