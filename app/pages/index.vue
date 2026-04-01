@@ -123,49 +123,33 @@
     <section class="py-20 bg-white">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div ref="howItWorksHeadingRef" class="reveal">
-          <p class="text-xs font-semibold uppercase tracking-widest mb-2" :style="{ color: siteConfig?.theme?.primary_color || '#6898ED' }">Simple & Easy</p>
-          <h2 class="text-3xl font-bold text-gray-900 mb-3">How It Works</h2>
-          <p class="text-gray-500 text-sm mb-14 max-w-md mx-auto">Start shopping in just three easy steps — no hassle, no confusion.</p>
+          <p class="text-xs font-semibold uppercase tracking-widest mb-2" :style="{ color: siteConfig?.theme?.primary_color || '#6898ED' }">{{ stepsLabel }}</p>
+          <h2 class="text-3xl font-bold text-gray-900 mb-3">{{ stepsHeading }}</h2>
+          <p class="text-gray-500 text-sm mb-14 max-w-md mx-auto">{{ stepsSubtitle }}</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
           <!-- Connector line desktop -->
           <div class="hidden md:block absolute top-10 left-[calc(16.66%+3rem)] right-[calc(16.66%+3rem)] h-px bg-gray-200 z-0"></div>
 
-          <!-- Step 1 -->
-          <div :ref="addRevealRef" class="reveal relative z-10 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col items-center" style="transition-delay: 0.1s">
-            <div class="w-12 h-12 rounded-2xl bg-primary-50 flex items-center justify-center mb-5 ring-4 ring-white shadow-sm">
-              <svg class="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
+          <div
+            v-for="(step, i) in steps"
+            :key="i"
+            :ref="addRevealRef"
+            class="reveal relative z-10 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col items-center"
+            :style="{ transitionDelay: `${0.1 + i * 0.15}s` }"
+          >
+            <div
+              class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 ring-4 ring-white shadow-sm"
+              :class="stepColors[i % stepColors.length]!.bg"
+            >
+              <svg class="w-6 h-6" :class="stepColors[i % stepColors.length]!.text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="stepIcons[i % stepIcons.length]" />
               </svg>
             </div>
-            <span class="text-xs font-bold text-primary-600 uppercase tracking-wider mb-2">Step 1</span>
-            <h3 class="text-base font-semibold text-gray-900 mb-1.5">Browse Products</h3>
-            <p class="text-gray-500 text-sm leading-relaxed">Explore our wide selection of quality items across all categories.</p>
-          </div>
-
-          <!-- Step 2 -->
-          <div :ref="addRevealRef" class="reveal relative z-10 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col items-center" style="transition-delay: 0.25s">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center mb-5 ring-4 ring-white shadow-sm">
-              <svg class="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13M7 13L5.4 5M17 21a1 1 0 100-2 1 1 0 000 2zm-10 0a1 1 0 100-2 1 1 0 000 2z" />
-              </svg>
-            </div>
-            <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-2">Step 2</span>
-            <h3 class="text-base font-semibold text-gray-900 mb-1.5">Add to Cart</h3>
-            <p class="text-gray-500 text-sm leading-relaxed">Pick your favourites and add them to your cart with one click.</p>
-          </div>
-
-          <!-- Step 3 -->
-          <div :ref="addRevealRef" class="reveal relative z-10 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col items-center" style="transition-delay: 0.4s">
-            <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center mb-5 ring-4 ring-white shadow-sm">
-              <svg class="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-            </div>
-            <span class="text-xs font-bold text-purple-600 uppercase tracking-wider mb-2">Step 3</span>
-            <h3 class="text-base font-semibold text-gray-900 mb-1.5">Fast Checkout</h3>
-            <p class="text-gray-500 text-sm leading-relaxed">Secure payment and fast delivery straight to your doorstep.</p>
+            <span class="text-xs font-bold uppercase tracking-wider mb-2" :class="stepColors[i % stepColors.length]!.text">Step {{ i + 1 }}</span>
+            <h3 class="text-base font-semibold text-gray-900 mb-1.5">{{ step.title }}</h3>
+            <p class="text-gray-500 text-sm leading-relaxed">{{ step.description }}</p>
           </div>
         </div>
 
@@ -181,34 +165,24 @@
     <section class="section-accent border-t border-gray-100 py-16">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div :ref="addRevealRef" class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-primary-100 transition-all duration-300" style="transition-delay: 0.1s">
-            <div class="w-12 h-12 mb-4 rounded-2xl bg-primary-50 flex items-center justify-center group-hover:bg-primary-100 transition-colors duration-300">
-              <svg class="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+          <div
+            v-for="(feature, i) in features"
+            :key="i"
+            :ref="addRevealRef"
+            class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-all duration-300"
+            :class="featureColors[i % featureColors.length]!.border"
+            :style="{ transitionDelay: `${0.1 + i * 0.15}s` }"
+          >
+            <div
+              class="w-12 h-12 mb-4 rounded-2xl flex items-center justify-center transition-colors duration-300"
+              :class="[featureColors[i % featureColors.length]!.bg, featureColors[i % featureColors.length]!.hoverBg]"
+            >
+              <svg class="w-6 h-6" :class="featureColors[i % featureColors.length]!.text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="featureIcons[i % featureIcons.length]" />
               </svg>
             </div>
-            <h3 class="text-base font-semibold text-gray-900 mb-1">Quality Products</h3>
-            <p class="text-gray-500 text-sm">Carefully curated selection of premium items.</p>
-          </div>
-
-          <div :ref="addRevealRef" class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-emerald-100 transition-all duration-300" style="transition-delay: 0.25s">
-            <div class="w-12 h-12 mb-4 rounded-2xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 transition-colors duration-300">
-              <svg class="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 class="text-base font-semibold text-gray-900 mb-1">Best Prices</h3>
-            <p class="text-gray-500 text-sm">Competitive pricing on all our products.</p>
-          </div>
-
-          <div :ref="addRevealRef" class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-purple-100 transition-all duration-300" style="transition-delay: 0.4s">
-            <div class="w-12 h-12 mb-4 rounded-2xl bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition-colors duration-300">
-              <svg class="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <h3 class="text-base font-semibold text-gray-900 mb-1">Fast Delivery</h3>
-            <p class="text-gray-500 text-sm">Quick and reliable shipping to your doorstep.</p>
+            <h3 class="text-base font-semibold text-gray-900 mb-1">{{ feature.title }}</h3>
+            <p class="text-gray-500 text-sm">{{ feature.description }}</p>
           </div>
         </div>
       </div>
@@ -233,9 +207,9 @@
         <div class="absolute bottom-0 right-1/4 w-72 h-72 rounded-full bg-white blur-3xl"></div>
       </div>
       <div ref="newsletterRef" class="reveal relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <p class="text-xs font-semibold uppercase tracking-widest text-white mb-3">Stay in the loop</p>
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">Don't miss a deal.</h2>
-        <p class="text-white text-sm mb-8 max-w-sm mx-auto">Get the latest products, exclusive offers, and updates delivered straight to your inbox.</p>
+        <p class="text-xs font-semibold uppercase tracking-widest text-white mb-3">{{ newsletterLabel }}</p>
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">{{ newsletterHeading }}</h2>
+        <p class="text-white text-sm mb-8 max-w-sm mx-auto">{{ newsletterSubtitle }}</p>
         <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" @submit.prevent>
           <input
             type="email"
@@ -249,7 +223,7 @@
             Subscribe
           </button>
         </form>
-        <p class="text-white text-xs mt-4">No spam, ever. Unsubscribe anytime.</p>
+        <p class="text-white text-xs mt-4">{{ newsletterDisclaimer }}</p>
       </div>
     </section>
   </div>
@@ -281,17 +255,69 @@ const { $apiFetch } = useNuxtApp()
 const { siteConfig } = useSiteConfig()
 
 // Scroll reveal
-const { revealRef: featuredHeadingRef } = useScrollReveal()
-const { revealRef: howItWorksHeadingRef } = useScrollReveal()
-const { revealRef: newsletterRef } = useScrollReveal()
+// const { revealRef: featuredHeadingRef } = useScrollReveal()
+// const { revealRef: howItWorksHeadingRef } = useScrollReveal()
+// const { revealRef: newsletterRef } = useScrollReveal()
 const { addRevealRef } = useScrollRevealAll()
 
-const stats = [
+const stepColors = [
+  { bg: 'bg-primary-50', text: 'text-primary-600' },
+  { bg: 'bg-emerald-50', text: 'text-emerald-600' },
+  { bg: 'bg-purple-50', text: 'text-purple-600' },
+]
+
+const stepIcons = [
+  'M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z',
+  'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13M7 13L5.4 5M17 21a1 1 0 100-2 1 1 0 000 2zm-10 0a1 1 0 100-2 1 1 0 000 2z',
+  'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+]
+
+const featureColors = [
+  { bg: 'bg-primary-50', hoverBg: 'group-hover:bg-primary-100', text: 'text-primary-600', border: 'hover:border-primary-100' },
+  { bg: 'bg-emerald-50', hoverBg: 'group-hover:bg-emerald-100', text: 'text-emerald-600', border: 'hover:border-emerald-100' },
+  { bg: 'bg-purple-50', hoverBg: 'group-hover:bg-purple-100', text: 'text-purple-600', border: 'hover:border-purple-100' },
+]
+
+const featureIcons = [
+  'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4',
+  'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+  'M13 10V3L4 14h7v7l9-11h-7z',
+]
+
+const defaultSteps = [
+  { title: 'Browse Products', description: 'Explore our wide selection of quality items across all categories.' },
+  { title: 'Add to Cart', description: 'Pick your favourites and add them to your cart with one click.' },
+  { title: 'Fast Checkout', description: 'Secure payment and fast delivery straight to your doorstep.' },
+]
+
+const defaultFeatures = [
+  { title: 'Quality Products', description: 'Carefully curated selection of premium items.' },
+  { title: 'Best Prices', description: 'Competitive pricing on all our products.' },
+  { title: 'Fast Delivery', description: 'Quick and reliable shipping to your doorstep.' },
+]
+
+const defaultStats = [
   { value: '500+', label: 'Products' },
   { value: '1,200+', label: 'Happy Customers' },
   { value: '99%', label: 'Satisfaction Rate' },
   { value: '24/7', label: 'Support' },
 ]
+
+const stepsConfig = computed(() => siteConfig.value?.homepage_steps)
+const stepsLabel = computed(() => stepsConfig.value?.label || 'Simple & Easy')
+const stepsHeading = computed(() => stepsConfig.value?.heading || 'How It Works')
+const stepsSubtitle = computed(() => stepsConfig.value?.subtitle || 'Start shopping in just three easy steps — no hassle, no confusion.')
+const steps = computed(() => stepsConfig.value?.items?.length ? stepsConfig.value.items : defaultSteps)
+
+const features = computed(() => siteConfig.value?.homepage_features?.items?.length ? siteConfig.value.homepage_features.items : defaultFeatures)
+
+const stats = computed(() => siteConfig.value?.homepage_stats?.items?.length ? siteConfig.value.homepage_stats.items : defaultStats)
+
+const newsletterConfig = computed(() => siteConfig.value?.homepage_newsletter)
+const newsletterLabel = computed(() => newsletterConfig.value?.label || 'Stay in the loop')
+const newsletterHeading = computed(() => newsletterConfig.value?.heading || "Don't miss a deal.")
+const newsletterSubtitle = computed(() => newsletterConfig.value?.subtitle || 'Get the latest products, exclusive offers, and updates delivered straight to your inbox.')
+const newsletterDisclaimer = computed(() => newsletterConfig.value?.disclaimer || 'No spam, ever. Unsubscribe anytime.')
 
 const products = ref<Product[]>([])
 const loading = ref(true)

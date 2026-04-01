@@ -7,6 +7,43 @@ export interface SiteTheme {
   texture: string
 }
 
+export interface HomepageStep {
+  title: string
+  description: string
+}
+
+export interface HomepageFeature {
+  title: string
+  description: string
+}
+
+export interface HomepageStat {
+  value: string
+  label: string
+}
+
+export interface HomepageSteps {
+  label: string
+  heading: string
+  subtitle: string
+  items: HomepageStep[]
+}
+
+export interface HomepageFeatures {
+  items: HomepageFeature[]
+}
+
+export interface HomepageStats {
+  items: HomepageStat[]
+}
+
+export interface HomepageNewsletter {
+  label: string
+  heading: string
+  subtitle: string
+  disclaimer: string
+}
+
 export interface SiteConfig {
   id: number
   site_name: string
@@ -30,6 +67,10 @@ export interface SiteConfig {
   welcome_popup_heading: string | null
   welcome_popup_body: string | null
   welcome_popup_discount_id: number | null
+  homepage_steps: HomepageSteps | null
+  homepage_features: HomepageFeatures | null
+  homepage_stats: HomepageStats | null
+  homepage_newsletter: HomepageNewsletter | null
   updated_at: string
 }
 
