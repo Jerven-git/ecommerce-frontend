@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Page Header -->
-    <div class="mb-8">
+    <div class="mb-6">
       <div class="flex items-center gap-2 text-sm text-gray-400 mb-2">
         <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
         <span>/</span>
@@ -10,6 +10,25 @@
       <h1 class="text-2xl font-bold text-gray-900">Site Settings</h1>
       <p class="text-gray-500 text-sm mt-1">Manage your store's appearance and content</p>
     </div>
+
+    <!-- Tab Navigation -->
+    <nav class="flex gap-1 mb-6 bg-gray-100 rounded-xl p-1 overflow-x-auto">
+      <button
+        v-for="tab in tabs"
+        :key="tab.id"
+        type="button"
+        class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200"
+        :class="activeTab === tab.id
+          ? 'bg-white text-gray-900 shadow-sm'
+          : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'"
+        @click="activeTab = tab.id"
+      >
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="tab.icon" />
+        </svg>
+        {{ tab.label }}
+      </button>
+    </nav>
 
     <!-- Loading -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
@@ -29,55 +48,42 @@
       <button @click="loadSettings" class="btn-primary" :disabled="saving">Retry</button>
     </div>
 
-    <!-- Form -->
-    <form v-else @submit.prevent="saveSettings" class="space-y-5 pb-24">
-      <AdminSettingsGeneral
-        :model-value="{ site_name: form.site_name, logo_url: form.logo_url, favicon_url: form.favicon_url, cart_icon_url: form.cart_icon_url }"
+    <!-- Tab Content -->
+    <form v-else @submit.prevent="saveSettings" class="pb-24">
+      <AdminSettingsTabsGeneralTab
+        v-show="activeTab === 'general'"
+        :form="form"
         :media-uploading="media.uploading"
-        @update:model-value="Object.assign(form, $event)"
         @media-select="onMediaSelect"
         @media-remove="onMediaRemove"
       />
 
-      <AdminSettingsTheme
-        v-model="form.theme"
+      <AdminSettingsTabsAppearanceTab
+        v-show="activeTab === 'appearance'"
+        :form="form"
       />
 
-      <AdminSettingsHomepage
-        :model-value="{ hero_title: form.hero_title, hero_subtitle: form.hero_subtitle, hero_image_url: form.hero_image_url, hero_media_mime: form.hero_media_mime }"
+      <AdminSettingsTabsHomepageTab
+        v-show="activeTab === 'homepage'"
+        :form="form"
         :media-uploading="media.uploading"
-        @update:model-value="Object.assign(form, $event)"
         @media-select="onMediaSelect"
         @media-remove="onMediaRemove"
       />
 
-      <AdminSettingsAbout
-        :model-value="{ about_image_url: form.about_image_url, about_content: form.about_content }"
+      <AdminSettingsTabsPagesTab
+        v-show="activeTab === 'pages'"
+        :form="form"
         :media-uploading="media.uploading"
-        @update:model-value="Object.assign(form, $event)"
         @media-select="onMediaSelect"
         @media-remove="onMediaRemove"
+        @add-contact-entry="addContactEntry"
+        @remove-contact-entry="removeContactEntry"
       />
 
-      <AdminSettingsFeatures
-        :favorites-enabled="form.favorites_enabled"
-        :show-stock-quantity="form.show_stock_quantity"
-        @update:favorites-enabled="form.favorites_enabled = $event"
-        @update:show-stock-quantity="form.show_stock_quantity = $event"
-      />
-
-      <AdminSettingsWelcomePopup
-        v-model="form.welcome_popup"
-      />
-
-      <AdminSettingsContact
-        :image-url="form.contact_image_url"
-        :entries="form.contact_entries"
-        :media-uploading="media.uploading"
-        @add-entry="addContactEntry"
-        @remove-entry="removeContactEntry"
-        @media-select="onMediaSelect"
-        @media-remove="onMediaRemove"
+      <AdminSettingsTabsPopupTab
+        v-show="activeTab === 'popup'"
+        :form="form"
       />
     </form>
 
@@ -107,6 +113,25 @@ interface SiteConfigResponse {
 }
 
 const { $apiFetch } = useNuxtApp()
+const route = useRoute()
+const router = useRouter()
+
+// --- Tabs ---
+const tabs = [
+  { id: 'general', label: 'General', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
+  { id: 'appearance', label: 'Appearance', icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01' },
+  { id: 'homepage', label: 'Homepage', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6' },
+  { id: 'pages', label: 'Pages', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
+  { id: 'popup', label: 'Popup', icon: 'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7' },
+] as const
+
+type TabId = typeof tabs[number]['id']
+
+const activeTab = ref<TabId>((route.query.tab as TabId) || 'general')
+
+watch(activeTab, (tab) => {
+  router.replace({ query: { ...route.query, tab } })
+})
 
 // --- Media upload composable ---
 const media = useMediaUpload({
@@ -160,6 +185,37 @@ const form = ref({
     welcome_popup_heading: '',
     welcome_popup_body: '',
     welcome_popup_discount_id: null as number | null,
+  },
+  homepage_steps: {
+    label: 'Simple & Easy',
+    heading: 'How It Works',
+    subtitle: 'Start shopping in just three easy steps — no hassle, no confusion.',
+    items: [
+      { title: 'Browse Products', description: 'Explore our wide selection of quality items across all categories.' },
+      { title: 'Add to Cart', description: 'Pick your favourites and add them to your cart with one click.' },
+      { title: 'Fast Checkout', description: 'Secure payment and fast delivery straight to your doorstep.' },
+    ],
+  },
+  homepage_features: {
+    items: [
+      { title: 'Quality Products', description: 'Carefully curated selection of premium items.' },
+      { title: 'Best Prices', description: 'Competitive pricing on all our products.' },
+      { title: 'Fast Delivery', description: 'Quick and reliable shipping to your doorstep.' },
+    ],
+  },
+  homepage_stats: {
+    items: [
+      { value: '500+', label: 'Products' },
+      { value: '1,200+', label: 'Happy Customers' },
+      { value: '99%', label: 'Satisfaction Rate' },
+      { value: '24/7', label: 'Support' },
+    ],
+  },
+  homepage_newsletter: {
+    label: 'Stay in the loop',
+    heading: "Don't miss a deal.",
+    subtitle: 'Get the latest products, exclusive offers, and updates delivered straight to your inbox.',
+    disclaimer: 'No spam, ever. Unsubscribe anytime.',
   },
 })
 
@@ -246,6 +302,35 @@ async function loadSettings() {
           welcome_popup_body: response.data.welcome_popup_body || '',
           welcome_popup_discount_id: response.data.welcome_popup_discount_id ?? null,
         },
+        homepage_steps: response.data.homepage_steps ?? {
+          label: 'Simple & Easy', heading: 'How It Works',
+          subtitle: 'Start shopping in just three easy steps — no hassle, no confusion.',
+          items: [
+            { title: 'Browse Products', description: 'Explore our wide selection of quality items across all categories.' },
+            { title: 'Add to Cart', description: 'Pick your favourites and add them to your cart with one click.' },
+            { title: 'Fast Checkout', description: 'Secure payment and fast delivery straight to your doorstep.' },
+          ],
+        },
+        homepage_features: response.data.homepage_features ?? {
+          items: [
+            { title: 'Quality Products', description: 'Carefully curated selection of premium items.' },
+            { title: 'Best Prices', description: 'Competitive pricing on all our products.' },
+            { title: 'Fast Delivery', description: 'Quick and reliable shipping to your doorstep.' },
+          ],
+        },
+        homepage_stats: response.data.homepage_stats ?? {
+          items: [
+            { value: '500+', label: 'Products' },
+            { value: '1,200+', label: 'Happy Customers' },
+            { value: '99%', label: 'Satisfaction Rate' },
+            { value: '24/7', label: 'Support' },
+          ],
+        },
+        homepage_newsletter: response.data.homepage_newsletter ?? {
+          label: 'Stay in the loop', heading: "Don't miss a deal.",
+          subtitle: 'Get the latest products, exclusive offers, and updates delivered straight to your inbox.',
+          disclaimer: 'No spam, ever. Unsubscribe anytime.',
+        },
       }
     }
   } catch (err: any) {
@@ -290,6 +375,10 @@ async function saveSettings() {
         welcome_popup_heading: form.value.welcome_popup.welcome_popup_heading,
         welcome_popup_body: form.value.welcome_popup.welcome_popup_body,
         welcome_popup_discount_id: form.value.welcome_popup.welcome_popup_discount_id,
+        homepage_steps: form.value.homepage_steps,
+        homepage_features: form.value.homepage_features,
+        homepage_stats: form.value.homepage_stats,
+        homepage_newsletter: form.value.homepage_newsletter,
       },
     })
 
