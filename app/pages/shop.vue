@@ -4,9 +4,9 @@
     <!-- Page Header -->
     <div class="bg-white border-b border-gray-100">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <p class="hero-stagger text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1" style="animation-delay: 0.1s">Store</p>
-        <h1 class="hero-stagger text-3xl font-bold text-gray-900" style="animation-delay: 0.25s">Shop All Products</h1>
-        <p class="hero-stagger text-sm text-gray-500 mt-1" style="animation-delay: 0.4s">Browse our full collection of quality items</p>
+        <p class="hero-stagger text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1" style="animation-delay: 0.1s">{{ siteConfig?.shop_header?.label || 'Store' }}</p>
+        <h1 class="hero-stagger text-3xl font-bold text-gray-900" style="animation-delay: 0.25s">{{ siteConfig?.shop_header?.heading || 'Shop All Products' }}</h1>
+        <p class="hero-stagger text-sm text-gray-500 mt-1" style="animation-delay: 0.4s">{{ siteConfig?.shop_header?.subtitle || 'Browse our full collection of quality items' }}</p>
       </div>
     </div>
 
@@ -220,6 +220,7 @@ interface CategoriesResponse {
 }
 
 const { $apiFetch } = useNuxtApp()
+const { siteConfig } = useSiteConfig()
 
 // Scroll reveal
 const { revealRef: promoRef } = useScrollReveal()

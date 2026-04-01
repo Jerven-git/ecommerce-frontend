@@ -217,6 +217,18 @@ const form = ref({
     subtitle: 'Get the latest products, exclusive offers, and updates delivered straight to your inbox.',
     disclaimer: 'No spam, ever. Unsubscribe anytime.',
   },
+  shop_header: {
+    label: 'Store',
+    heading: 'Shop All Products',
+    subtitle: 'Browse our full collection of quality items',
+  },
+  shop_promo: {
+    badge: 'Members get more',
+    heading: 'New arrivals every single week.',
+    subtitle: 'Stay ahead of the trend. Fresh drops, exclusive deals, and hand-picked collections — updated weekly just for you.',
+    button_text: 'Shop New Arrivals',
+    perks: ['Free Shipping', 'Easy Returns', 'Secure Checkout'],
+  },
 })
 
 // Map collection -> form field
@@ -331,6 +343,16 @@ async function loadSettings() {
           subtitle: 'Get the latest products, exclusive offers, and updates delivered straight to your inbox.',
           disclaimer: 'No spam, ever. Unsubscribe anytime.',
         },
+        shop_header: response.data.shop_header ?? {
+          label: 'Store', heading: 'Shop All Products',
+          subtitle: 'Browse our full collection of quality items',
+        },
+        shop_promo: response.data.shop_promo ?? {
+          badge: 'Members get more', heading: 'New arrivals every single week.',
+          subtitle: 'Stay ahead of the trend. Fresh drops, exclusive deals, and hand-picked collections — updated weekly just for you.',
+          button_text: 'Shop New Arrivals',
+          perks: ['Free Shipping', 'Easy Returns', 'Secure Checkout'],
+        },
       }
     }
   } catch (err: any) {
@@ -379,6 +401,8 @@ async function saveSettings() {
         homepage_features: form.value.homepage_features,
         homepage_stats: form.value.homepage_stats,
         homepage_newsletter: form.value.homepage_newsletter,
+        shop_header: form.value.shop_header,
+        shop_promo: form.value.shop_promo,
       },
     })
 

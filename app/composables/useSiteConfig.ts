@@ -44,6 +44,20 @@ export interface HomepageNewsletter {
   disclaimer: string
 }
 
+export interface ShopHeader {
+  label: string
+  heading: string
+  subtitle: string
+}
+
+export interface ShopPromo {
+  badge: string
+  heading: string
+  subtitle: string
+  button_text: string
+  perks: string[]
+}
+
 export interface SiteConfig {
   id: number
   site_name: string
@@ -71,6 +85,8 @@ export interface SiteConfig {
   homepage_features: HomepageFeatures | null
   homepage_stats: HomepageStats | null
   homepage_newsletter: HomepageNewsletter | null
+  shop_header: ShopHeader | null
+  shop_promo: ShopPromo | null
   updated_at: string
 }
 
