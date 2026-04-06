@@ -8,11 +8,13 @@ export interface SiteTheme {
 }
 
 export interface HomepageStep {
+  icon?: string
   title: string
   description: string
 }
 
 export interface HomepageFeature {
+  icon?: string
   title: string
   description: string
 }
@@ -42,6 +44,30 @@ export interface HomepageNewsletter {
   heading: string
   subtitle: string
   disclaimer: string
+}
+
+export interface AboutHighlightItem {
+  icon?: string
+  title: string
+  description: string
+}
+
+export interface AboutHighlights {
+  items: AboutHighlightItem[]
+}
+
+export interface ContactPagePromise {
+  icon?: string
+  title: string
+  description: string
+}
+
+export interface ContactPage {
+  info_title: string
+  info_subtitle: string
+  info_description: string
+  info_badge: string
+  promises: ContactPagePromise[]
 }
 
 export interface ShopHeader {
@@ -85,6 +111,8 @@ export interface SiteConfig {
   homepage_features: HomepageFeatures | null
   homepage_stats: HomepageStats | null
   homepage_newsletter: HomepageNewsletter | null
+  about_highlights: AboutHighlights | null
+  contact_page: ContactPage | null
   shop_header: ShopHeader | null
   shop_promo: ShopPromo | null
   updated_at: string

@@ -2,8 +2,10 @@
   <div class="space-y-5">
     <AdminSettingsAbout
       :model-value="{ about_image_url: form.about_image_url, about_content: form.about_content }"
+      :highlights="form.about_highlights"
       :media-uploading="mediaUploading"
       @update:model-value="Object.assign(form, $event)"
+      @update:highlights="form.about_highlights = $event"
       @media-select="(f: File, c: MediaCollection) => emit('media-select', f, c)"
       @media-remove="(c: MediaCollection) => emit('media-remove', c)"
     />
@@ -18,9 +20,11 @@
     <AdminSettingsContact
       :image-url="form.contact_image_url"
       :entries="form.contact_entries"
+      :contact-page="form.contact_page"
       :media-uploading="mediaUploading"
       @add-entry="emit('add-contact-entry')"
       @remove-entry="(i: number) => emit('remove-contact-entry', i)"
+      @update:contact-page="form.contact_page = $event"
       @media-select="(f: File, c: MediaCollection) => emit('media-select', f, c)"
       @media-remove="(c: MediaCollection) => emit('media-remove', c)"
     />

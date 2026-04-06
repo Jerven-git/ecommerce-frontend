@@ -217,6 +217,13 @@ const form = ref({
     subtitle: 'Get the latest products, exclusive offers, and updates delivered straight to your inbox.',
     disclaimer: 'No spam, ever. Unsubscribe anytime.',
   },
+  about_highlights: {
+    items: [
+      { icon: 'heroicons:check-circle', title: 'Quality Assured', description: 'Every product is carefully selected and tested.' },
+      { icon: 'heroicons:clock', title: 'Fast Shipping', description: 'Quick delivery straight to your doorstep.' },
+      { icon: 'heroicons:face-smile', title: 'Happy Customers', description: 'Dedicated to your satisfaction, always.' },
+    ],
+  },
   shop_header: {
     label: 'Store',
     heading: 'Shop All Products',
@@ -228,6 +235,17 @@ const form = ref({
     subtitle: 'Stay ahead of the trend. Fresh drops, exclusive deals, and hand-picked collections — updated weekly just for you.',
     button_text: 'Shop New Arrivals',
     perks: ['Free Shipping', 'Easy Returns', 'Secure Checkout'],
+  },
+  contact_page: {
+    info_title: 'Get In Touch',
+    info_subtitle: "We'd love to hear from you",
+    info_description: "Have a question or need assistance? Fill out the form and we'll get back to you as soon as possible.",
+    info_badge: 'Usually responds within 24 hours',
+    promises: [
+      { icon: 'heroicons:bolt', title: 'Fast Response', description: 'We reply to all inquiries within 24 hours, guaranteed.' },
+      { icon: 'heroicons:users', title: 'Expert Help', description: 'Our trained support team is ready to resolve any issue.' },
+      { icon: 'heroicons:lock-closed', title: '100% Private', description: 'Your details are always kept safe and never shared.' },
+    ],
   },
 })
 
@@ -314,22 +332,32 @@ async function loadSettings() {
           welcome_popup_body: response.data.welcome_popup_body || '',
           welcome_popup_discount_id: response.data.welcome_popup_discount_id ?? null,
         },
-        homepage_steps: response.data.homepage_steps ?? {
-          label: 'Simple & Easy', heading: 'How It Works',
-          subtitle: 'Start shopping in just three easy steps — no hassle, no confusion.',
-          items: [
-            { title: 'Browse Products', description: 'Explore our wide selection of quality items across all categories.' },
-            { title: 'Add to Cart', description: 'Pick your favourites and add them to your cart with one click.' },
-            { title: 'Fast Checkout', description: 'Secure payment and fast delivery straight to your doorstep.' },
-          ],
-        },
-        homepage_features: response.data.homepage_features ?? {
-          items: [
-            { title: 'Quality Products', description: 'Carefully curated selection of premium items.' },
-            { title: 'Best Prices', description: 'Competitive pricing on all our products.' },
-            { title: 'Fast Delivery', description: 'Quick and reliable shipping to your doorstep.' },
-          ],
-        },
+        homepage_steps: (() => {
+          const stepIcons = ['heroicons:magnifying-glass', 'heroicons:shopping-cart', 'heroicons:shield-check']
+          const hs = response.data.homepage_steps ?? {
+            label: 'Simple & Easy', heading: 'How It Works',
+            subtitle: 'Start shopping in just three easy steps — no hassle, no confusion.',
+            items: [
+              { icon: stepIcons[0], title: 'Browse Products', description: 'Explore our wide selection of quality items across all categories.' },
+              { icon: stepIcons[1], title: 'Add to Cart', description: 'Pick your favourites and add them to your cart with one click.' },
+              { icon: stepIcons[2], title: 'Fast Checkout', description: 'Secure payment and fast delivery straight to your doorstep.' },
+            ],
+          }
+          hs.items = hs.items.map((item: any, i: number) => ({ icon: stepIcons[i] || 'heroicons:check-circle', ...item }))
+          return hs
+        })(),
+        homepage_features: (() => {
+          const featIcons = ['heroicons:cube', 'heroicons:currency-dollar', 'heroicons:bolt']
+          const hf = response.data.homepage_features ?? {
+            items: [
+              { icon: featIcons[0], title: 'Quality Products', description: 'Carefully curated selection of premium items.' },
+              { icon: featIcons[1], title: 'Best Prices', description: 'Competitive pricing on all our products.' },
+              { icon: featIcons[2], title: 'Fast Delivery', description: 'Quick and reliable shipping to your doorstep.' },
+            ],
+          }
+          hf.items = hf.items.map((item: any, i: number) => ({ icon: featIcons[i] || 'heroicons:check-circle', ...item }))
+          return hf
+        })(),
         homepage_stats: response.data.homepage_stats ?? {
           items: [
             { value: '500+', label: 'Products' },
@@ -343,6 +371,18 @@ async function loadSettings() {
           subtitle: 'Get the latest products, exclusive offers, and updates delivered straight to your inbox.',
           disclaimer: 'No spam, ever. Unsubscribe anytime.',
         },
+        about_highlights: (() => {
+          const fallbackIcons = ['heroicons:check-circle', 'heroicons:clock', 'heroicons:face-smile', 'heroicons:star', 'heroicons:shield-check', 'heroicons:truck']
+          const hl = response.data.about_highlights ?? {
+            items: [
+              { icon: 'heroicons:check-circle', title: 'Quality Assured', description: 'Every product is carefully selected and tested.' },
+              { icon: 'heroicons:clock', title: 'Fast Shipping', description: 'Quick delivery straight to your doorstep.' },
+              { icon: 'heroicons:face-smile', title: 'Happy Customers', description: 'Dedicated to your satisfaction, always.' },
+            ],
+          }
+          hl.items = hl.items.map((item: any, i: number) => ({ icon: fallbackIcons[i] || 'heroicons:check-circle', ...item }))
+          return hl
+        })(),
         shop_header: response.data.shop_header ?? {
           label: 'Store', heading: 'Shop All Products',
           subtitle: 'Browse our full collection of quality items',
@@ -353,6 +393,23 @@ async function loadSettings() {
           button_text: 'Shop New Arrivals',
           perks: ['Free Shipping', 'Easy Returns', 'Secure Checkout'],
         },
+        contact_page: (() => {
+          const promiseIcons = ['heroicons:bolt', 'heroicons:users', 'heroicons:lock-closed']
+          const cp = response.data.contact_page ?? {
+            info_title: 'Get In Touch', info_subtitle: "We'd love to hear from you",
+            info_description: "Have a question or need assistance? Fill out the form and we'll get back to you as soon as possible.",
+            info_badge: 'Usually responds within 24 hours',
+            promises: [
+              { icon: promiseIcons[0], title: 'Fast Response', description: 'We reply to all inquiries within 24 hours, guaranteed.' },
+              { icon: promiseIcons[1], title: 'Expert Help', description: 'Our trained support team is ready to resolve any issue.' },
+              { icon: promiseIcons[2], title: '100% Private', description: 'Your details are always kept safe and never shared.' },
+            ],
+          }
+          if (cp.promises) {
+            cp.promises = cp.promises.map((item: any, i: number) => ({ icon: promiseIcons[i] || 'heroicons:check-circle', ...item }))
+          }
+          return cp
+        })(),
       }
     }
   } catch (err: any) {
@@ -401,8 +458,10 @@ async function saveSettings() {
         homepage_features: form.value.homepage_features,
         homepage_stats: form.value.homepage_stats,
         homepage_newsletter: form.value.homepage_newsletter,
+        about_highlights: form.value.about_highlights,
         shop_header: form.value.shop_header,
         shop_promo: form.value.shop_promo,
+        contact_page: form.value.contact_page,
       },
     })
 

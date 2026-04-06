@@ -17,8 +17,6 @@ export function useScrollReveal(options?: { threshold?: number }) {
   const revealRef = ref<HTMLElement | null>(null)
 
   onMounted(() => {
-    if (!revealRef.value) return
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -31,7 +29,11 @@ export function useScrollReveal(options?: { threshold?: number }) {
       { threshold: options?.threshold ?? 0.15 },
     )
 
-    observer.observe(revealRef.value)
+    // Watch ref so elements that appear after v-if/loading resolves are observed
+    watch(revealRef, (el, oldEl) => {
+      if (oldEl) observer.unobserve(oldEl)
+      if (el) observer.observe(el)
+    }, { immediate: true })
 
     onUnmounted(() => observer.disconnect())
   })
@@ -40,12 +42,18 @@ export function useScrollReveal(options?: { threshold?: number }) {
 }
 
 export function useScrollRevealAll(options?: { threshold?: number }) {
-  const elements: HTMLElement[] = []
+  const pending: Set<HTMLElement> = new Set()
   let observer: IntersectionObserver | null = null
 
   const addRevealRef = (el: any) => {
     if (el instanceof HTMLElement) {
-      elements.push(el)
+      if (observer) {
+        // Observer ready — observe immediately (handles elements created after loading)
+        observer.observe(el)
+      } else {
+        // Collect before observer is ready (initial hydration)
+        pending.add(el)
+      }
     }
   }
 
@@ -62,10 +70,14 @@ export function useScrollRevealAll(options?: { threshold?: number }) {
       { threshold: options?.threshold ?? 0.15 },
     )
 
-    elements.forEach((el) => observer!.observe(el))
+    pending.forEach((el) => observer!.observe(el))
+    pending.clear()
   })
 
-  onUnmounted(() => observer?.disconnect())
+  onUnmounted(() => {
+    observer?.disconnect()
+    observer = null
+  })
 
   return { addRevealRef }
 }

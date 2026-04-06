@@ -39,6 +39,26 @@
           placeholder="Tell your customers about your brand…"
         ></textarea>
       </div>
+
+      <hr class="border-gray-100" />
+
+      <!-- Highlights -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-3">Highlights</label>
+        <div class="space-y-2">
+          <div v-for="(item, i) in highlights.items" :key="i" class="flex items-start gap-3 bg-gray-50 rounded-xl p-3">
+            <AdminIconPicker :model-value="item.icon || 'check'" @update:model-value="updateHighlightItem(i, 'icon', $event)" class="mt-0.5" />
+            <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input :value="item.title" @input="updateHighlightItem(i, 'title', ($event.target as HTMLInputElement).value)" type="text" class="input-field" placeholder="Title" />
+              <input :value="item.description" @input="updateHighlightItem(i, 'description', ($event.target as HTMLInputElement).value)" type="text" class="input-field" placeholder="Description" />
+            </div>
+            <button v-if="highlights.items.length > 1" type="button" class="mt-2 text-gray-300 hover:text-red-500 transition-colors" @click="removeHighlightItem(i)">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+          <button v-if="highlights.items.length < 6" type="button" class="text-xs font-medium text-primary-600 hover:text-primary-700 transition-colors" @click="addHighlightItem">+ Add highlight</button>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -46,20 +66,36 @@
 <script setup lang="ts">
 import type { MediaCollection } from '~/composables/useMediaUpload'
 
+import type { AboutHighlights } from '~/composables/useSiteConfig'
+
 export interface AboutForm {
   about_image_url: string
   about_content: string
 }
 
-interface Props {
+const props = defineProps<{
   modelValue: AboutForm
   mediaUploading: Record<string, boolean>
-}
+  highlights: AboutHighlights
+}>()
 
-defineProps<Props>()
 const emit = defineEmits<{
   'update:modelValue': [value: AboutForm]
+  'update:highlights': [value: AboutHighlights]
   'media-select': [file: File, collection: MediaCollection]
   'media-remove': [collection: MediaCollection]
 }>()
+
+function updateHighlightItem(index: number, key: 'icon' | 'title' | 'description', value: string) {
+  const items = props.highlights.items.map((item, i) => i === index ? { ...item, [key]: value } : item)
+  emit('update:highlights', { items })
+}
+
+function removeHighlightItem(index: number) {
+  emit('update:highlights', { items: props.highlights.items.filter((_, i) => i !== index) })
+}
+
+function addHighlightItem() {
+  emit('update:highlights', { items: [...props.highlights.items, { icon: 'heroicons:check-circle', title: '', description: '' }] })
+}
 </script>

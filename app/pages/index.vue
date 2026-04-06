@@ -143,9 +143,7 @@
               class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 ring-4 ring-white shadow-sm"
               :class="stepColors[i % stepColors.length]!.bg"
             >
-              <svg class="w-6 h-6" :class="stepColors[i % stepColors.length]!.text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="stepIcons[i % stepIcons.length]" />
-              </svg>
+              <Icon :name="step.icon ?? defaultStepIcons[i % defaultStepIcons.length]!" class="w-6 h-6" :class="stepColors[i % stepColors.length]!.text" />
             </div>
             <span class="text-xs font-bold uppercase tracking-wider mb-2" :class="stepColors[i % stepColors.length]!.text">Step {{ i + 1 }}</span>
             <h3 class="text-base font-semibold text-gray-900 mb-1.5">{{ step.title }}</h3>
@@ -177,9 +175,7 @@
               class="w-12 h-12 mb-4 rounded-2xl flex items-center justify-center transition-colors duration-300"
               :class="[featureColors[i % featureColors.length]!.bg, featureColors[i % featureColors.length]!.hoverBg]"
             >
-              <svg class="w-6 h-6" :class="featureColors[i % featureColors.length]!.text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="featureIcons[i % featureIcons.length]" />
-              </svg>
+              <Icon :name="feature.icon ?? defaultFeatureIcons[i % defaultFeatureIcons.length]!" class="w-6 h-6" :class="featureColors[i % featureColors.length]!.text" />
             </div>
             <h3 class="text-base font-semibold text-gray-900 mb-1">{{ feature.title }}</h3>
             <p class="text-gray-500 text-sm">{{ feature.description }}</p>
@@ -210,26 +206,32 @@
         <p class="text-xs font-semibold uppercase tracking-widest text-white mb-3">{{ newsletterLabel }}</p>
         <h2 class="text-3xl md:text-4xl font-bold mb-4">{{ newsletterHeading }}</h2>
         <p class="text-white text-sm mb-8 max-w-sm mx-auto">{{ newsletterSubtitle }}</p>
-        <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" @submit.prevent>
+        <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" @submit.prevent="subscribeNewsletter">
           <input
+            v-model="newsletterEmail"
             type="email"
             placeholder="Enter your email"
             class="flex-1 px-5 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder-white/35 focus:outline-none focus:ring-2 focus:ring-primary-400 transition text-sm"
+            :disabled="newsletterSubmitting"
           />
           <button
             type="submit"
-            class="px-6 py-3 rounded-xl text-sm font-semibold text-white bg-primary-500 hover:bg-primary-400 hover:scale-105 transition-all duration-200 shadow-lg shrink-0"
+            class="px-6 py-3 rounded-xl text-sm font-semibold text-white bg-primary-500 hover:bg-primary-400 hover:scale-105 transition-all duration-200 shadow-lg shrink-0 disabled:opacity-50"
+            :disabled="newsletterSubmitting || !newsletterEmail"
           >
-            Subscribe
+            {{ newsletterSubmitting ? 'Subscribing...' : 'Subscribe' }}
           </button>
         </form>
-        <p class="text-white text-xs mt-4">{{ newsletterDisclaimer }}</p>
+        <p v-if="newsletterMsg" class="text-white text-sm mt-4 font-medium">{{ newsletterMsg }}</p>
+        <p v-else class="text-white text-xs mt-4">{{ newsletterDisclaimer }}</p>
       </div>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { HomepageStep, HomepageFeature } from '~/composables/useSiteConfig'
+
 interface Product {
   id: number
   name: string
@@ -255,9 +257,9 @@ const { $apiFetch } = useNuxtApp()
 const { siteConfig } = useSiteConfig()
 
 // Scroll reveal
-// const { revealRef: featuredHeadingRef } = useScrollReveal()
-// const { revealRef: howItWorksHeadingRef } = useScrollReveal()
-// const { revealRef: newsletterRef } = useScrollReveal()
+const { revealRef: featuredHeadingRef } = useScrollReveal()
+const { revealRef: howItWorksHeadingRef } = useScrollReveal()
+const { revealRef: newsletterRef } = useScrollReveal()
 const { addRevealRef } = useScrollRevealAll()
 
 const stepColors = [
@@ -266,10 +268,10 @@ const stepColors = [
   { bg: 'bg-purple-50', text: 'text-purple-600' },
 ]
 
-const stepIcons = [
-  'M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z',
-  'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13M7 13L5.4 5M17 21a1 1 0 100-2 1 1 0 000 2zm-10 0a1 1 0 100-2 1 1 0 000 2z',
-  'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+const defaultStepIcons = [
+  'heroicons:magnifying-glass',
+  'heroicons:shopping-cart',
+  'heroicons:shield-check',
 ]
 
 const featureColors = [
@@ -278,22 +280,22 @@ const featureColors = [
   { bg: 'bg-purple-50', hoverBg: 'group-hover:bg-purple-100', text: 'text-purple-600', border: 'hover:border-purple-100' },
 ]
 
-const featureIcons = [
-  'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4',
-  'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-  'M13 10V3L4 14h7v7l9-11h-7z',
+const defaultFeatureIcons = [
+  'heroicons:cube',
+  'heroicons:currency-dollar',
+  'heroicons:bolt',
 ]
 
-const defaultSteps = [
-  { title: 'Browse Products', description: 'Explore our wide selection of quality items across all categories.' },
-  { title: 'Add to Cart', description: 'Pick your favourites and add them to your cart with one click.' },
-  { title: 'Fast Checkout', description: 'Secure payment and fast delivery straight to your doorstep.' },
+const defaultSteps: HomepageStep[] = [
+  { icon: 'heroicons:magnifying-glass', title: 'Browse Products', description: 'Explore our wide selection of quality items across all categories.' },
+  { icon: 'heroicons:shopping-cart', title: 'Add to Cart', description: 'Pick your favourites and add them to your cart with one click.' },
+  { icon: 'heroicons:shield-check', title: 'Fast Checkout', description: 'Secure payment and fast delivery straight to your doorstep.' },
 ]
 
-const defaultFeatures = [
-  { title: 'Quality Products', description: 'Carefully curated selection of premium items.' },
-  { title: 'Best Prices', description: 'Competitive pricing on all our products.' },
-  { title: 'Fast Delivery', description: 'Quick and reliable shipping to your doorstep.' },
+const defaultFeatures: HomepageFeature[] = [
+  { icon: 'heroicons:cube', title: 'Quality Products', description: 'Carefully curated selection of premium items.' },
+  { icon: 'heroicons:currency-dollar', title: 'Best Prices', description: 'Competitive pricing on all our products.' },
+  { icon: 'heroicons:bolt', title: 'Fast Delivery', description: 'Quick and reliable shipping to your doorstep.' },
 ]
 
 const defaultStats = [
@@ -318,6 +320,28 @@ const newsletterLabel = computed(() => newsletterConfig.value?.label || 'Stay in
 const newsletterHeading = computed(() => newsletterConfig.value?.heading || "Don't miss a deal.")
 const newsletterSubtitle = computed(() => newsletterConfig.value?.subtitle || 'Get the latest products, exclusive offers, and updates delivered straight to your inbox.')
 const newsletterDisclaimer = computed(() => newsletterConfig.value?.disclaimer || 'No spam, ever. Unsubscribe anytime.')
+
+const newsletterEmail = ref('')
+const newsletterSubmitting = ref(false)
+const newsletterMsg = ref('')
+
+async function subscribeNewsletter() {
+  if (!newsletterEmail.value || newsletterSubmitting.value) return
+  newsletterSubmitting.value = true
+  newsletterMsg.value = ''
+  try {
+    const res = await $apiFetch<{ message: string }>('/subscribe', {
+      method: 'POST',
+      body: { email: newsletterEmail.value, source: 'newsletter' },
+    })
+    newsletterMsg.value = res.message || 'Subscribed successfully!'
+    newsletterEmail.value = ''
+  } catch (err: any) {
+    newsletterMsg.value = err?.data?.message || 'Something went wrong. Please try again.'
+  } finally {
+    newsletterSubmitting.value = false
+  }
+}
 
 const products = ref<Product[]>([])
 const loading = ref(true)
