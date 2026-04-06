@@ -32,7 +32,7 @@
         </div>
         <div class="space-y-3">
           <div v-for="(step, i) in localSteps.items" :key="i" class="flex items-start gap-3 bg-gray-50 rounded-xl p-3">
-            <span class="text-xs font-bold text-gray-400 mt-2.5 shrink-0 w-5 text-center">{{ i + 1 }}</span>
+            <AdminIconPicker :model-value="step.icon || DEFAULT_ICON" @update:model-value="updateStepItem(i, 'icon', $event)" class="mt-0.5" />
             <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <input :value="step.title" @input="updateStepItem(i, 'title', ($event.target as HTMLInputElement).value)" type="text" class="input-field" placeholder="Step title" />
               <input :value="step.description" @input="updateStepItem(i, 'description', ($event.target as HTMLInputElement).value)" type="text" class="input-field" placeholder="Step description" />
@@ -52,7 +52,7 @@
         <h3 class="text-sm font-semibold text-gray-800 mb-4">Features</h3>
         <div class="space-y-3">
           <div v-for="(feature, i) in localFeatures.items" :key="i" class="flex items-start gap-3 bg-gray-50 rounded-xl p-3">
-            <span class="text-xs font-bold text-gray-400 mt-2.5 shrink-0 w-5 text-center">{{ i + 1 }}</span>
+            <AdminIconPicker :model-value="feature.icon || DEFAULT_ICON" @update:model-value="updateFeatureItem(i, 'icon', $event)" class="mt-0.5" />
             <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <input :value="feature.title" @input="updateFeatureItem(i, 'title', ($event.target as HTMLInputElement).value)" type="text" class="input-field" placeholder="Feature title" />
               <input :value="feature.description" @input="updateFeatureItem(i, 'description', ($event.target as HTMLInputElement).value)" type="text" class="input-field" placeholder="Feature description" />
@@ -115,6 +115,7 @@
 
 <script setup lang="ts">
 import type { HomepageSteps, HomepageFeatures, HomepageStats, HomepageNewsletter } from '~/composables/useSiteConfig'
+import { DEFAULT_ICON } from '~/composables/useHighlightIcons'
 
 interface Props {
   steps: HomepageSteps
@@ -141,24 +142,24 @@ const localNewsletter = computed(() => props.newsletter)
 function updateStepsField(key: 'label' | 'heading' | 'subtitle', value: string) {
   emit('update:steps', { ...localSteps.value, [key]: value })
 }
-function updateStepItem(index: number, key: 'title' | 'description', value: string) {
+function updateStepItem(index: number, key: 'icon' | 'title' | 'description', value: string) {
   const items = localSteps.value.items.map((item, i) => i === index ? { ...item, [key]: value } : item)
   emit('update:steps', { ...localSteps.value, items })
 }
 function addStepItem() {
-  emit('update:steps', { ...localSteps.value, items: [...localSteps.value.items, { title: '', description: '' }] })
+  emit('update:steps', { ...localSteps.value, items: [...localSteps.value.items, { icon: DEFAULT_ICON, title: '', description: '' }] })
 }
 function removeStepItem(index: number) {
   emit('update:steps', { ...localSteps.value, items: localSteps.value.items.filter((_, i) => i !== index) })
 }
 
 // Features
-function updateFeatureItem(index: number, key: 'title' | 'description', value: string) {
+function updateFeatureItem(index: number, key: 'icon' | 'title' | 'description', value: string) {
   const items = localFeatures.value.items.map((item, i) => i === index ? { ...item, [key]: value } : item)
   emit('update:features', { items })
 }
 function addFeatureItem() {
-  emit('update:features', { items: [...localFeatures.value.items, { title: '', description: '' }] })
+  emit('update:features', { items: [...localFeatures.value.items, { icon: DEFAULT_ICON, title: '', description: '' }] })
 }
 function removeFeatureItem(index: number) {
   emit('update:features', { items: localFeatures.value.items.filter((_, i) => i !== index) })

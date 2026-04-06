@@ -157,7 +157,7 @@ async function handleSubmit() {
   try {
     const res = await $apiFetch<{ discount_code: string | null }>('/subscribe', {
       method: 'POST',
-      body: { email: email.value },
+      body: { email: email.value, source: 'welcome_popup' },
     })
 
     if (res.discount_code) {

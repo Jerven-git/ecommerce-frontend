@@ -58,7 +58,7 @@
             </svg>
           </div>
           <p class="text-sm font-medium text-red-600 mb-4">{{ error }}</p>
-          <button @click="fetchSiteConfig" class="btn-primary">Retry</button>
+          <button @click="fetchSiteConfig()" class="btn-primary">Retry</button>
         </div>
 
         <!-- Content -->
@@ -84,36 +84,21 @@
             </div>
           </div>
 
-          <!-- Feature Cards -->
+          <!-- Highlight Cards -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div :ref="addRevealRef" class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-primary-100 transition-all duration-300" style="transition-delay: 0.1s">
-              <div class="w-12 h-12 mb-4 rounded-2xl bg-primary-50 flex items-center justify-center group-hover:bg-primary-100 transition-colors duration-300">
-                <svg class="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+            <div
+              v-for="(item, i) in highlights"
+              :key="i"
+              :ref="addRevealRef"
+              class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-all duration-300"
+              :class="cardStyles[i % cardStyles.length]!.hover"
+              :style="{ transitionDelay: `${0.1 + i * 0.15}s` }"
+            >
+              <div class="w-12 h-12 mb-4 rounded-2xl flex items-center justify-center transition-colors duration-300" :class="cardStyles[i % cardStyles.length]!.icon">
+                <Icon :name="item.icon || DEFAULT_ICON" class="w-6 h-6" />
               </div>
-              <h3 class="text-base font-semibold text-gray-900 mb-1">Quality Assured</h3>
-              <p class="text-sm text-gray-500">Every product is carefully selected and tested.</p>
-            </div>
-
-            <div :ref="addRevealRef" class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-emerald-100 transition-all duration-300" style="transition-delay: 0.25s">
-              <div class="w-12 h-12 mb-4 rounded-2xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 transition-colors duration-300">
-                <svg class="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 class="text-base font-semibold text-gray-900 mb-1">Fast Shipping</h3>
-              <p class="text-sm text-gray-500">Quick delivery straight to your doorstep.</p>
-            </div>
-
-            <div :ref="addRevealRef" class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-purple-100 transition-all duration-300" style="transition-delay: 0.4s">
-              <div class="w-12 h-12 mb-4 rounded-2xl bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition-colors duration-300">
-                <svg class="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 class="text-base font-semibold text-gray-900 mb-1">Happy Customers</h3>
-              <p class="text-sm text-gray-500">Dedicated to your satisfaction, always.</p>
+              <h3 class="text-base font-semibold text-gray-900 mb-1">{{ item.title }}</h3>
+              <p class="text-sm text-gray-500">{{ item.description }}</p>
             </div>
           </div>
         </div>
@@ -128,6 +113,23 @@ const { siteConfig, pending: loading, fetchSiteConfig } = useSiteConfig()
 // Scroll reveal
 const { revealRef: storyCardRef } = useScrollReveal()
 const { addRevealRef } = useScrollRevealAll()
+
+import type { AboutHighlightItem } from '~/composables/useSiteConfig'
+import { DEFAULT_ICON } from '~/composables/useHighlightIcons'
+
+const defaultHighlights: AboutHighlightItem[] = [
+  { icon: 'heroicons:check-circle', title: 'Quality Assured', description: 'Every product is carefully selected and tested.' },
+  { icon: 'heroicons:clock', title: 'Fast Shipping', description: 'Quick delivery straight to your doorstep.' },
+  { icon: 'heroicons:face-smile', title: 'Happy Customers', description: 'Dedicated to your satisfaction, always.' },
+]
+
+const highlights = computed(() => siteConfig.value?.about_highlights?.items?.length ? siteConfig.value.about_highlights.items : defaultHighlights)
+
+const cardStyles = [
+  { icon: 'bg-primary-50 text-primary-600 group-hover:bg-primary-100', hover: 'hover:border-primary-100' },
+  { icon: 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100', hover: 'hover:border-emerald-100' },
+  { icon: 'bg-purple-50 text-purple-600 group-hover:bg-purple-100', hover: 'hover:border-purple-100' },
+]
 
 const error = ref<string | null>(null)
 const imageLoading = ref(false)
