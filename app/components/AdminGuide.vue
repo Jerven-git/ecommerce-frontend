@@ -336,7 +336,12 @@ const focusStep = async () => {
   const s = currentStep.value
   const route = useRoute()
 
-  if (route.path !== s.route) {
+  // Compare full path + query to handle tab/sub-tab switching
+  const stepPath = s.route.split('?')[0]
+  const currentUrl = route.fullPath.split('#')[0]
+  const needsNav = route.path !== stepPath || currentUrl !== s.route
+
+  if (needsNav) {
     transitioning.value = true
     await navigateTo(s.route)
     await new Promise(r => setTimeout(r, 150))
