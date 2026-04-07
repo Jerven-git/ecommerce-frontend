@@ -63,14 +63,6 @@
         :form="form"
       />
 
-      <AdminSettingsTabsHomepageTab
-        v-show="activeTab === 'homepage'"
-        :form="form"
-        :media-uploading="media.uploading"
-        @media-select="onMediaSelect"
-        @media-remove="onMediaRemove"
-      />
-
       <AdminSettingsTabsPagesTab
         v-show="activeTab === 'pages'"
         :form="form"
@@ -120,14 +112,32 @@ const router = useRouter()
 const tabs = [
   { id: 'general', label: 'General', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
   { id: 'appearance', label: 'Appearance', icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01' },
-  { id: 'homepage', label: 'Homepage', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6' },
   { id: 'pages', label: 'Pages', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
   { id: 'popup', label: 'Popup', icon: 'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7' },
 ] as const
 
 type TabId = typeof tabs[number]['id']
 
-const activeTab = ref<TabId>((route.query.tab as TabId) || 'general')
+// Redirect legacy ?tab=homepage to ?tab=pages&sub=homepage
+const initialTab = (() => {
+  const t = route.query.tab as string
+  if (t === 'homepage') return 'pages'
+  return (t as TabId) || 'general'
+})()
+
+const activeTab = ref<TabId>(initialTab)
+
+// If redirecting from homepage tab, set sub query
+if (route.query.tab === 'homepage') {
+  router.replace({ query: { ...route.query, tab: 'pages', sub: 'homepage' } })
+}
+
+// Sync activeTab when route query changes (e.g. from admin guide navigation)
+watch(() => route.query.tab, (tab) => {
+  if (tab && tab !== activeTab.value) {
+    activeTab.value = tab as TabId
+  }
+})
 
 watch(activeTab, (tab) => {
   router.replace({ query: { ...route.query, tab } })
