@@ -7,8 +7,10 @@ export function useCheckoutShipping(
   const { $apiFetch } = useNuxtApp()
   const cartStore = useCartStore()
 
-  const shippingOptions = ref<any[]>([])
-  const selectedShippingOptions = ref<string[]>([])
+  const shippingMethods = ref<any[]>([])
+  const shippingAddOns = ref<any[]>([])
+  const selectedShippingMethod = ref<string>('standard')
+  const selectedShippingAddOns = ref<string[]>([])
 
   let shippingDebounceTimer: ReturnType<typeof setTimeout>
 
@@ -44,32 +46,46 @@ export function useCheckoutShipping(
   watch(deliveryMethod, (newMethod) => {
     if (newMethod === 'pickup') {
       cartStore.shippingCalculation = null
-      selectedShippingOptions.value = []
+      selectedShippingMethod.value = 'standard'
+      selectedShippingAddOns.value = []
+      cartStore.setShippingMethod('standard')
       cartStore.setShippingOptions([])
     } else {
       debouncedShippingUpdate()
     }
   })
 
-  const updateShippingOptions = () => {
+  const updateShippingMethod = () => {
     if (deliveryMethod.value === 'delivery') {
-      cartStore.setShippingOptions(selectedShippingOptions.value)
+      cartStore.setShippingMethod(selectedShippingMethod.value)
+    }
+  }
+
+  const updateShippingAddOns = () => {
+    if (deliveryMethod.value === 'delivery') {
+      cartStore.setShippingOptions(selectedShippingAddOns.value)
     }
   }
 
   const loadShippingOptions = async () => {
     try {
       const response = await $apiFetch<any>('/shipping/options', { method: 'GET' })
-      if (response?.data) shippingOptions.value = response.data
+      if (response?.data) {
+        shippingMethods.value = response.data.methods ?? []
+        shippingAddOns.value = response.data.add_ons ?? []
+      }
     } catch (err) {
       console.error('Error loading shipping options:', err)
     }
   }
 
   return {
-    shippingOptions,
-    selectedShippingOptions,
-    updateShippingOptions,
+    shippingMethods,
+    shippingAddOns,
+    selectedShippingMethod,
+    selectedShippingAddOns,
+    updateShippingMethod,
+    updateShippingAddOns,
     loadShippingOptions,
   }
 }

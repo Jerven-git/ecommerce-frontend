@@ -83,9 +83,12 @@
 
             <CheckoutShippingOptions
               v-if="deliveryMethod === 'delivery'"
-              :options="shippingOptions"
-              v-model="selectedShippingOptions"
-              @update:model-value="updateShippingOptions"
+              :methods="shippingMethods"
+              :add-ons="shippingAddOns"
+              :selected-method="selectedShippingMethod"
+              :selected-add-ons="selectedShippingAddOns"
+              @update:selected-method="selectedShippingMethod = $event; updateShippingMethod()"
+              @update:selected-add-ons="selectedShippingAddOns = $event; updateShippingAddOns()"
             />
 
             <CheckoutPaymentSection
@@ -171,8 +174,10 @@ const {
 } = useCheckoutForm()
 
 const {
-  shippingOptions, selectedShippingOptions,
-  updateShippingOptions, loadShippingOptions
+  shippingMethods, shippingAddOns,
+  selectedShippingMethod, selectedShippingAddOns,
+  updateShippingMethod, updateShippingAddOns,
+  loadShippingOptions
 } = useCheckoutShipping(form, deliveryMethod)
 
 const {
@@ -190,7 +195,8 @@ const {
   placeDeferredBackorder, placeCashOrder
 } = useCheckoutOrder({
   form, deliveryMethod, phoneDialCode,
-  selectedShippingOptions, appliedDiscount, discountAmount,
+  selectedShippingMethod, selectedShippingAddOns,
+  appliedDiscount, discountAmount,
   saveDetailsToStorage
 })
 

@@ -5,7 +5,8 @@ interface UseCheckoutOrderOptions {
   form: Ref<CheckoutFormData>
   deliveryMethod: Ref<'delivery' | 'pickup'>
   phoneDialCode: Ref<string>
-  selectedShippingOptions: Ref<string[]>
+  selectedShippingMethod: Ref<string>
+  selectedShippingAddOns: Ref<string[]>
   appliedDiscount: Ref<AppliedDiscount | null>
   discountAmount: ComputedRef<number>
   saveDetailsToStorage?: () => void
@@ -17,7 +18,8 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
 
   const {
     form, deliveryMethod, phoneDialCode,
-    selectedShippingOptions, appliedDiscount, discountAmount,
+    selectedShippingMethod, selectedShippingAddOns,
+    appliedDiscount, discountAmount,
     saveDetailsToStorage
   } = opts
 
@@ -146,8 +148,11 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
         product_id: item.id,
         quantity: item.quantity
       })),
+      shipping_method: deliveryMethod.value === 'delivery'
+        ? selectedShippingMethod.value
+        : 'standard',
       shipping_options: deliveryMethod.value === 'delivery'
-        ? selectedShippingOptions.value
+        ? selectedShippingAddOns.value
         : [],
       discount_code: appliedDiscount.value?.code ?? null
     }
