@@ -135,7 +135,7 @@ export const guideSteps: GuideStep[] = [
     description: 'Your full product list. See price, stock, weight, category, and status at a glance.',
     icon: icons.table, iconBg: 'bg-primary-50',
     route: '/admin/products', target: '[data-guide="product-table"]', prefer: 'top',
-    tips: ['Click Edit to modify any product', 'Click Delete to remove (with confirmation)', 'Pagination at the bottom for large catalogues'],
+    tips: ['Click Edit to modify any product', 'Click Delete to remove (with confirmation)', 'Use the page navigation at the bottom to browse large catalogues'],
   },
 
   // ── Categories ───────────────────────────────────────────
@@ -144,11 +144,11 @@ export const guideSteps: GuideStep[] = [
     description: 'Type a name and click Add to create a root category. You can nest subcategories inside any category.',
     icon: icons.tag, iconBg: 'bg-purple-50',
     route: '/admin/categories', target: '[data-guide="add-category"]', prefer: 'bottom',
-    tips: ['Type a name and press Add or Enter', 'Categories can be nested to any depth'],
+    tips: ['Type a name and press Add or Enter', 'You can place categories inside other categories, as deep as you need'],
   },
   {
     title: 'Category Tree',
-    description: 'Your category hierarchy. Expand, collapse, rename, delete, or add child categories inline.',
+    description: 'Your full category list. Expand, collapse, rename, delete, or add sub-categories right here.',
     icon: icons.list, iconBg: 'bg-purple-50',
     route: '/admin/categories', target: '[data-guide="category-tree"]', prefer: 'right',
     tips: ['Click the arrow to expand/collapse children', 'Use edit, delete, and add-child buttons on each row', 'Search bar at the top to find categories quickly'],
@@ -183,7 +183,7 @@ export const guideSteps: GuideStep[] = [
     description: 'Configure how backorders work — enable/disable them and set payment link expiry time.',
     icon: icons.gearAmb, iconBg: 'bg-amber-50',
     route: '/admin/backorders', target: '[data-guide="backorder-settings-btn"]', prefer: 'bottom',
-    tips: ['Enable or disable backorders globally', 'Set how long payment links stay valid', 'Send payment links to customers when stock arrives'],
+    tips: ['Turn backorders on or off for your whole store', 'Set how long payment links stay valid', 'Send payment links to customers when stock arrives'],
   },
 
   // ── Discounts ────────────────────────────────────────────
@@ -237,28 +237,28 @@ export const guideSteps: GuideStep[] = [
     description: 'Edit How It Works, Features, Stats, and Newsletter sections directly in a visual display.',
     icon: icons.grid, iconBg: 'bg-amber-50',
     route: '/admin/settings?tab=pages&sub=homepage', target: '[data-guide="settings-homepage-sections"]', prefer: 'right',
-    tips: ['Click any text to edit it inline — no separate form fields', 'Hover a card to reveal the delete button', 'Click the "+" card to add new steps, features, or stats', 'Icons are clickable — pick from the icon library', 'Changes preview live as you type'],
+    tips: ['Click any text to edit it right on the page', 'Hover and click cards to manage edits', 'Icons are clickable — pick from the icon library', 'Changes preview live as you type'],
   },
   {
     title: 'About Page',
     description: 'Tell your story with a visual editor. Edit text and highlights right inside the display cards.',
     icon: icons.info, iconBg: 'bg-amber-50',
     route: '/admin/settings?tab=pages&sub=about', target: '[data-guide="settings-about"]', prefer: 'right',
-    tips: ['Upload an about image (recommended 800×600 px)', 'Click the story text to edit it inline', 'Highlight cards show as they appear on the page — click to edit titles and descriptions', 'Hover a highlight card to delete, or click "+" to add more'],
+    tips: ['Upload an about image (recommended 800×600 pixels)', 'Click the story text to edit it directly', 'Highlight cards show as they appear on the page — click to edit titles and descriptions', 'Hover a highlight card to delete, or click "+" to add more'],
   },
   {
     title: 'Shop Page — Header & Promo',
-    description: 'Your shop page has a visual editor too! Edit the page header and the promo banner at the bottom of the shop — all inline.',
+    description: 'Your shop page has a visual editor too! Edit the page header and the promo banner at the bottom of the shop — just click any text to change it.',
     icon: icons.store, iconBg: 'bg-blue-50',
     route: '/admin/settings?tab=pages&sub=shop', target: '[data-guide="settings-shop"]', prefer: 'right',
-    tips: ['The page header shows label, heading, and subtitle — click to edit each one', 'The promo banner uses your actual theme colors for a live preview', 'Perks appear as editable pills — hover to delete, click "+" to add', 'The CTA button text is editable right inside the button'],
+    tips: ['The page header shows label, heading, and subtitle — click to edit each one', 'The promo banner uses your actual theme colors for a live preview', 'Perks appear as editable pills — hover to delete, click "+" to add', 'Click the button text to change what it says'],
   },
   {
     title: 'Contact Page — Info & Promises',
     description: 'Edit your contact page just like the others. The info card, contact entries, and support promises are all visual editors.',
     icon: icons.mail, iconBg: 'bg-blue-50',
     route: '/admin/settings?tab=pages&sub=contact', target: '[data-guide="settings-contact"]', prefer: 'right',
-    tips: ['The info card header has editable title and subtitle', 'Contact entries show with email and phone icons — click to edit, hover to delete', 'Add multiple contact departments (Sales, Support, etc.)', 'Support promises appear on the dark strip — edit text and pick icons inline'],
+    tips: ['The info card header has editable title and subtitle', 'Contact entries show with email and phone icons — click to edit, hover to delete', 'Add multiple contact departments (Sales, Support, etc.)', 'Support promises appear on the dark strip — click to edit the text and choose icons'],
   },
   {
     title: 'Feature Toggles',
@@ -272,14 +272,14 @@ export const guideSteps: GuideStep[] = [
     description: 'Show a discount popup to first-time visitors. They enter their email and get a unique single-use discount code instantly.',
     icon: icons.tagPink, iconBg: 'bg-amber-50',
     route: '/admin/settings?tab=popup', target: '[data-guide="settings-welcome-popup"]', prefer: 'right',
-    tips: ['Toggle the popup on or off', 'Customize the heading and body text', 'Link a discount — each subscriber gets a unique single-use code cloned from it', 'The popup shows once per visitor (stored in browser)'],
+    tips: ['Turn the popup on or off', 'Customize the heading and body text', 'Link a discount — each subscriber gets their own unique, one-time discount code based on it', 'The popup only shows once to each visitor'],
   },
   {
     title: 'Save Changes',
     description: 'Don\'t forget to save! The save bar sticks to the bottom of the page whenever you have unsaved changes.',
     icon: icons.check, iconBg: 'bg-green-50',
     route: '/admin/settings?tab=general', target: '[data-guide="settings-save"]', prefer: 'top',
-    tips: ['Click "Save Changes" to persist your edits', 'Use "Reset" to discard unsaved changes', 'A green confirmation appears on success'],
+    tips: ['Click "Save Changes" to save your edits', 'Use "Reset" to undo any unsaved changes', 'A green confirmation appears when saving is successful'],
   },
 
   // ── Shipping ─────────────────────────────────────────────
@@ -295,7 +295,7 @@ export const guideSteps: GuideStep[] = [
     description: 'Define rates for different regions — own city, state, country, and international.',
     icon: icons.globe, iconBg: 'bg-blue-50',
     route: '/admin/shipping', target: '[data-guide="shipping-zones"]', prefer: 'right',
-    tips: ['Enable/disable each zone with the toggle', 'Set a base rate plus optional per-kg and per-cbm rates', 'Your store location determines how zones are calculated'],
+    tips: ['Turn each zone on or off with the toggle', 'Set a base rate, plus optional per-kilogram and per-cubic-meter rates', 'Your store location determines how zones are calculated'],
   },
 
   // ── Tax ──────────────────────────────────────────────────
@@ -304,14 +304,14 @@ export const guideSteps: GuideStep[] = [
     description: 'Enable tax and set your default rate. Choose whether prices include or exclude tax.',
     icon: icons.calc, iconBg: 'bg-amber-50',
     route: '/admin/tax-settings', target: '[data-guide="tax-config"]', prefer: 'right',
-    tips: ['Toggle to enable/disable tax globally', 'Set a percentage rate (e.g., 12% VAT, 10% GST)', 'Choose inclusive (tax baked into price) or exclusive (added at checkout)', 'Customize the tax label shown to customers'],
+    tips: ['Turn tax on or off for your whole store', 'Set a percentage rate (e.g., 12% VAT, 10% GST)', 'Choose inclusive (tax already included in the price) or exclusive (added at checkout)', 'Customize the tax label shown to customers'],
   },
   {
     title: 'Regional Tax Rules',
     description: 'Selling to multiple countries? Set different tax rates per country or state.',
     icon: icons.globe, iconBg: 'bg-blue-50',
     route: '/admin/tax-settings', target: '[data-guide="tax-regional"]', prefer: 'right',
-    tips: ['Optional — skip this if you only sell in one country', 'Add country rules with their own rate, name, and mode', 'Expand a country to add state-level overrides', 'Most specific rule wins: state > country > all regions > global default'],
+    tips: ['Optional — skip this if you only sell in one country', 'Optional — skip this if you do not sell enough in any other country or state or do not qualify for tax implications there', 'Add country rules with their own rate, name, and mode', 'Expand a country to add state-level rules', 'Most specific rule wins: state > country > all regions > global default'],
   },
   {
     title: 'Tax Preview',
@@ -336,14 +336,14 @@ export const guideSteps: GuideStep[] = [
     description: 'Toggle which payment options are available at checkout. Enable at least one before going live.',
     icon: icons.card, iconBg: 'bg-green-50',
     route: '/admin/payment-settings', target: '[data-guide="payment-methods"]', prefer: 'right',
-    tips: ['Cash: accept payment on delivery or pickup', 'Stripe: credit/debit cards (needs API key in .env)', 'PayPal: online payments (needs client ID in .env)', 'Square: alternative card processor (needs access token in .env)'],
+    tips: ['Cash: accept payment on delivery or pickup', 'Stripe: credit/debit cards', 'PayPal: online payments', 'Square: alternative card processor'],
   },
   {
     title: 'Security Notice',
-    description: 'API keys are stored securely in your server environment, not in the database. Always use sandbox mode for testing.',
+    description: 'Your payment provider keys are stored safely on your server, not in the database. Always test in practice mode before accepting real payments.',
     icon: icons.lock, iconBg: 'bg-red-50',
     route: '/admin/payment-settings', target: '[data-guide="payment-security"]', prefer: 'top',
-    tips: ['Set API keys via server environment variables only', 'Never expose keys in client-side code', 'Test with sandbox/test mode before going live'],
+    tips: ['Your developer should set up your payment keys on the server', 'Never share your payment keys publicly or in messages', 'Always test in practice mode before going live'],
   },
 
   // ── Finish ───────────────────────────────────────────────

@@ -37,9 +37,11 @@ interface ShippingCalculation {
   base_shipping: number
   weight_fee: number
   volume_fee: number
-  options_fee: number
+  method_fee: number
+  add_ons_fee: number
   total: number
   free_shipping: boolean
+  method: string
 }
 
 export const useCartStore = defineStore('cart', {
@@ -48,6 +50,7 @@ export const useCartStore = defineStore('cart', {
     _taxRequestId: 0,
     taxCalculation: null as TaxCalculation | null,
     shippingCalculation: null as ShippingCalculation | null,
+    shippingMethod: 'standard' as string,
     shippingOptions: [] as string[],
     shippingAddress: null as { country: string; state: string; city: string; postcode?: string } | null,
     shippingError: null as string | null,
@@ -251,6 +254,7 @@ export const useCartStore = defineStore('cart', {
             weight: this.totalWeight,
             volume_cbm: this.totalVolumeCbm,
             order_amount: this.rawSubtotal,
+            method: this.shippingMethod,
             options: this.shippingOptions
           }
         })
@@ -270,6 +274,11 @@ export const useCartStore = defineStore('cart', {
       }
     },
 
+    setShippingMethod(method: string) {
+      this.shippingMethod = method
+      this.calculateShipping()
+    },
+
     setShippingOptions(options: string[]) {
       this.shippingOptions = options
       this.calculateShipping()
@@ -281,6 +290,7 @@ export const useCartStore = defineStore('cart', {
       this.shippingAddress = null
       this.shippingCalculation = null
       this.shippingError = null
+      this.shippingMethod = 'standard'
       this.shippingOptions = []
     }
   }
