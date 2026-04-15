@@ -93,6 +93,9 @@ export interface SiteConfig {
   cart_icon_url: string | null
   hero_title: string | null
   hero_subtitle: string | null
+  hero_overlay_color: string
+  hero_overlay_opacity: number
+  hero_full_bleed: boolean
   hero_image_url: string | null
   hero_media_mime: string | null
   about_content: string | null

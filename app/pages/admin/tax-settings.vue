@@ -333,43 +333,13 @@
       </section>
     </div>
 
-    <!-- Sticky footer -->
-    <div class="fixed bottom-0 left-0 right-0 z-10 bg-white/80 backdrop-blur-md border-t border-gray-200">
-      <div class="max-w-screen-xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
-        <div class="flex items-center gap-2 min-w-0">
-          <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 translate-y-1" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition duration-150 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
-            <div v-if="success" class="flex items-center gap-1.5 text-green-600 text-sm font-medium">
-              <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              Tax settings saved
-            </div>
-          </Transition>
-          <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 translate-y-1" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition duration-150 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
-            <div v-if="saveError" class="flex items-center gap-1.5 text-red-500 text-sm font-medium truncate">
-              <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span class="truncate">{{ saveError }}</span>
-            </div>
-          </Transition>
-        </div>
-        <div class="flex items-center gap-2 shrink-0">
-          <button @click="loadAll" :disabled="saving" class="btn-secondary">Reset</button>
-          <button
-            @click="saveAll"
-            :disabled="saving"
-            class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
-          >
-            <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            {{ saving ? 'Saving...' : 'Save Changes' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <AdminSettingsSaveFooter
+      :saving="saving"
+      @save="saveAll"
+      @reset="loadAll"
+    />
+
+    <AdminToast />
   </div>
 </template>
 
@@ -383,10 +353,10 @@ const { getStates } = useRegions()
 
 // --- State ---
 
+const { showToast } = useAdminToast()
+
 const loading = ref(true)
 const saving = ref(false)
-const success = ref(false)
-const saveError = ref<string | null>(null)
 const showRegional = ref(false)
 const previewPrice = ref(100)
 
@@ -508,7 +478,6 @@ function removeStateRule(country: string, sIdx: number) {
 
 async function loadAll() {
   loading.value = true
-  saveError.value = null
 
   try {
     const [settingsRes, rulesRes] = await Promise.all([
@@ -558,7 +527,7 @@ async function loadAll() {
     }
   } catch (err: any) {
     console.error('Error loading tax settings:', err)
-    saveError.value = err?.data?.message || 'Failed to load tax settings'
+    showToast(err?.data?.message || 'Failed to load tax settings', 'error')
   } finally {
     loading.value = false
   }
@@ -566,8 +535,6 @@ async function loadAll() {
 
 async function saveAll() {
   saving.value = true
-  success.value = false
-  saveError.value = null
 
   try {
     await $apiFetch('/tax-settings', {
@@ -612,12 +579,11 @@ async function saveAll() {
 
     await $apiFetch('/tax-rules/sync', { method: 'POST', body: { rules: allRules } })
 
-    success.value = true
-    setTimeout(() => { success.value = false }, 3000)
+    showToast('Tax settings saved', 'success')
     await loadAll()
   } catch (err: any) {
     console.error('Error saving tax settings:', err)
-    saveError.value = err?.data?.message || 'Failed to save tax settings'
+    showToast(err?.data?.message || 'Failed to save tax settings', 'error')
   } finally {
     saving.value = false
   }

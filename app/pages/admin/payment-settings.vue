@@ -227,60 +227,13 @@
       </div>
     </div>
 
-    <!-- Sticky footer -->
-    <div class="fixed bottom-0 left-0 right-0 z-10 bg-white/80 backdrop-blur-md border-t border-gray-200">
-      <div class="max-w-screen-xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
-        <!-- Feedback -->
-        <div class="flex items-center gap-2 min-w-0">
-          <Transition
-            enter-active-class="transition duration-200 ease-out"
-            enter-from-class="opacity-0 translate-y-1"
-            enter-to-class="opacity-100 translate-y-0"
-            leave-active-class="transition duration-150 ease-in"
-            leave-from-class="opacity-100"
-            leave-to-class="opacity-0"
-          >
-            <div v-if="success" class="flex items-center gap-1.5 text-green-600 text-sm font-medium">
-              <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              Payment settings saved
-            </div>
-          </Transition>
-          <Transition
-            enter-active-class="transition duration-200 ease-out"
-            enter-from-class="opacity-0 translate-y-1"
-            enter-to-class="opacity-100 translate-y-0"
-            leave-active-class="transition duration-150 ease-in"
-            leave-from-class="opacity-100"
-            leave-to-class="opacity-0"
-          >
-            <div v-if="saveError" class="flex items-center gap-1.5 text-red-500 text-sm font-medium truncate">
-              <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span class="truncate">{{ saveError }}</span>
-            </div>
-          </Transition>
-        </div>
+    <AdminSettingsSaveFooter
+      :saving="saving"
+      @save="saveSettings"
+      @reset="loadSettings"
+    />
 
-        <!-- Actions -->
-        <div class="flex items-center gap-2 shrink-0">
-          <button @click="loadSettings" :disabled="saving" class="btn-secondary">Reset</button>
-          <button
-            @click="saveSettings"
-            :disabled="saving"
-            class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
-          >
-            <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            {{ saving ? 'Saving…' : 'Save Changes' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <AdminToast />
   </div>
 </template>
 
@@ -291,11 +244,11 @@ definePageMeta({
 
 const { $apiFetch } = useNuxtApp()
 
+const { showToast } = useAdminToast()
+
 const loading = ref(true)
 const saving = ref(false)
-const success = ref(false)
 const error = ref<string | null>(null)
-const saveError = ref<string | null>(null)
 
 const form = ref({
   cash_enabled: true,
@@ -335,8 +288,6 @@ const loadSettings = async () => {
 
 const saveSettings = async () => {
   saving.value = true
-  success.value = false
-  saveError.value = null
 
   try {
     await $apiFetch('/payment-settings', {
@@ -344,13 +295,11 @@ const saveSettings = async () => {
       body: form.value
     })
 
-    success.value = true
-    setTimeout(() => (success.value = false), 3000)
-
+    showToast('Payment settings saved', 'success')
     await loadSettings()
   } catch (err: any) {
     console.error('Error saving payment settings:', err)
-    saveError.value = err?.data?.message || 'Failed to save payment settings'
+    showToast(err?.data?.message || 'Failed to save payment settings', 'error')
   } finally {
     saving.value = false
   }
