@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-5">
     <AdminSettingsHomepage
-      :model-value="{ hero_title: form.hero_title, hero_subtitle: form.hero_subtitle, hero_image_url: form.hero_image_url, hero_media_mime: form.hero_media_mime }"
+      :model-value="{ hero_title: form.hero_title, hero_subtitle: form.hero_subtitle, hero_overlay_color: form.hero_overlay_color, hero_overlay_opacity: form.hero_overlay_opacity, hero_full_bleed: form.hero_full_bleed, hero_image_url: form.hero_image_url, hero_media_mime: form.hero_media_mime }"
       :media-uploading="mediaUploading"
       @update:model-value="Object.assign(form, $event)"
       @media-select="(f: File, c: MediaCollection) => emit('media-select', f, c)"

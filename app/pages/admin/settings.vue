@@ -61,6 +61,7 @@
       <AdminSettingsTabsAppearanceTab
         v-show="activeTab === 'appearance'"
         :form="form"
+        :saved-theme="savedTheme"
       />
 
       <AdminSettingsTabsPagesTab
@@ -81,10 +82,23 @@
 
     <AdminSettingsSaveFooter
       :saving="saving"
-      :success="success"
-      :error="saveError"
-      @save="saveSettings"
+      @save="requestSave"
       @reset="loadSettings"
+    />
+
+    <AdminToast />
+
+    <!-- Confirm save modal -->
+    <ConfirmModal
+      :open="saveConfirmOpen"
+      title="Save changes?"
+      :message="confirmMessage"
+      confirm-text="Save Changes"
+      loading-text="Saving…"
+      :loading="saving"
+      variant="success"
+      @confirm="confirmSave"
+      @cancel="saveConfirmOpen = false"
     />
   </div>
 </template>
@@ -160,10 +174,51 @@ const media = useMediaUpload({
 // --- Page state ---
 const loading = ref(true)
 const saving = ref(false)
-const success = ref(false)
 const error = ref<string | null>(null)
-const saveError = ref<string | null>(null)
 const configId = ref<number | null>(null)
+
+// Snapshot of the last-saved theme — used as the revert target when
+// deselecting a theme preset, so deselection returns to the live site
+// theme rather than a hardcoded default.
+const savedTheme = ref({
+  primary_color: "#6898ED",
+  secondary_color: "#4B5979",
+  accent_color: "#F3F4F6",
+  heading_font: "Inter",
+  body_font: "Inter",
+  texture: "none",
+})
+
+const { showToast } = useAdminToast()
+
+// --- Save confirmation modal ---
+const saveConfirmOpen = ref(false)
+
+const tabSuccessMessages: Record<TabId, string> = {
+  general: 'General settings have been updated',
+  appearance: 'Theme has been applied',
+  pages: 'Page content has been saved',
+  popup: 'Popup settings have been saved',
+}
+
+const tabConfirmMessages: Record<TabId, string> = {
+  general: 'Apply your general settings changes to the site?',
+  appearance: 'Apply the new theme to your site?',
+  pages: 'Save these page content changes?',
+  popup: 'Save these popup settings?',
+}
+
+const confirmMessage = computed(() => tabConfirmMessages[activeTab.value])
+
+function requestSave() {
+  if (saving.value) return
+  saveConfirmOpen.value = true
+}
+
+async function confirmSave() {
+  await saveSettings()
+  saveConfirmOpen.value = false
+}
 
 const form = ref({
   site_name: "",
@@ -180,6 +235,9 @@ const form = ref({
   cart_icon_url: "",
   hero_title: "",
   hero_subtitle: "",
+  hero_overlay_color: "#000000",
+  hero_overlay_opacity: 45,
+  hero_full_bleed: false,
   hero_image_url: "",
   hero_media_mime: "",
   about_content: "",
@@ -275,9 +333,8 @@ function onMediaSelect(file: File, collection: MediaCollection) {
   if (url) {
     ;(form.value[urlFields[collection]] as string) = url
     if (collection === 'hero') form.value.hero_media_mime = file.type
-    saveError.value = null
-  } else {
-    saveError.value = media.lastError.value
+  } else if (media.lastError.value) {
+    showToast(media.lastError.value, 'error')
   }
 }
 
@@ -324,6 +381,9 @@ async function loadSettings() {
         cart_icon_url: response.data.cart_icon_url || "",
         hero_title: response.data.hero_title || "",
         hero_subtitle: response.data.hero_subtitle || "",
+        hero_overlay_color: response.data.hero_overlay_color || "#000000",
+        hero_overlay_opacity: response.data.hero_overlay_opacity ?? 45,
+        hero_full_bleed: response.data.hero_full_bleed ?? false,
         hero_image_url: response.data.hero_image_url || "",
         hero_media_mime: response.data.hero_media_mime || "",
         about_content: response.data.about_content || "",
@@ -421,6 +481,8 @@ async function loadSettings() {
           return cp
         })(),
       }
+
+      savedTheme.value = { ...form.value.theme }
     }
   } catch (err: any) {
     console.error("Error loading settings:", err)
@@ -433,8 +495,6 @@ async function loadSettings() {
 // --- Save settings ---
 async function saveSettings() {
   saving.value = true
-  success.value = false
-  saveError.value = null
 
   try {
     // 1) Upload pending files
@@ -454,6 +514,9 @@ async function saveSettings() {
         theme: form.value.theme,
         hero_title: form.value.hero_title,
         hero_subtitle: form.value.hero_subtitle,
+        hero_overlay_color: form.value.hero_overlay_color,
+        hero_overlay_opacity: form.value.hero_overlay_opacity,
+        hero_full_bleed: form.value.hero_full_bleed,
         about_content: form.value.about_content,
         contact_email: form.value.contact_email,
         contact_phone: form.value.contact_phone,
@@ -483,12 +546,11 @@ async function saveSettings() {
     // Notify other open tabs to re-fetch and apply the new theme
     broadcastConfigUpdate()
 
-    success.value = true
-    setTimeout(() => (success.value = false), 3000)
+    showToast(tabSuccessMessages[activeTab.value], 'success')
     await loadSettings()
   } catch (err: any) {
     console.error("Save failed:", err?.data || err)
-    saveError.value = err?.data?.message || "Failed to save settings"
+    showToast(err?.data?.message || 'Failed to save settings', 'error')
   } finally {
     saving.value = false
   }

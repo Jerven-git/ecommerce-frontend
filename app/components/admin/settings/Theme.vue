@@ -23,7 +23,8 @@
             type="button"
             class="group relative rounded-xl border-2 p-3 transition-all hover:shadow-md text-left"
             :class="isActivePreset(preset) ? 'border-primary-500 ring-2 ring-primary-200 shadow-sm' : 'border-gray-200 hover:border-gray-300'"
-            @click="applyPreset(preset)"
+            :title="isActivePreset(preset) ? 'Click to deselect' : `Apply ${preset.name}`"
+            @click="togglePreset(preset)"
           >
             <!-- Mini preview -->
             <div class="rounded-lg overflow-hidden border border-gray-100 mb-2.5">
@@ -45,9 +46,15 @@
               <span class="w-3 h-3 rounded-full border border-white shadow-sm" :style="{ backgroundColor: preset.secondary }"></span>
               <span class="w-3 h-3 rounded-full border border-gray-200 shadow-sm" :style="{ backgroundColor: preset.accent }"></span>
             </div>
-            <div v-if="isActivePreset(preset)" class="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-primary-500 flex items-center justify-center">
-              <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+            <div
+              v-if="isActivePreset(preset)"
+              class="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-primary-500 flex items-center justify-center group-hover:bg-red-500 transition-colors"
+            >
+              <svg class="w-3 h-3 text-white group-hover:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <svg class="w-3 h-3 text-white hidden group-hover:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
           </button>
@@ -72,11 +79,53 @@
         </div>
       </div>
 
-      <!-- Preview bar -->
+      <!-- Preview bar (click any swatch to open a colour picker) -->
       <div class="rounded-xl overflow-hidden border border-gray-100 h-14 flex">
-        <div class="flex-1 flex items-center justify-center text-white text-sm font-semibold" :style="{ backgroundColor: modelValue.primary_color }">Primary</div>
-        <div class="flex-1 flex items-center justify-center text-white text-sm font-semibold" :style="{ backgroundColor: modelValue.secondary_color }">Secondary</div>
-        <div class="flex-1 flex items-center justify-center text-sm font-semibold text-gray-600" :style="{ backgroundColor: modelValue.accent_color }">Accent</div>
+        <label
+          for="primary_colorPickerLg"
+          class="flex-1 flex items-center justify-center text-white text-sm font-semibold cursor-pointer hover:brightness-110 transition-all"
+          :style="{ backgroundColor: modelValue.primary_color }"
+          title="Click to change primary colour"
+        >
+          Primary
+          <input
+            id="primary_colorPickerLg"
+            :value="modelValue.primary_color"
+            @input="updateField('primary_color', ($event.target as HTMLInputElement).value)"
+            type="color"
+            class="sr-only"
+          />
+        </label>
+        <label
+          for="secondary_colorPickerLg"
+          class="flex-1 flex items-center justify-center text-white text-sm font-semibold cursor-pointer hover:brightness-110 transition-all"
+          :style="{ backgroundColor: modelValue.secondary_color }"
+          title="Click to change secondary colour"
+        >
+          Secondary
+          <input
+            id="secondary_colorPickerLg"
+            :value="modelValue.secondary_color"
+            @input="updateField('secondary_color', ($event.target as HTMLInputElement).value)"
+            type="color"
+            class="sr-only"
+          />
+        </label>
+        <label
+          for="accent_colorPickerLg"
+          class="flex-1 flex items-center justify-center text-sm font-semibold text-gray-600 cursor-pointer hover:brightness-95 transition-all"
+          :style="{ backgroundColor: modelValue.accent_color }"
+          title="Click to change accent colour"
+        >
+          Accent
+          <input
+            id="accent_colorPickerLg"
+            :value="modelValue.accent_color"
+            @input="updateField('accent_color', ($event.target as HTMLInputElement).value)"
+            type="color"
+            class="sr-only"
+          />
+        </label>
       </div>
 
       <!-- Fonts -->
@@ -144,6 +193,7 @@ export interface ThemeForm {
 
 interface Props {
   modelValue: ThemeForm
+  savedTheme: ThemeForm
 }
 
 const props = defineProps<Props>()
@@ -165,24 +215,50 @@ function updateField(key: keyof ThemeForm, value: string) {
   emit('update:modelValue', { ...props.modelValue, [key]: value })
 }
 
-function applyPreset(preset: ThemePreset) {
-  emit('update:modelValue', {
+const DEFAULT_THEME: ThemeForm = {
+  primary_color: '#6898ED',
+  secondary_color: '#4B5979',
+  accent_color: '#F3F4F6',
+  heading_font: 'Inter',
+  body_font: 'Inter',
+  texture: 'none',
+}
+
+function themeMatches(a: ThemeForm, b: ThemeForm): boolean {
+  return a.primary_color.toLowerCase() === b.primary_color.toLowerCase()
+    && a.secondary_color.toLowerCase() === b.secondary_color.toLowerCase()
+    && a.accent_color.toLowerCase() === b.accent_color.toLowerCase()
+    && a.heading_font === b.heading_font
+    && a.body_font === b.body_font
+    && a.texture === b.texture
+}
+
+function presetToTheme(preset: ThemePreset): ThemeForm {
+  return {
     primary_color: preset.primary,
     secondary_color: preset.secondary,
     accent_color: preset.accent,
     heading_font: preset.headingFont,
     body_font: preset.bodyFont,
     texture: preset.texture,
-  })
+  }
 }
 
 function isActivePreset(preset: ThemePreset): boolean {
-  const t = props.modelValue
-  return t.primary_color.toLowerCase() === preset.primary.toLowerCase()
-    && t.secondary_color.toLowerCase() === preset.secondary.toLowerCase()
-    && t.accent_color.toLowerCase() === preset.accent.toLowerCase()
-    && t.heading_font === preset.headingFont
-    && t.body_font === preset.bodyFont
-    && t.texture === preset.texture
+  return themeMatches(props.modelValue, presetToTheme(preset))
+}
+
+function togglePreset(preset: ThemePreset) {
+  if (!isActivePreset(preset)) {
+    emit('update:modelValue', presetToTheme(preset))
+    return
+  }
+  // Deselect: revert to the last-saved theme. If the saved theme IS this
+  // preset, fall back to the hardcoded default so the toggle still does
+  // something visible.
+  const target = themeMatches(props.savedTheme, presetToTheme(preset))
+    ? DEFAULT_THEME
+    : props.savedTheme
+  emit('update:modelValue', { ...target })
 }
 </script>

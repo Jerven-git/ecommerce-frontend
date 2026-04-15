@@ -18,6 +18,15 @@
         <input :value="modelValue.site_name" @input="emit('update:modelValue', { ...modelValue, site_name: ($event.target as HTMLInputElement).value })" type="text" class="input-field" placeholder="My Awesome Store" />
       </div>
 
+      <div class="flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50/60 px-4 py-3">
+        <svg class="w-4 h-4 shrink-0 mt-0.5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-xs text-blue-900/80 leading-relaxed">
+          <span class="font-semibold">Tip:</span> For the cleanest look, upload <span class="font-semibold">transparent PNG</span> files — or use an image whose background matches your site's header/footer colour so no seams are visible.
+        </p>
+      </div>
+
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Logo</label>

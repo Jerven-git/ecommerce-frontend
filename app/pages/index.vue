@@ -1,7 +1,11 @@
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="relative h-screen flex items-center justify-center text-white overflow-hidden" :style="heroStyle">
+    <section
+      class="relative flex items-center justify-center text-white overflow-hidden"
+      :class="isFullBleed ? 'h-screen' : 'min-h-[calc(100vh-4rem)]'"
+      :style="heroStyle"
+    >
       <!-- Video background (autoplay, muted, loop for performance) -->
       <video
         v-if="isHeroVideo && siteConfig?.hero_image_url"
@@ -24,9 +28,16 @@
         </div>
       </Transition>
 
-      <!-- Dark scrim fades in once media is ready -->
+      <!-- Overlay scrim fades in once media is ready -->
       <Transition name="fade">
-        <div v-if="mediaReady || !siteConfig?.hero_image_url" class="absolute inset-0 bg-black/45" />
+        <div
+          v-if="mediaReady || !siteConfig?.hero_image_url"
+          class="absolute inset-0"
+          :style="{
+            backgroundColor: siteConfig?.hero_overlay_color || '#000000',
+            opacity: (siteConfig?.hero_overlay_opacity ?? 45) / 100,
+          }"
+        />
       </Transition>
 
       <!-- Hero text staggers in on mount -->
@@ -352,6 +363,7 @@ const videoReady = ref(false)
 const heroVideoRef = ref<HTMLVideoElement | null>(null)
 
 const isHeroVideo = computed(() => siteConfig.value?.hero_media_mime?.startsWith('video/'))
+const isFullBleed = computed(() => siteConfig.value?.hero_full_bleed ?? false)
 const mediaLoading = computed(() => isHeroVideo.value ? !videoReady.value && !!siteConfig.value?.hero_image_url : imageLoading.value)
 const mediaReady = computed(() => isHeroVideo.value ? videoReady.value : imageLoaded.value)
 

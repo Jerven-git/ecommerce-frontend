@@ -41,6 +41,158 @@
           @remove="emit('media-remove', 'hero')"
         />
       </div>
+
+      <!-- Header layout toggle -->
+      <div class="rounded-xl border border-gray-100 bg-gray-50/60 p-4">
+        <label class="flex items-start gap-3 cursor-pointer">
+          <input
+            :checked="modelValue.hero_full_bleed"
+            @change="update('hero_full_bleed', ($event.target as HTMLInputElement).checked)"
+            type="checkbox"
+            class="mt-0.5 w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+          />
+          <div class="flex-1">
+            <p class="text-sm font-medium text-gray-800">Hero image flows under header</p>
+            <p class="text-xs text-gray-500 mt-0.5">When on, the hero image extends behind a transparent header for a full-bleed look. When off, the header sits as its own band above the hero.</p>
+          </div>
+        </label>
+        <Transition
+          enter-active-class="transition duration-200 ease-out"
+          enter-from-class="opacity-0 -translate-y-1"
+          enter-to-class="opacity-100 translate-y-0"
+        >
+          <div v-if="modelValue.hero_full_bleed" class="mt-3 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+            <svg class="w-4 h-4 shrink-0 mt-0.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p class="text-xs text-amber-800 leading-relaxed">
+              Use a darker image, or increase the overlay opacity below, so the header navigation stays readable on top of the hero.
+            </p>
+          </div>
+        </Transition>
+      </div>
+
+      <!-- Hero overlay controls -->
+      <div class="rounded-xl border border-gray-100 bg-gray-50/60 p-4 space-y-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-sm font-medium text-gray-800">Hero Overlay</p>
+            <p class="text-xs text-gray-500 mt-0.5">Darken or tint the hero image for better text readability.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <!-- Color picker -->
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-2">Overlay colour</label>
+            <div class="flex items-center gap-2">
+              <button
+                v-for="preset in colorPresets"
+                :key="preset.value"
+                type="button"
+                :title="preset.label"
+                :aria-label="preset.label"
+                @click="update('hero_overlay_color', preset.value)"
+                class="w-8 h-8 rounded-lg border-2 shadow-sm transition-all"
+                :class="modelValue.hero_overlay_color.toLowerCase() === preset.value.toLowerCase()
+                  ? 'border-primary-500 ring-2 ring-primary-200 scale-105'
+                  : 'border-white ring-1 ring-gray-200 hover:scale-105'"
+                :style="{ backgroundColor: preset.value }"
+              />
+              <!-- Custom hex -->
+              <div class="flex items-center gap-1.5 ml-1">
+                <div class="relative shrink-0">
+                  <input
+                    :value="modelValue.hero_overlay_color"
+                    @input="update('hero_overlay_color', ($event.target as HTMLInputElement).value)"
+                    type="color"
+                    class="sr-only"
+                    id="heroOverlayColor"
+                  />
+                  <label
+                    for="heroOverlayColor"
+                    class="block w-8 h-8 rounded-lg cursor-pointer border-2 border-white shadow ring-1 ring-gray-200 hover:scale-105 transition-transform"
+                    :style="{ backgroundColor: modelValue.hero_overlay_color }"
+                    title="Custom colour"
+                    aria-label="Pick custom colour"
+                  />
+                </div>
+                <input
+                  :value="modelValue.hero_overlay_color"
+                  @input="update('hero_overlay_color', ($event.target as HTMLInputElement).value)"
+                  type="text"
+                  class="input-field font-mono text-xs w-24"
+                  placeholder="#000000"
+                  maxlength="7"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Opacity slider -->
+          <div>
+            <label class="flex items-center justify-between text-xs font-medium text-gray-600 mb-2">
+              <span>Opacity</span>
+              <span class="font-mono text-gray-500">{{ modelValue.hero_overlay_opacity }}%</span>
+            </label>
+            <input
+              :value="modelValue.hero_overlay_opacity"
+              @input="update('hero_overlay_opacity', Number(($event.target as HTMLInputElement).value))"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              class="w-full accent-primary-600"
+              aria-label="Overlay opacity"
+            />
+          </div>
+        </div>
+
+        <!-- Live preview -->
+        <div>
+          <p class="text-xs font-medium text-gray-600 mb-2">Preview</p>
+          <div class="relative w-full h-40 rounded-xl overflow-hidden border border-gray-200 bg-gray-200">
+            <img
+              v-if="modelValue.hero_image_url && !isHeroVideo"
+              :src="modelValue.hero_image_url"
+              alt=""
+              class="absolute inset-0 w-full h-full object-cover"
+            />
+            <video
+              v-else-if="modelValue.hero_image_url && isHeroVideo"
+              :src="modelValue.hero_image_url"
+              class="absolute inset-0 w-full h-full object-cover"
+              muted
+              autoplay
+              loop
+              playsinline
+            />
+            <div
+              v-else
+              class="absolute inset-0 flex items-center justify-center text-xs text-gray-400"
+            >
+              Upload a hero image to preview
+            </div>
+            <div
+              class="absolute inset-0 transition-opacity"
+              :style="{
+                backgroundColor: modelValue.hero_overlay_color,
+                opacity: modelValue.hero_overlay_opacity / 100,
+              }"
+            />
+            <div class="relative z-10 h-full flex items-center justify-center text-center px-4">
+              <div>
+                <p class="text-white text-xl font-bold drop-shadow">
+                  {{ modelValue.hero_title || 'Hero title preview' }}
+                </p>
+                <p class="text-white/90 text-xs mt-1 drop-shadow">
+                  {{ modelValue.hero_subtitle || 'Hero subtitle preview' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -51,6 +203,9 @@ import type { MediaCollection } from '~/composables/useMediaUpload'
 export interface HomepageForm {
   hero_title: string
   hero_subtitle: string
+  hero_overlay_color: string
+  hero_overlay_opacity: number
+  hero_full_bleed: boolean
   hero_image_url: string
   hero_media_mime: string
 }
@@ -69,7 +224,12 @@ const emit = defineEmits<{
 
 const isHeroVideo = computed(() => props.modelValue.hero_media_mime?.startsWith('video/'))
 
-function update(key: keyof HomepageForm, value: string) {
+const colorPresets = [
+  { label: 'Black', value: '#000000' },
+  { label: 'White', value: '#FFFFFF' },
+]
+
+function update<K extends keyof HomepageForm>(key: K, value: HomepageForm[K]) {
   emit('update:modelValue', { ...props.modelValue, [key]: value })
 }
 </script>

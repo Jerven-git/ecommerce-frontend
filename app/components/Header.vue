@@ -1,7 +1,7 @@
 <template>
   <header
     :class="[
-      isHomepage ? 'fixed w-full' : 'sticky',
+      isFullBleedHomepage ? 'fixed w-full' : 'sticky',
       'top-0 z-50 transition-all duration-300',
       isTransparent
         ? 'bg-transparent border-b border-transparent'
@@ -138,11 +138,16 @@ const navLinks = [
   { to: '/contact', label: 'Contact' },
 ]
 
-// Transparent header on homepage only
+// Transparent header only on the homepage AND only when the admin has
+// opted into the full-bleed hero (image flows under header). Otherwise
+// the header behaves like a normal sticky band and never goes transparent.
 const isHomepage = computed(() => route.path === '/')
+const isFullBleedHomepage = computed(() =>
+  isHomepage.value && (siteConfig.value?.hero_full_bleed ?? false)
+)
 const scrollY = ref(0)
 const isTransparent = computed(() =>
-  isHomepage.value && scrollY.value < 50 && !mobileMenuOpen.value
+  isFullBleedHomepage.value && scrollY.value < 50 && !mobileMenuOpen.value
 )
 
 function onScroll() {
