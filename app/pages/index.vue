@@ -11,6 +11,7 @@
         v-if="isHeroVideo && siteConfig?.hero_image_url"
         ref="heroVideoRef"
         class="absolute inset-0 w-full h-full object-cover"
+        :style="{ objectPosition: heroFocalPosition }"
         autoplay
         loop
         muted
@@ -150,14 +151,11 @@
             class="reveal relative z-10 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col items-center"
             :style="{ transitionDelay: `${0.1 + i * 0.15}s` }"
           >
-            <div
-              class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 ring-4 ring-white shadow-sm"
-              :class="stepColors[i % stepColors.length]!.bg"
-            >
-              <Icon :name="step.icon ?? defaultStepIcons[i % defaultStepIcons.length]!" class="w-6 h-6" :class="stepColors[i % stepColors.length]!.text" />
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 ring-4 ring-white shadow-sm bg-secondary-50">
+              <Icon :name="step.icon ?? defaultStepIcons[i % defaultStepIcons.length]!" class="w-6 h-6 text-secondary-600" />
             </div>
-            <span class="text-xs font-bold uppercase tracking-wider mb-2" :class="stepColors[i % stepColors.length]!.text">Step {{ i + 1 }}</span>
-            <h3 class="text-base font-semibold text-gray-900 mb-1.5">{{ step.title }}</h3>
+            <span class="text-xs font-bold uppercase tracking-wider mb-2 text-secondary-600">Step {{ i + 1 }}</span>
+            <h3 class="text-base font-semibold text-secondary-800 mb-1.5">{{ step.title }}</h3>
             <p class="text-gray-500 text-sm leading-relaxed">{{ step.description }}</p>
           </div>
         </div>
@@ -178,17 +176,13 @@
             v-for="(feature, i) in features"
             :key="i"
             :ref="addRevealRef"
-            class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-all duration-300"
-            :class="featureColors[i % featureColors.length]!.border"
+            class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-secondary-100 transition-all duration-300"
             :style="{ transitionDelay: `${0.1 + i * 0.15}s` }"
           >
-            <div
-              class="w-12 h-12 mb-4 rounded-2xl flex items-center justify-center transition-colors duration-300"
-              :class="[featureColors[i % featureColors.length]!.bg, featureColors[i % featureColors.length]!.hoverBg]"
-            >
-              <Icon :name="feature.icon ?? defaultFeatureIcons[i % defaultFeatureIcons.length]!" class="w-6 h-6" :class="featureColors[i % featureColors.length]!.text" />
+            <div class="w-12 h-12 mb-4 rounded-2xl flex items-center justify-center transition-colors duration-300 bg-secondary-50 group-hover:bg-secondary-100">
+              <Icon :name="feature.icon ?? defaultFeatureIcons[i % defaultFeatureIcons.length]!" class="w-6 h-6 text-secondary-600" />
             </div>
-            <h3 class="text-base font-semibold text-gray-900 mb-1">{{ feature.title }}</h3>
+            <h3 class="text-base font-semibold text-secondary-800 mb-1">{{ feature.title }}</h3>
             <p class="text-gray-500 text-sm">{{ feature.description }}</p>
           </div>
         </div>
@@ -273,22 +267,10 @@ const { revealRef: howItWorksHeadingRef } = useScrollReveal()
 const { revealRef: newsletterRef } = useScrollReveal()
 const { addRevealRef } = useScrollRevealAll()
 
-const stepColors = [
-  { bg: 'bg-primary-50', text: 'text-primary-600' },
-  { bg: 'bg-emerald-50', text: 'text-emerald-600' },
-  { bg: 'bg-purple-50', text: 'text-purple-600' },
-]
-
 const defaultStepIcons = [
   'heroicons:magnifying-glass',
   'heroicons:shopping-cart',
   'heroicons:shield-check',
-]
-
-const featureColors = [
-  { bg: 'bg-primary-50', hoverBg: 'group-hover:bg-primary-100', text: 'text-primary-600', border: 'hover:border-primary-100' },
-  { bg: 'bg-emerald-50', hoverBg: 'group-hover:bg-emerald-100', text: 'text-emerald-600', border: 'hover:border-emerald-100' },
-  { bg: 'bg-purple-50', hoverBg: 'group-hover:bg-purple-100', text: 'text-purple-600', border: 'hover:border-purple-100' },
 ]
 
 const defaultFeatureIcons = [
@@ -364,6 +346,9 @@ const heroVideoRef = ref<HTMLVideoElement | null>(null)
 
 const isHeroVideo = computed(() => siteConfig.value?.hero_media_mime?.startsWith('video/'))
 const isFullBleed = computed(() => siteConfig.value?.hero_full_bleed ?? false)
+const heroFocalPosition = computed(
+  () => `${siteConfig.value?.hero_focal_x ?? 50}% ${siteConfig.value?.hero_focal_y ?? 50}%`
+)
 const mediaLoading = computed(() => isHeroVideo.value ? !videoReady.value && !!siteConfig.value?.hero_image_url : imageLoading.value)
 const mediaReady = computed(() => isHeroVideo.value ? videoReady.value : imageLoaded.value)
 
@@ -378,7 +363,7 @@ const heroStyle = computed(() => {
     return {
       backgroundImage: imageLoaded.value ? `url("${imageUrl}")` : 'none',
       backgroundSize: 'cover',
-      backgroundPosition: 'center',
+      backgroundPosition: heroFocalPosition.value,
       backgroundRepeat: 'no-repeat',
       backgroundColor: '#1e293b',
     }

@@ -206,35 +206,33 @@
                 <fieldset class="space-y-3">
                   <legend class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Media & Status</legend>
 
-                  <!-- Main Image (for new products) -->
-                  <div v-if="!editingProduct">
-                    <label class="block text-xs font-medium text-gray-600 mb-1.5">Image</label>
-                    <div v-if="imagePreview" class="mb-2 flex items-center gap-3">
-                      <img :src="imagePreview" alt="Preview" class="h-14 w-14 rounded-lg object-cover border border-gray-200" />
-                      <button type="button" @click="$emit('removeImage')" class="text-xs text-red-500 hover:text-red-700 font-medium px-2 py-1 rounded-md hover:bg-red-50 transition-colors">
-                        Remove
-                      </button>
-                    </div>
-                    <input
-                      ref="imageInputRef"
-                      type="file"
-                      accept="image/*"
-                      @change="$emit('imageSelected', $event)"
-                      class="block w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
-                    />
-                  </div>
-
-                  <!-- Gallery Images (for editing existing products) -->
-                  <div v-if="editingProduct">
+                  <!-- Product Images (unified gallery for both new and existing products) -->
+                  <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1.5">Product Images</label>
-                    <div v-if="galleryImages.length" class="flex flex-wrap gap-2 mb-3">
-                      <div v-for="img in galleryImages" :key="img.id" class="relative group">
+                    <div v-if="galleryImages.length || stagedPreviews.length" class="flex flex-wrap gap-2 mb-3">
+                      <div v-for="img in galleryImages" :key="`saved-${img.id}`" class="relative">
                         <img :src="img.url" alt="Product image" class="h-20 w-20 rounded-lg object-cover border border-gray-200" />
                         <button
                           type="button"
                           @click="$emit('deleteGalleryImage', img.id)"
-                          class="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                          class="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white shadow-md ring-2 ring-white transition-colors"
                           title="Remove image"
+                          aria-label="Remove image"
+                        >
+                          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                      <div v-for="(preview, i) in stagedPreviews" :key="`staged-${preview.key}`" class="relative">
+                        <img :src="preview.url" :alt="preview.name" class="h-20 w-20 rounded-lg object-cover border border-dashed border-primary-300 opacity-90" />
+                        <span class="absolute bottom-1 left-1 right-1 text-[9px] font-semibold text-white bg-primary-600/80 rounded px-1 py-0.5 text-center truncate">Pending</span>
+                        <button
+                          type="button"
+                          @click="$emit('removeStagedFile', i)"
+                          class="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white shadow-md ring-2 ring-white transition-colors"
+                          title="Remove staged file"
+                          aria-label="Remove staged file"
                         >
                           <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -242,7 +240,8 @@
                         </button>
                       </div>
                     </div>
-                    <p v-else class="text-xs text-gray-400 mb-2">No images uploaded yet.</p>
+                    <p v-else-if="editingProduct" class="text-xs text-gray-400 mb-2">No images uploaded yet.</p>
+                    <p v-else class="text-xs text-gray-400 mb-2">Pick one or more images — they'll upload when you save the product.</p>
 
                     <div class="flex items-center gap-3">
                       <input
@@ -253,15 +252,12 @@
                         @change="$emit('gallerySelected', $event)"
                         class="block w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
                       />
-                      <button
+                      <span
                         v-if="galleryFilesCount > 0"
-                        type="button"
-                        @click="$emit('uploadGallery')"
-                        :disabled="uploadingGallery"
-                        class="shrink-0 px-3 py-1.5 text-xs font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors disabled:opacity-50"
+                        class="shrink-0 text-xs text-gray-500 font-medium"
                       >
-                        {{ uploadingGallery ? 'Uploading...' : `Upload (${galleryFilesCount})` }}
-                      </button>
+                        {{ galleryFilesCount }} file(s) ready
+                      </span>
                     </div>
                   </div>
 
@@ -372,30 +368,37 @@ import type { ProductFormData } from '~/composables/useProductForm'
 import type { Category } from '~/composables/useProductCategories'
 
 const backdropMouseDown = ref(false)
+const galleryInputRef = ref<HTMLInputElement | null>(null)
 
-defineProps<{
+const props = defineProps<{
   showModal: boolean
   submitting: boolean
   formError: string | null
   editingProduct: Product | null
   form: ProductFormData
   computedVolumeCbm: number
-  imagePreview: string | null
   galleryImages: { id: number; url: string }[]
   galleryFilesCount: number
-  uploadingGallery: boolean
+  stagedPreviews: { key: string; url: string; name: string }[]
   allCategories: Category[]
   catPickerExpanded: Set<number>
   categoryBreadcrumb: string
 }>()
 
+// Clear the native file input whenever staged files get flushed (after upload,
+// after save, or on modal close). The composable can't reach this DOM node
+// directly, so the modal owns the reset.
+watch(() => props.galleryFilesCount, (count, prev) => {
+  if (count === 0 && prev && prev > 0 && galleryInputRef.value) {
+    galleryInputRef.value.value = ''
+  }
+})
+
 defineEmits<{
   close: []
   save: []
-  imageSelected: [event: Event]
-  removeImage: []
   gallerySelected: [event: Event]
-  uploadGallery: []
+  removeStagedFile: [index: number]
   deleteGalleryImage: [mediaId: number]
   selectCategory: [id: number]
   toggleCatExpand: [id: number]

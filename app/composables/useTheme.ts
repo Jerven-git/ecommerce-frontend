@@ -64,12 +64,14 @@ function hslToHex(h: number, s: number, l: number): string {
 function generatePalette(baseHex: string): Record<string, string> {
   const { h, s } = hexToHSL(baseHex)
 
-  // Target lightness values for each shade (Tailwind-style distribution)
+  // Target lightness values for each shade (Tailwind-style distribution).
+  // 50 lowered slightly from 0.95 so highly saturated base colours still
+  // read as a visible tint instead of collapsing to near-white.
   const shades: Record<string, number> = {
-    '50': 0.95,
-    '100': 0.90,
-    '200': 0.82,
-    '300': 0.71,
+    '50': 0.93,
+    '100': 0.88,
+    '200': 0.80,
+    '300': 0.70,
     '400': 0.62,
     '500': 0.53,
     '600': 0.45,
@@ -81,10 +83,13 @@ function generatePalette(baseHex: string): Record<string, string> {
 
   const palette: Record<string, string> = {}
   for (const [shade, lightness] of Object.entries(shades)) {
-    // Slightly reduce saturation for very light and very dark shades
+    // Keep most of the saturation at the extremes so the tint stays
+    // recognisable for highly saturated base colours (e.g. pink/magenta).
+    // Previously the light-shade dampening was s*0.6 which washed the
+    // sidebar active state out to near-white on vivid palettes.
     let adjS = s
-    if (lightness > 0.85) adjS = Math.max(s * 0.6, 0)
-    else if (lightness < 0.2) adjS = Math.max(s * 0.7, 0)
+    if (lightness > 0.85) adjS = Math.max(s * 0.85, 0)
+    else if (lightness < 0.2) adjS = Math.max(s * 0.9, 0)
 
     palette[shade] = hslToHex(h, adjS, lightness)
   }
