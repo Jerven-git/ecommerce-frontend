@@ -46,16 +46,37 @@ export function useProductForm() {
   const editingProduct = ref<Product | null>(null)
   const form = ref<ProductFormData>(defaultFormData())
 
-  // Image (new product)
-  const imageFile = ref<File | null>(null)
-  const imagePreview = ref<string | null>(null)
-  const imageInput = ref<HTMLInputElement | null>(null)
-
-  // Gallery (editing existing product)
-  const galleryImages = ref<{ id: number; url: string }[]>([])
+  // Unified product images — gallery works for both new and existing products.
+  // Staged galleryFiles are uploaded by saveProduct after the product is
+  // created (new) or updated (edit).
+  // `legacy: true` marks items that come from product.image_url alone (no
+  // Media record) — removing them PATCHes the product to clear image_url.
+  interface GalleryItem {
+    id: number
+    url: string
+    legacy?: boolean
+  }
+  const galleryImages = ref<GalleryItem[]>([])
   const galleryFiles = ref<File[]>([])
   const galleryInput = ref<HTMLInputElement | null>(null)
-  const uploadingGallery = ref(false)
+
+  // Object-URL previews for staged (not-yet-uploaded) files. Kept in sync
+  // with galleryFiles via a watcher that revokes the previous URLs so the
+  // browser can reclaim the blob memory.
+  const stagedPreviews = ref<{ key: string; url: string; name: string }[]>([])
+  watch(galleryFiles, (files) => {
+    for (const p of stagedPreviews.value) URL.revokeObjectURL(p.url)
+    stagedPreviews.value = files.map((file, i) => ({
+      key: `${file.name}-${file.size}-${i}`,
+      url: URL.createObjectURL(file),
+      name: file.name,
+    }))
+  })
+
+  const removeStagedFile = (index: number) => {
+    galleryFiles.value = galleryFiles.value.filter((_, i) => i !== index)
+    if (!galleryFiles.value.length && galleryInput.value) galleryInput.value.value = ''
+  }
 
   const computedVolumeCbm = computed(() => {
     const l = Number(form.value.length_cm) || 0
@@ -65,62 +86,64 @@ export function useProductForm() {
     return (l * w * h) / 1000000
   })
 
-  const onImageSelected = (event: Event) => {
-    const file = (event.target as HTMLInputElement).files?.[0]
-    if (file) {
-      imageFile.value = file
-      imagePreview.value = URL.createObjectURL(file)
-    }
-  }
-
-  const removeImage = () => {
-    imageFile.value = null
-    imagePreview.value = null
-    if (imageInput.value) imageInput.value.value = ''
-  }
-
   const onGallerySelected = (event: Event) => {
     const files = (event.target as HTMLInputElement).files
     if (files) galleryFiles.value = Array.from(files)
   }
 
-  const uploadGalleryImages = async (onSuccess?: () => Promise<void>) => {
-    if (!editingProduct.value || !galleryFiles.value.length) return
-    uploadingGallery.value = true
-    try {
-      const formData = new FormData()
-      for (const file of galleryFiles.value) {
-        formData.append('images[]', file)
-      }
-      const res = await $apiFetch<{ data: any }>(`/products/${editingProduct.value.id}/images`, {
-        method: 'POST',
-        body: formData,
-      })
-      if (res?.data?.media) {
-        galleryImages.value = res.data.media
-          .filter((m: any) => m.collection === 'gallery')
-          .map((m: any) => ({ id: m.id, url: m.url }))
-      }
-      galleryFiles.value = []
-      if (galleryInput.value) galleryInput.value.value = ''
-      if (onSuccess) await onSuccess()
-    } catch (err: any) {
-      console.error('Error uploading gallery images:', err)
-      formError.value = err?.data?.message || 'Failed to upload images'
-    } finally {
-      uploadingGallery.value = false
+  // POSTs galleryFiles to the given product id and refreshes the gallery
+  // from the response media list. Called by saveProduct after the product
+  // is created or updated.
+  const uploadGalleryFilesTo = async (productId: number) => {
+    if (!galleryFiles.value.length) return
+    const formData = new FormData()
+    for (const file of galleryFiles.value) {
+      formData.append('images[]', file)
     }
+    const res = await $apiFetch<{ data: any }>(`/products/${productId}/images`, {
+      method: 'POST',
+      body: formData,
+    })
+    if (res?.data?.media) {
+      galleryImages.value = res.data.media
+        .filter((m: any) => m.collection === 'gallery' || m.collection === 'image')
+        .map((m: any) => ({ id: m.id, url: m.url }))
+    }
+    galleryFiles.value = []
+    if (galleryInput.value) galleryInput.value.value = ''
   }
 
   const deleteGalleryImage = async (mediaId: number, onSuccess?: () => Promise<void>) => {
     if (!editingProduct.value) return
+
+    // Legacy item (no Media row — product.image_url only): clear it by
+    // PATCHing the product instead of hitting the media delete endpoint.
+    const item = galleryImages.value.find(img => img.id === mediaId)
+    if (item?.legacy) {
+      try {
+        const formData = new FormData()
+        formData.append('_method', 'PATCH')
+        formData.append('image_url', '')
+        await $apiFetch(`/products/${editingProduct.value.id}`, {
+          method: 'POST',
+          body: formData,
+        })
+        galleryImages.value = galleryImages.value.filter(img => img.id !== mediaId)
+        if (onSuccess) await onSuccess()
+      } catch (err: any) {
+        console.error('Error clearing legacy image_url:', err)
+        formError.value = err?.data?.message || 'Failed to remove image'
+      }
+      return
+    }
+
     try {
       const res = await $apiFetch<{ data: any }>(`/products/${editingProduct.value.id}/images/${mediaId}`, {
         method: 'DELETE',
       })
       if (res?.data?.media) {
         galleryImages.value = res.data.media
-          .filter((m: any) => m.collection === 'gallery')
+          .filter((m: any) => m.collection === 'gallery' || m.collection === 'image')
           .map((m: any) => ({ id: m.id, url: m.url }))
       } else {
         galleryImages.value = galleryImages.value.filter(img => img.id !== mediaId)
@@ -134,8 +157,9 @@ export function useProductForm() {
   const openAddModal = () => {
     editingProduct.value = null
     form.value = defaultFormData()
-    imageFile.value = null
-    imagePreview.value = null
+    galleryImages.value = []
+    galleryFiles.value = []
+    if (galleryInput.value) galleryInput.value.value = ''
     formError.value = null
     showModal.value = true
   }
@@ -158,21 +182,29 @@ export function useProductForm() {
       allow_backorder: product.allow_backorder ?? false,
       backorder_charge_policy: product.backorder_charge_policy ?? 'charged_later',
     }
-    imageFile.value = null
-    imagePreview.value = null
     galleryFiles.value = []
     galleryImages.value = []
+    if (galleryInput.value) galleryInput.value.value = ''
 
-    // Fetch product with media to populate gallery
+    // Fetch product with media to populate the image gallery. We include
+    // both 'image' (the legacy single main image) and 'gallery' collections
+    // so admins can see and remove every image attached to the product.
     try {
-      const res = await $apiFetch<{ data: any }>(`/products/${product.id}`, { method: 'GET' })
+      const res = await $apiFetch<{ data: any }>(`/products/${product.slug}`, { method: 'GET' })
       if (res?.data?.media) {
         galleryImages.value = res.data.media
-          .filter((m: any) => m.collection === 'gallery')
+          .filter((m: any) => m.collection === 'gallery' || m.collection === 'image')
           .map((m: any) => ({ id: m.id, url: m.url }))
       }
     } catch {
-      // Silently fail — gallery just won't show existing images
+      // Silently fail — the gallery just won't show existing images.
+    }
+
+    // Fallback: older/seeded products may have `image_url` set directly
+    // with no Media record. Surface that as a legacy gallery item so it
+    // can still be previewed and removed from the same UI.
+    if (galleryImages.value.length === 0 && product.image_url) {
+      galleryImages.value = [{ id: 0, url: product.image_url, legacy: true }]
     }
 
     formError.value = null
@@ -183,6 +215,8 @@ export function useProductForm() {
     showModal.value = false
     editingProduct.value = null
     formError.value = null
+    galleryFiles.value = []
+    if (galleryInput.value) galleryInput.value.value = ''
   }
 
   const saveProduct = async (onSuccess?: () => Promise<void>) => {
@@ -207,9 +241,6 @@ export function useProductForm() {
       formData.append('is_active', form.value.is_active ? '1' : '0')
       formData.append('allow_backorder', form.value.allow_backorder ? '1' : '0')
       formData.append('backorder_charge_policy', form.value.backorder_charge_policy)
-      if (imageFile.value) {
-        formData.append('image', imageFile.value)
-      }
 
       if (editingProduct.value) {
         formData.append('_method', 'PATCH')
@@ -217,11 +248,31 @@ export function useProductForm() {
           method: 'POST',
           body: formData,
         })
+        if (galleryFiles.value.length) {
+          try {
+            await uploadGalleryFilesTo(editingProduct.value.id)
+          } catch (err: any) {
+            console.error('Error uploading images after product update:', err)
+            formError.value = err?.data?.message || 'Product saved but image upload failed'
+          }
+        }
       } else {
-        await $apiFetch('/products', {
+        // Create the product, then upload any staged gallery files against
+        // the new product's id so users can attach images during creation.
+        const res = await $apiFetch<{ data: any }>('/products', {
           method: 'POST',
           body: formData,
         })
+        const newId = res?.data?.id
+        if (newId && galleryFiles.value.length) {
+          try {
+            await uploadGalleryFilesTo(newId)
+          } catch (err: any) {
+            console.error('Error uploading images after product creation:', err)
+            // Product was created; surface the error but don't roll back.
+            formError.value = err?.data?.message || 'Product saved but image upload failed'
+          }
+        }
       }
 
       if (onSuccess) await onSuccess()
@@ -241,18 +292,13 @@ export function useProductForm() {
     formError,
     editingProduct,
     form,
-    imageFile,
-    imagePreview,
-    imageInput,
     galleryImages,
     galleryFiles,
     galleryInput,
-    uploadingGallery,
+    stagedPreviews,
     computedVolumeCbm,
-    onImageSelected,
-    removeImage,
     onGallerySelected,
-    uploadGalleryImages,
+    removeStagedFile,
     deleteGalleryImage,
     openAddModal,
     openEditModal,

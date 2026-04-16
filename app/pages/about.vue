@@ -90,14 +90,13 @@
               v-for="(item, i) in highlights"
               :key="i"
               :ref="addRevealRef"
-              class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-all duration-300"
-              :class="cardStyles[i % cardStyles.length]!.hover"
+              class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md hover:border-secondary-100 transition-all duration-300"
               :style="{ transitionDelay: `${0.1 + i * 0.15}s` }"
             >
-              <div class="w-12 h-12 mb-4 rounded-2xl flex items-center justify-center transition-colors duration-300" :class="cardStyles[i % cardStyles.length]!.icon">
+              <div class="w-12 h-12 mb-4 rounded-2xl flex items-center justify-center transition-colors duration-300 bg-secondary-50 text-secondary-600 group-hover:bg-secondary-100">
                 <Icon :name="item.icon || DEFAULT_ICON" class="w-6 h-6" />
               </div>
-              <h3 class="text-base font-semibold text-gray-900 mb-1">{{ item.title }}</h3>
+              <h3 class="text-base font-semibold text-secondary-800 mb-1">{{ item.title }}</h3>
               <p class="text-sm text-gray-500">{{ item.description }}</p>
             </div>
           </div>
@@ -124,12 +123,6 @@ const defaultHighlights: AboutHighlightItem[] = [
 ]
 
 const highlights = computed(() => siteConfig.value?.about_highlights?.items?.length ? siteConfig.value.about_highlights.items : defaultHighlights)
-
-const cardStyles = [
-  { icon: 'bg-primary-50 text-primary-600 group-hover:bg-primary-100', hover: 'hover:border-primary-100' },
-  { icon: 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100', hover: 'hover:border-emerald-100' },
-  { icon: 'bg-purple-50 text-purple-600 group-hover:bg-purple-100', hover: 'hover:border-purple-100' },
-]
 
 const error = ref<string | null>(null)
 const imageLoading = ref(false)

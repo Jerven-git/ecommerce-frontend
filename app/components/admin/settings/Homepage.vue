@@ -148,7 +148,7 @@
           </div>
         </div>
 
-        <!-- Live preview -->
+        <!-- Live preview (respects the chosen focal point) -->
         <div>
           <p class="text-xs font-medium text-gray-600 mb-2">Preview</p>
           <div class="relative w-full h-40 rounded-xl overflow-hidden border border-gray-200 bg-gray-200">
@@ -157,6 +157,7 @@
               :src="modelValue.hero_image_url"
               alt=""
               class="absolute inset-0 w-full h-full object-cover"
+              :style="{ objectPosition: focalPosition }"
             />
             <video
               v-else-if="modelValue.hero_image_url && isHeroVideo"
@@ -193,6 +194,83 @@
           </div>
         </div>
       </div>
+
+      <!-- Focal point picker -->
+      <div class="rounded-xl border border-gray-100 bg-gray-50/60 p-4 space-y-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-sm font-medium text-gray-800">Focal point</p>
+            <p class="text-xs text-gray-500 mt-0.5">Click the image to choose the spot that must stay visible when the hero is cropped for mobile, desktop and ultra-wide screens.</p>
+          </div>
+          <button
+            type="button"
+            @click="resetFocal"
+            class="text-xs text-primary-600 hover:underline shrink-0"
+          >
+            Reset to centre
+          </button>
+        </div>
+
+        <!-- Clickable full image -->
+        <div
+          v-if="modelValue.hero_image_url && !isHeroVideo"
+          @click="onFocalClick"
+          class="relative w-full max-h-72 overflow-hidden rounded-lg border border-gray-200 cursor-crosshair select-none bg-gray-100"
+        >
+          <img
+            :src="modelValue.hero_image_url"
+            class="block w-full h-auto max-h-72 object-contain mx-auto"
+            draggable="false"
+            alt="Hero image focal point picker"
+          />
+          <!-- Crosshair pin -->
+          <div
+            class="absolute w-5 h-5 rounded-full border-2 border-white shadow-lg bg-primary-500 ring-2 ring-primary-500/30 pointer-events-none transition-[left,top] duration-100"
+            :style="{
+              left: `${modelValue.hero_focal_x}%`,
+              top: `${modelValue.hero_focal_y}%`,
+              transform: 'translate(-50%, -50%)',
+            }"
+          />
+        </div>
+        <div
+          v-else-if="isHeroVideo"
+          class="rounded-lg border border-dashed border-gray-300 p-6 text-center text-xs text-gray-500"
+        >
+          Focal point is only available for image heroes. Videos fall back to centre cropping.
+        </div>
+        <div
+          v-else
+          class="rounded-lg border border-dashed border-gray-300 p-6 text-center text-xs text-gray-400"
+        >
+          Upload a hero image above to choose its focal point.
+        </div>
+
+        <!-- Readout + mini crop previews -->
+        <div v-if="modelValue.hero_image_url && !isHeroVideo">
+          <p class="text-xs text-gray-500 mb-2">
+            Focal point:
+            <span class="font-mono text-gray-700">{{ modelValue.hero_focal_x }}% × {{ modelValue.hero_focal_y }}%</span>
+          </p>
+          <p class="text-xs font-medium text-gray-600 mb-2">How it crops on each screen</p>
+          <div class="grid grid-cols-3 gap-3">
+            <div v-for="crop in cropPreviews" :key="crop.label" class="space-y-1">
+              <div
+                class="relative w-full rounded-lg border border-gray-200 overflow-hidden bg-gray-200"
+                :style="{ aspectRatio: crop.aspect }"
+              >
+                <img
+                  :src="modelValue.hero_image_url"
+                  alt=""
+                  class="absolute inset-0 w-full h-full object-cover"
+                  :style="{ objectPosition: focalPosition }"
+                />
+              </div>
+              <p class="text-[10px] text-center text-gray-500">{{ crop.label }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -206,6 +284,8 @@ export interface HomepageForm {
   hero_overlay_color: string
   hero_overlay_opacity: number
   hero_full_bleed: boolean
+  hero_focal_x: number
+  hero_focal_y: number
   hero_image_url: string
   hero_media_mime: string
 }
@@ -229,7 +309,37 @@ const colorPresets = [
   { label: 'White', value: '#FFFFFF' },
 ]
 
+const cropPreviews = [
+  { label: 'Mobile', aspect: '3 / 4' },
+  { label: 'Desktop', aspect: '16 / 9' },
+  { label: 'Ultra-wide', aspect: '21 / 7' },
+]
+
+const focalPosition = computed(
+  () => `${props.modelValue.hero_focal_x}% ${props.modelValue.hero_focal_y}%`
+)
+
 function update<K extends keyof HomepageForm>(key: K, value: HomepageForm[K]) {
   emit('update:modelValue', { ...props.modelValue, [key]: value })
+}
+
+function resetFocal() {
+  emit('update:modelValue', {
+    ...props.modelValue,
+    hero_focal_x: 50,
+    hero_focal_y: 50,
+  })
+}
+
+function onFocalClick(e: MouseEvent) {
+  const target = e.currentTarget as HTMLElement
+  const rect = target.getBoundingClientRect()
+  const x = Math.round(((e.clientX - rect.left) / rect.width) * 100)
+  const y = Math.round(((e.clientY - rect.top) / rect.height) * 100)
+  emit('update:modelValue', {
+    ...props.modelValue,
+    hero_focal_x: Math.min(100, Math.max(0, x)),
+    hero_focal_y: Math.min(100, Math.max(0, y)),
+  })
 }
 </script>

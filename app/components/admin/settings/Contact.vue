@@ -167,11 +167,12 @@
           <span class="ml-2 text-[10px] text-gray-400 font-medium">Support Promises</span>
         </div>
         <div class="py-8 px-6 text-white text-center" :style="{ backgroundColor: themeColors.secondary }">
-          <div class="flex gap-3 justify-center items-start flex-wrap">
+          <!-- Promises grid — matches public /contact (3 cols on desktop) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             <div
               v-for="(item, i) in contactPage.promises"
               :key="i"
-              class="group/card relative flex-1 min-w-[120px] max-w-[200px] flex flex-col items-center px-3"
+              class="group/card relative flex flex-col items-center px-3"
             >
               <!-- Delete button -->
               <button
@@ -206,9 +207,9 @@
 
             <!-- Add promise -->
             <button
-              v-if="contactPage.promises.length < 6"
+              v-if="contactPage.promises.length < 12"
               type="button"
-              class="flex-1 min-w-[80px] max-w-[100px] rounded-lg border-2 border-dashed border-white/20 py-6 flex flex-col items-center justify-center text-white/30 hover:text-white/70 hover:border-white/40 transition-all"
+              class="rounded-lg border-2 border-dashed border-white/20 py-6 flex flex-col items-center justify-center text-white/30 hover:text-white/70 hover:border-white/40 transition-all"
               @click="addPromiseItem"
             >
               <svg class="w-5 h-5 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>

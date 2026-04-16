@@ -73,7 +73,8 @@
           <span class="ml-2 text-[10px] text-gray-400 font-medium">Highlights</span>
         </div>
         <div class="bg-gray-50/80 p-6">
-          <div class="grid gap-3" :style="{ gridTemplateColumns: `repeat(${Math.min(highlights.items.length + 1, 4)}, minmax(0, 1fr))` }">
+          <!-- Highlights grid — matches public /about (3 cols on desktop) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             <div
               v-for="(item, i) in highlights.items"
               :key="i"
@@ -90,7 +91,7 @@
               </button>
 
               <!-- Icon -->
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3" :class="CARD_COLORS[i % CARD_COLORS.length]!.bg">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3 bg-secondary-50 text-secondary-600">
                 <AdminIconPicker :model-value="item.icon || 'heroicons:check-circle'" @update:model-value="updateHighlightItem(i, 'icon', $event)" />
               </div>
 
@@ -98,7 +99,7 @@
                 :value="item.title"
                 @input="updateHighlightItem(i, 'title', ($event.target as HTMLInputElement).value)"
                 type="text"
-                class="edit-inline text-sm font-semibold text-gray-900 mb-1"
+                class="edit-inline text-sm font-semibold text-secondary-800 mb-1"
                 placeholder="Title"
               />
               <input
@@ -112,7 +113,7 @@
 
             <!-- Add highlight card -->
             <button
-              v-if="highlights.items.length < 6"
+              v-if="highlights.items.length < 12"
               type="button"
               class="rounded-xl border-2 border-dashed border-gray-200 p-4 flex flex-col items-center justify-center text-gray-300 hover:text-primary-500 hover:border-primary-300 transition-all min-h-[100px]"
               @click="addHighlightItem"
@@ -131,12 +132,6 @@
 import type { MediaCollection } from '~/composables/useMediaUpload'
 import type { AboutHighlights } from '~/composables/useSiteConfig'
 import { DEFAULT_THEME } from '~/composables/useSiteConfig'
-
-const CARD_COLORS = [
-  { bg: 'bg-primary-50 text-primary-600' },
-  { bg: 'bg-emerald-50 text-emerald-600' },
-  { bg: 'bg-purple-50 text-purple-600' },
-]
 
 export interface AboutForm {
   about_image_url: string

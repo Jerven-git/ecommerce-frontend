@@ -96,6 +96,8 @@ export interface SiteConfig {
   hero_overlay_color: string
   hero_overlay_opacity: number
   hero_full_bleed: boolean
+  hero_focal_x: number
+  hero_focal_y: number
   hero_image_url: string | null
   hero_media_mime: string | null
   about_content: string | null

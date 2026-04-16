@@ -45,8 +45,8 @@
             placeholder="Subtitle"
           />
 
-          <!-- Step cards grid -->
-          <div class="grid gap-3" :style="{ gridTemplateColumns: `repeat(${Math.min(localSteps.items.length + 1, 4)}, minmax(0, 1fr))` }">
+          <!-- Step cards grid — matches public /page (3 cols on desktop) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             <div
               v-for="(step, i) in localSteps.items"
               :key="i"
@@ -63,17 +63,17 @@
               </button>
 
               <!-- Icon -->
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3 ring-2 ring-white shadow-sm" :class="STEP_COLORS[i % STEP_COLORS.length]!.bg">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3 ring-2 ring-white shadow-sm bg-secondary-50">
                 <AdminIconPicker :model-value="step.icon || DEFAULT_ICON" @update:model-value="updateStepItem(i, 'icon', $event)" />
               </div>
 
-              <span class="text-[9px] font-bold uppercase tracking-wider mb-1" :class="STEP_COLORS[i % STEP_COLORS.length]!.text">Step {{ i + 1 }}</span>
+              <span class="text-[9px] font-bold uppercase tracking-wider mb-1 text-secondary-600">Step {{ i + 1 }}</span>
 
               <input
                 :value="step.title"
                 @input="updateStepItem(i, 'title', ($event.target as HTMLInputElement).value)"
                 type="text"
-                class="edit-inline text-sm font-semibold text-gray-900 mb-1 text-center"
+                class="edit-inline text-sm font-semibold text-secondary-800 mb-1 text-center"
                 placeholder="Title"
               />
               <input
@@ -87,7 +87,7 @@
 
             <!-- Add step card -->
             <button
-              v-if="localSteps.items.length < 6"
+              v-if="localSteps.items.length < 12"
               type="button"
               class="rounded-xl border-2 border-dashed border-gray-200 p-4 flex flex-col items-center justify-center text-gray-300 hover:text-primary-500 hover:border-primary-300 transition-all min-h-[120px]"
               @click="addStepItem"
@@ -108,7 +108,8 @@
           <span class="ml-2 text-[10px] text-gray-400 font-medium">Features</span>
         </div>
         <div class="bg-gray-50/80 p-6">
-          <div class="grid gap-3" :style="{ gridTemplateColumns: `repeat(${Math.min(localFeatures.items.length + 1, 4)}, minmax(0, 1fr))` }">
+          <!-- Feature cards grid — matches public /page (3 cols on desktop) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             <div
               v-for="(feature, i) in localFeatures.items"
               :key="i"
@@ -125,7 +126,7 @@
               </button>
 
               <!-- Icon -->
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3" :class="FEATURE_COLORS[i % FEATURE_COLORS.length]!.bg">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3 bg-secondary-50">
                 <AdminIconPicker :model-value="feature.icon || DEFAULT_ICON" @update:model-value="updateFeatureItem(i, 'icon', $event)" />
               </div>
 
@@ -133,7 +134,7 @@
                 :value="feature.title"
                 @input="updateFeatureItem(i, 'title', ($event.target as HTMLInputElement).value)"
                 type="text"
-                class="edit-inline text-sm font-semibold text-gray-900 mb-1"
+                class="edit-inline text-sm font-semibold text-secondary-800 mb-1"
                 placeholder="Title"
               />
               <input
@@ -147,7 +148,7 @@
 
             <!-- Add feature card -->
             <button
-              v-if="localFeatures.items.length < 6"
+              v-if="localFeatures.items.length < 12"
               type="button"
               class="rounded-xl border-2 border-dashed border-gray-200 p-4 flex flex-col items-center justify-center text-gray-300 hover:text-primary-500 hover:border-primary-300 transition-all min-h-[100px]"
               @click="addFeatureItem"
@@ -168,11 +169,12 @@
           <span class="ml-2 text-[10px] text-gray-400 font-medium">Stats Banner</span>
         </div>
         <div class="py-8 px-6 text-white text-center" :style="{ background: `linear-gradient(135deg, ${themeColors.primary}, ${themeColors.secondary})` }">
-          <div class="flex gap-3 justify-center items-start flex-wrap">
+          <!-- Stats grid — matches public /page (2 cols mobile, 4 cols desktop) -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div
               v-for="(stat, i) in localStats.items"
               :key="i"
-              class="group/card relative flex-1 min-w-[80px] max-w-[140px]"
+              class="group/card relative"
             >
               <!-- Delete button -->
               <button
@@ -204,7 +206,7 @@
             <button
               v-if="localStats.items.length < 8"
               type="button"
-              class="flex-1 min-w-[60px] max-w-[80px] rounded-lg border-2 border-dashed border-white/20 py-4 flex flex-col items-center justify-center text-white/30 hover:text-white/70 hover:border-white/40 transition-all"
+              class="rounded-lg border-2 border-dashed border-white/20 py-4 flex flex-col items-center justify-center text-white/30 hover:text-white/70 hover:border-white/40 transition-all"
               @click="addStatItem"
             >
               <svg class="w-5 h-5 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
@@ -276,18 +278,6 @@
 import type { HomepageSteps, HomepageFeatures, HomepageStats, HomepageNewsletter } from '~/composables/useSiteConfig'
 import { DEFAULT_THEME } from '~/composables/useSiteConfig'
 import { DEFAULT_ICON } from '~/composables/useHighlightIcons'
-
-const STEP_COLORS = [
-  { bg: 'bg-primary-50', text: 'text-primary-600' },
-  { bg: 'bg-emerald-50', text: 'text-emerald-600' },
-  { bg: 'bg-purple-50', text: 'text-purple-600' },
-]
-
-const FEATURE_COLORS = [
-  { bg: 'bg-primary-50', text: 'text-primary-600' },
-  { bg: 'bg-emerald-50', text: 'text-emerald-600' },
-  { bg: 'bg-purple-50', text: 'text-purple-600' },
-]
 
 interface Props {
   steps: HomepageSteps
