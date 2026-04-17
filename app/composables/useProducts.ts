@@ -13,6 +13,7 @@ interface Product {
   volume_cbm: number
   category: string
   category_id: number | null
+  categories?: { id: number; name: string }[]
   image_url: string
   is_active: boolean
   allow_backorder: boolean

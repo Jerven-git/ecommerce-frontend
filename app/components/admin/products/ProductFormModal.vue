@@ -182,16 +182,16 @@
                         {{ categoryBreadcrumb }}
                       </p>
                       <p v-else class="text-xs text-gray-400">No category selected</p>
-                      <button v-if="form.category_id" type="button" @click="$emit('clearCategory')" class="text-xs text-gray-400 hover:text-red-500 transition-colors">Clear</button>
+                      <button v-if="form.category_ids.length" type="button" @click="$emit('clearCategory')" class="text-xs text-gray-400 hover:text-red-500 transition-colors">Clear</button>
                     </div>
                     <div class="max-h-48 overflow-y-auto py-1">
                       <template v-for="cat in allCategories" :key="cat.id">
                         <CategoryTreeItem
                           :category="cat"
                           :depth="0"
-                          :selected-id="form.category_id"
+                          :selected-ids="selectedCategoryIds"
                           :expanded-ids="catPickerExpanded"
-                          @select="$emit('selectCategory', $event)"
+                          @toggle-category="$emit('toggleCategory', $event)"
                           @toggle="$emit('toggleCatExpand', $event)"
                         />
                       </template>
@@ -381,6 +381,7 @@ const props = defineProps<{
   galleryFilesCount: number
   stagedPreviews: { key: string; url: string; name: string }[]
   allCategories: Category[]
+  selectedCategoryIds: Set<number>
   catPickerExpanded: Set<number>
   categoryBreadcrumb: string
 }>()
@@ -400,7 +401,7 @@ defineEmits<{
   gallerySelected: [event: Event]
   removeStagedFile: [index: number]
   deleteGalleryImage: [mediaId: number]
-  selectCategory: [id: number]
+  toggleCategory: [id: number]
   toggleCatExpand: [id: number]
   clearCategory: []
 }>()

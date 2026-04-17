@@ -304,7 +304,7 @@ export const guideSteps: GuideStep[] = [
     description: 'Enable tax and set your default rate. Choose whether prices include or exclude tax.',
     icon: icons.calc, iconBg: 'bg-amber-50',
     route: '/admin/tax-settings', target: '[data-guide="tax-config"]', prefer: 'right',
-    tips: ['Turn tax on or off for your whole store', 'Set a percentage rate (e.g., 12% VAT, 10% GST)', 'Choose inclusive (tax already included in the price) or exclusive (added at checkout)', 'Customize the tax label shown to customers'],
+    tips: ['Turn tax on or off for your whole store', 'Set a percentage rate (e.g., 12% Tax, 10% GST)', 'Choose inclusive (tax already included in the price) or exclusive (added at checkout)', 'Customize the tax label shown to customers'],
   },
   {
     title: 'Regional Tax Rules',

@@ -1,4 +1,4 @@
-<template>
+ t<template>
   <section data-guide="settings-theme" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
@@ -162,7 +162,7 @@
               :style="{
                 backgroundColor: modelValue.accent_color,
                 backgroundImage: tex.css,
-                backgroundSize: tex.id === 'dots' || tex.id === 'grid' ? '20px 20px' : tex.id === 'waves' ? '40px 20px' : 'auto',
+                backgroundSize: { dots: '20px 20px', grid: '20px 20px', waves: '40px 20px', polka: '30px 30px', zigzag: '20px 20px', diamond: '24px 24px' }[tex.id] || 'auto',
                 color: modelValue.primary_color + '15',
               }"
             ></div>

@@ -110,6 +110,8 @@
             :adding-name="addingName"
             :saving="saving"
             :search-query="searchQuery"
+            :dragging-id="draggingId"
+            :dragging-parent-id="draggingParentId"
             @toggle="toggleExpand"
             @start-edit="startEdit"
             @save-edit="saveEdit"
@@ -120,6 +122,9 @@
             @save-add="saveAddChild"
             @cancel-add="cancelAddChild"
             @update:adding-name="addingName = $event"
+            @drag-start="handleDragStart"
+            @drag-end="handleDragEnd"
+            @drag-drop="handleDragDrop"
           />
         </div>
 
@@ -176,6 +181,10 @@ const deleteTarget = ref<Category | null>(null)
 
 // Search
 const searchQuery = ref('')
+
+// Drag and drop
+const draggingId = ref<number | null>(null)
+const draggingParentId = ref<number | null | undefined>(undefined)
 
 function filterTree(cats: Category[], query: string): Category[] {
   if (!query) return cats
@@ -332,6 +341,68 @@ async function executeDelete() {
     alert(err?.data?.message || 'Failed to delete category.')
   } finally {
     saving.value = false
+  }
+}
+
+// --- Drag and drop handlers ---
+
+function handleDragStart(catId: number, parentId: number | null) {
+  draggingId.value = catId
+  draggingParentId.value = parentId
+}
+
+function handleDragEnd() {
+  draggingId.value = null
+  draggingParentId.value = undefined
+}
+
+function handleDragDrop(draggedId: number, targetId: number, parentId: number | null, pos: 'before' | 'after') {
+  const list = parentId === null
+    ? categories.value
+    : findCategory(categories.value, parentId)?.children
+
+  if (!list) return
+
+  const fromIdx = list.findIndex(c => c.id === draggedId)
+  if (fromIdx === -1) return
+
+  const arr = [...list]
+  const item = arr.splice(fromIdx, 1)[0]
+  if (!item) return
+
+  let toIdx = arr.findIndex(c => c.id === targetId)
+  if (toIdx === -1) return
+  if (pos === 'after') toIdx++
+
+  arr.splice(toIdx, 0, item)
+
+  if (parentId === null) {
+    categories.value = arr
+  } else {
+    const parent = findCategory(categories.value, parentId)
+    if (parent) parent.children = arr
+  }
+
+  handleDragEnd()
+  saveReorder(arr.map(c => c.id))
+}
+
+function findCategory(cats: Category[], id: number): Category | null {
+  for (const cat of cats) {
+    if (cat.id === id) return cat
+    if (cat.children?.length) {
+      const found = findCategory(cat.children, id)
+      if (found) return found
+    }
+  }
+  return null
+}
+
+async function saveReorder(ids: number[]) {
+  try {
+    await $apiFetch('/categories/reorder', { method: 'POST', body: { ids } })
+  } catch {
+    await fetchCategories()
   }
 }
 

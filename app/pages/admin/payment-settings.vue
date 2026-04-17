@@ -7,8 +7,6 @@
         <span>/</span>
         <span class="text-gray-600 font-medium">Payment Settings</span>
       </div>
-      <h1 class="text-2xl font-bold text-gray-900">Payment Settings</h1>
-      <p class="text-gray-500 text-sm mt-1">Enable and configure payment methods for your store</p>
     </div>
 
     <!-- Loading -->
@@ -30,27 +28,13 @@
 
       <!-- Payment Methods -->
       <section data-guide="payment-methods" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            </svg>
-          </div>
-          <div>
-            <p class="text-sm font-semibold text-gray-900">Payment Methods</p>
-            <p class="text-xs text-gray-400">Toggle which payment options are available at checkout</p>
-          </div>
-        </div>
-
         <div class="divide-y divide-gray-100">
           <!-- Cash -->
           <div class="px-6 py-5">
             <div class="flex items-center justify-between gap-4">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
-                  <svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
+                  <Icon name="mdi:cash" class="w-5 h-5 text-green-600" />
                 </div>
                 <div>
                   <p class="text-sm font-semibold text-gray-900">Cash Payment</p>
@@ -77,10 +61,8 @@
           <div class="px-6 py-5">
             <div class="flex items-center justify-between gap-4">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center shrink-0">
-                  <svg class="w-5 h-5 text-primary-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/>
-                  </svg>
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background-color:#635BFF">
+                  <Icon name="simple-icons:stripe" class="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <p class="text-sm font-semibold text-gray-900">Stripe</p>
@@ -121,11 +103,8 @@
           <div class="px-6 py-5">
             <div class="flex items-center justify-between gap-4">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center shrink-0">
-                  <svg class="w-5 h-5 text-primary-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M20.067 8.478c.492.88.556 2.014.3 3.327-.74 3.806-3.276 5.12-6.514 5.12h-.5a.805.805 0 00-.794.68l-.04.22-.63 3.993-.028.15a.805.805 0 01-.794.68H7.72a.483.483 0 01-.476-.558L8.926 9.306a.946.946 0 01.934-.807h2.094c4.066 0 6.826-1.676 7.69-6.51a5.47 5.47 0 00.05-.434.183.183 0 01.305-.142 3.994 3.994 0 011.645 2.32c.339.966.442 2.061.305 3.228z"/>
-                    <path d="M8.926 9.306h2.094c4.066 0 6.826-1.676 7.69-6.51a5.47 5.47 0 00.05-.434.183.183 0 01.305-.142 3.994 3.994 0 011.645 2.32c.34.966.442 2.061.305 3.228.492.88.556 2.014.3 3.327-.74 3.806-3.276 5.12-6.514 5.12h-.5a.805.805 0 00-.794.68l-.04.22-.63 3.993-.028.15a.805.805 0 01-.794.68H7.72a.483.483 0 01-.476-.558L8.926 9.306z" opacity="0.7"/>
-                  </svg>
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background-color:#003087">
+                  <Icon name="simple-icons:paypal" class="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <p class="text-sm font-semibold text-gray-900">PayPal</p>
@@ -166,10 +145,8 @@
           <div class="px-6 py-5">
             <div class="flex items-center justify-between gap-4">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center shrink-0">
-                  <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                    <rect x="4" y="4" width="16" height="16" rx="2"/>
-                  </svg>
+                <div class="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center shrink-0">
+                  <Icon name="simple-icons:square" class="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <p class="text-sm font-semibold text-gray-900">Square</p>

@@ -260,7 +260,10 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-900 mb-1.5">Payment Link Expiry (hours)</label>
+              <div class="flex items-center gap-1.5 mb-1.5">
+                <label class="text-sm font-medium text-gray-900">Payment Link Expiry (hours)</label>
+                <HelpTip :text="expiryHelpText" />
+              </div>
               <input
                 v-model.number="settings.backorder_payment_link_expiry_hours"
                 type="number"
@@ -385,6 +388,17 @@ const actionId = ref<number | null>(null)
 
 const showSettings = ref(false)
 const savingSettings = ref(false)
+
+const expiryHelpText = [
+  '1. If you have backorders enabled and a product\'s own backorder toggle is on...',
+  '2. A customer adds an out-of-stock item to their cart. Any available quantity completes as a standard purchase — the rest becomes a backorder.',
+  '3. If your payment settings allow manual invoice/payment, the backorder can also be placed as an "order" to be paid later.',
+  '4. The moment you add stock in the admin, the system finds the longest-waiting buyer for that product.',
+  '5. That buyer is emailed a payment link to complete their order.',
+  '6. The link stays active for as many hours as set in the field above.',
+  '7. If they don\'t pay in time, the link closes, their backorder is deleted, and they\'re notified by email.',
+  '8. The system moves to the next buyer in the queue and repeats the process.',
+].join('\n')
 const settings = ref({
   backorder_enabled: false,
   backorder_payment_link_expiry_hours: 24,

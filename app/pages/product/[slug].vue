@@ -302,6 +302,7 @@ interface Product {
   image_url?: string
   category: string
   category_id: number | null
+  categories?: { id: number; name: string }[]
   stock: number
   is_active: boolean
   can_backorder: boolean

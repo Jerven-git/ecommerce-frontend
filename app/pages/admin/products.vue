@@ -13,7 +13,7 @@
       </div>
       <button
         data-guide="add-product-btn"
-        @click="productForm.openAddModal(); categories.initCategoryForProduct(null)"
+        @click="productForm.openAddModal(); categories.initCategoryForProduct([])"
         class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shrink-0"
       >
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -60,7 +60,7 @@
       </div>
       <p class="font-semibold text-gray-700 mb-1">No products yet</p>
       <p class="text-sm text-gray-400 mb-6">Add your first product to get started</p>
-      <button @click="productForm.openAddModal(); categories.initCategoryForProduct(null)" class="btn-primary">Add Product</button>
+      <button @click="productForm.openAddModal(); categories.initCategoryForProduct([])" class="btn-primary">Add Product</button>
     </div>
 
     <!-- Products table -->
@@ -105,6 +105,7 @@
       :gallery-files-count="productForm.galleryFiles.value.length"
       :staged-previews="productForm.stagedPreviews.value"
       :all-categories="categories.allCategories.value"
+      :selected-category-ids="categories.selectedCategoryIds.value"
       :cat-picker-expanded="categories.catPickerExpanded.value"
       :category-breadcrumb="categories.categoryBreadcrumb.value"
       @close="productForm.closeModal"
@@ -112,7 +113,7 @@
       @gallery-selected="productForm.onGallerySelected"
       @remove-staged-file="productForm.removeStagedFile"
       @delete-gallery-image="(id: number) => productForm.deleteGalleryImage(id, products.loadProducts)"
-      @select-category="(id: number) => categories.selectCategory(id, productForm.form.value)"
+      @toggle-category="(id: number) => categories.toggleCategory(id, productForm.form.value)"
       @toggle-cat-expand="categories.toggleCatPickerExpand"
       @clear-category="categories.clearCategorySelection(productForm.form.value)"
     />
@@ -133,7 +134,8 @@ const categories = useProductCategories()
 
 const handleEdit = async (product: Product) => {
   await productForm.openEditModal(product)
-  categories.initCategoryForProduct(product.category_id ? Number(product.category_id) : null)
+  const ids = product.categories?.map((c: any) => c.id) || (product.category_id ? [Number(product.category_id)] : [])
+  categories.initCategoryForProduct(ids)
 }
 
 const onEscape = (e: KeyboardEvent) => {

@@ -59,7 +59,7 @@
             <div>
               <div class="flex items-center gap-1.5 mb-1.5">
                 <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tax Rate</label>
-                <HelpTip text="The percentage of tax applied to each order. For example, enter 12 for 12% VAT or 10 for 10% GST." />
+                <HelpTip text="The percentage of tax applied to each order. For example, enter 12 for 12% Tax or 10 for 10% GST." />
               </div>
               <div class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent max-w-xs">
                 <input v-model.number="form.tax_rate" type="number" step="0.01" min="0" max="100" class="flex-1 px-3 py-2 text-sm outline-none bg-white" placeholder="0.00" />
@@ -130,9 +130,9 @@
             <div>
               <div class="flex items-center gap-1.5 mb-1.5">
                 <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tax Label</label>
-                <HelpTip text="The name shown to customers on invoices and at checkout. Use your local tax name like VAT, GST, Sales Tax, etc." />
+                <HelpTip text="The name shown to customers on invoices and at checkout. Use your local tax name like Tax, GST, Sales Tax, etc." />
               </div>
-              <input v-model="form.tax_name" type="text" class="input-field max-w-xs" placeholder="VAT, GST, Sales Tax..." />
+              <input v-model="form.tax_name" type="text" class="input-field max-w-xs" placeholder="Tax, GST, Sales Tax..." />
             </div>
           </template>
         </div>
@@ -364,7 +364,7 @@ const form = ref({
   tax_enabled: false,
   tax_rate: 0,
   tax_display_mode: 'exclusive' as 'inclusive' | 'exclusive',
-  tax_name: 'VAT',
+  tax_name: 'Tax',
   default_display_country: '',
   default_display_state: '',
 })
@@ -490,7 +490,7 @@ async function loadAll() {
         tax_enabled: settingsRes.data.tax_enabled || false,
         tax_rate: parseFloat(settingsRes.data.tax_rate) || 0,
         tax_display_mode: settingsRes.data.tax_display_mode || 'exclusive',
-        tax_name: settingsRes.data.tax_name || 'VAT',
+        tax_name: settingsRes.data.tax_name || 'Tax',
         default_display_country: settingsRes.data.default_display_country || '',
         default_display_state: settingsRes.data.default_display_state || '',
       }

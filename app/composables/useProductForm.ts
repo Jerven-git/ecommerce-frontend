@@ -12,6 +12,7 @@ export interface ProductFormData {
   shipping_calc_type: 'weight' | 'dimensions'
   category: string
   category_id: number | null
+  category_ids: number[]
   is_active: boolean
   allow_backorder: boolean
   backorder_charge_policy: 'charged_now' | 'charged_later'
@@ -30,6 +31,7 @@ function defaultFormData(): ProductFormData {
     shipping_calc_type: 'weight',
     category: 'general',
     category_id: null,
+    category_ids: [],
     is_active: true,
     allow_backorder: false,
     backorder_charge_policy: 'charged_later',
@@ -178,6 +180,7 @@ export function useProductForm() {
       shipping_calc_type: product.shipping_calc_type || 'weight',
       category: product.category,
       category_id: product.category_id,
+      category_ids: product.categories?.map((c: any) => c.id) || (product.category_id ? [product.category_id] : []),
       is_active: product.is_active,
       allow_backorder: product.allow_backorder ?? false,
       backorder_charge_policy: product.backorder_charge_policy ?? 'charged_later',
@@ -237,6 +240,9 @@ export function useProductForm() {
       formData.append('category', form.value.category)
       if (form.value.category_id !== null) {
         formData.append('category_id', String(form.value.category_id))
+      }
+      for (const id of form.value.category_ids) {
+        formData.append('category_ids[]', String(id))
       }
       formData.append('is_active', form.value.is_active ? '1' : '0')
       formData.append('allow_backorder', form.value.allow_backorder ? '1' : '0')
