@@ -9,7 +9,7 @@ export function useProductCategories() {
   const { $apiFetch } = useNuxtApp()
 
   const allCategories = ref<Category[]>([])
-  const categorySelections = ref<(number | null)[]>([])
+  const selectedCategoryIds = ref<Set<number>>(new Set())
   const catPickerExpanded = ref<Set<number>>(new Set())
 
   function normalizeCategories(cats: any[]): Category[] {
@@ -59,59 +59,55 @@ export function useProductCategories() {
     catPickerExpanded.value = s
   }
 
-  function selectCategory(id: number, form: { category_id: number | null; category: string }) {
-    if (form.category_id === id) {
-      form.category_id = null
-      form.category = 'general'
-      categorySelections.value = []
-      return
-    }
-    form.category_id = id
-    const cat = findCategoryById(allCategories.value, id)
-    form.category = cat?.name || 'general'
-    const path = findCategoryPath(allCategories.value, id)
-    categorySelections.value = path.map(c => c.id)
-    const parentIds = path.slice(0, -1).map(c => c.id)
-    catPickerExpanded.value = new Set([...catPickerExpanded.value, ...parentIds])
-  }
-
-  function clearCategorySelection(form: { category_id: number | null; category: string }) {
-    form.category_id = null
-    form.category = 'general'
-    categorySelections.value = []
-  }
-
-  function initCategoryForProduct(categoryId: number | null) {
-    if (categoryId) {
-      const path = findCategoryPath(allCategories.value, categoryId)
-      categorySelections.value = path.map(c => Number(c.id))
-      catPickerExpanded.value = new Set(path.slice(0, -1).map(c => Number(c.id)))
+  function toggleCategory(id: number, form: { category_ids: number[] }) {
+    const s = new Set(selectedCategoryIds.value)
+    if (s.has(id)) {
+      s.delete(id)
     } else {
-      categorySelections.value = []
-      catPickerExpanded.value = new Set()
+      s.add(id)
     }
+    selectedCategoryIds.value = s
+    form.category_ids = Array.from(s)
+  }
+
+  function clearCategorySelection(form: { category_ids: number[] }) {
+    selectedCategoryIds.value = new Set()
+    form.category_ids = []
+  }
+
+  function initCategoryForProduct(categoryIds: number[]) {
+    selectedCategoryIds.value = new Set(categoryIds)
+    // Auto-expand parent paths for all selected categories
+    const expandIds = new Set(catPickerExpanded.value)
+    for (const id of categoryIds) {
+      const path = findCategoryPath(allCategories.value, id)
+      for (const cat of path.slice(0, -1)) {
+        expandIds.add(cat.id)
+      }
+    }
+    catPickerExpanded.value = expandIds
   }
 
   const categoryBreadcrumb = computed(() => {
-    const names: string[] = []
-    for (const selId of categorySelections.value) {
-      if (selId == null) break
-      const cat = findCategoryById(allCategories.value, selId)
-      if (cat) names.push(cat.name)
-    }
-    return names.length > 1 ? names.join(' > ') : ''
+    const ids = Array.from(selectedCategoryIds.value)
+    if (ids.length === 0) return ''
+    const names = ids.map(id => {
+      const cat = findCategoryById(allCategories.value, id)
+      return cat?.name || ''
+    }).filter(Boolean)
+    return names.join(', ')
   })
 
   return {
     allCategories,
-    categorySelections,
+    selectedCategoryIds,
     catPickerExpanded,
     categoryBreadcrumb,
     fetchCategories,
     findCategoryById,
     findCategoryPath,
     toggleCatPickerExpand,
-    selectCategory,
+    toggleCategory,
     clearCategorySelection,
     initCategoryForProduct,
   }

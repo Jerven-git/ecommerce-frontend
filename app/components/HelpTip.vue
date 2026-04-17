@@ -19,7 +19,7 @@
       <div
         v-if="open"
         ref="tooltipRef"
-        class="fixed z-50 w-64 p-3 bg-white text-gray-700 text-xs leading-relaxed rounded-xl shadow-lg border border-gray-200"
+        class="fixed z-50 w-72 p-3 bg-white text-gray-700 text-xs leading-relaxed rounded-xl shadow-lg border border-gray-200 whitespace-pre-line"
         :style="tooltipStyle"
       >
         {{ text }}

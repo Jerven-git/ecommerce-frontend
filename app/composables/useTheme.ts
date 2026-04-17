@@ -143,6 +143,26 @@ export const AVAILABLE_TEXTURES: TextureOption[] = [
     name: 'Waves',
     css: 'radial-gradient(ellipse at 50% 0%, transparent 60%, currentColor 61%, transparent 62%), radial-gradient(ellipse at 50% 100%, transparent 60%, currentColor 61%, transparent 62%)',
   },
+  {
+    id: 'polka',
+    name: 'Polka',
+    css: 'radial-gradient(circle, currentColor 3px, transparent 3px)',
+  },
+  {
+    id: 'zigzag',
+    name: 'Zigzag',
+    css: 'linear-gradient(135deg, currentColor 25%, transparent 25%), linear-gradient(225deg, currentColor 25%, transparent 25%), linear-gradient(315deg, currentColor 25%, transparent 25%), linear-gradient(45deg, currentColor 25%, transparent 25%)',
+  },
+  {
+    id: 'stripes',
+    name: 'Stripes',
+    css: 'repeating-linear-gradient(0deg, transparent, transparent 5px, currentColor 5px, currentColor 6px)',
+  },
+  {
+    id: 'diamond',
+    name: 'Diamond',
+    css: 'linear-gradient(45deg, currentColor 25%, transparent 25%), linear-gradient(-45deg, currentColor 25%, transparent 25%), linear-gradient(45deg, transparent 75%, currentColor 75%), linear-gradient(-45deg, transparent 75%, currentColor 75%)',
+  },
 ]
 
 // Complete theme presets
@@ -270,6 +290,10 @@ export function useTheme() {
         diagonal: 'auto',
         cross: 'auto',
         waves: '40px 20px',
+        polka: '30px 30px',
+        zigzag: '20px 20px',
+        stripes: 'auto',
+        diamond: '24px 24px',
       }
       root.setProperty('--texture-size', sizeMap[texture.id] || 'auto')
     } else {
