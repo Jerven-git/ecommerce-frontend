@@ -62,6 +62,8 @@
         v-show="activeTab === 'appearance'"
         :form="form"
         :saved-theme="savedTheme"
+        :saved-hero="savedHero"
+        @preset-applied="onPresetApplied"
       />
 
       <AdminSettingsTabsPagesTab
@@ -105,6 +107,7 @@
 
 <script setup lang="ts">
 import type { MediaCollection } from '~/composables/useMediaUpload'
+import { THEME_PRESETS, type ThemePreset } from '~/composables/useTheme'
 
 definePageMeta({ middleware: "auth" })
 
@@ -189,6 +192,10 @@ const savedTheme = ref({
   texture: "none",
 })
 
+// Snapshot of the last-saved hero media — used as the revert target when
+// deselecting a preset, mirroring how savedTheme reverts the colours.
+const savedHero = ref({ image: '', mime: '' })
+
 const { showToast } = useAdminToast()
 
 // --- Save confirmation modal ---
@@ -244,7 +251,11 @@ const form = ref({
   hero_media_mime: "",
   about_content: "",
   about_image_url: "",
+  about_overlay_color: "#000000",
+  about_overlay_opacity: 45,
   contact_image_url: "",
+  contact_overlay_color: "#000000",
+  contact_overlay_opacity: 45,
   contact_email: "",
   contact_phone: "",
   contact_entries: [{ label: '', email: '', phone: '' }] as ContactEntry[],
@@ -340,10 +351,56 @@ function onMediaSelect(file: File, collection: MediaCollection) {
   }
 }
 
+function findActiveThemePreset(): ThemePreset | undefined {
+  const t = form.value.theme
+  return THEME_PRESETS.find(p =>
+    p.primary.toLowerCase() === t.primary_color.toLowerCase()
+    && p.secondary.toLowerCase() === t.secondary_color.toLowerCase()
+    && p.accent.toLowerCase() === t.accent_color.toLowerCase()
+    && p.headingFont === t.heading_font
+    && p.bodyFont === t.body_font
+    && p.texture === t.texture
+  )
+}
+
 function onMediaRemove(collection: MediaCollection) {
+  // Capture what was there before we clear — lets us tell a user upload
+  // apart from a preset URL so we can restore the preset hero only when
+  // it makes sense (see the hero branch below).
+  const previousUrl = form.value[urlFields[collection]] as string
+
   media.markDeleted(collection)
   ;(form.value[urlFields[collection]] as string) = ''
-  if (collection === 'hero') form.value.hero_media_mime = ''
+  if (collection === 'hero') {
+    form.value.hero_media_mime = ''
+    // Only restore a preset's hero when the user is removing their own
+    // upload (not when they're removing the preset image itself).
+    const wasPresetHero = !!previousUrl && previousUrl.startsWith('/images/')
+    if (!wasPresetHero) {
+      const active = findActiveThemePreset()
+      if (active) {
+        form.value.hero_image_url = active.heroImage
+        form.value.hero_media_mime = active.heroMediaMime
+      }
+    }
+  }
+}
+
+function onPresetApplied({ heroImage, heroMediaMime }: { heroImage: string, heroMediaMime: string }) {
+  // Protect a user-uploaded hero: if the current hero is a real upload
+  // (not a preset URL) or a pending in-session upload, leave it alone.
+  // Presets then apply colours/fonts only.
+  const hasPendingUpload = !!media.pending.hero
+  const current = form.value.hero_image_url
+  const isPresetOrEmpty = !current || current.startsWith('/images/')
+
+  if (hasPendingUpload || !isPresetOrEmpty) return
+
+  // Current hero is empty or a preset URL — safe to swap. markDeleted clears
+  // any stale preview and queues deletion of a server-side preset Media (if any).
+  media.markDeleted('hero')
+  form.value.hero_image_url = heroImage
+  form.value.hero_media_mime = heroMediaMime
 }
 
 // --- Contact entries ---
@@ -392,7 +449,11 @@ async function loadSettings() {
         hero_media_mime: response.data.hero_media_mime || "",
         about_content: response.data.about_content || "",
         about_image_url: response.data.about_image_url || "",
+        about_overlay_color: response.data.about_overlay_color || "#000000",
+        about_overlay_opacity: response.data.about_overlay_opacity ?? 45,
         contact_image_url: response.data.contact_image_url || "",
+        contact_overlay_color: response.data.contact_overlay_color || "#000000",
+        contact_overlay_opacity: response.data.contact_overlay_opacity ?? 45,
         contact_email: response.data.contact_email || "",
         contact_phone: response.data.contact_phone || "",
         contact_entries: response.data.contact_entries?.length
@@ -487,6 +548,7 @@ async function loadSettings() {
       }
 
       savedTheme.value = { ...form.value.theme }
+      savedHero.value = { image: form.value.hero_image_url, mime: form.value.hero_media_mime }
     }
   } catch (err: any) {
     console.error("Error loading settings:", err)
@@ -523,7 +585,13 @@ async function saveSettings() {
         hero_full_bleed: form.value.hero_full_bleed,
         hero_focal_x: form.value.hero_focal_x,
         hero_focal_y: form.value.hero_focal_y,
+        hero_image_url: form.value.hero_image_url,
+        hero_media_mime: form.value.hero_media_mime,
         about_content: form.value.about_content,
+        about_overlay_color: form.value.about_overlay_color,
+        about_overlay_opacity: form.value.about_overlay_opacity,
+        contact_overlay_color: form.value.contact_overlay_color,
+        contact_overlay_opacity: form.value.contact_overlay_opacity,
         contact_email: form.value.contact_email,
         contact_phone: form.value.contact_phone,
         contact_entries: form.value.contact_entries,

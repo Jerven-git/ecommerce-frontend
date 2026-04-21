@@ -33,10 +33,21 @@
                 <span class="w-1.5 h-1.5 rounded-full bg-white/50"></span>
                 <span class="w-1.5 h-1.5 rounded-full bg-white/50"></span>
               </div>
-              <div class="h-12 p-1.5" :style="{ backgroundColor: preset.accent }">
-                <div class="h-2 rounded-sm w-3/4 mb-1" :style="{ backgroundColor: preset.primary, opacity: 0.3 }"></div>
-                <div class="h-1.5 rounded-sm w-full" :style="{ backgroundColor: preset.secondary, opacity: 0.15 }"></div>
-                <div class="h-1.5 rounded-sm w-2/3 mt-0.5" :style="{ backgroundColor: preset.secondary, opacity: 0.1 }"></div>
+              <div class="relative h-16 overflow-hidden" :style="{ backgroundColor: preset.accent }">
+                <img
+                  v-if="preset.heroImage"
+                  :src="preset.heroImage"
+                  class="absolute inset-0 w-full h-full object-cover"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="absolute inset-0" :style="{ backgroundColor: preset.primary, opacity: 0.35 }"></div>
+                <div class="relative p-1.5">
+                  <div class="h-2 rounded-sm w-3/4 mb-1 bg-white/85"></div>
+                  <div class="h-1.5 rounded-sm w-full bg-white/55"></div>
+                  <div class="h-1.5 rounded-sm w-2/3 mt-0.5 bg-white/40"></div>
+                </div>
               </div>
             </div>
             <p class="text-xs font-semibold text-gray-800 leading-tight">{{ preset.name }}</p>
@@ -194,11 +205,13 @@ export interface ThemeForm {
 interface Props {
   modelValue: ThemeForm
   savedTheme: ThemeForm
+  savedHero: { image: string, mime: string }
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
   'update:modelValue': [value: ThemeForm]
+  'preset-applied': [value: { heroImage: string, heroMediaMime: string }]
 }>()
 
 const availableFonts = AVAILABLE_FONTS
@@ -251,14 +264,20 @@ function isActivePreset(preset: ThemePreset): boolean {
 function togglePreset(preset: ThemePreset) {
   if (!isActivePreset(preset)) {
     emit('update:modelValue', presetToTheme(preset))
+    emit('preset-applied', { heroImage: preset.heroImage, heroMediaMime: preset.heroMediaMime })
     return
   }
-  // Deselect: revert to the last-saved theme. If the saved theme IS this
-  // preset, fall back to the hardcoded default so the toggle still does
-  // something visible.
+  // Deselect: revert to the last-saved theme + hero. If the saved state IS
+  // this preset, fall back to empty so the toggle still does something visible.
   const target = themeMatches(props.savedTheme, presetToTheme(preset))
     ? DEFAULT_THEME
     : props.savedTheme
   emit('update:modelValue', { ...target })
+
+  const heroMatchesPreset = props.savedHero.image === preset.heroImage
+  emit('preset-applied', {
+    heroImage: heroMatchesPreset ? '' : props.savedHero.image,
+    heroMediaMime: heroMatchesPreset ? '' : props.savedHero.mime,
+  })
 }
 </script>

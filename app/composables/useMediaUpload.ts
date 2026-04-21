@@ -70,6 +70,12 @@ export function useMediaUpload(options: UseMediaUploadOptions) {
     clearPreview(collection)
   }
 
+  function cancelPending(collection: MediaCollection) {
+    pending[collection] = null
+    pendingDelete[collection] = false
+    clearPreview(collection)
+  }
+
   // --- Drag handlers ---
 
   function onDragEnter(collection: MediaCollection) {
@@ -161,6 +167,7 @@ export function useMediaUpload(options: UseMediaUploadOptions) {
 
     queueFile,
     markDeleted,
+    cancelPending,
     clearPreview,
 
     onDragEnter,

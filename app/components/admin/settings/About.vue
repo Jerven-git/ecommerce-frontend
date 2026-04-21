@@ -30,6 +30,22 @@
         />
       </div>
 
+      <!-- Hero overlay controls -->
+      <AdminSettingsOverlayControls
+        heading="About Image Overlay"
+        description="Darken or tint the about image for better text readability."
+        input-id-prefix="about"
+        :color="modelValue.about_overlay_color"
+        :opacity="modelValue.about_overlay_opacity"
+        show-preview
+        :preview-image-url="modelValue.about_image_url"
+        preview-title="About Us"
+        preview-subtitle="Learn more about our story and mission"
+        preview-empty-text="Upload an about image to preview"
+        @update:color="update('about_overlay_color', $event)"
+        @update:opacity="update('about_overlay_opacity', $event)"
+      />
+
       <!-- ═══════════ Our Story Display ═══════════ -->
       <div class="rounded-xl border border-gray-200 overflow-hidden">
         <div class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 border-b border-gray-200">
@@ -136,6 +152,8 @@ import { DEFAULT_THEME } from '~/composables/useSiteConfig'
 export interface AboutForm {
   about_image_url: string
   about_content: string
+  about_overlay_color: string
+  about_overlay_opacity: number
 }
 
 const props = defineProps<{
@@ -156,6 +174,10 @@ const themeColors = computed(() => ({
   primary: siteConfig.value?.theme?.primary_color || DEFAULT_THEME.primary_color,
   secondary: siteConfig.value?.theme?.secondary_color || DEFAULT_THEME.secondary_color,
 }))
+
+function update<K extends keyof AboutForm>(key: K, value: AboutForm[K]) {
+  emit('update:modelValue', { ...props.modelValue, [key]: value })
+}
 
 function updateHighlightItem(index: number, key: 'icon' | 'title' | 'description', value: string) {
   const items = props.highlights.items.map((item, i) => i === index ? { ...item, [key]: value } : item)
