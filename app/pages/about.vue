@@ -11,7 +11,14 @@
 
       <!-- Dark scrim for image readability -->
       <Transition name="fade">
-        <div v-if="imageLoaded" class="absolute inset-0 bg-black/45" />
+        <div
+          v-if="imageLoaded"
+          class="absolute inset-0"
+          :style="{
+            backgroundColor: siteConfig?.about_overlay_color || '#000000',
+            opacity: (siteConfig?.about_overlay_opacity ?? 45) / 100,
+          }"
+        />
       </Transition>
 
       <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

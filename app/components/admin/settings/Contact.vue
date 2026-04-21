@@ -30,6 +30,22 @@
         />
       </div>
 
+      <!-- Contact image overlay controls -->
+      <AdminSettingsOverlayControls
+        heading="Contact Image Overlay"
+        description="Darken or tint the contact image for better text readability."
+        input-id-prefix="contact"
+        :color="overlayColor"
+        :opacity="overlayOpacity"
+        show-preview
+        :preview-image-url="imageUrl"
+        preview-title="Contact Us"
+        preview-subtitle="We'd love to hear from you"
+        preview-empty-text="Upload a contact image to preview"
+        @update:color="emit('update:overlay-color', $event)"
+        @update:opacity="emit('update:overlay-opacity', $event)"
+      />
+
       <!-- ═══════════ Info Card Display ═══════════ -->
       <div class="rounded-xl border border-gray-200 overflow-hidden">
         <div class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 border-b border-gray-200">
@@ -239,12 +255,16 @@ const props = defineProps<{
   entries: ContactEntry[]
   contactPage: ContactPage
   mediaUploading: Record<string, boolean>
+  overlayColor: string
+  overlayOpacity: number
 }>()
 
 const emit = defineEmits<{
   'add-entry': []
   'remove-entry': [index: number]
   'update:contact-page': [value: ContactPage]
+  'update:overlay-color': [value: string]
+  'update:overlay-opacity': [value: number]
   'media-select': [file: File, collection: MediaCollection]
   'media-remove': [collection: MediaCollection]
 }>()

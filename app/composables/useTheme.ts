@@ -97,16 +97,32 @@ function generatePalette(baseHex: string): Record<string, string> {
   return palette
 }
 
-// Fonts available for selection
+// Fonts available for selection. Any font added here must also be declared in
+// `fonts.families` in nuxt.config.ts so @nuxt/fonts self-hosts it.
 export const AVAILABLE_FONTS = [
+  // Sans-serif (UI / general)
   'Inter',
   'Poppins',
-  'Playfair Display',
   'Roboto',
   'Lato',
   'Montserrat',
   'Open Sans',
+  'Nunito',
+  'Work Sans',
+  'DM Sans',
+  'Raleway',
+  'Fira Sans',
+  // Serif (editorial / premium)
+  'Playfair Display',
   'Merriweather',
+  'Lora',
+  'Crimson Pro',
+  'Libre Baskerville',
+  // Display / headings
+  'Bebas Neue',
+  'Oswald',
+  'Archivo Black',
+  'Space Grotesk',
 ]
 
 // Available texture patterns (CSS-only, no images)
@@ -174,6 +190,8 @@ export interface ThemePreset {
   headingFont: string
   bodyFont: string
   texture: string
+  heroImage: string
+  heroMediaMime: string
 }
 
 export const THEME_PRESETS: ThemePreset[] = [
@@ -185,6 +203,8 @@ export const THEME_PRESETS: ThemePreset[] = [
     headingFont: 'Inter',
     bodyFont: 'Inter',
     texture: 'none',
+    heroImage: '/images/window.webp',
+    heroMediaMime: 'image/webp',
   },
   {
     name: 'Forest Green',
@@ -194,6 +214,8 @@ export const THEME_PRESETS: ThemePreset[] = [
     headingFont: 'Montserrat',
     bodyFont: 'Open Sans',
     texture: 'dots',
+    heroImage: '/images/food.webp',
+    heroMediaMime: 'image/webp',
   },
   {
     name: 'Warm Sunset',
@@ -203,6 +225,8 @@ export const THEME_PRESETS: ThemePreset[] = [
     headingFont: 'Poppins',
     bodyFont: 'Lato',
     texture: 'none',
+    heroImage: '/images/wedding.webp',
+    heroMediaMime: 'image/webp',
   },
   {
     name: 'Soft Lavender',
@@ -212,6 +236,8 @@ export const THEME_PRESETS: ThemePreset[] = [
     headingFont: 'Playfair Display',
     bodyFont: 'Lato',
     texture: 'dots',
+    heroImage: '/images/woman.webp',
+    heroMediaMime: 'image/webp',
   },
   {
     name: 'Minimal Mono',
@@ -221,31 +247,10 @@ export const THEME_PRESETS: ThemePreset[] = [
     headingFont: 'Inter',
     bodyFont: 'Inter',
     texture: 'grid',
+    heroImage: '/images/laptop.webp',
+    heroMediaMime: 'image/webp',
   },
 ]
-
-let fontLinkEl: HTMLLinkElement | null = null
-
-function loadGoogleFonts(fonts: string[]) {
-  const unique = [...new Set(fonts.filter(f => f && f !== 'Inter'))]
-  if (unique.length === 0) {
-    if (fontLinkEl) {
-      fontLinkEl.remove()
-      fontLinkEl = null
-    }
-    return
-  }
-
-  const families = unique.map(f => f.replace(/ /g, '+')).join('&family=')
-  const href = `https://fonts.googleapis.com/css2?family=${families}:wght@300;400;500;600;700&display=swap`
-
-  if (!fontLinkEl) {
-    fontLinkEl = document.createElement('link')
-    fontLinkEl.rel = 'stylesheet'
-    document.head.appendChild(fontLinkEl)
-  }
-  fontLinkEl.href = href
-}
 
 export function useTheme() {
   const { siteConfig } = useSiteConfig()
@@ -301,13 +306,12 @@ export function useTheme() {
       root.setProperty('--texture-size', 'auto')
     }
 
-    // Fonts
+    // Fonts — @nuxt/fonts self-hosts all AVAILABLE_FONTS at build time, so we
+    // only need to swap the CSS variables here.
     const headingFont = theme.heading_font || 'Inter'
     const bodyFont = theme.body_font || 'Inter'
     root.setProperty('--font-heading', `'${headingFont}', sans-serif`)
     root.setProperty('--font-body', `'${bodyFont}', sans-serif`)
-
-    loadGoogleFonts([headingFont, bodyFont])
   }
 
   // Watch for siteConfig changes and re-apply

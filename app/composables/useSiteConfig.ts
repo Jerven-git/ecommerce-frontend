@@ -102,7 +102,11 @@ export interface SiteConfig {
   hero_media_mime: string | null
   about_content: string | null
   about_image_url: string | null
+  about_overlay_color: string
+  about_overlay_opacity: number
   contact_image_url: string | null
+  contact_overlay_color: string
+  contact_overlay_opacity: number
   contact_email: string | null
   contact_phone: string | null
   contact_entries: Array<{ label: string; email: string | null; phone: string | null }> | null

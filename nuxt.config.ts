@@ -4,7 +4,38 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: false,
   
-  modules: ['@nuxtjs/tailwindcss', '@nuxt/icon', '@nuxt/content', '@pinia/nuxt'],
+  modules: ['@nuxtjs/tailwindcss', '@nuxt/icon', '@nuxt/content', '@pinia/nuxt', '@nuxt/fonts'],
+
+  fonts: {
+    // Font choice is driven by admin settings at runtime (via CSS variables),
+    // so the @font-face scanner can't detect which families are used.
+    // `global: true` forces each family to be injected on every page regardless.
+    families: [
+      // Sans-serif (UI / general)
+      { name: 'Inter',             weights: [300, 400, 500, 600, 700], global: true },
+      { name: 'Poppins',           weights: [300, 400, 500, 600, 700], global: true },
+      { name: 'Roboto',            weights: [300, 400, 500, 700],      global: true },
+      { name: 'Lato',              weights: [300, 400, 700],           global: true },
+      { name: 'Montserrat',        weights: [300, 400, 500, 600, 700], global: true },
+      { name: 'Open Sans',         weights: [300, 400, 500, 600, 700], global: true },
+      { name: 'Nunito',            weights: [300, 400, 600, 700],      global: true },
+      { name: 'Work Sans',         weights: [300, 400, 500, 600, 700], global: true },
+      { name: 'DM Sans',           weights: [400, 500, 700],           global: true },
+      { name: 'Raleway',           weights: [300, 400, 500, 600, 700], global: true },
+      { name: 'Fira Sans',         weights: [300, 400, 500, 600, 700], global: true },
+      // Serif (editorial / premium)
+      { name: 'Playfair Display',  weights: [400, 500, 600, 700],      global: true },
+      { name: 'Merriweather',      weights: [300, 400, 700],           global: true },
+      { name: 'Lora',              weights: [400, 500, 600, 700],      global: true },
+      { name: 'Crimson Pro',       weights: [300, 400, 500, 600, 700], global: true },
+      { name: 'Libre Baskerville', weights: [400, 700],                global: true },
+      // Display / headings
+      { name: 'Bebas Neue',        weights: [400],                     global: true },
+      { name: 'Oswald',            weights: [300, 400, 500, 600, 700], global: true },
+      { name: 'Archivo Black',     weights: [400],                     global: true },
+      { name: 'Space Grotesk',     weights: [300, 400, 500, 600, 700], global: true },
+    ],
+  },
   
   components: {
     global: true,
