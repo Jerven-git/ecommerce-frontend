@@ -190,6 +190,7 @@ const savedTheme = ref({
   heading_font: "Inter",
   body_font: "Inter",
   texture: "none",
+  badge_in_stock_color: "#16a34a",
 })
 
 // Snapshot of the last-saved hero media — used as the revert target when
@@ -236,6 +237,7 @@ const form = ref({
     heading_font: "Inter",
     body_font: "Inter",
     texture: "none",
+    badge_in_stock_color: "#16a34a",
   },
   logo_url: "",
   favicon_url: "",
@@ -434,6 +436,7 @@ async function loadSettings() {
           heading_font: response.data.theme?.heading_font || "Inter",
           body_font: response.data.theme?.body_font || "Inter",
           texture: response.data.theme?.texture || "none",
+          badge_in_stock_color: response.data.badge_in_stock_color || "#16a34a",
         },
         logo_url: response.data.logo_url || "",
         favicon_url: response.data.favicon_url || "",
@@ -577,7 +580,8 @@ async function saveSettings() {
       method: "PATCH",
       body: {
         site_name: form.value.site_name,
-        theme: form.value.theme,
+        theme: (({ badge_in_stock_color: _, ...t }) => t)(form.value.theme),
+        badge_in_stock_color: form.value.theme.badge_in_stock_color,
         hero_title: form.value.hero_title,
         hero_subtitle: form.value.hero_subtitle,
         hero_overlay_color: form.value.hero_overlay_color,

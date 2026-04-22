@@ -189,20 +189,7 @@
 </template>
 
 <script setup lang="ts">
-interface Product {
-  id: number
-  name: string
-  description: string
-  price: number
-  image_url?: string
-  category: string
-  category_id: number | null
-  categories?: { id: number; name: string }[]
-  stock: number
-  is_active: boolean
-  created_at: string
-  updated_at: string
-}
+import type { Product } from '~/types/product'
 
 interface Category {
   id: number

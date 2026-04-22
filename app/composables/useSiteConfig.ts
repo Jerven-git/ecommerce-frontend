@@ -107,6 +107,7 @@ export interface SiteConfig {
   contact_image_url: string | null
   contact_overlay_color: string
   contact_overlay_opacity: number
+  badge_in_stock_color: string
   contact_email: string | null
   contact_phone: string | null
   contact_entries: Array<{ label: string; email: string | null; phone: string | null }> | null
@@ -135,6 +136,9 @@ export const DEFAULT_THEME: SiteTheme = {
   body_font: 'Inter',
   texture: 'none',
 }
+
+/** Fallback color for the "In Stock" badge when `site_config.badge_in_stock_color` is unset. */
+export const DEFAULT_IN_STOCK_COLOR = '#16a34a'
 
 const DEFAULT_CONFIG: Partial<SiteConfig> = {
   theme: { ...DEFAULT_THEME },

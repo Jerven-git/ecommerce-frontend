@@ -236,17 +236,7 @@
 
 <script setup lang="ts">
 import type { HomepageStep, HomepageFeature } from '~/composables/useSiteConfig'
-
-interface Product {
-  id: number
-  name: string
-  description: string
-  price: number
-  image_url?: string
-  is_active: boolean
-  created_at: string
-  updated_at: string
-}
+import type { Product } from '~/types/product'
 
 interface ProductsResponse {
   data: Product[]
