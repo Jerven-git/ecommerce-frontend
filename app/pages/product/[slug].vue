@@ -57,11 +57,7 @@
                 class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105 cursor-zoom-in"
                 @click="showLightbox = true"
               />
-              <div v-else class="w-full h-full flex items-center justify-center">
-                <svg class="w-20 h-20 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
+              <ProductImagePlaceholder v-else size="lg" />
 
               <!-- Prev / Next Arrows (only if multiple images) -->
               <template v-if="allImages.length > 1">
@@ -83,25 +79,7 @@
                 </button>
               </template>
 
-              <!-- Favorite button -->
-              <button
-                v-if="favoritesEnabled"
-                @click="toggleFavorite"
-                class="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white transition-all duration-200 hover:scale-110"
-                :aria-label="isFavorited ? 'Remove from favorites' : 'Add to favorites'"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="w-5 h-5 transition-colors duration-200"
-                  :class="isFavorited ? 'text-red-500' : 'text-gray-400 hover:text-red-400'"
-                  :fill="isFavorited ? 'currentColor' : 'none'"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              </button>
+              <FavoriteButton :product-id="product.id" size="md" />
             </div>
 
             <!-- Thumbnail Strip -->
@@ -150,27 +128,7 @@
 
           <!-- Stock -->
           <div class="flex items-center gap-2 mb-6">
-            <span
-              v-if="product.stock > 0"
-              class="inline-flex items-center gap-1.5 text-sm font-medium text-green-700"
-            >
-              <span class="w-2 h-2 rounded-full bg-green-500" />
-              In Stock<template v-if="siteConfig?.show_stock_quantity"> ({{ product.stock }})</template>
-            </span>
-            <span
-              v-else-if="product.can_backorder"
-              class="inline-flex items-center gap-1.5 text-sm font-medium text-amber-600"
-            >
-              <span class="w-2 h-2 rounded-full bg-amber-500" />
-              Out of Stock — Available on Backorder
-            </span>
-            <span
-              v-else
-              class="inline-flex items-center gap-1.5 text-sm font-medium text-red-600"
-            >
-              <span class="w-2 h-2 rounded-full bg-red-500" />
-              Out of Stock
-            </span>
+            <StockBadge :stock="product.stock" :can-backorder="product.can_backorder" variant="dot" />
           </div>
 
           <!-- Quantity -->
@@ -204,10 +162,10 @@
           <!-- Add to Cart -->
           <button
             @click="addToCart"
-            :disabled="product.stock === 0 && !product.can_backorder"
+            :disabled="!canOrder"
             class="w-full py-3.5 px-6 text-sm font-bold uppercase tracking-wider text-white bg-[var(--color-secondary)] hover:bg-[var(--color-secondary-600)] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {{ product.stock === 0 && !product.can_backorder ? 'Out of Stock' : 'Proceed to Cart' }}
+            {{ canOrder ? 'Proceed to Cart' : 'Out of Stock' }}
           </button>
 
         </div>
@@ -287,46 +245,18 @@
 </template>
 
 <script setup lang="ts">
-interface MediaItem {
-  id: number
-  url: string
-  collection: string
-}
-
-interface Product {
-  id: number
-  name: string
-  slug: string
-  description: string
-  price: number
-  image_url?: string
-  category: string
-  category_id: number | null
-  categories?: { id: number; name: string }[]
-  stock: number
-  is_active: boolean
-  can_backorder: boolean
-  backorder_charge_policy?: 'charged_now' | 'charged_later'
-  media?: MediaItem[]
-  created_at: string
-  updated_at: string
-}
+import type { ProductDetail } from '~/types/product'
 
 const route = useRoute()
 const { $apiFetch } = useNuxtApp()
 const cartStore = useCartStore()
-const favoritesStore = useFavoritesStore()
-const { siteConfig } = useSiteConfig()
 
-const product = ref<Product | null>(null)
+const product = ref<ProductDetail | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
 const quantity = ref(1)
 const showLightbox = ref(false)
 const activeIndex = ref(0)
-
-const favoritesEnabled = computed(() => siteConfig.value?.favorites_enabled ?? false)
-const isFavorited = computed(() => product.value ? favoritesStore.isFavorited(product.value.id) : false)
 
 // Build image list from media array, falling back to image_url
 const allImages = computed(() => {
@@ -335,7 +265,6 @@ const allImages = computed(() => {
     .filter(m => m.collection === 'gallery')
     .map(m => m.url)
   if (mediaUrls.length) return mediaUrls
-  // Fallback: use image_url if no gallery media
   return product.value.image_url ? [product.value.image_url] : []
 })
 
@@ -351,16 +280,7 @@ const nextImage = () => {
   activeIndex.value = (activeIndex.value + 1) % allImages.value.length
 }
 
-const toggleFavorite = () => {
-  if (product.value) {
-    favoritesStore.toggle(product.value.id)
-  }
-}
-
-const canOrder = computed(() => {
-  if (!product.value) return false
-  return product.value.stock > 0 || product.value.can_backorder
-})
+const canOrder = computed(() => !!product.value && isOrderable(product.value))
 
 const addToCart = () => {
   if (!product.value || !canOrder.value) return
@@ -374,7 +294,7 @@ const fetchProduct = async () => {
   loading.value = true
   error.value = null
   try {
-    const response = await $apiFetch<{ data: Product }>(`/products/${route.params.slug}`, { method: 'GET' })
+    const response = await $apiFetch<{ data: ProductDetail }>(`/products/${route.params.slug}`, { method: 'GET' })
     if (response?.data) {
       product.value = response.data
     }

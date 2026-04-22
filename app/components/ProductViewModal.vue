@@ -45,10 +45,8 @@
                 :alt="product.name"
                 class="w-full h-72 object-cover object-center"
               />
-              <div v-else class="w-full h-72 flex items-center justify-center">
-                <svg class="w-16 h-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+              <div v-else class="w-full h-72">
+                <ProductImagePlaceholder size="md" />
               </div>
               <!-- Expand hint -->
               <div
@@ -67,34 +65,17 @@
 
               <div class="flex items-center gap-3 mb-4">
                 <span class="text-2xl font-bold text-primary-600">${{ product.price }}</span>
-                <span
-                  v-if="product.stock > 0"
-                  class="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-50 text-green-700"
-                >
-                  In Stock<template v-if="siteConfig?.show_stock_quantity"> ({{ product.stock }})</template>
-                </span>
-                <span
-                  v-else-if="product.can_backorder"
-                  class="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-600"
-                >
-                  Backorder
-                </span>
-                <span
-                  v-else
-                  class="text-xs font-semibold px-2.5 py-1 rounded-full bg-red-50 text-red-600"
-                >
-                  Out of Stock
-                </span>
+                <StockBadge :stock="product.stock" :can-backorder="product.can_backorder" variant="pill" />
               </div>
 
               <p class="text-sm text-gray-600 leading-relaxed mb-6">{{ product.description || 'No description available.' }}</p>
 
               <button
                 @click="addToCart"
-                :disabled="product.stock === 0 && !product.can_backorder"
+                :disabled="!orderable"
                 class="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {{ product.stock === 0 && !product.can_backorder ? 'Out of Stock' : 'Add to Cart' }}
+                {{ orderable ? 'Add to Cart' : 'Out of Stock' }}
               </button>
             </div>
           </div>
@@ -151,9 +132,11 @@
 </template>
 
 <script setup lang="ts">
+import type { Product } from '~/types/product'
+
 const props = defineProps<{
   open: boolean
-  product: any
+  product: Product
 }>()
 
 const emit = defineEmits<{
@@ -161,8 +144,9 @@ const emit = defineEmits<{
 }>()
 
 const cartStore = useCartStore()
-const { siteConfig } = useSiteConfig()
 const showLightbox = ref(false)
+
+const orderable = computed(() => isOrderable(props.product))
 
 const addToCart = () => {
   cartStore.addItem(props.product)

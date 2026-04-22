@@ -155,6 +155,27 @@
         </div>
       </div>
 
+      <!-- Badge Colors -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Badge Colors</label>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div v-for="color in badgeColorFields" :key="color.key">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ color.label }}</label>
+            <div class="flex items-center gap-2">
+              <div class="relative shrink-0">
+                <input :value="modelValue[color.key]" @input="updateField(color.key, ($event.target as HTMLInputElement).value)" type="color" class="sr-only" :id="color.key + 'Picker'" />
+                <label
+                  :for="color.key + 'Picker'"
+                  class="block w-10 h-10 rounded-lg cursor-pointer border-2 border-white shadow ring-1 ring-gray-200 hover:scale-105 transition-transform"
+                  :style="{ backgroundColor: modelValue[color.key] }"
+                />
+              </div>
+              <input :value="modelValue[color.key]" @input="updateField(color.key, ($event.target as HTMLInputElement).value)" type="text" class="input-field font-mono text-sm" :placeholder="color.placeholder" />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Texture -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">Background Texture</label>
@@ -200,6 +221,7 @@ export interface ThemeForm {
   heading_font: string
   body_font: string
   texture: string
+  badge_in_stock_color: string
 }
 
 interface Props {
@@ -224,6 +246,10 @@ const colorFields = [
   { key: 'accent_color' as const, label: 'Accent / Surface Color', placeholder: '#F3F4F6' },
 ]
 
+const badgeColorFields = [
+  { key: 'badge_in_stock_color' as const, label: 'In Stock Badge', placeholder: '#16a34a' },
+]
+
 function updateField(key: keyof ThemeForm, value: string) {
   emit('update:modelValue', { ...props.modelValue, [key]: value })
 }
@@ -235,6 +261,7 @@ const DEFAULT_THEME: ThemeForm = {
   heading_font: 'Inter',
   body_font: 'Inter',
   texture: 'none',
+  badge_in_stock_color: '#16a34a',
 }
 
 function themeMatches(a: ThemeForm, b: ThemeForm): boolean {
@@ -254,6 +281,7 @@ function presetToTheme(preset: ThemePreset): ThemeForm {
     heading_font: preset.headingFont,
     body_font: preset.bodyFont,
     texture: preset.texture,
+    badge_in_stock_color: props.modelValue.badge_in_stock_color,
   }
 }
 
