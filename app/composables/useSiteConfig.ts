@@ -76,6 +76,76 @@ export interface ShopHeader {
   subtitle: string
 }
 
+export interface BlogPageHeader {
+  label: string
+  heading: string
+  subtitle: string
+}
+
+export interface BlogPageCta {
+  heading: string
+  subtitle: string
+  button_label: string
+  button_link: string
+}
+
+export interface BlogPage {
+  header: BlogPageHeader
+  cta?: BlogPageCta | null
+}
+
+export interface ServicesPageCtaLink {
+  label: string
+  link: string
+}
+
+export interface ServicesPageHeader {
+  label: string
+  heading: string
+  subtitle: string
+  primary_cta?: ServicesPageCtaLink | null
+  secondary_cta?: ServicesPageCtaLink | null
+}
+
+export interface ServicesSummaryItem {
+  title: string
+  description: string
+}
+
+export interface ServicesStatItem {
+  value: string
+  label: string
+}
+
+export interface ServicesGroupItem {
+  eyebrow?: string
+  title: string
+  description: string
+  image_url?: string
+  cta_label?: string
+  cta_link?: string
+}
+
+export interface ServicesGroup {
+  heading: string
+  items: ServicesGroupItem[]
+}
+
+export interface ServicesPageCta {
+  heading: string
+  subtitle: string
+  button_label: string
+  button_link: string
+}
+
+export interface ServicesPage {
+  header: ServicesPageHeader
+  summary?: { items: ServicesSummaryItem[] } | null
+  stats?: { items: ServicesStatItem[] } | null
+  groups: ServicesGroup[]
+  cta?: ServicesPageCta | null
+}
+
 export interface ShopPromo {
   badge: string
   heading: string
@@ -125,6 +195,14 @@ export interface SiteConfig {
   contact_page: ContactPage | null
   shop_header: ShopHeader | null
   shop_promo: ShopPromo | null
+  blog_page: BlogPage | null
+  blog_image_url: string | null
+  blog_overlay_color: string
+  blog_overlay_opacity: number
+  services_page: ServicesPage | null
+  services_image_url: string | null
+  services_overlay_color: string
+  services_overlay_opacity: number
   updated_at: string
 }
 

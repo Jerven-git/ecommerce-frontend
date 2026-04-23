@@ -96,6 +96,30 @@
           </NuxtLink>
 
           <NuxtLink
+            to="/admin/posts"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
+            :class="linkClass('/admin/posts')"
+            @click="closeSidebarOnMobile"
+          >
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+            </svg>
+            <span class="font-medium">Blog Posts</span>
+          </NuxtLink>
+
+          <NuxtLink
+            to="/admin/post-categories"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
+            :class="linkClass('/admin/post-categories')"
+            @click="closeSidebarOnMobile"
+          >
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h10M4 18h10" />
+            </svg>
+            <span class="font-medium">Blog Categories</span>
+          </NuxtLink>
+
+          <NuxtLink
             to="/admin/orders"
             class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
             :class="linkClass('/admin/orders')"
@@ -318,6 +342,8 @@ const handleLogout = async () => {
 const pageTitle = computed(() => {
   if (route.path === '/admin') return 'Admin Dashboard'
   if (route.path.startsWith('/admin/products')) return 'Products'
+  if (route.path.startsWith('/admin/post-categories')) return 'Blog Categories'
+  if (route.path.startsWith('/admin/posts')) return 'Blog Posts'
   if (route.path.startsWith('/admin/backorders')) return 'Backorders'
   if (route.path.startsWith('/admin/orders')) return 'Orders'
   if (route.path.startsWith('/admin/settings')) return 'Settings'
