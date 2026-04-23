@@ -162,7 +162,7 @@ watch(activeTab, (tab) => {
 
 // --- Media upload composable ---
 const media = useMediaUpload({
-  collections: ['logo', 'favicon', 'cart_icon', 'hero', 'about', 'contact'],
+  collections: ['logo', 'favicon', 'cart_icon', 'hero', 'about', 'contact', 'blog', 'services'],
   limits: {
     logo:      { maxMB: 2,  label: 'Logo' },
     favicon:   { maxMB: 2,  label: 'Site icon' },
@@ -170,6 +170,8 @@ const media = useMediaUpload({
     hero:    { maxMB: 10, label: 'Hero media', accept: ['image/', 'video/'] },
     about:   { maxMB: 10, label: 'About image' },
     contact: { maxMB: 10, label: 'Contact image' },
+    blog:    { maxMB: 10, label: 'Blog image' },
+    services:{ maxMB: 10, label: 'Services image' },
   },
   apiFetch: $apiFetch,
 })
@@ -330,6 +332,40 @@ const form = ref({
       { icon: 'heroicons:lock-closed', title: '100% Private', description: 'Your details are always kept safe and never shared.' },
     ],
   },
+  blog_image_url: "",
+  blog_overlay_color: "#000000",
+  blog_overlay_opacity: 45,
+  blog_page: {
+    header: {
+      label: 'BLOGS',
+      heading: 'Blogs on product management & user feedback',
+      subtitle: 'Insights, stories and updates from our team.',
+    },
+    cta: null as null | { heading: string; subtitle: string; button_label: string; button_link: string },
+  },
+  services_image_url: "",
+  services_overlay_color: "#000000",
+  services_overlay_opacity: 45,
+  services_page: {
+    header: {
+      label: 'OUR SERVICES',
+      heading: 'Services built around you',
+      subtitle: 'Expert help across every stage — from setup to scale.',
+      primary_cta: null as null | { label: string; link: string },
+      secondary_cta: null as null | { label: string; link: string },
+    },
+    summary: null as null | { items: Array<{ title: string; description: string }> },
+    stats: null as null | { items: Array<{ value: string; label: string }> },
+    groups: [
+      {
+        heading: 'For your business',
+        items: [
+          { eyebrow: 'Consulting', title: 'Hands-on expert guidance', description: 'Work with senior advisors who understand your industry and your goals.', image_url: '', cta_label: 'Get started', cta_link: '/contact' },
+        ],
+      },
+    ],
+    cta: null as null | { heading: string; subtitle: string; button_label: string; button_link: string },
+  },
 })
 
 // Map collection -> form field
@@ -340,6 +376,8 @@ const urlFields: Record<MediaCollection, keyof typeof form.value> = {
   hero: 'hero_image_url',
   about: 'about_image_url',
   contact: 'contact_image_url',
+  blog: 'blog_image_url',
+  services: 'services_image_url',
 }
 
 // --- Media event handlers ---
@@ -548,6 +586,51 @@ async function loadSettings() {
           }
           return cp
         })(),
+        blog_image_url: response.data.blog_image_url || "",
+        blog_overlay_color: response.data.blog_overlay_color || "#000000",
+        blog_overlay_opacity: response.data.blog_overlay_opacity ?? 45,
+        blog_page: response.data.blog_page ?? {
+          header: {
+            label: 'BLOGS',
+            heading: 'Blogs on product management & user feedback',
+            subtitle: 'Insights, stories and updates from our team.',
+          },
+          cta: null,
+        },
+        services_image_url: response.data.services_image_url || "",
+        services_overlay_color: response.data.services_overlay_color || "#000000",
+        services_overlay_opacity: response.data.services_overlay_opacity ?? 45,
+        services_page: (() => {
+          const sp = response.data.services_page ?? {
+            header: {
+              label: 'OUR SERVICES',
+              heading: 'Services built around you',
+              subtitle: 'Expert help across every stage — from setup to scale.',
+              primary_cta: null,
+              secondary_cta: null,
+            },
+            summary: null,
+            stats: null,
+            groups: [
+              {
+                heading: 'For your business',
+                items: [
+                  { eyebrow: 'Consulting', title: 'Hands-on expert guidance', description: 'Work with senior advisors who understand your industry and your goals.', image_url: '', cta_label: 'Get started', cta_link: '/contact' },
+                ],
+              },
+            ],
+            cta: null,
+          }
+          // Ensure required shape keys exist on older records
+          sp.header = sp.header ?? { label: '', heading: '', subtitle: '', primary_cta: null, secondary_cta: null }
+          sp.header.primary_cta = sp.header.primary_cta ?? null
+          sp.header.secondary_cta = sp.header.secondary_cta ?? null
+          sp.groups = Array.isArray(sp.groups) ? sp.groups : []
+          sp.summary = sp.summary ?? null
+          sp.stats = sp.stats ?? null
+          sp.cta = sp.cta ?? null
+          return sp
+        })(),
       }
 
       savedTheme.value = { ...form.value.theme }
@@ -613,6 +696,12 @@ async function saveSettings() {
         shop_header: form.value.shop_header,
         shop_promo: form.value.shop_promo,
         contact_page: form.value.contact_page,
+        blog_page: form.value.blog_page,
+        blog_overlay_color: form.value.blog_overlay_color,
+        blog_overlay_opacity: form.value.blog_overlay_opacity,
+        services_page: form.value.services_page,
+        services_overlay_color: form.value.services_overlay_color,
+        services_overlay_opacity: form.value.services_overlay_opacity,
       },
     })
 

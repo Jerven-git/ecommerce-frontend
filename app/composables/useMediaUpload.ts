@@ -1,4 +1,4 @@
-export type MediaCollection = 'logo' | 'favicon' | 'cart_icon' | 'hero' | 'about' | 'contact'
+export type MediaCollection = 'logo' | 'favicon' | 'cart_icon' | 'hero' | 'about' | 'contact' | 'blog' | 'services'
 
 export interface UploadLimits {
   maxMB: number

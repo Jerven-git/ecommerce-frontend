@@ -16,6 +16,8 @@
           <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Quick Links</h4>
           <ul class="space-y-2">
             <li><NuxtLink to="/shop" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">Shop</NuxtLink></li>
+            <li><NuxtLink to="/services" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">Services</NuxtLink></li>
+            <li><NuxtLink to="/blog" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">Blog</NuxtLink></li>
             <li><NuxtLink to="/about" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">About Us</NuxtLink></li>
             <li><NuxtLink to="/contact" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">Contact</NuxtLink></li>
           </ul>
