@@ -13,7 +13,7 @@
 
     <!-- Image (clickable to expand) -->
     <div class="w-full bg-gray-100 relative group/img cursor-pointer" @click="product.image_url && (showLightbox = true)">
-      <img
+      <SmoothImage
         v-if="product.image_url"
         :src="product.image_url"
         :alt="product.name"
@@ -93,6 +93,7 @@
             :src="product.image_url"
             :alt="product.name"
             class="relative max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+            decoding="async"
             @click.stop
           />
         </Transition>

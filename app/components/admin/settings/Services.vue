@@ -355,26 +355,18 @@
                     </div>
                   </div>
 
-                  <div>
-                    <div class="aspect-square w-full rounded-lg border border-dashed border-gray-200 bg-gray-50 overflow-hidden flex items-center justify-center">
-                      <img
-                        v-if="item.image_url"
-                        :src="item.image_url"
-                        class="w-full h-full object-cover"
-                        alt=""
-                      />
-                      <svg v-else class="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <input
-                      :value="item.image_url || ''"
-                      @input="updateGroupItem(gi, ii, 'image_url', ($event.target as HTMLInputElement).value)"
-                      type="text"
-                      class="edit-inline text-[10px] font-mono mt-2"
-                      placeholder="Image URL (optional)"
-                    />
-                  </div>
+                  <AdminMediaUploader
+                    :url="item.image_url || ''"
+                    :uploading="itemUploading[`${gi}-${ii}`] ?? false"
+                    label="Image"
+                    hint="JPG, PNG, GIF — max 10 MB"
+                    :input-id="`servicesItemImage-${gi}-${ii}`"
+                    preview-class="aspect-square w-full object-cover"
+                    dropzone-class="aspect-square"
+                    overlay
+                    @select="(f: File) => uploadItemImage(gi, ii, f)"
+                    @remove="updateGroupItem(gi, ii, 'image_url', '')"
+                  />
                 </div>
               </div>
 
@@ -484,6 +476,39 @@ const emit = defineEmits<{
   'media-select': [file: File, collection: MediaCollection]
   'media-remove': [collection: MediaCollection]
 }>()
+
+const { $apiFetch } = useNuxtApp()
+const { showToast } = useAdminToast()
+
+// Per-item upload flag keyed by `${groupIndex}-${itemIndex}`.
+const itemUploading = reactive<Record<string, boolean>>({})
+
+async function uploadItemImage(gi: number, ii: number, file: File) {
+  if (!file.type.startsWith('image/')) {
+    showToast('Please upload an image file', 'error')
+    return
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    showToast(`File size (${(file.size / 1024 / 1024).toFixed(1)}MB) exceeds the 10MB limit`, 'error')
+    return
+  }
+
+  const key = `${gi}-${ii}`
+  itemUploading[key] = true
+  try {
+    const fd = new FormData()
+    fd.append('file', file)
+    const res = await $apiFetch<{ url: string }>('/site-config/services-items/media', {
+      method: 'POST',
+      body: fd,
+    })
+    updateGroupItem(gi, ii, 'image_url', res.url)
+  } catch (err: any) {
+    showToast(err?.data?.message || 'Failed to upload image', 'error')
+  } finally {
+    itemUploading[key] = false
+  }
+}
 
 function emitUpdate(next: ServicesPage) {
   emit('update:services-page', next)

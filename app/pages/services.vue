@@ -3,17 +3,15 @@
 
     <!-- Hero -->
     <section class="relative overflow-hidden">
-      <div class="absolute inset-0">
+      <div class="absolute inset-0" :style="fallbackHeroStyle">
         <img
           v-if="heroImage"
           :src="heroImage"
           :alt="heroHeading"
           class="w-full h-full object-cover"
-        />
-        <div
-          v-else
-          class="w-full h-full"
-          :style="fallbackHeroStyle"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
         />
         <div
           v-if="heroImage"
@@ -117,6 +115,8 @@
                 :src="item.image_url"
                 :alt="item.title"
                 class="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
               />
               <div v-else class="w-full h-full flex items-center justify-center text-gray-300">
                 <svg class="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">

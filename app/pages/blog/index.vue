@@ -4,17 +4,18 @@
     <!-- Hero -->
     <section class="relative overflow-hidden">
       <!-- Background -->
-      <div class="absolute inset-0">
+      <div class="absolute inset-0" :style="fallbackHeroStyle">
         <img
           v-if="heroImage"
           :src="heroImage"
           :alt="heroHeading"
-          class="w-full h-full object-cover"
-        />
-        <div
-          v-else
-          class="w-full h-full"
-          :style="fallbackHeroStyle"
+          class="w-full h-full object-cover transition-opacity duration-500"
+          :class="heroLoaded ? 'opacity-100' : 'opacity-0'"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          @load="heroLoaded = true"
+          @error="heroLoaded = true"
         />
         <div
           v-if="heroImage"
@@ -222,6 +223,7 @@ const {
 
 const { categories, loadCategories } = usePostCategories()
 const featuredPosts = ref<Post[]>([])
+const heroLoaded = ref(false)
 
 const heroLabel = computed(() => siteConfig.value?.blog_page?.header?.label || 'Blog')
 const heroHeading = computed(() =>

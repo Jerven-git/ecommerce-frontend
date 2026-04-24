@@ -5,6 +5,7 @@ export interface PostCategory {
   gradient_from: string
   gradient_to: string
   image_url: string | null
+  overlay_opacity: number
   sort_order: number
   posts_count?: number
   created_at?: string

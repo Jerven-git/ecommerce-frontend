@@ -3,11 +3,11 @@
     <!-- Image with hover overlay -->
     <NuxtLink :to="`/product/${product.slug}`" class="block">
       <div class="relative w-full overflow-hidden rounded-lg bg-gray-200 mb-4">
-        <img
+        <SmoothImage
           v-if="product.image_url"
           :src="product.image_url"
           :alt="product.name"
-          class="h-64 w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+          class="h-64 w-full object-cover object-center group-hover:scale-105"
         />
         <div v-else class="h-64 w-full bg-gray-300">
           <ProductImagePlaceholder size="md" />
