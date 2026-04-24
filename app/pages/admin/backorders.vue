@@ -227,67 +227,63 @@
     </div>
 
     <!-- Settings Modal -->
-    <Transition name="fade">
-      <div v-if="showSettings" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" @click.self="showSettings = false">
-        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4">
-          <h2 class="text-lg font-bold text-gray-900 mb-5">Backorder Settings</h2>
-
-          <div class="space-y-5">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm font-medium text-gray-900">Enable Backorders</p>
-                <p class="text-xs text-gray-400 mt-0.5">Master switch for all backorder functionality</p>
-              </div>
-              <button
-                @click="settings.backorder_enabled = !settings.backorder_enabled"
-                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
-                :class="settings.backorder_enabled ? 'bg-primary-600' : 'bg-gray-200'"
-              >
-                <span
-                  class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm"
-                  :class="settings.backorder_enabled ? 'translate-x-6' : 'translate-x-1'"
-                />
-              </button>
-            </div>
-
-            <!-- Explanation note -->
-            <div class="rounded-lg bg-amber-50 border border-amber-200 px-3.5 py-3">
-              <p class="text-xs text-amber-800 leading-relaxed">
-                <span class="font-semibold">How it works:</span> This enables the backorder feature site-wide. You still need to enable backorder on each product individually via
-                <NuxtLink to="/admin/products" class="underline font-medium hover:text-amber-900">Products</NuxtLink>
-                &rarr; Edit &rarr; <span class="font-medium">Allow Backorder</span> toggle. Both this global setting and the per-product toggle must be on for a product to accept backorders.
-              </p>
-            </div>
-
-            <div>
-              <div class="flex items-center gap-1.5 mb-1.5">
-                <label class="text-sm font-medium text-gray-900">Payment Link Expiry (hours)</label>
-                <HelpTip :text="expiryHelpText" />
-              </div>
-              <input
-                v-model.number="settings.backorder_payment_link_expiry_hours"
-                type="number"
-                min="1"
-                max="720"
-                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-              <p class="text-xs text-gray-400 mt-1">How long the payment link stays active after sending</p>
-            </div>
+    <BaseModal :open="showSettings" title="Backorder Settings" size="md" body-class="px-6 py-5" @close="showSettings = false">
+      <div class="space-y-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-900">Enable Backorders</p>
+            <p class="text-xs text-gray-400 mt-0.5">Master switch for all backorder functionality</p>
           </div>
+          <button
+            @click="settings.backorder_enabled = !settings.backorder_enabled"
+            class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+            :class="settings.backorder_enabled ? 'bg-primary-600' : 'bg-gray-200'"
+          >
+            <span
+              class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm"
+              :class="settings.backorder_enabled ? 'translate-x-6' : 'translate-x-1'"
+            />
+          </button>
+        </div>
 
-          <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
-            <button @click="showSettings = false" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Cancel</button>
-            <button
-              @click="saveSettings"
-              :disabled="savingSettings"
-              class="px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg disabled:opacity-50 transition-colors"
-            >
-              {{ savingSettings ? 'Saving...' : 'Save Settings' }}
-            </button>
+        <!-- Explanation note -->
+        <div class="rounded-lg bg-amber-50 border border-amber-200 px-3.5 py-3">
+          <p class="text-xs text-amber-800 leading-relaxed">
+            <span class="font-semibold">How it works:</span> This enables the backorder feature site-wide. You still need to enable backorder on each product individually via
+            <NuxtLink to="/admin/products" class="underline font-medium hover:text-amber-900">Products</NuxtLink>
+            &rarr; Edit &rarr; <span class="font-medium">Allow Backorder</span> toggle. Both this global setting and the per-product toggle must be on for a product to accept backorders.
+          </p>
+        </div>
+
+        <div>
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <label class="text-sm font-medium text-gray-900">Payment Link Expiry (hours)</label>
+            <HelpTip :text="expiryHelpText" />
           </div>
+          <input
+            v-model.number="settings.backorder_payment_link_expiry_hours"
+            type="number"
+            min="1"
+            max="720"
+            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          />
+          <p class="text-xs text-gray-400 mt-1">How long the payment link stays active after sending</p>
         </div>
       </div>
-    </Transition>
+
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <button @click="showSettings = false" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Cancel</button>
+          <button
+            @click="saveSettings"
+            :disabled="savingSettings"
+            class="px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg disabled:opacity-50 transition-colors"
+          >
+            {{ savingSettings ? 'Saving...' : 'Save Settings' }}
+          </button>
+        </div>
+      </template>
+    </BaseModal>
 
     <!-- Toast notification -->
     <Transition

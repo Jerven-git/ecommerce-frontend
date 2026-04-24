@@ -12,14 +12,12 @@
           <p class="text-sm text-gray-500">Your trusted online shopping destination</p>
         </div>
 
-        <div>
+        <div v-if="quickLinks.length">
           <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Quick Links</h4>
           <ul class="space-y-2">
-            <li><NuxtLink to="/shop" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">Shop</NuxtLink></li>
-            <li><NuxtLink to="/services" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">Services</NuxtLink></li>
-            <li><NuxtLink to="/blog" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">Blog</NuxtLink></li>
-            <li><NuxtLink to="/about" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">About Us</NuxtLink></li>
-            <li><NuxtLink to="/contact" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">Contact</NuxtLink></li>
+            <li v-for="link in quickLinks" :key="link.to">
+              <NuxtLink :to="link.to" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">{{ link.label }}</NuxtLink>
+            </li>
           </ul>
         </div>
 
@@ -41,4 +39,15 @@
 
 <script setup lang="ts">
 const { siteConfig } = useSiteConfig()
+const { isEnabled } = useModules()
+
+const allQuickLinks = [
+  { to: '/shop', label: 'Shop', module: 'shop' as const },
+  { to: '/services', label: 'Services', module: 'services' as const },
+  { to: '/blog', label: 'Blog', module: 'blog' as const },
+  { to: '/about', label: 'About Us', module: 'about' as const },
+  { to: '/contact', label: 'Contact', module: 'contact' as const },
+]
+
+const quickLinks = computed(() => allQuickLinks.filter(l => isEnabled(l.module)))
 </script>
