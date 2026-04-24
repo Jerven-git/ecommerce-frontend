@@ -56,6 +56,8 @@
                     :src="item.image_url"
                     :alt="item.name"
                     class="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div v-else class="w-full h-full flex items-center justify-center">
                     <svg class="w-8 h-8 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">

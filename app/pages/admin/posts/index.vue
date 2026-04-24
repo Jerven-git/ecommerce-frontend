@@ -98,7 +98,7 @@
               <td class="px-6 py-4">
                 <div class="flex items-center gap-3 min-w-0">
                   <div class="w-12 h-12 rounded-lg bg-gray-100 shrink-0 overflow-hidden">
-                    <img v-if="post.cover_image_url" :src="post.cover_image_url" :alt="post.title" class="w-full h-full object-cover" />
+                    <img v-if="post.cover_image_url" :src="post.cover_image_url" :alt="post.title" class="w-full h-full object-cover" loading="lazy" decoding="async" />
                     <div v-else class="w-full h-full flex items-center justify-center">
                       <Icon name="heroicons:photo" class="w-5 h-5 text-gray-300" />
                     </div>

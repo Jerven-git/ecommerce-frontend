@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-6xl mx-auto pb-24">
+  <div class="max-w-7xl mx-auto pb-24">
     <!-- Header -->
     <div class="mb-6 flex items-start justify-between gap-4">
       <div>
@@ -76,44 +76,138 @@
         </div>
 
         <!-- Body editor with preview -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div class="px-5 py-3 border-b border-gray-100 flex items-center justify-between gap-3">
-            <div>
-              <p class="text-sm font-semibold text-gray-900">Body</p>
-              <p class="text-xs text-gray-400">Markdown — supports headings, lists, links, images, code, tables</p>
+        <Teleport to="body" :disabled="!isBodyFullscreen">
+          <div
+            :class="isBodyFullscreen
+              ? 'fixed inset-0 z-[60] bg-white flex flex-col'
+              : 'bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden'"
+          >
+            <div class="px-5 py-3 border-b border-gray-100 flex items-center justify-between gap-3 shrink-0">
+              <div class="min-w-0">
+                <p class="text-sm font-semibold text-gray-900 truncate">
+                  {{ isBodyFullscreen ? (form.title || 'Untitled post') : 'Body' }}
+                </p>
+                <p class="text-xs text-gray-400 truncate">
+                  Markdown — supports headings, lists, links, images, code, tables
+                </p>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <div class="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                  <button
+                    v-for="mode in ['write', 'split', 'preview'] as const"
+                    :key="mode"
+                    type="button"
+                    class="px-3 py-1 rounded-md text-[11px] font-medium transition-colors"
+                    :class="editorMode === mode ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+                    @click="editorMode = mode"
+                  >
+                    {{ mode.charAt(0).toUpperCase() + mode.slice(1) }}
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                  :title="isBodyFullscreen ? 'Exit fullscreen (Esc)' : 'Fullscreen editor'"
+                  @click="isBodyFullscreen = !isBodyFullscreen"
+                >
+                  <Icon :name="isBodyFullscreen ? 'heroicons:arrows-pointing-in' : 'heroicons:arrows-pointing-out'" class="w-4 h-4" />
+                </button>
+                <button
+                  v-if="isBodyFullscreen"
+                  type="button"
+                  :disabled="saving || !form.title.trim()"
+                  class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors disabled:opacity-50"
+                  @click="save"
+                >
+                  <span v-if="saving" class="w-3 h-3 rounded-full border-2 border-white/30 border-t-white animate-spin"></span>
+                  {{ isNew ? 'Create' : 'Save' }}
+                </button>
+              </div>
             </div>
-            <div class="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-              <button
-                v-for="mode in ['write', 'split', 'preview'] as const"
-                :key="mode"
-                type="button"
-                class="px-3 py-1 rounded-md text-[11px] font-medium transition-colors"
-                :class="editorMode === mode ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
-                @click="editorMode = mode"
-              >
-                {{ mode[0].toUpperCase() + mode.slice(1) }}
+
+            <!-- Toolbar -->
+            <div
+              v-show="editorMode !== 'preview'"
+              class="px-3 py-1.5 border-b border-gray-100 flex flex-wrap items-center gap-0.5 bg-gray-50/60 shrink-0"
+            >
+              <button type="button" class="toolbar-btn" title="Bold (Ctrl+B)" @click="fmt.bold()">
+                <Icon name="heroicons:bold" class="w-4 h-4" />
+              </button>
+              <button type="button" class="toolbar-btn" title="Italic (Ctrl+I)" @click="fmt.italic()">
+                <Icon name="heroicons:italic" class="w-4 h-4" />
+              </button>
+              <div class="toolbar-divider"></div>
+              <button type="button" class="toolbar-btn text-[11px] font-bold" title="Heading 1" @click="fmt.heading(1)">H1</button>
+              <button type="button" class="toolbar-btn text-[11px] font-bold" title="Heading 2" @click="fmt.heading(2)">H2</button>
+              <button type="button" class="toolbar-btn text-[11px] font-bold" title="Heading 3" @click="fmt.heading(3)">H3</button>
+              <div class="toolbar-divider"></div>
+              <button type="button" class="toolbar-btn" title="Link (Ctrl+K)" @click="fmt.link()">
+                <Icon name="heroicons:link" class="w-4 h-4" />
+              </button>
+              <button type="button" class="toolbar-btn" title="Image" @click="fmt.image()">
+                <Icon name="heroicons:photo" class="w-4 h-4" />
+              </button>
+              <div class="toolbar-divider"></div>
+              <button type="button" class="toolbar-btn" title="Bullet list" @click="fmt.bullet()">
+                <Icon name="heroicons:list-bullet" class="w-4 h-4" />
+              </button>
+              <button type="button" class="toolbar-btn" title="Numbered list" @click="fmt.ordered()">
+                <Icon name="heroicons:numbered-list" class="w-4 h-4" />
+              </button>
+              <button type="button" class="toolbar-btn" title="Quote" @click="fmt.quote()">
+                <Icon name="heroicons:chat-bubble-left" class="w-4 h-4" />
+              </button>
+              <div class="toolbar-divider"></div>
+              <button type="button" class="toolbar-btn" title="Inline code" @click="fmt.code()">
+                <Icon name="heroicons:code-bracket" class="w-4 h-4" />
+              </button>
+              <button type="button" class="toolbar-btn" title="Code block" @click="fmt.codeBlock()">
+                <Icon name="heroicons:command-line" class="w-4 h-4" />
+              </button>
+              <button type="button" class="toolbar-btn" title="Horizontal rule" @click="fmt.hr()">
+                <Icon name="heroicons:minus" class="w-4 h-4" />
               </button>
             </div>
-          </div>
 
-          <div
-            class="grid gap-px bg-gray-100"
-            :class="editorMode === 'split' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'"
-          >
-            <div v-show="editorMode !== 'preview'" class="bg-white">
-              <textarea
-                v-model="form.body"
-                rows="20"
-                class="w-full px-4 py-3 text-sm font-mono leading-relaxed border-0 focus:outline-none focus:ring-0 resize-y min-h-[420px]"
-                placeholder="# Your post starts here&#10;&#10;Write anything in markdown..."
-              ></textarea>
+            <div
+              class="grid gap-px bg-gray-100 flex-1 min-h-0"
+              :class="editorMode === 'split' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'"
+            >
+              <div v-show="editorMode !== 'preview'" class="bg-white flex flex-col min-h-0">
+                <textarea
+                  ref="bodyTextarea"
+                  v-model="form.body"
+                  :class="isBodyFullscreen
+                    ? 'flex-1 w-full px-6 py-5 text-[15px] font-mono leading-7 border-0 focus:outline-none focus:ring-0 resize-none'
+                    : 'w-full px-4 py-3 text-[15px] font-mono leading-7 border-0 focus:outline-none focus:ring-0 resize-y min-h-[560px]'"
+                  placeholder="# Your post starts here&#10;&#10;Write anything in markdown..."
+                  @keydown="onBodyKeydown"
+                ></textarea>
+              </div>
+              <div
+                v-show="editorMode !== 'write'"
+                :class="isBodyFullscreen
+                  ? 'bg-white overflow-auto min-h-0'
+                  : 'bg-white p-5 overflow-auto min-h-[560px]'"
+              >
+                <div
+                  v-if="form.body"
+                  class="post-prose"
+                  :class="isBodyFullscreen ? 'max-w-3xl mx-auto px-8 py-6' : ''"
+                  v-html="renderedBody"
+                ></div>
+                <p v-else class="text-sm text-gray-300 italic" :class="isBodyFullscreen ? 'px-8 py-6' : ''">
+                  Preview will appear here.
+                </p>
+              </div>
             </div>
-            <div v-show="editorMode !== 'write'" class="bg-white p-5 overflow-auto min-h-[420px]">
-              <div v-if="form.body" class="post-prose" v-html="renderedBody"></div>
-              <p v-else class="text-sm text-gray-300 italic">Preview will appear here.</p>
+
+            <div class="px-5 py-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-400 shrink-0">
+              <span>{{ wordCount }} words · {{ charCount }} characters</span>
+              <span v-if="isBodyFullscreen" class="hidden sm:inline">Press Esc to exit fullscreen</span>
             </div>
           </div>
-        </div>
+        </Teleport>
 
         <!-- SEO -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
@@ -289,6 +383,8 @@ const showDelete = ref(false)
 
 const categories = ref<PostCategory[]>([])
 const editorMode = ref<'write' | 'split' | 'preview'>('split')
+const isBodyFullscreen = ref(false)
+const bodyTextarea = ref<HTMLTextAreaElement | null>(null)
 
 const form = reactive({
   title: '',
@@ -313,7 +409,93 @@ const previewCoverUrl = computed(() => coverPreviewUrl.value || (coverCleared.va
 const renderedBody = computed(() => renderMarkdown(form.body))
 
 const autoSlug = computed(() => slugify(form.title))
-const effectiveSlug = computed(() => form.slug_manual.trim() || autoSlug.value)
+
+const wordCount = computed(() => {
+  const s = form.body.trim()
+  return s ? s.split(/\s+/).length : 0
+})
+const charCount = computed(() => form.body.length)
+
+type InsertOpts = {
+  prefix: string
+  suffix?: string
+  placeholder?: string
+  block?: boolean
+}
+
+function insertAtCursor(opts: InsertOpts) {
+  const ta = bodyTextarea.value
+  if (!ta) return
+  const start = ta.selectionStart ?? 0
+  const end = ta.selectionEnd ?? 0
+  const value = ta.value
+
+  if (opts.block) {
+    const lineStart = value.lastIndexOf('\n', start - 1) + 1
+    const before = value.slice(0, lineStart)
+    const middle = value.slice(lineStart, end)
+    const after = value.slice(end)
+    const prefixed = middle.split('\n').map((ln) => opts.prefix + ln).join('\n')
+    form.body = before + prefixed + after
+    const addedOnFirstLine = opts.prefix.length
+    const totalAdded = prefixed.length - middle.length
+    nextTick(() => {
+      ta.focus()
+      ta.setSelectionRange(start + addedOnFirstLine, end + totalAdded)
+    })
+    return
+  }
+
+  const suffix = opts.suffix ?? opts.prefix
+  const selected = value.slice(start, end)
+  const text = selected || (opts.placeholder ?? '')
+  const inserted = opts.prefix + text + suffix
+  form.body = value.slice(0, start) + inserted + value.slice(end)
+  nextTick(() => {
+    ta.focus()
+    const selStart = start + opts.prefix.length
+    ta.setSelectionRange(selStart, selStart + text.length)
+  })
+}
+
+function insertLinkOrImage(kind: 'link' | 'image') {
+  const ta = bodyTextarea.value
+  if (!ta) return
+  const start = ta.selectionStart ?? 0
+  const end = ta.selectionEnd ?? 0
+  const selected = form.body.slice(start, end) || (kind === 'image' ? 'alt text' : 'link text')
+  const url = 'https://'
+  const prefix = kind === 'image' ? '![' : '['
+  const inserted = `${prefix}${selected}](${url})`
+  form.body = form.body.slice(0, start) + inserted + form.body.slice(end)
+  nextTick(() => {
+    ta.focus()
+    const urlStart = start + prefix.length + selected.length + 2
+    ta.setSelectionRange(urlStart, urlStart + url.length)
+  })
+}
+
+const fmt = {
+  bold: () => insertAtCursor({ prefix: '**', placeholder: 'bold text' }),
+  italic: () => insertAtCursor({ prefix: '*', placeholder: 'italic text' }),
+  heading: (n: 1 | 2 | 3) => insertAtCursor({ prefix: '#'.repeat(n) + ' ', block: true }),
+  link: () => insertLinkOrImage('link'),
+  image: () => insertLinkOrImage('image'),
+  bullet: () => insertAtCursor({ prefix: '- ', block: true }),
+  ordered: () => insertAtCursor({ prefix: '1. ', block: true }),
+  quote: () => insertAtCursor({ prefix: '> ', block: true }),
+  code: () => insertAtCursor({ prefix: '`', placeholder: 'code' }),
+  codeBlock: () => insertAtCursor({ prefix: '\n```\n', suffix: '\n```\n', placeholder: 'code' }),
+  hr: () => insertAtCursor({ prefix: '\n\n---\n\n', suffix: '' }),
+}
+
+function onBodyKeydown(e: KeyboardEvent) {
+  if (!(e.ctrlKey || e.metaKey) || e.shiftKey || e.altKey) return
+  const k = e.key.toLowerCase()
+  if (k === 'b') { e.preventDefault(); fmt.bold() }
+  else if (k === 'i') { e.preventDefault(); fmt.italic() }
+  else if (k === 'k') { e.preventDefault(); fmt.link() }
+}
 
 let titleTouched = false
 function onTitleInput() {
@@ -479,17 +661,57 @@ async function executeDelete() {
   }
 }
 
+function onGlobalKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape' && isBodyFullscreen.value) {
+    isBodyFullscreen.value = false
+  }
+}
+
+watch(isBodyFullscreen, (v) => {
+  if (typeof document !== 'undefined') {
+    document.body.style.overflow = v ? 'hidden' : ''
+  }
+})
+
 onMounted(() => {
   loadCategories()
   loadPost()
+  window.addEventListener('keydown', onGlobalKeydown)
 })
 
 onBeforeUnmount(() => {
   if (coverPreviewUrl.value) URL.revokeObjectURL(coverPreviewUrl.value)
+  window.removeEventListener('keydown', onGlobalKeydown)
+  if (typeof document !== 'undefined') document.body.style.overflow = ''
 })
 </script>
 
 <style scoped>
+.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 6px;
+  color: rgb(75, 85, 99);
+  transition: background-color 120ms, color 120ms;
+}
+.toolbar-btn:hover {
+  background: rgb(229, 231, 235);
+  color: rgb(17, 24, 39);
+}
+.toolbar-btn:active {
+  background: rgb(209, 213, 219);
+}
+.toolbar-divider {
+  width: 1px;
+  height: 18px;
+  background: rgb(229, 231, 235);
+  margin: 0 4px;
+}
+
 .post-prose :deep(h1) { font-size: 1.5rem; font-weight: 700; color: rgb(17, 24, 39); margin: 1.25rem 0 0.75rem; line-height: 1.2; }
 .post-prose :deep(h2) { font-size: 1.25rem; font-weight: 700; color: rgb(17, 24, 39); margin: 1rem 0 0.5rem; }
 .post-prose :deep(h3) { font-size: 1.125rem; font-weight: 600; color: rgb(17, 24, 39); margin: 0.75rem 0 0.5rem; }

@@ -55,6 +55,9 @@
                 :src="activeImage"
                 :alt="product.name"
                 class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105 cursor-zoom-in"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
                 @click="showLightbox = true"
               />
               <ProductImagePlaceholder v-else size="lg" />
@@ -93,7 +96,7 @@
                   ? 'border-[var(--color-secondary)] opacity-100 ring-1 ring-[var(--color-secondary)]'
                   : 'border-gray-200 opacity-60 hover:border-gray-300'"
               >
-                <img :src="img" :alt="`${product.name} ${idx + 1}`" class="w-full h-full object-cover" />
+                <img :src="img" :alt="`${product.name} ${idx + 1}`" class="w-full h-full object-cover" loading="lazy" decoding="async" />
               </button>
             </div>
           </div>
@@ -224,6 +227,7 @@
             :src="activeImage"
             :alt="product?.name"
             class="relative max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+            decoding="async"
             @click.stop
           />
 

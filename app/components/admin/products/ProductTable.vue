@@ -17,7 +17,7 @@
           <tr v-for="product in products" :key="product.id" class="hover:bg-gray-50/60 transition-colors">
             <td class="px-6 py-4">
               <div class="flex items-center gap-3">
-                <img
+                <SmoothImage
                   v-if="product.image_url"
                   :src="product.image_url"
                   :alt="product.name"

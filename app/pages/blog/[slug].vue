@@ -21,17 +21,14 @@
     <template v-else>
       <!-- Hero -->
       <section class="relative overflow-hidden">
-        <div class="absolute inset-0">
-          <img
+        <div class="absolute inset-0" :style="fallbackGradient">
+          <SmoothImage
             v-if="post.cover_image_url"
             :src="post.cover_image_url"
             :alt="post.title"
             class="w-full h-full object-cover"
-          />
-          <div
-            v-else
-            class="w-full h-full"
-            :style="fallbackGradient"
+            loading="eager"
+            fetchpriority="high"
           />
           <div
             v-if="post.cover_image_url"

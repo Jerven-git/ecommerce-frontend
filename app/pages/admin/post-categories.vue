@@ -142,19 +142,6 @@
           </div>
         </div>
 
-        <!-- Preview -->
-        <div>
-          <label class="block text-xs font-semibold text-gray-700 mb-1">Preview</label>
-          <div
-            class="w-full aspect-[5/2] rounded-xl flex items-end p-4"
-            :style="{ background: `linear-gradient(135deg, ${form.gradient_from}, ${form.gradient_to})` }"
-          >
-            <span class="inline-flex items-center px-3 py-1.5 rounded-lg bg-white/95 text-[12px] font-semibold text-gray-900 shadow-sm">
-              {{ form.name || 'Category name' }}
-            </span>
-          </div>
-        </div>
-
         <!-- Optional image upload -->
         <div>
           <label class="block text-xs font-semibold text-gray-700 mb-1">Image (optional)</label>
@@ -190,6 +177,53 @@
             </div>
           </div>
           <p class="text-[11px] text-gray-400 mt-1">Blends over the gradient when set. JPG, PNG, WebP — max 5 MB.</p>
+        </div>
+
+        <!-- Color overlay (only meaningful when an image is present) -->
+        <div v-if="previewImageUrl">
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-semibold text-gray-700">Color overlay</label>
+            <span class="text-xs font-mono text-gray-500 tabular-nums">{{ form.overlay_opacity }}%</span>
+          </div>
+          <input
+            v-model.number="form.overlay_opacity"
+            type="range"
+            min="0"
+            max="100"
+            step="5"
+            class="w-full accent-primary-600"
+          />
+          <div class="flex items-center justify-between text-[11px] text-gray-400 mt-0.5">
+            <span>Image only</span>
+            <span>Strong color</span>
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Preview</label>
+          <div
+            class="relative w-full aspect-[5/2] rounded-xl overflow-hidden flex items-end p-4"
+            :style="{ background: `linear-gradient(135deg, ${form.gradient_from}, ${form.gradient_to})` }"
+          >
+            <img
+              v-if="previewImageUrl"
+              :src="previewImageUrl"
+              alt=""
+              class="absolute inset-0 w-full h-full object-cover"
+            />
+            <div
+              v-if="previewImageUrl"
+              class="absolute inset-0 mix-blend-multiply"
+              :style="{
+                background: `linear-gradient(135deg, ${form.gradient_from}, ${form.gradient_to})`,
+                opacity: form.overlay_opacity / 100,
+              }"
+            />
+            <span class="relative inline-flex items-center px-3 py-1.5 rounded-lg bg-white/95 text-[12px] font-semibold text-gray-900 shadow-sm">
+              {{ form.name || 'Category name' }}
+            </span>
+          </div>
         </div>
       </form>
 
@@ -243,6 +277,7 @@ const form = reactive({
   name: '',
   gradient_from: '#6898ED',
   gradient_to: '#4B5979',
+  overlay_opacity: 60,
 })
 
 const imageFile = ref<File | null>(null)
@@ -274,6 +309,7 @@ function resetForm() {
   form.name = ''
   form.gradient_from = '#6898ED'
   form.gradient_to = '#4B5979'
+  form.overlay_opacity = 60
   resetImageState()
 }
 
@@ -296,6 +332,7 @@ function startEdit(cat: PostCategory) {
   form.name = cat.name
   form.gradient_from = cat.gradient_from
   form.gradient_to = cat.gradient_to
+  form.overlay_opacity = cat.overlay_opacity ?? 60
   resetImageState()
   existingImageUrl.value = cat.image_url || null
   showModal.value = true
@@ -334,6 +371,7 @@ async function save() {
       fd.append('name', form.name.trim())
       fd.append('gradient_from', form.gradient_from)
       fd.append('gradient_to', form.gradient_to)
+      fd.append('overlay_opacity', String(form.overlay_opacity))
       fd.append('image', imageFile.value as File)
       if (editing.value) fd.append('_method', 'PATCH')
 
@@ -347,6 +385,7 @@ async function save() {
         name: form.name.trim(),
         gradient_from: form.gradient_from,
         gradient_to: form.gradient_to,
+        overlay_opacity: form.overlay_opacity,
       }
       if (editing.value) {
         await $apiFetch(`/post-categories/${editing.value.id}`, { method: 'PATCH', body })
