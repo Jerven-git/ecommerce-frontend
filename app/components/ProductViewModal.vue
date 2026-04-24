@@ -1,89 +1,60 @@
 <template>
-  <Teleport to="body">
-    <!-- Product Detail Modal -->
-    <Transition
-      enter-active-class="transition duration-200 ease-out"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition duration-150 ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
+  <BaseModal :open="open" size="lg" hide-close body-class="p-0" @close="$emit('close')">
+    <!-- Close button (floating over image) -->
+    <button
+      type="button"
+      @click="$emit('close')"
+      class="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm text-gray-500 hover:text-gray-700 hover:bg-white transition-colors shadow-sm"
     >
-      <div
-        v-if="open"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
-        @click.self="$emit('close')"
-      >
-        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"></div>
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
 
-        <Transition
-          enter-active-class="transition duration-200 ease-out"
-          enter-from-class="opacity-0 scale-95 translate-y-2"
-          enter-to-class="opacity-100 scale-100 translate-y-0"
-          leave-active-class="transition duration-150 ease-in"
-          leave-from-class="opacity-100 scale-100 translate-y-0"
-          leave-to-class="opacity-0 scale-95 translate-y-2"
-          appear
-        >
-          <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
-            <!-- Close button -->
-            <button
-              type="button"
-              @click="$emit('close')"
-              class="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm text-gray-500 hover:text-gray-700 hover:bg-white transition-colors shadow-sm"
-            >
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            <!-- Image (clickable to expand) -->
-            <div class="w-full bg-gray-100 relative group/img cursor-pointer" @click="product.image_url && (showLightbox = true)">
-              <img
-                v-if="product.image_url"
-                :src="product.image_url"
-                :alt="product.name"
-                class="w-full h-72 object-cover object-center"
-              />
-              <div v-else class="w-full h-72">
-                <ProductImagePlaceholder size="md" />
-              </div>
-              <!-- Expand hint -->
-              <div
-                v-if="product.image_url"
-                class="absolute inset-0 bg-transparent flex items-center justify-center"
-              >
-                <span class="opacity-0 group-hover/img:opacity-100 transition-opacity duration-200 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm text-white shadow-lg">
-                  View Image
-                </span>
-              </div>
-            </div>
-
-            <!-- Content -->
-            <div class="p-6">
-              <h2 class="text-xl font-bold text-gray-900 mb-1">{{ product.name }}</h2>
-
-              <div class="flex items-center gap-3 mb-4">
-                <span class="text-2xl font-bold text-primary-600">${{ product.price }}</span>
-                <StockBadge :stock="product.stock" :can-backorder="product.can_backorder" variant="pill" />
-              </div>
-
-              <p class="text-sm text-gray-600 leading-relaxed mb-6">{{ product.description || 'No description available.' }}</p>
-
-              <button
-                @click="addToCart"
-                :disabled="!orderable"
-                class="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {{ orderable ? 'Add to Cart' : 'Out of Stock' }}
-              </button>
-            </div>
-          </div>
-        </Transition>
+    <!-- Image (clickable to expand) -->
+    <div class="w-full bg-gray-100 relative group/img cursor-pointer" @click="product.image_url && (showLightbox = true)">
+      <img
+        v-if="product.image_url"
+        :src="product.image_url"
+        :alt="product.name"
+        class="w-full h-72 object-cover object-center"
+      />
+      <div v-else class="w-full h-72">
+        <ProductImagePlaceholder size="md" />
       </div>
-    </Transition>
+      <div
+        v-if="product.image_url"
+        class="absolute inset-0 bg-transparent flex items-center justify-center"
+      >
+        <span class="opacity-0 group-hover/img:opacity-100 transition-opacity duration-200 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm text-white shadow-lg">
+          View Image
+        </span>
+      </div>
+    </div>
 
-    <!-- Full-screen Image Lightbox -->
+    <!-- Content -->
+    <div class="p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-1">{{ product.name }}</h2>
+
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-2xl font-bold text-primary-600">${{ product.price }}</span>
+        <StockBadge :stock="product.stock" :can-backorder="product.can_backorder" variant="pill" />
+      </div>
+
+      <p class="text-sm text-gray-600 leading-relaxed mb-6">{{ product.description || 'No description available.' }}</p>
+
+      <button
+        @click="addToCart"
+        :disabled="!orderable"
+        class="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {{ orderable ? 'Add to Cart' : 'Out of Stock' }}
+      </button>
+    </div>
+  </BaseModal>
+
+  <!-- Full-screen Image Lightbox -->
+  <Teleport to="body">
     <Transition
       enter-active-class="transition duration-200 ease-out"
       enter-from-class="opacity-0"
@@ -99,7 +70,6 @@
       >
         <div class="absolute inset-0 bg-black/80"></div>
 
-        <!-- Close -->
         <button
           type="button"
           @click="showLightbox = false"
@@ -153,7 +123,6 @@ const addToCart = () => {
   emit('close')
 }
 
-// Close lightbox when modal closes
 watch(() => props.open, (val) => {
   if (!val) showLightbox.value = false
 })

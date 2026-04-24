@@ -57,8 +57,9 @@
             Admin
           </NuxtLink>
 
-          <!-- Cart -->
+          <!-- Cart (hidden when Shop module is disabled) -->
           <NuxtLink
+            v-if="isEnabled('shop')"
             to="/cart"
             class="relative p-2 rounded-lg transition-colors"
             :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
@@ -129,16 +130,21 @@ const route = useRoute()
 const cartStore = useCartStore()
 const authStore = useAuthStore()
 const { siteConfig } = useSiteConfig()
+const { isEnabled } = useModules()
 const mobileMenuOpen = ref(false)
 
-const navLinks = [
-  { to: '/', label: 'Home' },
-  { to: '/shop', label: 'Shop' },
-  { to: '/services', label: 'Services' },
-  { to: '/blog', label: 'Blog' },
-  { to: '/about', label: 'About' },
-  { to: '/contact', label: 'Contact' },
+const allNavLinks = [
+  { to: '/', label: 'Home', module: null },
+  { to: '/shop', label: 'Shop', module: 'shop' as const },
+  { to: '/services', label: 'Services', module: 'services' as const },
+  { to: '/blog', label: 'Blog', module: 'blog' as const },
+  { to: '/about', label: 'About', module: 'about' as const },
+  { to: '/contact', label: 'Contact', module: 'contact' as const },
 ]
+
+const navLinks = computed(() =>
+  allNavLinks.filter(l => l.module === null || isEnabled(l.module))
+)
 
 // Transparent header only on the homepage AND only when the admin has
 // opted into the full-bleed hero (image flows under header). Otherwise

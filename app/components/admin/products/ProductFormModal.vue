@@ -1,53 +1,21 @@
 <template>
-  <Teleport to="body">
-    <Transition
-      enter-active-class="transition-all duration-200"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition-all duration-150"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
-      <div
-        v-if="showModal"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-        @mousedown.self="backdropMouseDown = true"
-        @mouseup.self="if (backdropMouseDown) $emit('close'); backdropMouseDown = false"
-        @mouseup.capture="backdropMouseDown = false"
-      >
-        <Transition
-          enter-active-class="transition-all duration-200"
-          enter-from-class="opacity-0 scale-95 translate-y-2"
-          enter-to-class="opacity-100 scale-100 translate-y-0"
-          leave-active-class="transition-all duration-150"
-          leave-from-class="opacity-100 scale-100 translate-y-0"
-          leave-to-class="opacity-0 scale-95 translate-y-2"
-        >
-          <div v-if="showModal" class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-            <!-- Modal header -->
-            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :class="editingProduct ? 'bg-primary-50' : 'bg-green-50'">
-                  <svg class="w-4 h-4" :class="editingProduct ? 'text-primary-600' : 'text-green-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path v-if="editingProduct" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                  </svg>
-                </div>
-                <div>
-                  <h2 class="text-sm font-semibold text-gray-900">{{ editingProduct ? 'Edit Product' : 'New Product' }}</h2>
-                  <p class="text-xs text-gray-400">{{ editingProduct ? 'Update product details' : 'Fill in the details below' }}</p>
-                </div>
-              </div>
-              <button @click="$emit('close')" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+  <BaseModal :open="showModal" size="2xl" body-class="px-6 py-5" @close="$emit('close')">
+    <template #header>
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :class="editingProduct ? 'bg-primary-50' : 'bg-green-50'">
+          <svg class="w-4 h-4" :class="editingProduct ? 'text-primary-600' : 'text-green-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path v-if="editingProduct" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <h2 class="text-sm font-semibold text-gray-900 truncate">{{ editingProduct ? 'Edit Product' : 'New Product' }}</h2>
+          <p class="text-xs text-gray-400 truncate">{{ editingProduct ? 'Update product details' : 'Fill in the details below' }}</p>
+        </div>
+      </div>
+    </template>
 
-            <!-- Modal body (scrollable) -->
-            <div class="overflow-y-auto flex-1 px-6 py-5">
-              <form id="productForm" @submit.prevent="$emit('save')" class="space-y-5">
+    <form id="productForm" @submit.prevent="$emit('save')" class="space-y-5">
 
                 <!-- Section: Basic Info -->
                 <fieldset class="space-y-3">
@@ -330,36 +298,32 @@
                     {{ formError }}
                   </div>
                 </Transition>
-              </form>
-            </div>
+    </form>
 
-            <!-- Modal footer -->
-            <div class="px-6 py-3.5 border-t border-gray-100 flex items-center justify-end gap-3 shrink-0">
-              <button
-                type="button"
-                @click="$emit('close')"
-                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                form="productForm"
-                class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                :disabled="submitting"
-              >
-                <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                {{ submitting ? 'Saving...' : (editingProduct ? 'Save Changes' : 'Add Product') }}
-              </button>
-            </div>
-          </div>
-        </Transition>
+    <template #footer>
+      <div class="flex items-center justify-end gap-3">
+        <button
+          type="button"
+          @click="$emit('close')"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          form="productForm"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          :disabled="submitting"
+        >
+          <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          {{ submitting ? 'Saving...' : (editingProduct ? 'Save Changes' : 'Add Product') }}
+        </button>
       </div>
-    </Transition>
-  </Teleport>
+    </template>
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
@@ -367,7 +331,6 @@ import type { Product } from '~/composables/useProducts'
 import type { ProductFormData } from '~/composables/useProductForm'
 import type { Category } from '~/composables/useProductCategories'
 
-const backdropMouseDown = ref(false)
 const galleryInputRef = ref<HTMLInputElement | null>(null)
 
 const props = defineProps<{

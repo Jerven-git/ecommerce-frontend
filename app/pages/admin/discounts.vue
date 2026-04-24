@@ -237,59 +237,22 @@
     />
 
     <!-- Add/Edit Modal -->
-    <Teleport to="body">
-      <Transition
-        enter-active-class="transition duration-200 ease-out"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
-        leave-active-class="transition duration-150 ease-in"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
-      >
-        <div
-          v-if="showModal"
-          class="fixed inset-0 z-50 flex items-center justify-center p-4"
-          @click.self="closeModal"
-        >
-          <!-- Backdrop -->
-          <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"></div>
+    <BaseModal :open="showModal" size="xl" body-class="px-6 py-5" @close="closeModal">
+      <template #header>
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <h2 class="text-sm font-semibold text-gray-900 truncate">{{ editingDiscount ? 'Edit Discount' : 'New Discount' }}</h2>
+            <p class="text-xs text-gray-400 truncate">{{ editingDiscount ? `Editing ${editingDiscount.code}` : 'Create a new promotional code' }}</p>
+          </div>
+        </div>
+      </template>
 
-          <!-- Panel -->
-          <Transition
-            enter-active-class="transition duration-200 ease-out"
-            enter-from-class="opacity-0 scale-95 translate-y-2"
-            enter-to-class="opacity-100 scale-100 translate-y-0"
-            leave-active-class="transition duration-150 ease-in"
-            leave-from-class="opacity-100 scale-100 translate-y-0"
-            leave-to-class="opacity-0 scale-95 translate-y-2"
-            appear
-          >
-            <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden">
-              <!-- Modal header -->
-              <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h2 class="text-sm font-semibold text-gray-900">{{ editingDiscount ? 'Edit Discount' : 'New Discount' }}</h2>
-                    <p class="text-xs text-gray-400">{{ editingDiscount ? `Editing ${editingDiscount.code}` : 'Create a new promotional code' }}</p>
-                  </div>
-                </div>
-                <button
-                  @click="closeModal"
-                  class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-                >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              <!-- Modal body -->
-              <form id="discount-form" @submit.prevent="saveDiscount" class="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+      <form id="discount-form" @submit.prevent="saveDiscount" class="space-y-5">
                 <!-- Code -->
                 <div>
                   <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Discount Code *</label>
@@ -403,29 +366,26 @@
                   </svg>
                   <p class="text-sm text-red-700">{{ formError }}</p>
                 </div>
-              </form>
+      </form>
 
-              <!-- Modal footer -->
-              <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3 shrink-0 bg-gray-50/50">
-                <button type="button" @click="closeModal" class="btn-secondary">Cancel</button>
-                <button
-                  type="submit"
-                  form="discount-form"
-                  :disabled="submitting"
-                  class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
-                >
-                  <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  {{ submitting ? 'Saving…' : 'Save Discount' }}
-                </button>
-              </div>
-            </div>
-          </Transition>
+      <template #footer>
+        <div class="flex items-center justify-end gap-3">
+          <button type="button" @click="closeModal" class="btn-secondary">Cancel</button>
+          <button
+            type="submit"
+            form="discount-form"
+            :disabled="submitting"
+            class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            {{ submitting ? 'Saving…' : 'Save Discount' }}
+          </button>
         </div>
-      </Transition>
-    </Teleport>
+      </template>
+    </BaseModal>
   </div>
 </template>
 

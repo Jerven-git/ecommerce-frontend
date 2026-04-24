@@ -154,6 +154,10 @@ export interface ShopPromo {
   perks: string[]
 }
 
+export type ModuleKey = 'shop' | 'blog' | 'services' | 'about' | 'contact'
+
+export type ModulesEnabled = Record<ModuleKey, boolean>
+
 export interface SiteConfig {
   id: number
   site_name: string
@@ -203,7 +207,16 @@ export interface SiteConfig {
   services_image_url: string | null
   services_overlay_color: string
   services_overlay_opacity: number
+  modules_enabled: ModulesEnabled
   updated_at: string
+}
+
+export const DEFAULT_MODULES_ENABLED: ModulesEnabled = {
+  shop: true,
+  blog: true,
+  services: true,
+  about: true,
+  contact: true,
 }
 
 export const DEFAULT_THEME: SiteTheme = {
@@ -220,6 +233,7 @@ export const DEFAULT_IN_STOCK_COLOR = '#16a34a'
 
 const DEFAULT_CONFIG: Partial<SiteConfig> = {
   theme: { ...DEFAULT_THEME },
+  modules_enabled: { ...DEFAULT_MODULES_ENABLED },
 }
 
 // BroadcastChannel for cross-tab config sync
@@ -249,9 +263,10 @@ export function useSiteConfig() {
     try {
       const { $apiFetch } = useNuxtApp()
       const res = await $apiFetch<{ data: SiteConfig }>('/site-config')
-      // Merge theme defaults so missing keys are always present
+      // Merge theme + module defaults so missing keys are always present
       const data = res.data
       data.theme = { ...DEFAULT_THEME, ...(data.theme ?? {}) }
+      data.modules_enabled = { ...DEFAULT_MODULES_ENABLED, ...(data.modules_enabled ?? {}) }
       siteConfig.value = { ...DEFAULT_CONFIG, ...data } as SiteConfig
       fetched.value = true
     } catch {

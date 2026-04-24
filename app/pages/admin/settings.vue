@@ -80,6 +80,11 @@
         v-show="activeTab === 'popup'"
         :form="form"
       />
+
+      <AdminSettingsTabsModulesTab
+        v-show="activeTab === 'modules'"
+        :form="form"
+      />
     </form>
 
     <AdminSettingsSaveFooter
@@ -108,6 +113,7 @@
 <script setup lang="ts">
 import type { MediaCollection } from '~/composables/useMediaUpload'
 import { THEME_PRESETS, type ThemePreset } from '~/composables/useTheme'
+import { DEFAULT_MODULES_ENABLED, type ModulesEnabled } from '~/composables/useSiteConfig'
 
 definePageMeta({ middleware: "auth" })
 
@@ -131,6 +137,7 @@ const tabs = [
   { id: 'appearance', label: 'Appearance', icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01' },
   { id: 'pages', label: 'Pages', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
   { id: 'popup', label: 'Popup', icon: 'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7' },
+  { id: 'modules', label: 'Modules', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z' },
 ] as const
 
 type TabId = typeof tabs[number]['id']
@@ -209,6 +216,7 @@ const tabSuccessMessages: Record<TabId, string> = {
   appearance: 'Theme has been applied',
   pages: 'Page content has been saved',
   popup: 'Popup settings have been saved',
+  modules: 'Module visibility has been updated',
 }
 
 const tabConfirmMessages: Record<TabId, string> = {
@@ -216,12 +224,21 @@ const tabConfirmMessages: Record<TabId, string> = {
   appearance: 'Apply the new theme to your site?',
   pages: 'Save these page content changes?',
   popup: 'Save these popup settings?',
+  modules: 'Apply these module visibility changes? Disabled pages will redirect to the homepage.',
 }
 
 const confirmMessage = computed(() => tabConfirmMessages[activeTab.value])
 
 function requestSave() {
   if (saving.value) return
+
+  const popup = form.value.welcome_popup
+  if (popup.welcome_popup_enabled && !popup.welcome_popup_discount_id) {
+    if (activeTab.value !== 'popup') activeTab.value = 'popup'
+    showToast('Select a discount before enabling the welcome popup', 'error')
+    return
+  }
+
   saveConfirmOpen.value = true
 }
 
@@ -366,6 +383,7 @@ const form = ref({
     ],
     cta: null as null | { heading: string; subtitle: string; button_label: string; button_link: string },
   },
+  modules_enabled: { ...DEFAULT_MODULES_ENABLED } as ModulesEnabled,
 })
 
 // Map collection -> form field
@@ -631,6 +649,10 @@ async function loadSettings() {
           sp.cta = sp.cta ?? null
           return sp
         })(),
+        modules_enabled: {
+          ...DEFAULT_MODULES_ENABLED,
+          ...(response.data.modules_enabled ?? {}),
+        } as ModulesEnabled,
       }
 
       savedTheme.value = { ...form.value.theme }
@@ -702,6 +724,7 @@ async function saveSettings() {
         services_page: form.value.services_page,
         services_overlay_color: form.value.services_overlay_color,
         services_overlay_opacity: form.value.services_overlay_opacity,
+        modules_enabled: form.value.modules_enabled,
       },
     })
 

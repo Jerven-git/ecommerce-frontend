@@ -78,88 +78,96 @@
 
     <!-- Table -->
     <div v-else data-guide="post-table" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      <table class="w-full">
-        <thead class="bg-gray-50 border-b border-gray-100">
-          <tr>
-            <th class="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Post</th>
-            <th class="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Category</th>
-            <th class="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Status</th>
-            <th class="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Published</th>
-            <th class="px-4 py-3"></th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          <tr
-            v-for="post in posts"
-            :key="post.id"
-            class="hover:bg-gray-50/50 transition-colors"
-          >
-            <td class="px-4 py-3">
-              <div class="flex items-center gap-3 min-w-0">
-                <div class="w-12 h-12 rounded-lg bg-gray-100 shrink-0 overflow-hidden">
-                  <img v-if="post.cover_image_url" :src="post.cover_image_url" :alt="post.title" class="w-full h-full object-cover" />
-                  <div v-else class="w-full h-full flex items-center justify-center">
-                    <Icon name="heroicons:photo" class="w-5 h-5 text-gray-300" />
+      <div class="overflow-x-auto">
+        <table class="min-w-full">
+          <thead>
+            <tr class="border-b border-gray-100">
+              <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Post</th>
+              <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Category</th>
+              <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Status</th>
+              <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">Published</th>
+              <th class="px-6 py-3.5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            <tr
+              v-for="post in posts"
+              :key="post.id"
+              class="hover:bg-gray-50/60 transition-colors"
+            >
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-12 h-12 rounded-lg bg-gray-100 shrink-0 overflow-hidden">
+                    <img v-if="post.cover_image_url" :src="post.cover_image_url" :alt="post.title" class="w-full h-full object-cover" />
+                    <div v-else class="w-full h-full flex items-center justify-center">
+                      <Icon name="heroicons:photo" class="w-5 h-5 text-gray-300" />
+                    </div>
                   </div>
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-gray-900 truncate">{{ post.title }}</p>
+                    <p class="text-xs text-gray-400 truncate font-mono">/{{ post.slug }}</p>
+                  </div>
+                  <Icon
+                    v-if="post.is_featured"
+                    name="heroicons:star"
+                    class="w-4 h-4 text-amber-400 shrink-0"
+                    title="Featured"
+                  />
                 </div>
-                <div class="min-w-0">
-                  <p class="text-sm font-semibold text-gray-900 truncate">{{ post.title }}</p>
-                  <p class="text-xs text-gray-400 truncate font-mono">/{{ post.slug }}</p>
+              </td>
+
+              <td class="px-6 py-4 hidden md:table-cell">
+                <span
+                  v-if="post.category"
+                  class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium text-white"
+                  :style="{ background: `linear-gradient(135deg, ${post.category.gradient_from}, ${post.category.gradient_to})` }"
+                >
+                  {{ post.category.name }}
+                </span>
+                <span v-else class="text-xs text-gray-400">—</span>
+              </td>
+
+              <td class="px-6 py-4 hidden sm:table-cell">
+                <span
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                  :class="post.is_published ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full" :class="post.is_published ? 'bg-green-500' : 'bg-gray-400'"></span>
+                  {{ post.is_published ? 'Published' : 'Draft' }}
+                </span>
+              </td>
+
+              <td class="px-6 py-4 hidden lg:table-cell whitespace-nowrap text-sm text-gray-500">
+                {{ post.published_at ? formatPostDate(post.published_at) : '—' }}
+              </td>
+
+              <td class="px-6 py-4 whitespace-nowrap text-right">
+                <div class="inline-flex items-center gap-1">
+                  <NuxtLink
+                    :to="`/admin/posts/${post.id}`"
+                    class="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                    title="Edit"
+                  >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </NuxtLink>
+                  <button
+                    type="button"
+                    @click="deleteTarget = post"
+                    class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Delete"
+                  >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
                 </div>
-                <Icon
-                  v-if="post.is_featured"
-                  name="heroicons:star"
-                  class="w-4 h-4 text-amber-400 shrink-0"
-                  title="Featured"
-                />
-              </div>
-            </td>
-
-            <td class="px-4 py-3 hidden md:table-cell">
-              <span
-                v-if="post.category"
-                class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium text-white"
-                :style="{ background: `linear-gradient(135deg, ${post.category.gradient_from}, ${post.category.gradient_to})` }"
-              >
-                {{ post.category.name }}
-              </span>
-              <span v-else class="text-xs text-gray-400">—</span>
-            </td>
-
-            <td class="px-4 py-3 hidden sm:table-cell">
-              <span
-                class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium"
-                :class="post.is_published ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'"
-              >
-                <span class="w-1.5 h-1.5 rounded-full" :class="post.is_published ? 'bg-green-500' : 'bg-gray-400'"></span>
-                {{ post.is_published ? 'Published' : 'Draft' }}
-              </span>
-            </td>
-
-            <td class="px-4 py-3 hidden lg:table-cell text-sm text-gray-500">
-              {{ post.published_at ? formatPostDate(post.published_at) : '—' }}
-            </td>
-
-            <td class="px-4 py-3 text-right">
-              <div class="inline-flex items-center gap-1">
-                <NuxtLink
-                  :to="`/admin/posts/${post.id}`"
-                  class="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors"
-                >
-                  Edit
-                </NuxtLink>
-                <button
-                  type="button"
-                  @click="deleteTarget = post"
-                  class="px-3 py-1.5 rounded-lg text-xs font-medium text-red-500 hover:bg-red-50 transition-colors"
-                >
-                  Delete
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Pagination -->

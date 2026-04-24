@@ -88,139 +88,128 @@
     </div>
 
     <!-- Form Modal -->
-    <Transition
-      enter-active-class="transition duration-150 ease-out"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition duration-100 ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
+    <BaseModal
+      :open="showModal"
+      :title="editing ? 'Edit Category' : 'New Blog Category'"
+      size="md"
+      body-class="p-0"
+      @close="closeModal"
     >
-      <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm" @click.self="closeModal">
-        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 w-full max-w-md overflow-hidden">
-          <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h2 class="text-sm font-semibold text-gray-900">
-              {{ editing ? 'Edit Category' : 'New Blog Category' }}
-            </h2>
-            <button type="button" @click="closeModal" class="text-gray-400 hover:text-gray-600 transition-colors">
-              <Icon name="heroicons:x-mark" class="w-5 h-5" />
-            </button>
-          </div>
+      <form id="postCategoryForm" class="p-5 space-y-4" @submit.prevent="save">
+        <!-- Name -->
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Name</label>
+          <input
+            v-model="form.name"
+            type="text"
+            required
+            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+            placeholder="e.g. Product Management"
+          />
+        </div>
 
-          <form class="p-5 space-y-4" @submit.prevent="save">
-            <!-- Name -->
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1">Name</label>
+        <!-- Gradient colors -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Gradient from</label>
+            <div class="flex items-center gap-2">
               <input
-                v-model="form.name"
+                type="color"
+                v-model="form.gradient_from"
+                class="w-10 h-9 rounded-lg border border-gray-200 cursor-pointer shrink-0"
+              />
+              <input
+                v-model="form.gradient_from"
                 type="text"
-                required
-                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
-                placeholder="e.g. Product Management"
+                class="flex-1 min-w-0 px-3 py-2 text-xs font-mono border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
               />
             </div>
-
-            <!-- Gradient colors -->
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Gradient from</label>
-                <div class="flex items-center gap-2">
-                  <input
-                    type="color"
-                    v-model="form.gradient_from"
-                    class="w-10 h-9 rounded-lg border border-gray-200 cursor-pointer shrink-0"
-                  />
-                  <input
-                    v-model="form.gradient_from"
-                    type="text"
-                    class="flex-1 px-3 py-2 text-xs font-mono border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
-                  />
-                </div>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Gradient to</label>
-                <div class="flex items-center gap-2">
-                  <input
-                    type="color"
-                    v-model="form.gradient_to"
-                    class="w-10 h-9 rounded-lg border border-gray-200 cursor-pointer shrink-0"
-                  />
-                  <input
-                    v-model="form.gradient_to"
-                    type="text"
-                    class="flex-1 px-3 py-2 text-xs font-mono border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
-                  />
-                </div>
-              </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Gradient to</label>
+            <div class="flex items-center gap-2">
+              <input
+                type="color"
+                v-model="form.gradient_to"
+                class="w-10 h-9 rounded-lg border border-gray-200 cursor-pointer shrink-0"
+              />
+              <input
+                v-model="form.gradient_to"
+                type="text"
+                class="flex-1 min-w-0 px-3 py-2 text-xs font-mono border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+              />
             </div>
-
-            <!-- Preview -->
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1">Preview</label>
-              <div
-                class="w-full aspect-[5/2] rounded-xl flex items-end p-4"
-                :style="{ background: `linear-gradient(135deg, ${form.gradient_from}, ${form.gradient_to})` }"
-              >
-                <span class="inline-flex items-center px-3 py-1.5 rounded-lg bg-white/95 text-[12px] font-semibold text-gray-900 shadow-sm">
-                  {{ form.name || 'Category name' }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Optional image upload -->
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1">Image (optional)</label>
-
-              <div class="relative">
-                <img
-                  v-if="previewImageUrl"
-                  :src="previewImageUrl"
-                  alt="Category image preview"
-                  class="w-full aspect-[5/2] object-cover rounded-xl border border-gray-100"
-                />
-                <label
-                  v-else
-                  class="flex flex-col items-center justify-center w-full aspect-[5/2] border-2 border-dashed border-gray-200 rounded-xl text-gray-400 hover:border-primary-300 hover:text-primary-500 cursor-pointer transition-colors"
-                >
-                  <Icon name="heroicons:photo" class="w-7 h-7 mb-1" />
-                  <span class="text-xs font-medium">Upload image</span>
-                  <input type="file" accept="image/*" class="hidden" @change="onImageSelect" />
-                </label>
-
-                <div v-if="previewImageUrl" class="absolute top-2 right-2 flex gap-1">
-                  <label class="px-2 py-1 bg-white/90 backdrop-blur-sm rounded-md text-[11px] font-medium text-gray-700 hover:bg-white cursor-pointer shadow-sm">
-                    Replace
-                    <input type="file" accept="image/*" class="hidden" @change="onImageSelect" />
-                  </label>
-                  <button
-                    type="button"
-                    class="px-2 py-1 bg-white/90 backdrop-blur-sm rounded-md text-[11px] font-medium text-red-500 hover:bg-white shadow-sm"
-                    @click="clearImage"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-              <p class="text-[11px] text-gray-400 mt-1">Blends over the gradient when set. JPG, PNG, WebP — max 5 MB.</p>
-            </div>
-
-            <div class="flex items-center justify-end gap-2 pt-2">
-              <button type="button" @click="closeModal" class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                Cancel
-              </button>
-              <button
-                type="submit"
-                :disabled="saving || !form.name.trim()"
-                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors disabled:opacity-50"
-              >
-                <span v-if="saving" class="w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin"></span>
-                {{ editing ? 'Save changes' : 'Create category' }}
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
-      </div>
-    </Transition>
+
+        <!-- Preview -->
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Preview</label>
+          <div
+            class="w-full aspect-[5/2] rounded-xl flex items-end p-4"
+            :style="{ background: `linear-gradient(135deg, ${form.gradient_from}, ${form.gradient_to})` }"
+          >
+            <span class="inline-flex items-center px-3 py-1.5 rounded-lg bg-white/95 text-[12px] font-semibold text-gray-900 shadow-sm">
+              {{ form.name || 'Category name' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Optional image upload -->
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Image (optional)</label>
+
+          <div class="relative">
+            <img
+              v-if="previewImageUrl"
+              :src="previewImageUrl"
+              alt="Category image preview"
+              class="w-full aspect-[5/2] object-cover rounded-xl border border-gray-100"
+            />
+            <label
+              v-else
+              class="flex flex-col items-center justify-center w-full aspect-[5/2] border-2 border-dashed border-gray-200 rounded-xl text-gray-400 hover:border-primary-300 hover:text-primary-500 cursor-pointer transition-colors"
+            >
+              <Icon name="heroicons:photo" class="w-7 h-7 mb-1" />
+              <span class="text-xs font-medium">Upload image</span>
+              <input type="file" accept="image/*" class="hidden" @change="onImageSelect" />
+            </label>
+
+            <div v-if="previewImageUrl" class="absolute top-2 right-2 flex gap-1">
+              <label class="px-2 py-1 bg-white/90 backdrop-blur-sm rounded-md text-[11px] font-medium text-gray-700 hover:bg-white cursor-pointer shadow-sm">
+                Replace
+                <input type="file" accept="image/*" class="hidden" @change="onImageSelect" />
+              </label>
+              <button
+                type="button"
+                class="px-2 py-1 bg-white/90 backdrop-blur-sm rounded-md text-[11px] font-medium text-red-500 hover:bg-white shadow-sm"
+                @click="clearImage"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+          <p class="text-[11px] text-gray-400 mt-1">Blends over the gradient when set. JPG, PNG, WebP — max 5 MB.</p>
+        </div>
+      </form>
+
+      <template #footer>
+        <div class="flex items-center justify-end gap-2">
+          <button type="button" @click="closeModal" class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="postCategoryForm"
+            :disabled="saving || !form.name.trim()"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors disabled:opacity-50"
+          >
+            <span v-if="saving" class="w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin"></span>
+            {{ editing ? 'Save changes' : 'Create category' }}
+          </button>
+        </div>
+      </template>
+    </BaseModal>
 
     <ConfirmDeleteModal
       :open="!!deleteTarget"

@@ -128,15 +128,17 @@ onMounted(() => {
   const dismissed = localStorage.getItem(STORAGE_KEY)
   if (dismissed) return
 
-  // Wait for siteConfig to load, then check if popup is enabled
-  const stop = watch(
+  // Wait for siteConfig to load, then check if popup is enabled.
+  // `stop` must be declared before `watch` so the immediate callback can reach it.
+  let stop: (() => void) | null = null
+  stop = watch(
     () => siteConfig.value?.welcome_popup_enabled,
     (enabled) => {
       if (enabled && siteConfig.value?.welcome_popup_discount_id) {
         setTimeout(() => { visible.value = true }, 1500)
-        stop()
+        stop?.()
       } else if (enabled === false) {
-        stop()
+        stop?.()
       }
     },
     { immediate: true },
