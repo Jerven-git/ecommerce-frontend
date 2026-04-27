@@ -117,20 +117,6 @@ export interface ServicesStatItem {
   label: string
 }
 
-export interface ServicesGroupItem {
-  eyebrow?: string
-  title: string
-  description: string
-  image_url?: string
-  cta_label?: string
-  cta_link?: string
-}
-
-export interface ServicesGroup {
-  heading: string
-  items: ServicesGroupItem[]
-}
-
 export interface ServicesPageCta {
   heading: string
   subtitle: string
@@ -142,7 +128,6 @@ export interface ServicesPage {
   header: ServicesPageHeader
   summary?: { items: ServicesSummaryItem[] } | null
   stats?: { items: ServicesStatItem[] } | null
-  groups: ServicesGroup[]
   cta?: ServicesPageCta | null
 }
 
