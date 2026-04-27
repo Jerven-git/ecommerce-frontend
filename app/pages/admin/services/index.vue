@@ -1,0 +1,326 @@
+<template>
+  <div>
+    <!-- Page Header -->
+    <div class="mb-6 flex items-start justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 text-sm text-gray-400 mb-2">
+          <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
+          <span>/</span>
+          <span class="text-gray-600 font-medium">Services</span>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900">Services</h1>
+        <p class="text-gray-500 text-sm mt-1">Each service gets its own detail page with full content and SEO</p>
+      </div>
+      <NuxtLink
+        data-guide="add-service-btn"
+        to="/admin/services/new"
+        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shrink-0"
+      >
+        <Icon name="heroicons:plus" class="w-4 h-4" />
+        New Service
+      </NuxtLink>
+    </div>
+
+    <!-- Filters -->
+    <div data-guide="service-filters" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <div class="flex-1 flex items-center rounded-lg border border-gray-200 overflow-hidden focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-500/20 bg-white">
+          <span class="pl-3 text-gray-400 shrink-0">
+            <Icon name="heroicons:magnifying-glass" class="w-4 h-4" />
+          </span>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search by title or description…"
+            class="flex-1 py-2 pr-3 pl-2 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none"
+          />
+        </div>
+
+        <select
+          v-model="statusFilter"
+          class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white"
+        >
+          <option value="all">All statuses</option>
+          <option value="published">Published</option>
+          <option value="draft">Drafts</option>
+        </select>
+
+        <select
+          v-model="categoryFilter"
+          class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white"
+        >
+          <option value="">All categories</option>
+          <option v-for="cat in categories" :key="cat.id" :value="String(cat.id)">{{ cat.name }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div v-if="loading" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 animate-pulse space-y-3">
+      <div v-for="i in 5" :key="i" class="h-16 bg-gray-100 rounded-xl"></div>
+    </div>
+
+    <!-- Error -->
+    <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">
+      <p class="text-sm font-medium text-red-600 mb-4">{{ error }}</p>
+      <button @click="load" class="btn-primary">Retry</button>
+    </div>
+
+    <!-- Empty -->
+    <div v-else-if="!services.length" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
+      <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <Icon name="heroicons:rectangle-stack" class="w-7 h-7 text-gray-400" />
+      </div>
+      <p class="font-semibold text-gray-700 mb-1">No services yet</p>
+      <p class="text-sm text-gray-400 mb-6">Create your first service to get started</p>
+      <NuxtLink to="/admin/services/new" class="btn-primary">New Service</NuxtLink>
+    </div>
+
+    <!-- Table -->
+    <div v-else data-guide="service-table" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full">
+          <thead>
+            <tr class="border-b border-gray-100">
+              <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Service</th>
+              <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Category</th>
+              <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Status</th>
+              <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">Published</th>
+              <th class="px-6 py-3.5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            <tr
+              v-for="service in services"
+              :key="service.id"
+              class="hover:bg-gray-50/60 transition-colors"
+            >
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-12 h-12 rounded-lg bg-gray-100 shrink-0 overflow-hidden">
+                    <img v-if="service.cover_image_url" :src="service.cover_image_url" :alt="service.title" class="w-full h-full object-cover" loading="lazy" decoding="async" />
+                    <div v-else class="w-full h-full flex items-center justify-center">
+                      <Icon name="heroicons:photo" class="w-5 h-5 text-gray-300" />
+                    </div>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-gray-900 truncate">{{ service.title }}</p>
+                    <p class="text-xs text-gray-400 truncate font-mono">/{{ service.slug }}</p>
+                  </div>
+                  <Icon
+                    v-if="service.is_featured"
+                    name="heroicons:star"
+                    class="w-4 h-4 text-amber-400 shrink-0"
+                    title="Featured"
+                  />
+                </div>
+              </td>
+
+              <td class="px-6 py-4 hidden md:table-cell">
+                <span
+                  v-if="service.category"
+                  class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium text-white"
+                  :style="{ background: `linear-gradient(135deg, ${service.category.gradient_from}, ${service.category.gradient_to})` }"
+                >
+                  {{ service.category.name }}
+                </span>
+                <span v-else class="text-xs text-gray-400">—</span>
+              </td>
+
+              <td class="px-6 py-4 hidden sm:table-cell">
+                <span
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                  :class="service.is_published ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full" :class="service.is_published ? 'bg-green-500' : 'bg-gray-400'"></span>
+                  {{ service.is_published ? 'Published' : 'Draft' }}
+                </span>
+              </td>
+
+              <td class="px-6 py-4 hidden lg:table-cell whitespace-nowrap text-sm text-gray-500">
+                {{ service.published_at ? formatPostDate(service.published_at) : '—' }}
+              </td>
+
+              <td class="px-6 py-4 whitespace-nowrap text-right">
+                <div class="inline-flex items-center gap-1">
+                  <NuxtLink
+                    :to="`/admin/services/${service.id}`"
+                    class="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                    title="Edit"
+                  >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </NuxtLink>
+                  <button
+                    type="button"
+                    @click="deleteTarget = service"
+                    class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Delete"
+                  >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav v-if="!loading && !error && totalPages > 1" class="flex items-center justify-center gap-1.5 mt-6">
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        :disabled="currentPage === 1"
+        @click="goToPage(currentPage - 1)"
+      >
+        Prev
+      </button>
+      <button
+        v-for="(page, i) in visiblePages"
+        :key="i"
+        type="button"
+        class="min-w-[36px] px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+        :class="page === currentPage ? 'bg-primary-600 text-white' : 'text-gray-600 hover:text-gray-900 hover:bg-white'"
+        :disabled="typeof page !== 'number'"
+        @click="typeof page === 'number' && goToPage(page)"
+      >
+        {{ page }}
+      </button>
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        :disabled="currentPage === totalPages"
+        @click="goToPage(currentPage + 1)"
+      >
+        Next
+      </button>
+    </nav>
+
+    <!-- Delete confirm -->
+    <ConfirmDeleteModal
+      :open="!!deleteTarget"
+      title="Delete Service"
+      :message="`Are you sure you want to delete &quot;${deleteTarget?.title}&quot;? This cannot be undone.`"
+      :deleting="deleting"
+      @confirm="executeDelete"
+      @cancel="deleteTarget = null"
+    />
+
+    <AdminToast />
+  </div>
+</template>
+
+<script setup lang="ts">
+import type { PaginatedServices, Service, ServiceCategory } from '~/types/service'
+import { formatPostDate } from '~/utils/formatPostDate'
+
+definePageMeta({ middleware: 'auth' })
+
+const { $apiFetch } = useNuxtApp()
+const { showToast } = useAdminToast()
+
+const services = ref<Service[]>([])
+const categories = ref<ServiceCategory[]>([])
+const loading = ref(true)
+const error = ref<string | null>(null)
+
+const searchQuery = ref('')
+const statusFilter = ref<'all' | 'published' | 'draft'>('all')
+const categoryFilter = ref('')
+
+const currentPage = ref(1)
+const totalPages = ref(1)
+const perPage = 15
+
+const deleteTarget = ref<Service | null>(null)
+const deleting = ref(false)
+
+const visiblePages = computed(() => {
+  const total = totalPages.value
+  const current = currentPage.value
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
+  const pages: (number | string)[] = [1]
+  if (current > 3) pages.push('...')
+  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) pages.push(i)
+  if (current < total - 2) pages.push('...')
+  pages.push(total)
+  return pages
+})
+
+async function load() {
+  loading.value = true
+  error.value = null
+  try {
+    const query: Record<string, string | number> = {
+      page: currentPage.value,
+      per_page: perPage,
+      sort: 'created_at',
+      order: 'desc',
+    }
+    if (statusFilter.value === 'published') query.is_published = 1
+    else if (statusFilter.value === 'draft') query.is_published = 0
+    if (categoryFilter.value) query.category_id = categoryFilter.value
+    if (searchQuery.value.trim()) query.search = searchQuery.value.trim()
+
+    const res = await $apiFetch<PaginatedServices>('/admin/services', { query })
+    services.value = res.data ?? []
+    totalPages.value = res.last_page ?? 1
+  } catch (err: any) {
+    error.value = err?.data?.message || 'Failed to load services'
+  } finally {
+    loading.value = false
+  }
+}
+
+async function loadCategories() {
+  try {
+    const res = await $apiFetch<{ data: ServiceCategory[] }>('/service-categories')
+    categories.value = res.data ?? []
+  } catch {}
+}
+
+function goToPage(page: number) {
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+  load()
+}
+
+async function executeDelete() {
+  if (!deleteTarget.value) return
+  deleting.value = true
+  try {
+    await $apiFetch(`/admin/services/${deleteTarget.value.id}`, { method: 'DELETE' })
+    showToast('Service deleted', 'success')
+    deleteTarget.value = null
+    await load()
+  } catch (err: any) {
+    showToast(err?.data?.message || 'Failed to delete service', 'error')
+  } finally {
+    deleting.value = false
+  }
+}
+
+watch([statusFilter, categoryFilter], () => {
+  currentPage.value = 1
+  load()
+})
+
+let searchTimer: ReturnType<typeof setTimeout>
+watch(searchQuery, () => {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    currentPage.value = 1
+    load()
+  }, 400)
+})
+
+onMounted(() => {
+  load()
+  loadCategories()
+})
+</script>
