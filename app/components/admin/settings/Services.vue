@@ -257,142 +257,24 @@
         </div>
       </div>
 
-      <!-- Service Groups -->
-      <div class="rounded-xl border border-gray-200 overflow-hidden">
-        <div class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 border-b border-gray-200">
-          <span class="w-1.5 h-1.5 rounded-full bg-red-300"></span>
-          <span class="w-1.5 h-1.5 rounded-full bg-yellow-300"></span>
-          <span class="w-1.5 h-1.5 rounded-full bg-green-300"></span>
-          <span class="ml-2 text-[10px] text-gray-400 font-medium">Service Groups</span>
+      <!-- Pointer to Services admin -->
+      <NuxtLink
+        to="/admin/services"
+        class="flex items-center gap-3 rounded-xl border border-dashed border-gray-200 bg-gray-50/60 p-4 hover:border-primary-300 hover:bg-primary-50/40 transition-colors group"
+      >
+        <div class="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center shrink-0 group-hover:border-primary-300">
+          <svg class="w-4 h-4 text-gray-500 group-hover:text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          </svg>
         </div>
-
-        <div class="bg-gray-50/80 p-4 space-y-4">
-          <div
-            v-for="(group, gi) in servicesPage.groups"
-            :key="gi"
-            class="rounded-xl border border-gray-200 bg-white overflow-hidden"
-          >
-            <!-- Group heading bar -->
-            <div class="flex items-center gap-2 px-4 py-2 bg-gray-50 border-b border-gray-200">
-              <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
-              </svg>
-              <input
-                :value="group.heading"
-                @input="updateGroupHeading(gi, ($event.target as HTMLInputElement).value)"
-                type="text"
-                class="edit-inline text-sm font-semibold text-gray-800 flex-1"
-                placeholder="Group heading (e.g. For your everyday spending)"
-              />
-              <button
-                v-if="servicesPage.groups.length > 1"
-                type="button"
-                class="shrink-0 p-1 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                @click="removeGroup(gi)"
-                title="Remove group"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V4a2 2 0 012-2h4a2 2 0 012 2v3" />
-                </svg>
-              </button>
-            </div>
-
-            <!-- Items -->
-            <div class="p-4 space-y-3">
-              <div
-                v-for="(item, ii) in group.items"
-                :key="ii"
-                class="group/item relative rounded-lg border border-gray-200 bg-white p-4 hover:border-primary-200 transition-colors"
-              >
-                <button
-                  v-if="group.items.length > 1"
-                  type="button"
-                  class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity shadow-sm hover:bg-red-600 z-10"
-                  @click="removeGroupItem(gi, ii)"
-                >
-                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-
-                <div class="grid grid-cols-1 md:grid-cols-[1fr,160px] gap-4">
-                  <div class="space-y-2">
-                    <input
-                      :value="item.eyebrow || ''"
-                      @input="updateGroupItem(gi, ii, 'eyebrow', ($event.target as HTMLInputElement).value)"
-                      type="text"
-                      class="edit-inline text-[10px] font-semibold text-gray-400 uppercase tracking-[0.15em]"
-                      placeholder="Eyebrow (e.g. Chequing)"
-                    />
-                    <input
-                      :value="item.title"
-                      @input="updateGroupItem(gi, ii, 'title', ($event.target as HTMLInputElement).value)"
-                      type="text"
-                      class="edit-inline text-sm font-bold text-gray-900"
-                      placeholder="Service title"
-                    />
-                    <textarea
-                      :value="item.description"
-                      @input="updateGroupItem(gi, ii, 'description', ($event.target as HTMLTextAreaElement).value)"
-                      rows="3"
-                      class="edit-inline text-xs text-gray-500 resize-none w-full"
-                      placeholder="Description of this service..."
-                    ></textarea>
-
-                    <div class="grid grid-cols-2 gap-2 pt-1">
-                      <input
-                        :value="item.cta_label || ''"
-                        @input="updateGroupItem(gi, ii, 'cta_label', ($event.target as HTMLInputElement).value)"
-                        type="text"
-                        class="edit-inline text-[11px]"
-                        placeholder="CTA label"
-                      />
-                      <input
-                        :value="item.cta_link || ''"
-                        @input="updateGroupItem(gi, ii, 'cta_link', ($event.target as HTMLInputElement).value)"
-                        type="text"
-                        class="edit-inline text-[11px] font-mono"
-                        placeholder="/contact or https://..."
-                      />
-                    </div>
-                  </div>
-
-                  <AdminMediaUploader
-                    :url="item.image_url || ''"
-                    :uploading="itemUploading[`${gi}-${ii}`] ?? false"
-                    label="Image"
-                    hint="JPG, PNG, GIF — max 10 MB"
-                    :input-id="`servicesItemImage-${gi}-${ii}`"
-                    preview-class="aspect-square w-full object-cover"
-                    dropzone-class="aspect-square"
-                    overlay
-                    @select="(f: File) => uploadItemImage(gi, ii, f)"
-                    @remove="updateGroupItem(gi, ii, 'image_url', '')"
-                  />
-                </div>
-              </div>
-
-              <button
-                v-if="group.items.length < 12"
-                type="button"
-                class="w-full rounded-lg border-2 border-dashed border-gray-200 py-3 flex items-center justify-center gap-1.5 text-gray-400 hover:text-primary-500 hover:border-primary-300 transition-all"
-                @click="addGroupItem(gi)"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                <span class="text-xs font-medium">Add service</span>
-              </button>
-            </div>
-          </div>
-
-          <button
-            v-if="servicesPage.groups.length < 6"
-            type="button"
-            class="w-full rounded-xl border-2 border-dashed border-gray-200 py-4 flex items-center justify-center gap-1.5 text-gray-400 hover:text-primary-500 hover:border-primary-300 transition-all"
-            @click="addGroup"
-          >
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-            <span class="text-sm font-medium">Add group</span>
-          </button>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-gray-900">Manage services in Admin → Services</p>
+          <p class="text-xs text-gray-500 mt-0.5">Each service has its own detail page, full content, and SEO. Categories live under Service Categories.</p>
         </div>
-      </div>
+        <svg class="w-4 h-4 text-gray-400 group-hover:text-primary-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </NuxtLink>
 
       <!-- CTA banner -->
       <div class="rounded-xl border border-gray-200 overflow-hidden">
@@ -453,12 +335,10 @@
 import type { MediaCollection } from '~/composables/useMediaUpload'
 import type {
   ServicesPage,
-  ServicesPageHeader,
   ServicesPageCta,
   ServicesPageCtaLink,
   ServicesSummaryItem,
   ServicesStatItem,
-  ServicesGroupItem,
 } from '~/composables/useSiteConfig'
 
 const props = defineProps<{
@@ -476,39 +356,6 @@ const emit = defineEmits<{
   'media-select': [file: File, collection: MediaCollection]
   'media-remove': [collection: MediaCollection]
 }>()
-
-const { $apiFetch } = useNuxtApp()
-const { showToast } = useAdminToast()
-
-// Per-item upload flag keyed by `${groupIndex}-${itemIndex}`.
-const itemUploading = reactive<Record<string, boolean>>({})
-
-async function uploadItemImage(gi: number, ii: number, file: File) {
-  if (!file.type.startsWith('image/')) {
-    showToast('Please upload an image file', 'error')
-    return
-  }
-  if (file.size > 10 * 1024 * 1024) {
-    showToast(`File size (${(file.size / 1024 / 1024).toFixed(1)}MB) exceeds the 10MB limit`, 'error')
-    return
-  }
-
-  const key = `${gi}-${ii}`
-  itemUploading[key] = true
-  try {
-    const fd = new FormData()
-    fd.append('file', file)
-    const res = await $apiFetch<{ url: string }>('/site-config/services-items/media', {
-      method: 'POST',
-      body: fd,
-    })
-    updateGroupItem(gi, ii, 'image_url', res.url)
-  } catch (err: any) {
-    showToast(err?.data?.message || 'Failed to upload image', 'error')
-  } finally {
-    itemUploading[key] = false
-  }
-}
 
 function emitUpdate(next: ServicesPage) {
   emit('update:services-page', next)
@@ -605,41 +452,6 @@ function removeStatItem(i: number) {
   emitUpdate({ ...props.servicesPage, stats: { items: props.servicesPage.stats.items.filter((_, idx) => idx !== i) } })
 }
 
-// --- Groups ---
-function updateGroupHeading(gi: number, value: string) {
-  const groups = props.servicesPage.groups.map((g, i) => i === gi ? { ...g, heading: value } : g)
-  emitUpdate({ ...props.servicesPage, groups })
-}
-function addGroup() {
-  emitUpdate({
-    ...props.servicesPage,
-    groups: [...props.servicesPage.groups, { heading: 'New service group', items: [emptyGroupItem()] }],
-  })
-}
-function removeGroup(gi: number) {
-  emitUpdate({ ...props.servicesPage, groups: props.servicesPage.groups.filter((_, i) => i !== gi) })
-}
-function addGroupItem(gi: number) {
-  const groups = props.servicesPage.groups.map((g, i) =>
-    i === gi ? { ...g, items: [...g.items, emptyGroupItem()] } : g,
-  )
-  emitUpdate({ ...props.servicesPage, groups })
-}
-function removeGroupItem(gi: number, ii: number) {
-  const groups = props.servicesPage.groups.map((g, i) =>
-    i === gi ? { ...g, items: g.items.filter((_, j) => j !== ii) } : g,
-  )
-  emitUpdate({ ...props.servicesPage, groups })
-}
-function updateGroupItem(gi: number, ii: number, key: keyof ServicesGroupItem, value: string) {
-  const groups = props.servicesPage.groups.map((g, i) => {
-    if (i !== gi) return g
-    const items = g.items.map((it, j) => j === ii ? { ...it, [key]: value } : it)
-    return { ...g, items }
-  })
-  emitUpdate({ ...props.servicesPage, groups })
-}
-
 // --- CTA banner ---
 function toggleCta(enabled: boolean) {
   emitUpdate({
@@ -666,9 +478,6 @@ function emptySummaryItem(): ServicesSummaryItem {
 }
 function emptyStatItem(): ServicesStatItem {
   return { value: '', label: '' }
-}
-function emptyGroupItem(): ServicesGroupItem {
-  return { eyebrow: '', title: '', description: '', image_url: '', cta_label: '', cta_link: '' }
 }
 </script>
 

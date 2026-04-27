@@ -373,14 +373,6 @@ const form = ref({
     },
     summary: null as null | { items: Array<{ title: string; description: string }> },
     stats: null as null | { items: Array<{ value: string; label: string }> },
-    groups: [
-      {
-        heading: 'For your business',
-        items: [
-          { eyebrow: 'Consulting', title: 'Hands-on expert guidance', description: 'Work with senior advisors who understand your industry and your goals.', image_url: '', cta_label: 'Get started', cta_link: '/contact' },
-        ],
-      },
-    ],
     cta: null as null | { heading: string; subtitle: string; button_label: string; button_link: string },
   },
   modules_enabled: { ...DEFAULT_MODULES_ENABLED } as ModulesEnabled,
@@ -629,24 +621,17 @@ async function loadSettings() {
             },
             summary: null,
             stats: null,
-            groups: [
-              {
-                heading: 'For your business',
-                items: [
-                  { eyebrow: 'Consulting', title: 'Hands-on expert guidance', description: 'Work with senior advisors who understand your industry and your goals.', image_url: '', cta_label: 'Get started', cta_link: '/contact' },
-                ],
-              },
-            ],
             cta: null,
           }
           // Ensure required shape keys exist on older records
           sp.header = sp.header ?? { label: '', heading: '', subtitle: '', primary_cta: null, secondary_cta: null }
           sp.header.primary_cta = sp.header.primary_cta ?? null
           sp.header.secondary_cta = sp.header.secondary_cta ?? null
-          sp.groups = Array.isArray(sp.groups) ? sp.groups : []
           sp.summary = sp.summary ?? null
           sp.stats = sp.stats ?? null
           sp.cta = sp.cta ?? null
+          // Strip any leftover groups from older records — content lives in services/service_categories tables now.
+          delete (sp as any).groups
           return sp
         })(),
         modules_enabled: {
