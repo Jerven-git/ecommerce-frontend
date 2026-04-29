@@ -76,6 +76,16 @@
         @remove-contact-entry="removeContactEntry"
       />
 
+      <AdminSettingsShowcase
+        v-show="activeTab === 'showcase'"
+        :model-value="form.homepage_showcase"
+        :video-preview-url="form.showcase_video_url"
+        :media-uploading="media.uploading"
+        @update:model-value="form.homepage_showcase = $event"
+        @media-select="onMediaSelect"
+        @media-remove="onMediaRemove"
+      />
+
       <AdminSettingsTabsPopupTab
         v-show="activeTab === 'popup'"
         :form="form"
@@ -136,6 +146,7 @@ const tabs = [
   { id: 'general', label: 'General', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
   { id: 'appearance', label: 'Appearance', icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01' },
   { id: 'pages', label: 'Pages', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
+  { id: 'showcase', label: 'Showcase', icon: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' },
   { id: 'popup', label: 'Popup', icon: 'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7' },
   { id: 'modules', label: 'Modules', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z' },
 ] as const
@@ -169,7 +180,7 @@ watch(activeTab, (tab) => {
 
 // --- Media upload composable ---
 const media = useMediaUpload({
-  collections: ['logo', 'favicon', 'cart_icon', 'hero', 'about', 'contact', 'blog', 'services'],
+  collections: ['logo', 'favicon', 'cart_icon', 'hero', 'about', 'contact', 'blog', 'services', 'showcase_video'],
   limits: {
     logo:      { maxMB: 2,  label: 'Logo' },
     favicon:   { maxMB: 2,  label: 'Site icon' },
@@ -179,6 +190,7 @@ const media = useMediaUpload({
     contact: { maxMB: 10, label: 'Contact image' },
     blog:    { maxMB: 10, label: 'Blog image' },
     services:{ maxMB: 10, label: 'Services image' },
+    showcase_video: { maxMB: 100, label: 'Showcase video', accept: ['video/'] },
   },
   apiFetch: $apiFetch,
 })
@@ -215,6 +227,7 @@ const tabSuccessMessages: Record<TabId, string> = {
   general: 'General settings have been updated',
   appearance: 'Theme has been applied',
   pages: 'Page content has been saved',
+  showcase: 'Showcase has been saved',
   popup: 'Popup settings have been saved',
   modules: 'Module visibility has been updated',
 }
@@ -223,6 +236,7 @@ const tabConfirmMessages: Record<TabId, string> = {
   general: 'Apply your general settings changes to the site?',
   appearance: 'Apply the new theme to your site?',
   pages: 'Save these page content changes?',
+  showcase: 'Save these showcase changes?',
   popup: 'Save these popup settings?',
   modules: 'Apply these module visibility changes? Disabled pages will redirect to the homepage.',
 }
@@ -319,6 +333,22 @@ const form = ref({
     subtitle: 'Get the latest products, exclusive offers, and updates delivered straight to your inbox.',
     disclaimer: 'No spam, ever. Unsubscribe anytime.',
   },
+  showcase_video_url: "",
+  homepage_showcase: {
+    enabled: false,
+    label: 'Featured',
+    heading: 'Find your product',
+    subtitle: '',
+    video_url: null,
+    video_poster_url: null,
+    video_status: 'idle',
+    tiles: [
+      { title: '', cta_label: 'SHOP NOW', category_id: null, featured_product_id: null },
+      { title: '', cta_label: 'SHOP NOW', category_id: null, featured_product_id: null },
+      { title: '', cta_label: 'SHOP NOW', category_id: null, featured_product_id: null },
+      { title: '', cta_label: 'SHOP NOW', category_id: null, featured_product_id: null },
+    ],
+  } as import('~/composables/useSiteConfig').HomepageShowcase,
   about_highlights: {
     items: [
       { icon: 'heroicons:check-circle', title: 'Quality Assured', description: 'Every product is carefully selected and tested.' },
@@ -388,6 +418,7 @@ const urlFields: Record<MediaCollection, keyof typeof form.value> = {
   contact: 'contact_image_url',
   blog: 'blog_image_url',
   services: 'services_image_url',
+  showcase_video: 'showcase_video_url',
 }
 
 // --- Media event handlers ---
@@ -557,6 +588,25 @@ async function loadSettings() {
           subtitle: 'Get the latest products, exclusive offers, and updates delivered straight to your inbox.',
           disclaimer: 'No spam, ever. Unsubscribe anytime.',
         },
+        showcase_video_url: response.data.homepage_showcase?.video_url || "",
+        homepage_showcase: (() => {
+          const shape = response.data.homepage_showcase
+          // Server always returns 4 tiles, but be defensive in case of an older record.
+          const tiles = Array.isArray(shape?.tiles) ? shape.tiles.slice(0, 4) : []
+          while (tiles.length < 4) {
+            tiles.push({ title: '', cta_label: 'SHOP NOW', category_id: null, featured_product_id: null })
+          }
+          return {
+            enabled: !!shape?.enabled,
+            label: shape?.label ?? 'Featured',
+            heading: shape?.heading ?? 'Find your product',
+            subtitle: shape?.subtitle ?? '',
+            video_url: shape?.video_url ?? null,
+            video_poster_url: shape?.video_poster_url ?? null,
+            video_status: shape?.video_status ?? 'idle',
+            tiles,
+          }
+        })(),
         about_highlights: (() => {
           const fallbackIcons = ['heroicons:check-circle', 'heroicons:clock', 'heroicons:face-smile', 'heroicons:star', 'heroicons:shield-check', 'heroicons:truck']
           const hl = response.data.about_highlights ?? {
@@ -699,6 +749,15 @@ async function saveSettings() {
         homepage_features: form.value.homepage_features,
         homepage_stats: form.value.homepage_stats,
         homepage_newsletter: form.value.homepage_newsletter,
+        // Strip server-owned fields (video_url/poster come from media,
+        // video_status is owned by OptimizeShowcaseVideoJob).
+        homepage_showcase: {
+          enabled: form.value.homepage_showcase.enabled,
+          label: form.value.homepage_showcase.label,
+          heading: form.value.homepage_showcase.heading,
+          subtitle: form.value.homepage_showcase.subtitle,
+          tiles: form.value.homepage_showcase.tiles,
+        },
         about_highlights: form.value.about_highlights,
         shop_header: form.value.shop_header,
         shop_promo: form.value.shop_promo,
