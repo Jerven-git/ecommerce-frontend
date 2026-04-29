@@ -131,6 +131,9 @@
       </div>
     </section>
 
+    <!-- Featured Showcase (admin-configurable promo block) -->
+    <HomepageShowcase />
+
     <!-- How It Works -->
     <section class="py-20 bg-white">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

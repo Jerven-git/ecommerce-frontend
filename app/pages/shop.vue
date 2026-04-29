@@ -359,8 +359,30 @@ const debouncedFetch = () => {
   debounceTimer = setTimeout(fetchProducts, 500)
 }
 
-onMounted(() => {
-  fetchCategories()
+// Build the [root, sub, ...] selection path that leads to the given category id,
+// so a deep link from `/shop?category_id=42` opens with that branch already selected.
+function buildPathToCategory(tree: Category[], targetId: number): Category[] | null {
+  for (const cat of tree) {
+    if (cat.id === targetId) return [cat]
+    if (cat.children?.length) {
+      const childPath = buildPathToCategory(cat.children, targetId)
+      if (childPath) return [cat, ...childPath]
+    }
+  }
+  return null
+}
+
+const route = useRoute()
+
+onMounted(async () => {
+  await fetchCategories()
+
+  const queryCategoryId = Number(route.query.category_id)
+  if (Number.isFinite(queryCategoryId) && queryCategoryId > 0) {
+    const path = buildPathToCategory(categories.value, queryCategoryId)
+    if (path) selectedPath.value = path
+  }
+
   fetchProducts()
 })
 </script>

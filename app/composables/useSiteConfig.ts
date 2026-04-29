@@ -46,6 +46,26 @@ export interface HomepageNewsletter {
   disclaimer: string
 }
 
+export interface HomepageShowcaseTile {
+  title: string
+  cta_label: string
+  category_id: number | null
+  featured_product_id: number | null
+}
+
+export type HomepageShowcaseVideoStatus = 'idle' | 'processing' | 'ready' | 'failed'
+
+export interface HomepageShowcase {
+  enabled: boolean
+  label: string
+  heading: string
+  subtitle: string
+  video_url: string | null
+  video_poster_url: string | null
+  video_status: HomepageShowcaseVideoStatus
+  tiles: HomepageShowcaseTile[]
+}
+
 export interface AboutHighlightItem {
   icon?: string
   title: string
@@ -180,6 +200,7 @@ export interface SiteConfig {
   homepage_features: HomepageFeatures | null
   homepage_stats: HomepageStats | null
   homepage_newsletter: HomepageNewsletter | null
+  homepage_showcase: HomepageShowcase | null
   about_highlights: AboutHighlights | null
   contact_page: ContactPage | null
   shop_header: ShopHeader | null
