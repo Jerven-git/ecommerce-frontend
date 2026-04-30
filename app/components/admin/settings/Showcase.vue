@@ -38,14 +38,16 @@
       <div class="p-6">
         <p class="text-xs font-semibold text-gray-700 mb-2">Background Video</p>
         <p class="text-xs text-gray-400 mb-3">
-          MP4 / WebM / MOV up to 100MB. Auto-optimized on upload (H.264 + faststart) so it plays without buffering on the homepage.
+          MP4 / WebM / MOV up to 25MB. Auto-optimized on upload (H.264 + faststart) so it plays without buffering on the homepage.
+          Compress to ~20MB before uploading for fastest results.
         </p>
 
         <AdminMediaUploader
           :url="videoPreviewUrl"
           :uploading="mediaUploading.showcase_video"
+          :progress="mediaProgress?.showcase_video"
           label="Video"
-          hint="MP4, WebM, MOV — up to 100MB"
+          hint="MP4, WebM, MOV — up to 25MB"
           input-id="showcase-video-upload"
           accept="video/mp4,video/webm,video/quicktime"
           overlay
@@ -241,6 +243,7 @@ interface Props {
   modelValue: HomepageShowcase
   videoPreviewUrl: string
   mediaUploading: Record<string, boolean>
+  mediaProgress?: Record<string, { loaded: number; total: number; percent: number }>
 }
 
 const props = defineProps<Props>()

@@ -1,3 +1,5 @@
+import { uploadFileWithProgress } from '~/utils/uploadFileWithProgress'
+
 export type MediaCollection = 'logo' | 'favicon' | 'cart_icon' | 'hero' | 'about' | 'contact' | 'blog' | 'services' | 'showcase_video'
 
 export interface UploadLimits {
@@ -12,8 +14,18 @@ export interface UseMediaUploadOptions {
   apiFetch: typeof $fetch
 }
 
+export interface UploadProgressState {
+  loaded: number
+  total: number
+  percent: number
+}
+
 export function useMediaUpload(options: UseMediaUploadOptions) {
   const { collections, limits, apiFetch } = options
+
+  // Mirror $apiFetch's baseURL so progress-aware XHR uploads hit the same path.
+  const config = useRuntimeConfig()
+  const apiBase = `${config.public.apiBase}${config.public.apiPath}`
 
   // Build initial records from collections
   const makeRecord = <T>(val: T) =>
@@ -25,6 +37,9 @@ export function useMediaUpload(options: UseMediaUploadOptions) {
   const pendingDelete = reactive<Record<MediaCollection, boolean>>(makeRecord(false))
   const uploading = reactive<Record<MediaCollection, boolean>>(makeRecord(false))
   const dragging = reactive<Record<MediaCollection, boolean>>(makeRecord(false))
+  const uploadProgress = reactive<Record<MediaCollection, UploadProgressState>>(
+    makeRecord({ loaded: 0, total: 0, percent: 0 }),
+  )
 
   const lastError = ref<string | null>(null)
 
@@ -103,13 +118,17 @@ export function useMediaUpload(options: UseMediaUploadOptions) {
         if (!pending[c]) continue
 
         uploading[c] = true
-        const fd = new FormData()
-        fd.append('file', pending[c]!)
+        uploadProgress[c] = { loaded: 0, total: pending[c]!.size, percent: 0 }
 
-        const res = await apiFetch<{ url: string }>(`/site-config/media/${c}`, {
-          method: 'POST',
-          body: fd,
-        })
+        const res = await uploadFileWithProgress<{ url: string }>(
+          `${apiBase}/site-config/media/${c}`,
+          pending[c]!,
+          {
+            onProgress: (p) => {
+              uploadProgress[c] = p
+            },
+          },
+        )
 
         if (!res?.url) throw new Error('Upload response missing url')
 
@@ -118,11 +137,13 @@ export function useMediaUpload(options: UseMediaUploadOptions) {
         pending[c] = null
         pendingDelete[c] = false
         uploading[c] = false
+        uploadProgress[c] = { loaded: 0, total: 0, percent: 0 }
       }
     } finally {
       // Ensure all uploading flags are cleared even on error
       for (const c of collections) {
         uploading[c] = false
+        uploadProgress[c] = { loaded: 0, total: 0, percent: 0 }
       }
     }
 
@@ -148,6 +169,7 @@ export function useMediaUpload(options: UseMediaUploadOptions) {
       uploading[c] = false
       dragging[c] = false
       dragCounter[c] = 0
+      uploadProgress[c] = { loaded: 0, total: 0, percent: 0 }
     }
     lastError.value = null
   }
@@ -161,6 +183,7 @@ export function useMediaUpload(options: UseMediaUploadOptions) {
   return {
     lastError,
     uploading,
+    uploadProgress,
     dragging,
     pending,
     pendingDelete,

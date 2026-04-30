@@ -47,20 +47,33 @@
     @dragleave.prevent="onDragLeave"
     @drop.prevent="onDrop"
   >
-    <svg class="w-7 h-7 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg v-if="!uploading" class="w-7 h-7 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
     </svg>
-    <p class="text-sm text-gray-500">
-      <span v-if="uploading" class="text-primary-600 font-medium">Uploading…</span>
-      <template v-else>Drop {{ label.toLowerCase() }} here or <span class="text-primary-600 font-medium">browse</span></template>
+
+    <!-- Inline progress UI when an upload is in flight -->
+    <template v-if="uploading">
+      <p class="text-sm text-primary-600 font-medium">Uploading{{ progressPercent != null ? `… ${progressPercent}%` : '…' }}</p>
+      <div v-if="progressPercent != null" class="mt-2 w-3/4 max-w-xs h-1.5 bg-gray-200 rounded-full overflow-hidden">
+        <div
+          class="h-full bg-primary-500 transition-[width] duration-100 ease-linear"
+          :style="{ width: progressPercent + '%' }"
+        />
+      </div>
+      <p v-if="progressBytesLabel" class="text-[10px] text-gray-400 mt-1 tabular-nums">{{ progressBytesLabel }}</p>
+    </template>
+
+    <p v-else class="text-sm text-gray-500">
+      Drop {{ label.toLowerCase() }} here or <span class="text-primary-600 font-medium">browse</span>
     </p>
-    <p class="text-xs text-gray-400 mt-1">{{ hint }}</p>
+
+    <p v-if="!uploading" class="text-xs text-gray-400 mt-1">{{ hint }}</p>
     <input :id="inputId" ref="fileInput" type="file" class="hidden" :accept="accept || 'image/*'" @change="onInputChange" />
   </label>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   url: string
   uploading: boolean | undefined
   label: string
@@ -71,7 +84,20 @@ defineProps<{
   dropzoneClass?: string
   accept?: string
   video?: boolean
+  /** Optional upload progress (0-100). When omitted the label just shows "Uploading…". */
+  progress?: { loaded: number; total: number; percent: number }
 }>()
+
+const progressPercent = computed(() => {
+  if (!props.progress || props.progress.total <= 0) return null
+  return props.progress.percent
+})
+
+const progressBytesLabel = computed(() => {
+  if (!props.progress || props.progress.total <= 0) return ''
+  const fmt = (b: number) => (b / 1024 / 1024 >= 1 ? `${(b / 1024 / 1024).toFixed(1)} MB` : `${(b / 1024).toFixed(0)} KB`)
+  return `${fmt(props.progress.loaded)} / ${fmt(props.progress.total)}`
+})
 
 const emit = defineEmits<{
   select: [file: File]
