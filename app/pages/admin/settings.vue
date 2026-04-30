@@ -49,7 +49,7 @@
     </div>
 
     <!-- Tab Content -->
-    <form v-else @submit.prevent="saveSettings" class="pb-24">
+    <form v-else @submit.prevent="requestSave" class="pb-24">
       <AdminSettingsTabsGeneralTab
         v-show="activeTab === 'general'"
         :form="form"
@@ -81,9 +81,16 @@
         :model-value="form.homepage_showcase"
         :video-preview-url="form.showcase_video_url"
         :media-uploading="media.uploading"
+        :media-progress="media.uploadProgress"
         @update:model-value="form.homepage_showcase = $event"
         @media-select="onMediaSelect"
         @media-remove="onMediaRemove"
+      />
+
+      <AdminSettingsWatchShop
+        v-show="activeTab === 'watch_shop'"
+        :model-value="form.homepage_watch_shop"
+        @update:model-value="form.homepage_watch_shop = $event"
       />
 
       <AdminSettingsTabsPopupTab
@@ -147,6 +154,7 @@ const tabs = [
   { id: 'appearance', label: 'Appearance', icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01' },
   { id: 'pages', label: 'Pages', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
   { id: 'showcase', label: 'Showcase', icon: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' },
+  { id: 'watch_shop', label: 'Watch & Shop', icon: 'M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM10 9l5 3-5 3V9z' },
   { id: 'popup', label: 'Popup', icon: 'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7' },
   { id: 'modules', label: 'Modules', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z' },
 ] as const
@@ -190,7 +198,7 @@ const media = useMediaUpload({
     contact: { maxMB: 10, label: 'Contact image' },
     blog:    { maxMB: 10, label: 'Blog image' },
     services:{ maxMB: 10, label: 'Services image' },
-    showcase_video: { maxMB: 100, label: 'Showcase video', accept: ['video/'] },
+    showcase_video: { maxMB: 25, label: 'Showcase video', accept: ['video/'] },
   },
   apiFetch: $apiFetch,
 })
@@ -228,6 +236,7 @@ const tabSuccessMessages: Record<TabId, string> = {
   appearance: 'Theme has been applied',
   pages: 'Page content has been saved',
   showcase: 'Showcase has been saved',
+  watch_shop: 'Watch & Shop has been saved',
   popup: 'Popup settings have been saved',
   modules: 'Module visibility has been updated',
 }
@@ -237,6 +246,7 @@ const tabConfirmMessages: Record<TabId, string> = {
   appearance: 'Apply the new theme to your site?',
   pages: 'Save these page content changes?',
   showcase: 'Save these showcase changes?',
+  watch_shop: 'Save these Watch & Shop changes?',
   popup: 'Save these popup settings?',
   modules: 'Apply these module visibility changes? Disabled pages will redirect to the homepage.',
 }
@@ -251,6 +261,64 @@ function requestSave() {
     if (activeTab.value !== 'popup') activeTab.value = 'popup'
     showToast('Select a discount before enabling the welcome popup', 'error')
     return
+  }
+
+  // Showcase: any tile that's been touched (has a title, category, or product)
+  // must be fully wired (both category AND product). Runs whether the section
+  // is hidden or visible — half-configured tiles in storage are bugs waiting
+  // to happen the moment the toggle flips on.
+  const showcase = form.value.homepage_showcase
+  const partialTileIndex = showcase.tiles.findIndex(
+    (t) => (t.title || t.category_id != null || t.featured_product_id != null)
+      && (t.category_id == null || t.featured_product_id == null),
+  )
+  if (partialTileIndex >= 0) {
+    const tile = showcase.tiles[partialTileIndex]!
+    const missing = tile.category_id == null ? 'a category' : 'a product'
+    if (activeTab.value !== 'showcase') activeTab.value = 'showcase'
+    showToast(`Tile ${partialTileIndex + 1}: select ${missing} before saving.`, 'error')
+    return
+  }
+
+  if (showcase.enabled) {
+    if (!showcase.heading.trim()) {
+      if (activeTab.value !== 'showcase') activeTab.value = 'showcase'
+      showToast('Showcase needs a heading before saving.', 'error')
+      return
+    }
+
+    const anyComplete = showcase.tiles.some(
+      (t) => t.category_id != null && t.featured_product_id != null,
+    )
+    if (!anyComplete) {
+      if (activeTab.value !== 'showcase') activeTab.value = 'showcase'
+      showToast('Showcase is enabled but no tile has a category and product. Configure at least one tile or hide the section.', 'error')
+      return
+    }
+  }
+
+  // Watch & Shop: every card needs a product, regardless of section visibility.
+  // A card without a product has no chip, no link target — it's a broken row.
+  const watchShop = form.value.homepage_watch_shop
+  const missingProductIndex = watchShop.cards.findIndex((c) => !c.product?.id)
+  if (missingProductIndex >= 0) {
+    if (activeTab.value !== 'watch_shop') activeTab.value = 'watch_shop'
+    showToast(`Card ${missingProductIndex + 1}: select a product before saving.`, 'error')
+    return
+  }
+
+  if (watchShop.enabled) {
+    if (!watchShop.heading.trim()) {
+      if (activeTab.value !== 'watch_shop') activeTab.value = 'watch_shop'
+      showToast('Watch & Shop needs a heading before saving.', 'error')
+      return
+    }
+
+    if (watchShop.cards.length === 0) {
+      if (activeTab.value !== 'watch_shop') activeTab.value = 'watch_shop'
+      showToast('Watch & Shop is enabled but has no cards. Add at least one or hide the section.', 'error')
+      return
+    }
   }
 
   saveConfirmOpen.value = true
@@ -349,6 +417,13 @@ const form = ref({
       { title: '', cta_label: 'SHOP NOW', category_id: null, featured_product_id: null },
     ],
   } as import('~/composables/useSiteConfig').HomepageShowcase,
+  homepage_watch_shop: {
+    enabled: false,
+    label: '',
+    heading: 'Watch and Shop',
+    subtitle: '',
+    cards: [],
+  } as import('~/composables/useSiteConfig').HomepageWatchShop,
   about_highlights: {
     items: [
       { icon: 'heroicons:check-circle', title: 'Quality Assured', description: 'Every product is carefully selected and tested.' },
@@ -607,6 +682,16 @@ async function loadSettings() {
             tiles,
           }
         })(),
+        homepage_watch_shop: (() => {
+          const ws = response.data.homepage_watch_shop
+          return {
+            enabled: !!ws?.enabled,
+            label: ws?.label ?? '',
+            heading: ws?.heading ?? 'Watch and Shop',
+            subtitle: ws?.subtitle ?? '',
+            cards: Array.isArray(ws?.cards) ? ws.cards : [],
+          }
+        })(),
         about_highlights: (() => {
           const fallbackIcons = ['heroicons:check-circle', 'heroicons:clock', 'heroicons:face-smile', 'heroicons:star', 'heroicons:shield-check', 'heroicons:truck']
           const hl = response.data.about_highlights ?? {
@@ -757,6 +842,20 @@ async function saveSettings() {
           heading: form.value.homepage_showcase.heading,
           subtitle: form.value.homepage_showcase.subtitle,
           tiles: form.value.homepage_showcase.tiles,
+        },
+        // Watch & Shop: only id + media_id + product_id per card go to the
+        // server. media_url/poster_url/status/product details are resolved
+        // server-side from the Media + Product tables on each show().
+        homepage_watch_shop: {
+          enabled: form.value.homepage_watch_shop.enabled,
+          label: form.value.homepage_watch_shop.label,
+          heading: form.value.homepage_watch_shop.heading,
+          subtitle: form.value.homepage_watch_shop.subtitle,
+          cards: form.value.homepage_watch_shop.cards.map((c) => ({
+            id: c.id,
+            media_id: c.media_id,
+            product_id: c.product?.id ?? null,
+          })),
         },
         about_highlights: form.value.about_highlights,
         shop_header: form.value.shop_header,

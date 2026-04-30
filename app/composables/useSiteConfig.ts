@@ -66,6 +66,34 @@ export interface HomepageShowcase {
   tiles: HomepageShowcaseTile[]
 }
 
+export type WatchShopMediaKind = 'video' | 'image'
+export type WatchShopMediaStatus = 'processing' | 'ready' | 'failed'
+
+export interface WatchShopCardProduct {
+  id: number
+  name: string
+  slug: string
+  image_url: string | null
+}
+
+export interface HomepageWatchShopCard {
+  id: string
+  media_id: number | null
+  media_url: string | null
+  media_kind: WatchShopMediaKind | null
+  poster_url: string | null
+  media_status: WatchShopMediaStatus
+  product: WatchShopCardProduct | null
+}
+
+export interface HomepageWatchShop {
+  enabled: boolean
+  label: string
+  heading: string
+  subtitle: string
+  cards: HomepageWatchShopCard[]
+}
+
 export interface AboutHighlightItem {
   icon?: string
   title: string
@@ -201,6 +229,7 @@ export interface SiteConfig {
   homepage_stats: HomepageStats | null
   homepage_newsletter: HomepageNewsletter | null
   homepage_showcase: HomepageShowcase | null
+  homepage_watch_shop: HomepageWatchShop | null
   about_highlights: AboutHighlights | null
   contact_page: ContactPage | null
   shop_header: ShopHeader | null

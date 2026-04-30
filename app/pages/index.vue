@@ -134,6 +134,9 @@
     <!-- Featured Showcase (admin-configurable promo block) -->
     <HomepageShowcase />
 
+    <!-- Watch & Shop (admin-configurable video carousel) -->
+    <HomepageWatchShop />
+
     <!-- How It Works -->
     <section class="py-20 bg-white">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
