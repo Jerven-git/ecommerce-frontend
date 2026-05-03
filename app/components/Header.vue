@@ -57,6 +57,25 @@
             Admin
           </NuxtLink>
 
+          <!-- Favorites (hidden when the favorites feature is off site-wide) -->
+          <NuxtLink
+            v-if="favoritesEnabled"
+            to="/favorites"
+            class="relative p-2 rounded-lg transition-colors"
+            :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+            aria-label="Favorites"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            <span
+              v-if="favoritesStore.count > 0"
+              class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none"
+            >
+              {{ favoritesStore.count }}
+            </span>
+          </NuxtLink>
+
           <!-- Cart (hidden when Shop module is disabled) -->
           <NuxtLink
             v-if="isEnabled('shop')"
@@ -129,9 +148,12 @@
 const route = useRoute()
 const cartStore = useCartStore()
 const authStore = useAuthStore()
+const favoritesStore = useFavoritesStore()
 const { siteConfig } = useSiteConfig()
 const { isEnabled } = useModules()
 const mobileMenuOpen = ref(false)
+
+const favoritesEnabled = computed(() => siteConfig.value?.favorites_enabled ?? false)
 
 const allNavLinks = [
   { to: '/', label: 'Home', module: null },

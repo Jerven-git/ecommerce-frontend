@@ -29,6 +29,26 @@
         @media-remove="(c: MediaCollection) => emit('media-remove', c)"
       />
 
+      <AdminSettingsShowcase
+        :model-value="form.homepage_showcase"
+        :video-preview-url="form.showcase_video_url"
+        :media-uploading="mediaUploading"
+        :media-progress="mediaProgress"
+        @update:model-value="form.homepage_showcase = $event"
+        @media-select="(f: File, c: MediaCollection) => emit('media-select', f, c)"
+        @media-remove="(c: MediaCollection) => emit('media-remove', c)"
+      />
+
+      <AdminSettingsWatchShop
+        :model-value="form.homepage_watch_shop"
+        @update:model-value="form.homepage_watch_shop = $event"
+      />
+
+      <AdminSettingsBestSellers
+        :model-value="form.homepage_best_sellers"
+        @update:model-value="form.homepage_best_sellers = $event"
+      />
+
       <AdminSettingsHomepageSections
         :steps="form.homepage_steps"
         :features="form.homepage_features"
@@ -118,7 +138,7 @@
 </template>
 
 <script setup lang="ts">
-import type { MediaCollection } from '~/composables/useMediaUpload'
+import type { MediaCollection, UploadProgressState } from '~/composables/useMediaUpload'
 
 const subTabs = [
   { id: 'homepage', label: 'Home', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6' },
@@ -150,6 +170,7 @@ watch(activeSubTab, (sub) => {
 defineProps<{
   form: Record<string, any>
   mediaUploading: Record<string, boolean>
+  mediaProgress: Record<string, UploadProgressState>
 }>()
 
 const emit = defineEmits<{
