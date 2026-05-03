@@ -70,27 +70,11 @@
         v-show="activeTab === 'pages'"
         :form="form"
         :media-uploading="media.uploading"
+        :media-progress="media.uploadProgress"
         @media-select="onMediaSelect"
         @media-remove="onMediaRemove"
         @add-contact-entry="addContactEntry"
         @remove-contact-entry="removeContactEntry"
-      />
-
-      <AdminSettingsShowcase
-        v-show="activeTab === 'showcase'"
-        :model-value="form.homepage_showcase"
-        :video-preview-url="form.showcase_video_url"
-        :media-uploading="media.uploading"
-        :media-progress="media.uploadProgress"
-        @update:model-value="form.homepage_showcase = $event"
-        @media-select="onMediaSelect"
-        @media-remove="onMediaRemove"
-      />
-
-      <AdminSettingsWatchShop
-        v-show="activeTab === 'watch_shop'"
-        :model-value="form.homepage_watch_shop"
-        @update:model-value="form.homepage_watch_shop = $event"
       />
 
       <AdminSettingsTabsPopupTab
@@ -153,25 +137,24 @@ const tabs = [
   { id: 'general', label: 'General', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
   { id: 'appearance', label: 'Appearance', icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01' },
   { id: 'pages', label: 'Pages', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
-  { id: 'showcase', label: 'Showcase', icon: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' },
-  { id: 'watch_shop', label: 'Watch & Shop', icon: 'M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM10 9l5 3-5 3V9z' },
   { id: 'popup', label: 'Popup', icon: 'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7' },
   { id: 'modules', label: 'Modules', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z' },
 ] as const
 
 type TabId = typeof tabs[number]['id']
 
-// Redirect legacy ?tab=homepage to ?tab=pages&sub=homepage
+// Redirect legacy ?tab=homepage|showcase|watch_shop to ?tab=pages&sub=homepage —
+// those used to be top-level tabs but now live as sections under Pages → Homepage.
+const LEGACY_HOMEPAGE_TABS = ['homepage', 'showcase', 'watch_shop'] as const
 const initialTab = (() => {
   const t = route.query.tab as string
-  if (t === 'homepage') return 'pages'
+  if (LEGACY_HOMEPAGE_TABS.includes(t as typeof LEGACY_HOMEPAGE_TABS[number])) return 'pages'
   return (t as TabId) || 'general'
 })()
 
 const activeTab = ref<TabId>(initialTab)
 
-// If redirecting from homepage tab, set sub query
-if (route.query.tab === 'homepage') {
+if (LEGACY_HOMEPAGE_TABS.includes(route.query.tab as typeof LEGACY_HOMEPAGE_TABS[number])) {
   router.replace({ query: { ...route.query, tab: 'pages', sub: 'homepage' } })
 }
 
@@ -235,8 +218,6 @@ const tabSuccessMessages: Record<TabId, string> = {
   general: 'General settings have been updated',
   appearance: 'Theme has been applied',
   pages: 'Page content has been saved',
-  showcase: 'Showcase has been saved',
-  watch_shop: 'Watch & Shop has been saved',
   popup: 'Popup settings have been saved',
   modules: 'Module visibility has been updated',
 }
@@ -245,10 +226,17 @@ const tabConfirmMessages: Record<TabId, string> = {
   general: 'Apply your general settings changes to the site?',
   appearance: 'Apply the new theme to your site?',
   pages: 'Save these page content changes?',
-  showcase: 'Save these showcase changes?',
-  watch_shop: 'Save these Watch & Shop changes?',
   popup: 'Save these popup settings?',
   modules: 'Apply these module visibility changes? Disabled pages will redirect to the homepage.',
+}
+
+// Showcase and Watch & Shop now live as sections inside Pages → Homepage,
+// so validation errors there focus the user there rather than at a top-level tab.
+function focusHomepageSubTab() {
+  if (activeTab.value !== 'pages') activeTab.value = 'pages'
+  if (route.query.sub !== 'homepage') {
+    router.replace({ query: { ...route.query, tab: 'pages', sub: 'homepage' } })
+  }
 }
 
 const confirmMessage = computed(() => tabConfirmMessages[activeTab.value])
@@ -275,14 +263,14 @@ function requestSave() {
   if (partialTileIndex >= 0) {
     const tile = showcase.tiles[partialTileIndex]!
     const missing = tile.category_id == null ? 'a category' : 'a product'
-    if (activeTab.value !== 'showcase') activeTab.value = 'showcase'
+    focusHomepageSubTab()
     showToast(`Tile ${partialTileIndex + 1}: select ${missing} before saving.`, 'error')
     return
   }
 
   if (showcase.enabled) {
     if (!showcase.heading.trim()) {
-      if (activeTab.value !== 'showcase') activeTab.value = 'showcase'
+      focusHomepageSubTab()
       showToast('Showcase needs a heading before saving.', 'error')
       return
     }
@@ -291,7 +279,7 @@ function requestSave() {
       (t) => t.category_id != null && t.featured_product_id != null,
     )
     if (!anyComplete) {
-      if (activeTab.value !== 'showcase') activeTab.value = 'showcase'
+      focusHomepageSubTab()
       showToast('Showcase is enabled but no tile has a category and product. Configure at least one tile or hide the section.', 'error')
       return
     }
@@ -302,23 +290,34 @@ function requestSave() {
   const watchShop = form.value.homepage_watch_shop
   const missingProductIndex = watchShop.cards.findIndex((c) => !c.product?.id)
   if (missingProductIndex >= 0) {
-    if (activeTab.value !== 'watch_shop') activeTab.value = 'watch_shop'
+    focusHomepageSubTab()
     showToast(`Card ${missingProductIndex + 1}: select a product before saving.`, 'error')
     return
   }
 
   if (watchShop.enabled) {
     if (!watchShop.heading.trim()) {
-      if (activeTab.value !== 'watch_shop') activeTab.value = 'watch_shop'
+      focusHomepageSubTab()
       showToast('Watch & Shop needs a heading before saving.', 'error')
       return
     }
 
     if (watchShop.cards.length === 0) {
-      if (activeTab.value !== 'watch_shop') activeTab.value = 'watch_shop'
+      focusHomepageSubTab()
       showToast('Watch & Shop is enabled but has no cards. Add at least one or hide the section.', 'error')
       return
     }
+  }
+
+  // Best Sellers: heading is the only hard requirement (the section is auto
+  // by default, and an empty fallback list is fine — the section just hides
+  // itself when there's nothing to render). We don't gate on the fallback
+  // being filled, since a store with real sales never needs it.
+  const bestSellers = form.value.homepage_best_sellers
+  if (bestSellers.enabled && !bestSellers.heading.trim()) {
+    focusHomepageSubTab()
+    showToast('Best Sellers needs a heading before saving.', 'error')
+    return
   }
 
   saveConfirmOpen.value = true
@@ -424,6 +423,15 @@ const form = ref({
     subtitle: '',
     cards: [],
   } as import('~/composables/useSiteConfig').HomepageWatchShop,
+  homepage_best_sellers: {
+    enabled: false,
+    label: '',
+    heading: 'Best Sellers',
+    subtitle: '',
+    source: 'fallback',
+    products: [],
+    fallback_product_ids: [],
+  } as import('~/composables/useSiteConfig').HomepageBestSellers,
   about_highlights: {
     items: [
       { icon: 'heroicons:check-circle', title: 'Quality Assured', description: 'Every product is carefully selected and tested.' },
@@ -692,6 +700,20 @@ async function loadSettings() {
             cards: Array.isArray(ws?.cards) ? ws.cards : [],
           }
         })(),
+        homepage_best_sellers: (() => {
+          const bs = response.data.homepage_best_sellers
+          return {
+            enabled: !!bs?.enabled,
+            label: bs?.label ?? '',
+            heading: bs?.heading ?? 'Best Sellers',
+            subtitle: bs?.subtitle ?? '',
+            source: bs?.source ?? 'fallback',
+            products: Array.isArray(bs?.products) ? bs.products : [],
+            fallback_product_ids: Array.isArray(bs?.fallback_product_ids)
+              ? bs.fallback_product_ids.map((n: any) => Number(n))
+              : [],
+          }
+        })(),
         about_highlights: (() => {
           const fallbackIcons = ['heroicons:check-circle', 'heroicons:clock', 'heroicons:face-smile', 'heroicons:star', 'heroicons:shield-check', 'heroicons:truck']
           const hl = response.data.about_highlights ?? {
@@ -856,6 +878,16 @@ async function saveSettings() {
             media_id: c.media_id,
             product_id: c.product?.id ?? null,
           })),
+        },
+        // Best Sellers: the server owns `source` and `products` (computed at
+        // read time from the orders table or the fallback). The admin form
+        // only persists toggle + copy + the curated fallback id list.
+        homepage_best_sellers: {
+          enabled: form.value.homepage_best_sellers.enabled,
+          label: form.value.homepage_best_sellers.label,
+          heading: form.value.homepage_best_sellers.heading,
+          subtitle: form.value.homepage_best_sellers.subtitle,
+          fallback_product_ids: form.value.homepage_best_sellers.fallback_product_ids ?? [],
         },
         about_highlights: form.value.about_highlights,
         shop_header: form.value.shop_header,

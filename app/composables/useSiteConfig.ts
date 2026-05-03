@@ -94,6 +94,37 @@ export interface HomepageWatchShop {
   cards: HomepageWatchShopCard[]
 }
 
+// Best Sellers — server-resolved. The admin only persists `fallback_product_ids`
+// + heading/label/subtitle/enabled; `products` and `source` are computed at
+// read time. `source: 'auto'` means the server returned products derived from
+// real order history; `'fallback'` means the curated list was used because
+// purchase signal was too weak.
+export type HomepageBestSellersSource = 'auto' | 'fallback'
+
+export interface HomepageBestSellersProduct {
+  id: number
+  name: string
+  slug: string
+  image_url: string | null
+  price: string
+  stock: number
+  allow_backorder: boolean
+  backorder_charge_policy: string | null
+  can_backorder: boolean
+  is_active: boolean
+}
+
+export interface HomepageBestSellers {
+  enabled: boolean
+  label: string
+  heading: string
+  subtitle: string
+  source: HomepageBestSellersSource
+  products: HomepageBestSellersProduct[]
+  // Admin-only: not present on public reads, only round-trips through the form.
+  fallback_product_ids?: number[]
+}
+
 export interface AboutHighlightItem {
   icon?: string
   title: string
@@ -230,6 +261,7 @@ export interface SiteConfig {
   homepage_newsletter: HomepageNewsletter | null
   homepage_showcase: HomepageShowcase | null
   homepage_watch_shop: HomepageWatchShop | null
+  homepage_best_sellers: HomepageBestSellers | null
   about_highlights: AboutHighlights | null
   contact_page: ContactPage | null
   shop_header: ShopHeader | null
