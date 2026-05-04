@@ -267,11 +267,9 @@ const summary = computed(() => servicesCfg.value?.summary?.items ?? [])
 const stats = computed(() => servicesCfg.value?.stats?.items ?? [])
 const bottomCta = computed(() => servicesCfg.value?.cta || null)
 
-useHead({
-  title: computed(() => `${servicesCfg.value?.header?.label || 'Services'} – ${siteConfig.value?.site_name || ''}`),
-  meta: [
-    { name: 'description', content: computed(() => servicesCfg.value?.header?.subtitle || '') },
-  ],
+useStaticPageSeo('services', {
+  title: `${servicesCfg.value?.header?.label || 'Services'} – ${siteConfig.value?.site_name || ''}`,
+  description: servicesCfg.value?.header?.subtitle || '',
 })
 </script>
 

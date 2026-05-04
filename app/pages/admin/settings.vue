@@ -489,6 +489,16 @@ const form = ref({
     cta: null as null | { heading: string; subtitle: string; button_label: string; button_link: string },
   },
   modules_enabled: { ...DEFAULT_MODULES_ENABLED } as ModulesEnabled,
+  default_seo_title: '',
+  default_seo_description: '',
+  default_og_image_url: '',
+  pages_seo: {
+    about: { seo_title: '', seo_description: '', og_image_url: '', noindex: false },
+    contact: { seo_title: '', seo_description: '', og_image_url: '', noindex: false },
+    shop: { seo_title: '', seo_description: '', og_image_url: '', noindex: false },
+    blog: { seo_title: '', seo_description: '', og_image_url: '', noindex: false },
+    services: { seo_title: '', seo_description: '', og_image_url: '', noindex: false },
+  } as Record<string, { seo_title: string; seo_description: string; og_image_url: string; noindex: boolean }>,
 })
 
 // Map collection -> form field
@@ -795,6 +805,24 @@ async function loadSettings() {
           ...DEFAULT_MODULES_ENABLED,
           ...(response.data.modules_enabled ?? {}),
         } as ModulesEnabled,
+        default_seo_title: response.data.default_seo_title || '',
+        default_seo_description: response.data.default_seo_description || '',
+        default_og_image_url: response.data.default_og_image_url || '',
+        pages_seo: (() => {
+          const slugs = ['about', 'contact', 'shop', 'blog', 'services'] as const
+          const incoming = response.data.pages_seo ?? {}
+          const out: Record<string, { seo_title: string; seo_description: string; og_image_url: string; noindex: boolean }> = {}
+          for (const slug of slugs) {
+            const p = incoming[slug] ?? {}
+            out[slug] = {
+              seo_title: p.seo_title ?? '',
+              seo_description: p.seo_description ?? '',
+              og_image_url: p.og_image_url ?? '',
+              noindex: !!p.noindex,
+            }
+          }
+          return out
+        })(),
       }
 
       savedTheme.value = { ...form.value.theme }
@@ -900,6 +928,17 @@ async function saveSettings() {
         services_overlay_color: form.value.services_overlay_color,
         services_overlay_opacity: form.value.services_overlay_opacity,
         modules_enabled: form.value.modules_enabled,
+        default_seo_title: form.value.default_seo_title || null,
+        default_seo_description: form.value.default_seo_description || null,
+        default_og_image_url: form.value.default_og_image_url || null,
+        pages_seo: Object.fromEntries(
+          Object.entries(form.value.pages_seo).map(([slug, p]) => [slug, {
+            seo_title: p.seo_title || null,
+            seo_description: p.seo_description || null,
+            og_image_url: p.og_image_url || null,
+            noindex: !!p.noindex,
+          }]),
+        ),
       },
     })
 

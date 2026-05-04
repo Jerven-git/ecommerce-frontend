@@ -16,6 +16,7 @@ export interface PostMedia {
   id: number
   url: string
   collection: string
+  alt_text?: string | null
 }
 
 /**
@@ -44,6 +45,8 @@ export interface PostDetail extends Post {
   body: string | null
   seo_title: string | null
   seo_description: string | null
+  og_image_url: string | null
+  noindex: boolean
   media?: PostMedia[]
 }
 

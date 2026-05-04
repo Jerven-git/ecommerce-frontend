@@ -116,12 +116,7 @@ async function load() {
 onMounted(load)
 watch(slug, load)
 
-useHead({
-  title: computed(() => post.value?.seo_title || post.value?.title || 'Post'),
-  meta: [
-    { name: 'description', content: computed(() => post.value?.seo_description || post.value?.excerpt || '') },
-  ],
-})
+useEntitySeo(() => post.value)
 </script>
 
 <style scoped>

@@ -258,11 +258,9 @@ onMounted(async () => {
   ])
 })
 
-useHead({
-  title: computed(() => `${siteConfig.value?.blog_page?.header?.label || 'Blog'} – ${siteConfig.value?.site_name || ''}`),
-  meta: [
-    { name: 'description', content: computed(() => siteConfig.value?.blog_page?.header?.subtitle || '') },
-  ],
+useStaticPageSeo('blog', {
+  title: `${siteConfig.value?.blog_page?.header?.label || 'Blog'} – ${siteConfig.value?.site_name || ''}`,
+  description: siteConfig.value?.blog_page?.header?.subtitle || '',
 })
 </script>
 

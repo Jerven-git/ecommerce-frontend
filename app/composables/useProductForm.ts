@@ -16,6 +16,10 @@ export interface ProductFormData {
   is_active: boolean
   allow_backorder: boolean
   backorder_charge_policy: 'charged_now' | 'charged_later'
+  seo_title: string
+  seo_description: string
+  og_image_url: string
+  noindex: boolean
 }
 
 function defaultFormData(): ProductFormData {
@@ -35,6 +39,10 @@ function defaultFormData(): ProductFormData {
     is_active: true,
     allow_backorder: false,
     backorder_charge_policy: 'charged_later',
+    seo_title: '',
+    seo_description: '',
+    og_image_url: '',
+    noindex: false,
   }
 }
 
@@ -56,6 +64,7 @@ export function useProductForm() {
   interface GalleryItem {
     id: number
     url: string
+    alt_text?: string | null
     legacy?: boolean
   }
   const galleryImages = ref<GalleryItem[]>([])
@@ -109,7 +118,7 @@ export function useProductForm() {
     if (res?.data?.media) {
       galleryImages.value = res.data.media
         .filter((m: any) => m.collection === 'gallery' || m.collection === 'image')
-        .map((m: any) => ({ id: m.id, url: m.url }))
+        .map((m: any) => ({ id: m.id, url: m.url, alt_text: m.alt_text ?? null }))
     }
     galleryFiles.value = []
     if (galleryInput.value) galleryInput.value.value = ''
@@ -184,6 +193,10 @@ export function useProductForm() {
       is_active: product.is_active,
       allow_backorder: product.allow_backorder ?? false,
       backorder_charge_policy: product.backorder_charge_policy ?? 'charged_later',
+      seo_title: (product as any).seo_title ?? '',
+      seo_description: (product as any).seo_description ?? '',
+      og_image_url: (product as any).og_image_url ?? '',
+      noindex: !!(product as any).noindex,
     }
     galleryFiles.value = []
     galleryImages.value = []
@@ -247,6 +260,10 @@ export function useProductForm() {
       formData.append('is_active', form.value.is_active ? '1' : '0')
       formData.append('allow_backorder', form.value.allow_backorder ? '1' : '0')
       formData.append('backorder_charge_policy', form.value.backorder_charge_policy)
+      if (form.value.seo_title.trim()) formData.append('seo_title', form.value.seo_title.trim())
+      if (form.value.seo_description.trim()) formData.append('seo_description', form.value.seo_description.trim())
+      if (form.value.og_image_url.trim()) formData.append('og_image_url', form.value.og_image_url.trim())
+      formData.append('noindex', form.value.noindex ? '1' : '0')
 
       if (editingProduct.value) {
         formData.append('_method', 'PATCH')

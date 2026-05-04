@@ -173,6 +173,8 @@ const preloadImage = (url: string) => {
 watch(() => siteConfig.value?.about_image_url, (url) => {
   if (url) preloadImage(url)
 }, { immediate: true })
+
+useStaticPageSeo('about')
 </script>
 
 <style scoped>

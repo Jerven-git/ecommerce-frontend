@@ -248,30 +248,14 @@
         </div>
 
         <!-- SEO -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
-          <div>
-            <p class="text-sm font-semibold text-gray-900">SEO</p>
-            <p class="text-xs text-gray-400">Overrides the default title/description used by search engines.</p>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">SEO title</label>
-            <input
-              v-model="form.seo_title"
-              type="text"
-              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
-              placeholder="Defaults to service title"
-            />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">SEO description</label>
-            <textarea
-              v-model="form.seo_description"
-              rows="2"
-              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none resize-none"
-              placeholder="Defaults to short description"
-            ></textarea>
-          </div>
-        </div>
+        <SeoFields
+          v-model:seo-title="form.seo_title"
+          v-model:seo-description="form.seo_description"
+          v-model:og-image-url="form.og_image_url"
+          v-model:noindex="form.noindex"
+          title-placeholder="Defaults to service title"
+          description-placeholder="Defaults to short description"
+        />
       </div>
 
       <!-- Sidebar -->
@@ -429,6 +413,8 @@ const form = reactive({
   published_at: '',
   seo_title: '',
   seo_description: '',
+  og_image_url: '',
+  noindex: false,
 })
 
 const coverFile = ref<File | null>(null)
@@ -574,6 +560,8 @@ async function loadService() {
     form.published_at = s.published_at ? toLocalInput(s.published_at) : ''
     form.seo_title = s.seo_title || ''
     form.seo_description = s.seo_description || ''
+    form.og_image_url = s.og_image_url || ''
+    form.noindex = !!s.noindex
     existingCoverUrl.value = s.cover_image_url
   } catch (err: any) {
     showToast(err?.data?.message || 'Failed to load service', 'error')
@@ -619,6 +607,8 @@ function buildPayload(): Record<string, any> {
     is_featured: form.is_featured ? 1 : 0,
     seo_title: form.seo_title.trim() || null,
     seo_description: form.seo_description.trim() || null,
+    og_image_url: form.og_image_url.trim() || null,
+    noindex: form.noindex ? 1 : 0,
   }
   if (form.is_published && form.published_at) {
     payload.published_at = new Date(form.published_at).toISOString()
