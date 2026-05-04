@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="relative text-white py-28 overflow-hidden" :style="heroStyle">
+    <section class="relative text-white py-28 overflow-hidden" :style="heroStyle" :aria-label="coverAltText || undefined">
       <!-- Slide progress bar while background image is loading -->
       <Transition name="fade">
         <div v-if="imageLoading" class="absolute bottom-0 left-0 right-0 h-0.5 overflow-hidden">
@@ -175,6 +175,8 @@ watch(() => siteConfig.value?.about_image_url, (url) => {
 }, { immediate: true })
 
 useStaticPageSeo('about')
+
+const coverAltText = computed(() => siteConfig.value?.pages_seo?.about?.cover_alt_text ?? '')
 </script>
 
 <style scoped>

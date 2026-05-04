@@ -31,8 +31,22 @@ function firstNonEmpty(...values: Array<string | null | undefined>): string | un
   return undefined
 }
 
+/**
+ * Build the canonical URL for the current request: `<canonical_base_url><path>`
+ * with a trailing-slash on the base stripped. Returns undefined when the base
+ * URL isn't configured — better to omit the tag than emit a bad one.
+ */
+function buildCanonical(cfg: Partial<SiteConfig>, path: string): string | undefined {
+  const base = cfg.canonical_base_url?.trim()
+  if (!base) return undefined
+  const trimmed = base.replace(/\/$/, '')
+  const normalisedPath = path.startsWith('/') ? path : `/${path}`
+  return `${trimmed}${normalisedPath}`
+}
+
 export function useEntitySeo(entity: MaybeRefOrGetter<EntityLike | null | undefined>) {
   const { siteConfig } = useSiteConfig()
+  const route = useRoute()
 
   const seo = computed(() => {
     const e = toValue(entity) ?? ({} as EntityLike)
@@ -52,8 +66,10 @@ export function useEntitySeo(entity: MaybeRefOrGetter<EntityLike | null | undefi
       cfg.default_og_image_url,
     )
     const robots = e.noindex ? 'noindex,nofollow' : undefined
+    const canonical = buildCanonical(cfg, route.path)
+    const siteName = firstNonEmpty(cfg.site_name)
 
-    return { title, description, ogImage, robots }
+    return { title, description, ogImage, robots, canonical, siteName }
   })
 
   useSeoMeta({
@@ -62,16 +78,26 @@ export function useEntitySeo(entity: MaybeRefOrGetter<EntityLike | null | undefi
     ogTitle: () => seo.value.title,
     ogDescription: () => seo.value.description,
     ogImage: () => seo.value.ogImage,
+    ogUrl: () => seo.value.canonical,
+    ogSiteName: () => seo.value.siteName,
+    ogType: 'website',
     twitterTitle: () => seo.value.title,
     twitterDescription: () => seo.value.description,
     twitterImage: () => seo.value.ogImage,
     twitterCard: 'summary_large_image',
     robots: () => seo.value.robots,
   })
+
+  useHead({
+    link: () => seo.value.canonical
+      ? [{ rel: 'canonical', href: seo.value.canonical }]
+      : [],
+  })
 }
 
 export function useStaticPageSeo(slug: string, fallback?: { title?: string; description?: string }) {
   const { siteConfig } = useSiteConfig()
+  const route = useRoute()
 
   const seo = computed(() => {
     const cfg = siteConfig.value ?? ({} as Partial<SiteConfig>)
@@ -85,8 +111,10 @@ export function useStaticPageSeo(slug: string, fallback?: { title?: string; desc
     )
     const ogImage = firstNonEmpty(page.og_image_url, cfg.default_og_image_url)
     const robots = page.noindex ? 'noindex,nofollow' : undefined
+    const canonical = buildCanonical(cfg, route.path)
+    const siteName = firstNonEmpty(cfg.site_name)
 
-    return { title, description, ogImage, robots }
+    return { title, description, ogImage, robots, canonical, siteName }
   })
 
   useSeoMeta({
@@ -95,10 +123,19 @@ export function useStaticPageSeo(slug: string, fallback?: { title?: string; desc
     ogTitle: () => seo.value.title,
     ogDescription: () => seo.value.description,
     ogImage: () => seo.value.ogImage,
+    ogUrl: () => seo.value.canonical,
+    ogSiteName: () => seo.value.siteName,
+    ogType: 'website',
     twitterTitle: () => seo.value.title,
     twitterDescription: () => seo.value.description,
     twitterImage: () => seo.value.ogImage,
     twitterCard: 'summary_large_image',
     robots: () => seo.value.robots,
+  })
+
+  useHead({
+    link: () => seo.value.canonical
+      ? [{ rel: 'canonical', href: seo.value.canonical }]
+      : [],
   })
 }

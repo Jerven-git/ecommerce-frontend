@@ -59,6 +59,18 @@
         @update:stats="form.homepage_stats = $event"
         @update:newsletter="form.homepage_newsletter = $event"
       />
+
+      <AdminSettingsCoverAltField v-model="form.pages_seo.home.cover_alt_text" label="Hero image accessibility" placeholder="e.g. Vintage chronograph watch on dark leather" />
+
+      <!-- Homepage SEO -->
+      <AdminSeoFields
+        v-model:seo-title="form.pages_seo.home.seo_title"
+        v-model:seo-description="form.pages_seo.home.seo_description"
+        v-model:og-image-url="form.pages_seo.home.og_image_url"
+        v-model:noindex="form.pages_seo.home.noindex"
+        title-placeholder="Defaults to site name"
+        description-placeholder="Defaults to site description"
+      />
     </div>
 
     <!-- About sub-tab -->
@@ -72,6 +84,7 @@
         @media-select="(f: File, c: MediaCollection) => emit('media-select', f, c)"
         @media-remove="(c: MediaCollection) => emit('media-remove', c)"
       />
+      <AdminSettingsCoverAltField v-model="form.pages_seo.about.cover_alt_text" label="About cover image accessibility" placeholder="e.g. Storefront and team at the workshop" />
       <AdminSeoFields
         v-model:seo-title="form.pages_seo.about.seo_title"
         v-model:seo-description="form.pages_seo.about.seo_description"
@@ -117,6 +130,7 @@
         @media-select="(f: File, c: MediaCollection) => emit('media-select', f, c)"
         @media-remove="(c: MediaCollection) => emit('media-remove', c)"
       />
+      <AdminSettingsCoverAltField v-model="form.pages_seo.contact.cover_alt_text" label="Contact cover image accessibility" placeholder="e.g. Studio entrance with neon sign" />
       <AdminSeoFields
         v-model:seo-title="form.pages_seo.contact.seo_title"
         v-model:seo-description="form.pages_seo.contact.seo_description"
@@ -141,6 +155,7 @@
         @media-select="(f: File, c: MediaCollection) => emit('media-select', f, c)"
         @media-remove="(c: MediaCollection) => emit('media-remove', c)"
       />
+      <AdminSettingsCoverAltField v-model="form.pages_seo.blog.cover_alt_text" label="Blog cover image accessibility" placeholder="e.g. Open notebook beside disassembled watch movement" />
       <AdminSeoFields
         v-model:seo-title="form.pages_seo.blog.seo_title"
         v-model:seo-description="form.pages_seo.blog.seo_description"
@@ -165,6 +180,7 @@
         @media-select="(f: File, c: MediaCollection) => emit('media-select', f, c)"
         @media-remove="(c: MediaCollection) => emit('media-remove', c)"
       />
+      <AdminSettingsCoverAltField v-model="form.pages_seo.services.cover_alt_text" label="Services cover image accessibility" placeholder="e.g. Watchmaker repairing a movement under a loupe" />
       <AdminSeoFields
         v-model:seo-title="form.pages_seo.services.seo_title"
         v-model:seo-description="form.pages_seo.services.seo_description"

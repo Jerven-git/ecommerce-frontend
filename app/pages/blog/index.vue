@@ -8,7 +8,7 @@
         <img
           v-if="heroImage"
           :src="heroImage"
-          :alt="heroHeading"
+          :alt="coverAltText || heroHeading"
           class="w-full h-full object-cover transition-opacity duration-500"
           :class="heroLoaded ? 'opacity-100' : 'opacity-0'"
           loading="eager"
@@ -262,6 +262,8 @@ useStaticPageSeo('blog', {
   title: `${siteConfig.value?.blog_page?.header?.label || 'Blog'} – ${siteConfig.value?.site_name || ''}`,
   description: siteConfig.value?.blog_page?.header?.subtitle || '',
 })
+
+const coverAltText = computed(() => siteConfig.value?.pages_seo?.blog?.cover_alt_text ?? '')
 </script>
 
 <style scoped>

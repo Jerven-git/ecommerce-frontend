@@ -5,6 +5,7 @@
       class="relative flex items-center justify-center text-white overflow-hidden"
       :class="isFullBleed ? 'h-screen' : 'min-h-[calc(100vh-4rem)]'"
       :style="heroStyle"
+      :aria-label="heroAltText || undefined"
     >
       <!-- Video background (autoplay, muted, loop for performance) -->
       <video
@@ -12,6 +13,7 @@
         ref="heroVideoRef"
         class="absolute inset-0 w-full h-full object-cover"
         :style="{ objectPosition: heroFocalPosition }"
+        :aria-label="heroAltText || undefined"
         autoplay
         loop
         muted
@@ -425,6 +427,10 @@ watch(() => siteConfig.value?.hero_image_url, (url) => {
 onMounted(() => {
   fetchData()
 })
+
+useStaticPageSeo('home')
+
+const heroAltText = computed(() => siteConfig.value?.pages_seo?.home?.cover_alt_text ?? '')
 </script>
 
 <style scoped>
