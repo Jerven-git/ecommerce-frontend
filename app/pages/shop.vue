@@ -385,6 +385,8 @@ onMounted(async () => {
 
   fetchProducts()
 })
+
+useStaticPageSeo('shop')
 </script>
 
 <style scoped>

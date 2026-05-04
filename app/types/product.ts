@@ -2,6 +2,7 @@ export interface ProductMedia {
   id: number
   url: string
   collection: string
+  alt_text?: string | null
 }
 
 /**
@@ -30,5 +31,9 @@ export interface Product {
 export interface ProductDetail extends Product {
   category_id?: number | null
   backorder_charge_policy?: 'charged_now' | 'charged_later'
+  seo_title?: string | null
+  seo_description?: string | null
+  og_image_url?: string | null
+  noindex?: boolean
   media?: ProductMedia[]
 }

@@ -178,19 +178,27 @@
                   <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1.5">Product Images</label>
                     <div v-if="galleryImages.length || stagedPreviews.length" class="flex flex-wrap gap-2 mb-3">
-                      <div v-for="img in galleryImages" :key="`saved-${img.id}`" class="relative">
-                        <img :src="img.url" alt="Product image" class="h-20 w-20 rounded-lg object-cover border border-gray-200" />
-                        <button
-                          type="button"
-                          @click="$emit('deleteGalleryImage', img.id)"
-                          class="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white shadow-md ring-2 ring-white transition-colors"
-                          title="Remove image"
-                          aria-label="Remove image"
-                        >
-                          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
+                      <div v-for="img in galleryImages" :key="`saved-${img.id}`" class="relative flex flex-col gap-1">
+                        <div class="relative">
+                          <img :src="img.url" :alt="img.alt_text || 'Product image'" class="h-20 w-20 rounded-lg object-cover border border-gray-200" />
+                          <button
+                            type="button"
+                            @click="$emit('deleteGalleryImage', img.id)"
+                            class="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white shadow-md ring-2 ring-white transition-colors"
+                            title="Remove image"
+                            aria-label="Remove image"
+                          >
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                        <AdminMediaAltEditor
+                          v-if="!img.legacy"
+                          :media-id="img.id"
+                          :model-value="img.alt_text"
+                          @update:model-value="img.alt_text = $event"
+                        />
                       </div>
                       <div v-for="(preview, i) in stagedPreviews" :key="`staged-${preview.key}`" class="relative">
                         <img :src="preview.url" :alt="preview.name" class="h-20 w-20 rounded-lg object-cover border border-dashed border-primary-300 opacity-90" />
@@ -282,6 +290,15 @@
                   </div>
                 </fieldset>
 
+                <SeoFields
+                  v-model:seo-title="form.seo_title"
+                  v-model:seo-description="form.seo_description"
+                  v-model:og-image-url="form.og_image_url"
+                  v-model:noindex="form.noindex"
+                  title-placeholder="Defaults to product name"
+                  description-placeholder="Defaults to product description"
+                />
+
                 <!-- Form error -->
                 <Transition
                   enter-active-class="transition-all duration-200"
@@ -340,7 +357,7 @@ const props = defineProps<{
   editingProduct: Product | null
   form: ProductFormData
   computedVolumeCbm: number
-  galleryImages: { id: number; url: string }[]
+  galleryImages: { id: number; url: string; alt_text?: string | null; legacy?: boolean }[]
   galleryFilesCount: number
   stagedPreviews: { key: string; url: string; name: string }[]
   allCategories: Category[]

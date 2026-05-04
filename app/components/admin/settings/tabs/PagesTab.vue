@@ -72,6 +72,14 @@
         @media-select="(f: File, c: MediaCollection) => emit('media-select', f, c)"
         @media-remove="(c: MediaCollection) => emit('media-remove', c)"
       />
+      <AdminSeoFields
+        v-model:seo-title="form.pages_seo.about.seo_title"
+        v-model:seo-description="form.pages_seo.about.seo_description"
+        v-model:og-image-url="form.pages_seo.about.og_image_url"
+        v-model:noindex="form.pages_seo.about.noindex"
+        title-placeholder="Defaults to site title"
+        description-placeholder="Defaults to site description"
+      />
     </div>
 
     <!-- Shop sub-tab -->
@@ -81,6 +89,14 @@
         :promo="form.shop_promo"
         @update:header="form.shop_header = $event"
         @update:promo="form.shop_promo = $event"
+      />
+      <AdminSeoFields
+        v-model:seo-title="form.pages_seo.shop.seo_title"
+        v-model:seo-description="form.pages_seo.shop.seo_description"
+        v-model:og-image-url="form.pages_seo.shop.og_image_url"
+        v-model:noindex="form.pages_seo.shop.noindex"
+        title-placeholder="Defaults to site title"
+        description-placeholder="Defaults to site description"
       />
     </div>
 
@@ -101,6 +117,14 @@
         @media-select="(f: File, c: MediaCollection) => emit('media-select', f, c)"
         @media-remove="(c: MediaCollection) => emit('media-remove', c)"
       />
+      <AdminSeoFields
+        v-model:seo-title="form.pages_seo.contact.seo_title"
+        v-model:seo-description="form.pages_seo.contact.seo_description"
+        v-model:og-image-url="form.pages_seo.contact.og_image_url"
+        v-model:noindex="form.pages_seo.contact.noindex"
+        title-placeholder="Defaults to site title"
+        description-placeholder="Defaults to site description"
+      />
     </div>
 
     <!-- Blog sub-tab -->
@@ -117,6 +141,14 @@
         @media-select="(f: File, c: MediaCollection) => emit('media-select', f, c)"
         @media-remove="(c: MediaCollection) => emit('media-remove', c)"
       />
+      <AdminSeoFields
+        v-model:seo-title="form.pages_seo.blog.seo_title"
+        v-model:seo-description="form.pages_seo.blog.seo_description"
+        v-model:og-image-url="form.pages_seo.blog.og_image_url"
+        v-model:noindex="form.pages_seo.blog.noindex"
+        title-placeholder="Defaults to site title"
+        description-placeholder="Defaults to site description"
+      />
     </div>
 
     <!-- Services sub-tab -->
@@ -132,6 +164,14 @@
         @update:overlay-opacity="form.services_overlay_opacity = $event"
         @media-select="(f: File, c: MediaCollection) => emit('media-select', f, c)"
         @media-remove="(c: MediaCollection) => emit('media-remove', c)"
+      />
+      <AdminSeoFields
+        v-model:seo-title="form.pages_seo.services.seo_title"
+        v-model:seo-description="form.pages_seo.services.seo_description"
+        v-model:og-image-url="form.pages_seo.services.og_image_url"
+        v-model:noindex="form.pages_seo.services.noindex"
+        title-placeholder="Defaults to site title"
+        description-placeholder="Defaults to site description"
       />
     </div>
   </div>

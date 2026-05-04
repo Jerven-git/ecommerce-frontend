@@ -275,7 +275,18 @@ export interface SiteConfig {
   services_overlay_color: string
   services_overlay_opacity: number
   modules_enabled: ModulesEnabled
+  default_seo_title: string | null
+  default_seo_description: string | null
+  default_og_image_url: string | null
+  pages_seo: Record<string, PageSeo> | null
   updated_at: string
+}
+
+export interface PageSeo {
+  seo_title?: string | null
+  seo_description?: string | null
+  og_image_url?: string | null
+  noindex?: boolean | null
 }
 
 export const DEFAULT_MODULES_ENABLED: ModulesEnabled = {

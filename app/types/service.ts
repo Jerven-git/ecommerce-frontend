@@ -16,6 +16,7 @@ export interface ServiceMedia {
   id: number
   url: string
   collection: string
+  alt_text?: string | null
 }
 
 /**
@@ -47,6 +48,8 @@ export interface ServiceDetail extends Service {
   body: string | null
   seo_title: string | null
   seo_description: string | null
+  og_image_url: string | null
+  noindex: boolean
   media?: ServiceMedia[]
 }
 

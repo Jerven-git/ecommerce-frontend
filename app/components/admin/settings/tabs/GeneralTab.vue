@@ -14,6 +14,15 @@
       @update:favorites-enabled="form.favorites_enabled = $event"
       @update:show-stock-quantity="form.show_stock_quantity = $event"
     />
+
+    <AdminSeoFields
+      v-model:seo-title="form.default_seo_title"
+      v-model:seo-description="form.default_seo_description"
+      v-model:og-image-url="form.default_og_image_url"
+      title-placeholder="Defaults to site name"
+      description-placeholder="Used on pages without their own description"
+      hide-noindex
+    />
   </div>
 </template>
 

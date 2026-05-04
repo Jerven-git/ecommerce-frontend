@@ -427,6 +427,7 @@ useHead({
   }),
 })
 
+useStaticPageSeo('contact')
 </script>
 
 <style scoped>

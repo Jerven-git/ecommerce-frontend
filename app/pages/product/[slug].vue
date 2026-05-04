@@ -52,8 +52,8 @@
             <div class="relative aspect-square bg-gray-100 rounded-2xl overflow-hidden group">
               <img
                 v-if="activeImage"
-                :src="activeImage"
-                :alt="product.name"
+                :src="activeImage.url"
+                :alt="activeImage.alt || product.name"
                 class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105 cursor-zoom-in"
                 loading="eager"
                 fetchpriority="high"
@@ -96,7 +96,7 @@
                   ? 'border-[var(--color-secondary)] opacity-100 ring-1 ring-[var(--color-secondary)]'
                   : 'border-gray-200 opacity-60 hover:border-gray-300'"
               >
-                <img :src="img" :alt="`${product.name} ${idx + 1}`" class="w-full h-full object-cover" loading="lazy" decoding="async" />
+                <img :src="img.url" :alt="img.alt || `${product.name} ${idx + 1}`" class="w-full h-full object-cover" loading="lazy" decoding="async" />
               </button>
             </div>
           </div>
@@ -224,8 +224,8 @@
           </template>
 
           <img
-            :src="activeImage"
-            :alt="product?.name"
+            :src="activeImage.url"
+            :alt="activeImage.alt || product?.name"
             class="relative max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
             decoding="async"
             @click.stop
@@ -262,14 +262,14 @@ const quantity = ref(1)
 const showLightbox = ref(false)
 const activeIndex = ref(0)
 
-// Build image list from media array, falling back to image_url
-const allImages = computed(() => {
+// Build image list from media array (with alt_text), falling back to image_url.
+const allImages = computed<{ url: string; alt: string | null }[]>(() => {
   if (!product.value) return []
-  const mediaUrls = (product.value.media || [])
+  const fromMedia = (product.value.media || [])
     .filter(m => m.collection === 'gallery')
-    .map(m => m.url)
-  if (mediaUrls.length) return mediaUrls
-  return product.value.image_url ? [product.value.image_url] : []
+    .map(m => ({ url: m.url, alt: m.alt_text ?? null }))
+  if (fromMedia.length) return fromMedia
+  return product.value.image_url ? [{ url: product.value.image_url, alt: null }] : []
 })
 
 const activeImage = computed(() => allImages.value[activeIndex.value] || null)
@@ -311,6 +311,8 @@ const fetchProduct = async () => {
 }
 
 onMounted(fetchProduct)
+
+useEntitySeo(() => product.value)
 </script>
 
 <style scoped>
