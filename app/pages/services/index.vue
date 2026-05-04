@@ -7,7 +7,7 @@
         <img
           v-if="heroImage"
           :src="heroImage"
-          :alt="heroHeading"
+          :alt="coverAltText || heroHeading"
           class="w-full h-full object-cover"
           loading="eager"
           fetchpriority="high"
@@ -271,6 +271,8 @@ useStaticPageSeo('services', {
   title: `${servicesCfg.value?.header?.label || 'Services'} – ${siteConfig.value?.site_name || ''}`,
   description: servicesCfg.value?.header?.subtitle || '',
 })
+
+const coverAltText = computed(() => siteConfig.value?.pages_seo?.services?.cover_alt_text ?? '')
 </script>
 
 <style scoped>

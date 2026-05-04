@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="relative text-white py-28 overflow-hidden" :style="heroStyle">
+    <section class="relative text-white py-28 overflow-hidden" :style="heroStyle" :aria-label="coverAltText || undefined">
       <Transition name="fade">
         <div v-if="imageLoading" class="absolute bottom-0 left-0 right-0 h-0.5 overflow-hidden z-20">
           <div class="slide-bar h-full" />
@@ -428,6 +428,8 @@ useHead({
 })
 
 useStaticPageSeo('contact')
+
+const coverAltText = computed(() => siteConfig.value?.pages_seo?.contact?.cover_alt_text ?? '')
 </script>
 
 <style scoped>

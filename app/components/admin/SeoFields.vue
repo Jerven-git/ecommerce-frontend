@@ -9,7 +9,7 @@
     <div>
       <div class="flex items-baseline justify-between mb-1">
         <label class="block text-xs font-semibold text-gray-700">SEO title</label>
-        <CharCount :value="seoTitle" :soft="60" :hard="70" />
+        <AdminCharCount :value="seoTitle" :soft="60" :hard="70" />
       </div>
       <input
         v-model="seoTitle"
@@ -23,7 +23,7 @@
     <div>
       <div class="flex items-baseline justify-between mb-1">
         <label class="block text-xs font-semibold text-gray-700">SEO description</label>
-        <CharCount :value="seoDescription" :soft="120" :hard="160" />
+        <AdminCharCount :value="seoDescription" :soft="120" :hard="160" />
       </div>
       <textarea
         v-model="seoDescription"
@@ -46,17 +46,18 @@
     </div>
 
     <!-- noindex -->
-    <label v-if="!hideNoindex" class="flex items-start gap-2 cursor-pointer">
+    <div v-if="!hideNoindex" class="flex items-start gap-2">
       <input
+        :id="noindexId"
         v-model="noindex"
         type="checkbox"
-        class="mt-0.5 rounded border-gray-300 text-primary-500 focus:ring-primary-500/20"
+        class="mt-0.5 rounded border-gray-300 text-primary-500 focus:ring-primary-500/20 cursor-pointer"
       />
-      <span>
+      <label :for="noindexId" class="cursor-pointer">
         <span class="block text-xs font-semibold text-gray-700">Hide from search engines</span>
         <span class="block text-[11px] text-gray-400">Adds a noindex,nofollow meta tag so this page is excluded from search results.</span>
-      </span>
-    </label>
+      </label>
+    </div>
   </div>
 </template>
 
@@ -71,4 +72,6 @@ defineProps<{
   descriptionPlaceholder?: string
   hideNoindex?: boolean
 }>()
+
+const noindexId = useId()
 </script>

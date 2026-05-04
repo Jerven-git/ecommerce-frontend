@@ -15,7 +15,7 @@
     <div class="p-4 space-y-6">
       <!-- Contact Image -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Contact Image</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Contact Cover Image</label>
         <AdminMediaUploader
           :url="imageUrl"
           :uploading="mediaUploading.contact ?? false"

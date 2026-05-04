@@ -279,6 +279,8 @@ export interface SiteConfig {
   default_seo_description: string | null
   default_og_image_url: string | null
   pages_seo: Record<string, PageSeo> | null
+  canonical_base_url: string | null
+  logo_alt_text: string | null
   updated_at: string
 }
 
@@ -287,6 +289,7 @@ export interface PageSeo {
   seo_description?: string | null
   og_image_url?: string | null
   noindex?: boolean | null
+  cover_alt_text?: string | null
 }
 
 export const DEFAULT_MODULES_ENABLED: ModulesEnabled = {

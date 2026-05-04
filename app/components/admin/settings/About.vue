@@ -15,7 +15,7 @@
     <div class="p-4 space-y-6">
       <!-- About Image -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">About Image</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">About Cover Image</label>
         <AdminMediaUploader
           :url="modelValue.about_image_url"
           :uploading="mediaUploading.about ?? false"

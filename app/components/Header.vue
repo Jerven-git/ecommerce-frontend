@@ -16,7 +16,7 @@
           <img
             v-if="siteConfig?.logo_url"
             :src="siteConfig.logo_url"
-            :alt="siteConfig.site_name"
+            :alt="siteConfig.logo_alt_text || siteConfig.site_name"
             class="h-9 w-auto object-contain"
           />
           <span
