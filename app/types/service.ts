@@ -29,6 +29,7 @@ export interface Service {
   eyebrow: string | null
   description: string | null
   cover_image_url: string | null
+  cover_alt_text: string | null
   category_id: number | null
   category?: ServiceCategory | null
   cta_label: string | null

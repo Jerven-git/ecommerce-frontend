@@ -25,7 +25,7 @@
           <SmoothImage
             v-if="post.cover_image_url"
             :src="post.cover_image_url"
-            :alt="post.title"
+            :alt="post.cover_alt_text || post.title"
             class="w-full h-full object-cover"
             loading="eager"
             fetchpriority="high"
