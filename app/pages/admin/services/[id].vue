@@ -295,6 +295,18 @@
               </button>
             </div>
           </div>
+
+          <div class="mt-4">
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Cover image alt text</label>
+            <input
+              v-model="form.cover_alt_text"
+              type="text"
+              maxlength="255"
+              :placeholder="`Defaults to service title${form.title ? ` — “${form.title}”` : ''}`"
+              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+            />
+            <p class="text-[11px] text-gray-400 mt-1">Used for screen readers and image search. Describe what the image shows.</p>
+          </div>
         </div>
 
         <!-- Publish controls -->
@@ -415,6 +427,7 @@ const form = reactive({
   seo_description: '',
   og_image_url: '',
   noindex: false,
+  cover_alt_text: '',
 })
 
 const coverFile = ref<File | null>(null)
@@ -562,6 +575,7 @@ async function loadService() {
     form.seo_description = s.seo_description || ''
     form.og_image_url = s.og_image_url || ''
     form.noindex = !!s.noindex
+    form.cover_alt_text = s.cover_alt_text || ''
     existingCoverUrl.value = s.cover_image_url
   } catch (err: any) {
     showToast(err?.data?.message || 'Failed to load service', 'error')
@@ -609,6 +623,7 @@ function buildPayload(): Record<string, any> {
     seo_description: form.seo_description.trim() || null,
     og_image_url: form.og_image_url.trim() || null,
     noindex: form.noindex ? 1 : 0,
+    cover_alt_text: form.cover_alt_text.trim() || null,
   }
   if (form.is_published && form.published_at) {
     payload.published_at = new Date(form.published_at).toISOString()

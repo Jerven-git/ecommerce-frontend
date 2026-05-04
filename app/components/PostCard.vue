@@ -8,7 +8,7 @@
       <SmoothImage
         v-if="post.cover_image_url"
         :src="post.cover_image_url"
-        :alt="post.title"
+        :alt="post.cover_alt_text || post.title"
         class="w-full h-full object-cover group-hover:scale-105"
       />
       <div v-else class="w-full h-full flex items-center justify-center">

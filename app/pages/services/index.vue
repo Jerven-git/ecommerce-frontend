@@ -131,7 +131,7 @@
               <img
                 v-if="service.cover_image_url"
                 :src="service.cover_image_url"
-                :alt="service.title"
+                :alt="service.cover_alt_text || service.title"
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 loading="lazy"
                 decoding="async"

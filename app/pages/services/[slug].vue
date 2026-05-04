@@ -25,7 +25,7 @@
           <SmoothImage
             v-if="service.cover_image_url"
             :src="service.cover_image_url"
-            :alt="service.title"
+            :alt="service.cover_alt_text || service.title"
             class="w-full h-full object-cover"
             loading="eager"
             fetchpriority="high"
@@ -99,7 +99,7 @@
                 <img
                   v-if="r.cover_image_url"
                   :src="r.cover_image_url"
-                  :alt="r.title"
+                  :alt="r.cover_alt_text || r.title"
                   class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                   loading="lazy"
                   decoding="async"

@@ -28,6 +28,7 @@ export interface Post {
   title: string
   excerpt: string | null
   cover_image_url: string | null
+  cover_alt_text: string | null
   author_name: string | null
   category_id: number | null
   category?: PostCategory | null
