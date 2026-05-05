@@ -105,7 +105,7 @@ export const guideSteps: GuideStep[] = [
     description: 'Your main menu — every section of the store lives here.',
     icon: icons.menu, iconBg: 'bg-purple-50',
     route: '/admin', target: '[data-guide="sidebar-nav"]', prefer: 'right',
-    tips: ['Products, Categories, Blog Posts, Blog Categories, Orders, Backorders, Discounts', 'Collapse the sidebar with the arrow for more workspace'],
+    tips: ['Products, Categories, Blog Posts, Blog Categories, Services, Service Categories, Orders, Backorders, Discounts', 'Collapse the sidebar with the arrow for more workspace'],
   },
   {
     title: 'Settings Menu',
@@ -188,6 +188,43 @@ export const guideSteps: GuideStep[] = [
     description: 'Edit, recolor, or delete blog categories here. Post counts shown per category.',
     icon: icons.list, iconBg: 'bg-purple-50',
     route: '/admin/post-categories', target: '[data-guide="post-category-list"]', prefer: 'right',
+  },
+
+  // ── Services ─────────────────────────────────────────────
+  {
+    title: 'New Service',
+    description: 'Each service gets its own detail page — content, image, pricing, and SEO.',
+    icon: icons.plus, iconBg: 'bg-primary-50',
+    route: '/admin/services', target: '[data-guide="add-service-btn"]', prefer: 'bottom',
+    tips: ['Title, slug, summary, body, and cover image', 'Save as draft or publish when ready', 'Assign to a service category'],
+  },
+  {
+    title: 'Service Filters',
+    description: 'Search services or filter by status and category.',
+    icon: icons.search, iconBg: 'bg-indigo-50',
+    route: '/admin/services', target: '[data-guide="service-filters"]', prefer: 'bottom',
+    tips: ['Filter by Published or Drafts', 'Narrow down by service category'],
+  },
+  {
+    title: 'Services Table',
+    description: 'All your services in one place — edit or delete any row.',
+    icon: icons.table, iconBg: 'bg-primary-50',
+    route: '/admin/services', target: '[data-guide="service-table"]', prefer: 'top',
+    tips: ['Drafts stay hidden from the public site'],
+  },
+
+  // ── Service Categories ───────────────────────────────────
+  {
+    title: 'New Service Category',
+    description: 'Group related services under headings (e.g. Everyday spending, Travel).',
+    icon: icons.tagPink, iconBg: 'bg-pink-50',
+    route: '/admin/service-categories', target: '[data-guide="add-service-category-btn"]', prefer: 'bottom',
+  },
+  {
+    title: 'Service Category List',
+    description: 'Edit or delete service categories here. Service counts shown per category.',
+    icon: icons.list, iconBg: 'bg-purple-50',
+    route: '/admin/service-categories', target: '[data-guide="service-category-list"]', prefer: 'right',
   },
 
   // ── Orders ───────────────────────────────────────────────
@@ -325,6 +362,13 @@ export const guideSteps: GuideStep[] = [
     tips: ['Link it to a discount — each subscriber gets their own code', 'Shows once per visitor'],
   },
   {
+    title: 'Site Modules',
+    description: 'Turn entire sections on or off — Shop, Blog, Services, About, Contact.',
+    icon: icons.sliders, iconBg: 'bg-indigo-50',
+    route: '/admin/settings?tab=modules', target: '[data-guide="settings-modules"]', prefer: 'right',
+    tips: ['Disabled pages redirect to the homepage', 'Hides nav links and related UI (e.g. cart icon when Shop is off)', 'Re-enable here anytime'],
+  },
+  {
     title: 'Save Changes',
     description: 'This bar pops up whenever you have unsaved edits. Click Save — or Reset to undo.',
     icon: icons.check, iconBg: 'bg-green-50',
@@ -405,6 +449,8 @@ export const guideSteps: GuideStep[] = [
       'Customize Home, About, Shop, Blog, Services, and Contact',
       'Add products and categories',
       'Write a first blog post (optional)',
+      'Add your services and service categories (if applicable)',
+      'Toggle off any modules you don\'t need (Modules tab)',
       'Enable at least one payment method',
       'Configure shipping zones and tax',
       'Replay this guide anytime with the "Guide" button in the header',
