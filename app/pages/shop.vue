@@ -169,10 +169,10 @@
         <!-- Product Grid with stagger -->
         <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <div
-            v-for="(product, index) in products"
+            v-for="product in products"
             :key="product.id"
+            :ref="addCardRevealRef"
             class="card-stagger"
-            :style="{ animationDelay: `${index * 50}ms` }"
           >
             <ProductCard :product="product" />
           </div>
@@ -212,6 +212,7 @@ const { siteConfig } = useSiteConfig()
 
 // Scroll reveal
 const { revealRef: promoRef } = useScrollReveal()
+const { addRevealRef: addCardRevealRef } = useScrollRevealAll({ threshold: 0.1 })
 
 const products = ref<Product[]>([])
 const categories = ref<Category[]>([])
@@ -448,20 +449,34 @@ useStaticPageSeo('shop')
   transform: translateY(-8px);
 }
 
-/* Product card stagger fade-up */
+/* Product card stagger pop-up — scroll triggered, row-by-row */
 .card-stagger {
   opacity: 0;
-  animation: card-fade-up 0.45s ease forwards;
+  transform: translateY(24px) scale(0.94);
 }
 
-@keyframes card-fade-up {
+.card-stagger.reveal-visible {
+  animation: card-pop-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes card-pop-up {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(24px) scale(0.94);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-stagger,
+  .card-stagger.reveal-visible,
+  .hero-stagger {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
 </style>
