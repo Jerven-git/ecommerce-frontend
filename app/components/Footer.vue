@@ -10,6 +10,20 @@
             </span>
           </NuxtLink>
           <p class="text-sm text-gray-500">Your trusted online shopping destination</p>
+
+          <div v-if="socialLinks.length" class="flex items-center gap-3 mt-5">
+            <a
+              v-for="link in socialLinks"
+              :key="link.platform + link.url"
+              :href="link.url"
+              :aria-label="link.label || link.platform"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white transition-colors"
+            >
+              <Icon :name="link.icon" class="w-4 h-4" />
+            </a>
+          </div>
         </div>
 
         <div v-if="quickLinks.length">
@@ -50,4 +64,33 @@ const allQuickLinks = [
 ]
 
 const quickLinks = computed(() => allQuickLinks.filter(l => isEnabled(l.module)))
+
+const SOCIAL_ICONS: Record<string, string> = {
+  facebook: 'mdi:facebook',
+  instagram: 'mdi:instagram',
+  x: 'simple-icons:x',
+  twitter: 'mdi:twitter',
+  tiktok: 'simple-icons:tiktok',
+  youtube: 'mdi:youtube',
+  linkedin: 'mdi:linkedin',
+  pinterest: 'mdi:pinterest',
+  snapchat: 'mdi:snapchat',
+  threads: 'simple-icons:threads',
+  whatsapp: 'mdi:whatsapp',
+  telegram: 'mdi:telegram',
+  discord: 'simple-icons:discord',
+  github: 'mdi:github',
+  website: 'heroicons:globe-alt',
+}
+
+const socialLinks = computed(() =>
+  (siteConfig.value?.social_links ?? [])
+    .filter(s => s?.platform && s?.url)
+    .map(s => ({
+      platform: s.platform,
+      url: s.url,
+      label: s.label || s.platform,
+      icon: SOCIAL_ICONS[s.platform.toLowerCase()] || 'heroicons:globe-alt',
+    })),
+)
 </script>

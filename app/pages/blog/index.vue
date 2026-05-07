@@ -55,13 +55,18 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <p class="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mb-4">Read by category</p>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <CategoryTile
-            v-for="cat in categories"
+          <div
+            v-for="(cat, idx) in categories"
             :key="cat.id"
-            :category="cat"
-            :active="selectedCategory === cat.slug"
-            @select="onCategorySelect"
-          />
+            class="category-stagger"
+            :style="{ animationDelay: `${idx * 100}ms` }"
+          >
+            <CategoryTile
+              :category="cat"
+              :active="selectedCategory === cat.slug"
+              @select="onCategorySelect"
+            />
+          </div>
         </div>
       </div>
     </section>
@@ -141,16 +146,20 @@
         </div>
 
         <!-- Grid -->
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-else :key="`grid-${animationKey}`" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <template v-for="(post, idx) in posts" :key="post.id">
-            <div class="card-stagger" :style="{ animationDelay: `${idx * 50}ms` }">
+            <div
+              :ref="el => observeCard(el as Element | null)"
+              class="card-stagger"
+              :style="{ animationDelay: `${(idx % 3) * 100}ms` }"
+            >
               <PostCard :post="post" />
             </div>
             <!-- CTA interstitial after row 2 (index 5) when CTA configured and on first page -->
             <div
               v-if="cta && currentPage === 1 && idx === 5"
+              :ref="el => observeCard(el as Element | null)"
               class="card-stagger sm:col-span-2 lg:col-span-3"
-              :style="{ animationDelay: `${idx * 50}ms` }"
             >
               <div class="rounded-2xl bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-8 sm:p-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 shadow-sm">
                 <div class="max-w-xl">
@@ -224,6 +233,40 @@ const {
 const { categories, loadCategories } = usePostCategories()
 const featuredPosts = ref<Post[]>([])
 const heroLoaded = ref(false)
+const animationKey = ref(0)
+
+watch([currentPage, selectedCategory, searchQuery], () => {
+  animationKey.value++
+})
+
+let cardObserver: IntersectionObserver | null = null
+
+function observeCard(el: Element | null) {
+  if (el && cardObserver) {
+    cardObserver.observe(el)
+  }
+}
+
+onMounted(() => {
+  if (typeof IntersectionObserver !== 'undefined') {
+    cardObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible')
+            cardObserver?.unobserve(entry.target)
+          }
+        }
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' },
+    )
+  }
+})
+
+onUnmounted(() => {
+  cardObserver?.disconnect()
+  cardObserver = null
+})
 
 const heroLabel = computed(() => siteConfig.value?.blog_page?.header?.label || 'Blog')
 const heroHeading = computed(() =>
@@ -251,6 +294,7 @@ function onCategorySelect(slug: string) {
 }
 
 onMounted(async () => {
+  animationKey.value++
   await Promise.all([
     loadPosts(),
     loadCategories(),
@@ -279,11 +323,36 @@ const coverAltText = computed(() => siteConfig.value?.pages_seo?.blog?.cover_alt
 
 .card-stagger {
   opacity: 0;
-  animation: card-fade-up 0.45s ease forwards;
+  transform: translateY(24px) scale(0.94);
 }
 
-@keyframes card-fade-up {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
+.card-stagger.is-visible {
+  animation: card-pop-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes card-pop-up {
+  from { opacity: 0; transform: translateY(24px) scale(0.94); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.category-stagger {
+  opacity: 0;
+  animation: category-slide-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes category-slide-in {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-stagger,
+  .card-stagger.is-visible,
+  .category-stagger,
+  .hero-stagger {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
 </style>

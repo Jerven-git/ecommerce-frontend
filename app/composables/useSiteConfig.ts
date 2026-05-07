@@ -249,6 +249,7 @@ export interface SiteConfig {
   contact_email: string | null
   contact_phone: string | null
   contact_entries: Array<{ label: string; email: string | null; phone: string | null }> | null
+  social_links: Array<{ platform: string; url: string; label?: string | null }> | null
   favorites_enabled: boolean
   show_stock_quantity: boolean
   welcome_popup_enabled: boolean

@@ -49,7 +49,11 @@
     </div>
 
     <!-- Tab Content -->
-    <form v-else @submit.prevent="requestSave" class="pb-24">
+    <!-- transform-gpu + isolate forces this subtree onto its own compositor layer,
+         which fixes a Chromium stale-paint bug where toggling Showcase/WatchShop/
+         BestSellers (which replace the whole form sub-object) leaves a white
+         region covering content below. Firefox is unaffected. -->
+    <form v-else @submit.prevent="requestSave" class="pb-24 transform-gpu isolate">
       <AdminSettingsTabsGeneralTab
         v-show="activeTab === 'general'"
         :form="form"
@@ -361,6 +365,7 @@ const form = ref({
   contact_email: "",
   contact_phone: "",
   contact_entries: [{ label: '', email: '', phone: '' }] as ContactEntry[],
+  social_links: [] as Array<{ platform: string; url: string; label?: string }>,
   favorites_enabled: false,
   show_stock_quantity: false,
   welcome_popup: {
@@ -637,6 +642,13 @@ async function loadSettings() {
         contact_entries: response.data.contact_entries?.length
           ? response.data.contact_entries
           : [{ label: '', email: '', phone: '' }],
+        social_links: Array.isArray(response.data.social_links)
+          ? response.data.social_links.map((s: any) => ({
+              platform: s.platform || '',
+              url: s.url || '',
+              label: s.label || '',
+            }))
+          : [],
         favorites_enabled: response.data.favorites_enabled ?? false,
         show_stock_quantity: response.data.show_stock_quantity ?? false,
         welcome_popup: {
@@ -880,6 +892,13 @@ async function saveSettings() {
         contact_email: form.value.contact_email,
         contact_phone: form.value.contact_phone,
         contact_entries: form.value.contact_entries,
+        social_links: (form.value.social_links || [])
+          .filter((s) => s.platform && s.url)
+          .map((s) => ({
+            platform: s.platform.trim(),
+            url: s.url.trim(),
+            label: s.label?.trim() || null,
+          })),
         favorites_enabled: form.value.favorites_enabled,
         show_stock_quantity: form.value.show_stock_quantity,
         welcome_popup_enabled: form.value.welcome_popup.welcome_popup_enabled,

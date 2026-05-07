@@ -110,13 +110,14 @@
           <p class="text-sm text-gray-400">No products available at the moment.</p>
         </div>
 
-        <!-- Products with stagger fade-up -->
+        <!-- Products: row 1 slides from right, row 2 slides from left -->
         <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div
             v-for="(product, index) in products"
             :key="product.id"
-            class="card-stagger"
-            :style="{ animationDelay: `${index * 60}ms` }"
+            :ref="addFeaturedRevealRef"
+            :class="['featured-card', Math.floor(index / 4) % 2 === 0 ? 'from-right' : 'from-left']"
+            :style="{ animationDelay: `${Math.floor(index / 4) * 600 + (index % 4) * 100}ms` }"
           >
             <ProductCard :product="product" />
           </div>
@@ -267,6 +268,7 @@ const { revealRef: featuredHeadingRef } = useScrollReveal()
 const { revealRef: howItWorksHeadingRef } = useScrollReveal()
 const { revealRef: newsletterRef } = useScrollReveal()
 const { addRevealRef } = useScrollRevealAll()
+const { addRevealRef: addFeaturedRevealRef } = useScrollRevealAll({ threshold: 0.15 })
 
 const defaultStepIcons = [
   'heroicons:magnifying-glass',
@@ -465,20 +467,44 @@ const heroAltText = computed(() => siteConfig.value?.pages_seo?.home?.cover_alt_
   }
 }
 
-/* Product cards stagger fade-up */
-.card-stagger {
+/* Featured products — row 1 slides from right, row 2 from left, with inter-row delay */
+.featured-card {
   opacity: 0;
-  animation: card-fade-up 0.5s ease forwards;
 }
 
-@keyframes card-fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
+.featured-card.from-right {
+  transform: translateX(60px);
+}
+
+.featured-card.from-left {
+  transform: translateX(-60px);
+}
+
+.featured-card.reveal-visible.from-right {
+  animation: card-slide-from-right 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.featured-card.reveal-visible.from-left {
+  animation: card-slide-from-left 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes card-slide-from-right {
+  from { opacity: 0; transform: translateX(60px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes card-slide-from-left {
+  from { opacity: 0; transform: translateX(-60px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featured-card,
+  .featured-card.reveal-visible.from-right,
+  .featured-card.reveal-visible.from-left {
+    animation: none;
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 }
 
