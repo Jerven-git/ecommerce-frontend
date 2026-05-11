@@ -74,6 +74,192 @@
       </div>
     </div>
 
+    <!-- Header call-to-action button -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold text-gray-900">Header call-to-action</p>
+          <p class="text-xs text-gray-400">A single button shown top-right in the site header on every page.</p>
+        </div>
+        <label class="inline-flex items-center gap-2 cursor-pointer">
+          <input
+            v-model="form.header_cta.enabled"
+            type="checkbox"
+            class="sr-only peer"
+          />
+          <span class="relative w-10 h-6 bg-gray-200 rounded-full peer-checked:bg-primary-500 transition-colors">
+            <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4" />
+          </span>
+          <span class="text-xs font-semibold text-gray-700">{{ form.header_cta.enabled ? 'On' : 'Off' }}</span>
+        </label>
+      </div>
+      <div v-if="form.header_cta.enabled" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Button label</label>
+          <input
+            v-model="form.header_cta.label"
+            type="text"
+            maxlength="30"
+            placeholder="e.g. Shop Now"
+            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+          />
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-[160px_1fr] gap-2">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Destination type</label>
+            <select
+              v-model="ctaLinkMode"
+              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white"
+            >
+              <option value="page">Site page</option>
+              <option value="custom">Custom URL</option>
+            </select>
+          </div>
+          <div v-if="ctaLinkMode === 'page'">
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Page</label>
+            <select
+              v-model="form.header_cta.link"
+              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white"
+            >
+              <option value="" disabled>Choose a page…</option>
+              <option v-for="opt in pageOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+          <div v-else>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">URL</label>
+            <input
+              v-model="form.header_cta.link"
+              type="text"
+              maxlength="500"
+              placeholder="https://example.com/page"
+              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Above-footer promotional banner -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold text-gray-900">Above-footer banner</p>
+          <p class="text-xs text-gray-400">A promotional strip shown just above the footer on every page.</p>
+        </div>
+        <label class="inline-flex items-center gap-2 cursor-pointer">
+          <input
+            v-model="form.footer_banner.enabled"
+            type="checkbox"
+            class="sr-only peer"
+          />
+          <span class="relative w-10 h-6 bg-gray-200 rounded-full peer-checked:bg-primary-500 transition-colors">
+            <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4" />
+          </span>
+          <span class="text-xs font-semibold text-gray-700">{{ form.footer_banner.enabled ? 'On' : 'Off' }}</span>
+        </label>
+      </div>
+      <div v-if="form.footer_banner.enabled" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Heading</label>
+          <input
+            v-model="form.footer_banner.heading"
+            type="text"
+            maxlength="150"
+            placeholder="e.g. Summer sale on now"
+            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Subtitle (optional)</label>
+          <input
+            v-model="form.footer_banner.subtitle"
+            type="text"
+            maxlength="255"
+            placeholder="Short supporting line"
+            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+          />
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Button label</label>
+            <input
+              v-model="form.footer_banner.button_label"
+              type="text"
+              maxlength="30"
+              placeholder="e.g. Shop"
+              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+            />
+          </div>
+          <div class="grid grid-cols-[140px_1fr] gap-2">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Destination</label>
+              <select
+                v-model="bannerLinkMode"
+                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white"
+              >
+                <option value="page">Site page</option>
+                <option value="custom">Custom URL</option>
+              </select>
+            </div>
+            <div v-if="bannerLinkMode === 'page'">
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Page</label>
+              <select
+                v-model="form.footer_banner.button_link"
+                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white"
+              >
+                <option value="" disabled>Choose…</option>
+                <option v-for="opt in pageOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              </select>
+            </div>
+            <div v-else>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">URL</label>
+              <input
+                v-model="form.footer_banner.button_link"
+                type="text"
+                maxlength="500"
+                placeholder="https://example.com/page"
+                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Background color</label>
+            <div class="flex items-center gap-2">
+              <input
+                v-model="form.footer_banner.background_color"
+                type="color"
+                class="h-10 w-12 rounded-lg border border-gray-200 cursor-pointer"
+              />
+              <input
+                v-model="form.footer_banner.background_color"
+                type="text"
+                maxlength="7"
+                class="flex-1 px-3 py-2 text-sm font-mono border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+              />
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Text color</label>
+            <div class="flex items-center gap-2">
+              <input
+                v-model="form.footer_banner.text_color"
+                type="color"
+                class="h-10 w-12 rounded-lg border border-gray-200 cursor-pointer"
+              />
+              <input
+                v-model="form.footer_banner.text_color"
+                type="text"
+                maxlength="7"
+                class="flex-1 px-3 py-2 text-sm font-mono border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Canonical base URL + logo alt text -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
       <div>
@@ -116,6 +302,67 @@ const emit = defineEmits<{
   'media-select': [file: File, collection: MediaCollection]
   'media-remove': [collection: MediaCollection]
 }>()
+
+const ALL_PAGE_OPTIONS: Array<{ value: string; label: string; module: 'shop' | 'blog' | 'services' | 'about' | 'contact' | null }> = [
+  { value: '/', label: 'Home', module: null },
+  { value: '/shop', label: 'Shop', module: 'shop' },
+  { value: '/services', label: 'Services', module: 'services' },
+  { value: '/blog', label: 'Blog', module: 'blog' },
+  { value: '/about', label: 'About', module: 'about' },
+  { value: '/contact', label: 'Contact', module: 'contact' },
+  { value: '/favorites', label: 'Favorites', module: null },
+  { value: '/cart', label: 'Cart', module: 'shop' },
+]
+
+const pageOptions = computed(() => {
+  const modules = props.form.modules_enabled ?? {}
+  return ALL_PAGE_OPTIONS.filter(o => o.module === null || modules[o.module] !== false)
+})
+
+const ctaLinkMode = ref<'page' | 'custom'>(
+  isKnownPagePath(props.form.header_cta?.link ?? '') ? 'page' : 'custom'
+)
+
+const bannerLinkMode = ref<'page' | 'custom'>(
+  isKnownPagePath(props.form.footer_banner?.button_link ?? '') ? 'page' : 'custom'
+)
+
+function isKnownPagePath(link: string): boolean {
+  if (!link) {
+    return true
+  }
+  return ALL_PAGE_OPTIONS.some(o => o.value === link)
+}
+
+watch(
+  () => props.form.header_cta?.link,
+  link => {
+    if (ctaLinkMode.value === 'page' && !isKnownPagePath(link ?? '')) {
+      ctaLinkMode.value = 'custom'
+    }
+  },
+)
+
+watch(ctaLinkMode, mode => {
+  if (mode === 'page' && !isKnownPagePath(props.form.header_cta.link)) {
+    props.form.header_cta.link = ''
+  }
+})
+
+watch(
+  () => props.form.footer_banner?.button_link,
+  link => {
+    if (bannerLinkMode.value === 'page' && !isKnownPagePath(link ?? '')) {
+      bannerLinkMode.value = 'custom'
+    }
+  },
+)
+
+watch(bannerLinkMode, mode => {
+  if (mode === 'page' && !isKnownPagePath(props.form.footer_banner.button_link)) {
+    props.form.footer_banner.button_link = ''
+  }
+})
 
 const SOCIAL_PLATFORMS = [
   { value: 'facebook', label: 'Facebook' },

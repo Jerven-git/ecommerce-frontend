@@ -144,6 +144,17 @@ export const THEME_PRESETS: ThemePreset[] = [
     heroMediaMime: 'image/webp',
   },
   {
+    name: 'Arte Gallery',
+    primary: '#C8A45C',
+    secondary: '#1A1A1A',
+    accent: '#FAF7F0',
+    headingFont: 'Playfair Display',
+    bodyFont: 'Lora',
+    texture: 'none',
+    heroImage: '/images/mountain-art.webp',
+    heroMediaMime: 'image/webp',
+  },
+  {
     name: 'Minimal Mono',
     primary: '#424242',
     secondary: '#212121',

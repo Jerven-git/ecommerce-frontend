@@ -282,7 +282,25 @@ export interface SiteConfig {
   pages_seo: Record<string, PageSeo> | null
   canonical_base_url: string | null
   logo_alt_text: string | null
+  header_cta: HeaderCta
+  footer_banner: FooterBanner
   updated_at: string
+}
+
+export interface HeaderCta {
+  enabled: boolean
+  label: string
+  link: string
+}
+
+export interface FooterBanner {
+  enabled: boolean
+  heading: string
+  subtitle: string
+  button_label: string
+  button_link: string
+  background_color: string
+  text_color: string
 }
 
 export interface PageSeo {

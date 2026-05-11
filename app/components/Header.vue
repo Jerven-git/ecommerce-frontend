@@ -95,6 +95,16 @@
             </span>
           </NuxtLink>
 
+          <!-- Header CTA (desktop) -->
+          <NuxtLink
+            v-if="headerCta?.enabled && headerCta.label && headerCta.link"
+            :to="headerCta.link"
+            class="hidden md:inline-flex items-center px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-colors"
+            :class="isTransparent
+              ? 'bg-white text-gray-900 hover:bg-white/90'
+              : 'bg-primary-600 text-white hover:bg-primary-700'"
+          >{{ headerCta.label }}</NuxtLink>
+
           <!-- Mobile hamburger / close -->
           <button
             @click="mobileMenuOpen = !mobileMenuOpen"
@@ -154,6 +164,7 @@ const { isEnabled } = useModules()
 const mobileMenuOpen = ref(false)
 
 const favoritesEnabled = computed(() => siteConfig.value?.favorites_enabled ?? false)
+const headerCta = computed(() => siteConfig.value?.header_cta ?? null)
 
 const allNavLinks = [
   { to: '/', label: 'Home', module: null },
