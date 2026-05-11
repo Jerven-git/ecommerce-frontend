@@ -499,6 +499,16 @@ const form = ref({
   default_og_image_url: '',
   canonical_base_url: '',
   logo_alt_text: '',
+  header_cta: { enabled: false, label: '', link: '' },
+  footer_banner: {
+    enabled: false,
+    heading: '',
+    subtitle: '',
+    button_label: '',
+    button_link: '',
+    background_color: '#111827',
+    text_color: '#ffffff',
+  },
   pages_seo: {
     home: { seo_title: '', seo_description: '', og_image_url: '', noindex: false, cover_alt_text: '' },
     about: { seo_title: '', seo_description: '', og_image_url: '', noindex: false, cover_alt_text: '' },
@@ -825,6 +835,20 @@ async function loadSettings() {
         default_og_image_url: response.data.default_og_image_url || '',
         canonical_base_url: response.data.canonical_base_url || '',
         logo_alt_text: response.data.logo_alt_text || '',
+        header_cta: {
+          enabled: !!response.data.header_cta?.enabled,
+          label: response.data.header_cta?.label || '',
+          link: response.data.header_cta?.link || '',
+        },
+        footer_banner: {
+          enabled: !!response.data.footer_banner?.enabled,
+          heading: response.data.footer_banner?.heading || '',
+          subtitle: response.data.footer_banner?.subtitle || '',
+          button_label: response.data.footer_banner?.button_label || '',
+          button_link: response.data.footer_banner?.button_link || '',
+          background_color: response.data.footer_banner?.background_color || '#111827',
+          text_color: response.data.footer_banner?.text_color || '#ffffff',
+        },
         pages_seo: (() => {
           const slugs = ['home', 'about', 'contact', 'shop', 'blog', 'services'] as const
           const incoming = response.data.pages_seo ?? {}
@@ -958,6 +982,20 @@ async function saveSettings() {
         default_og_image_url: form.value.default_og_image_url || null,
         canonical_base_url: form.value.canonical_base_url || null,
         logo_alt_text: form.value.logo_alt_text || null,
+        header_cta: {
+          enabled: !!form.value.header_cta.enabled,
+          label: form.value.header_cta.label || '',
+          link: form.value.header_cta.link || '',
+        },
+        footer_banner: {
+          enabled: !!form.value.footer_banner.enabled,
+          heading: form.value.footer_banner.heading || '',
+          subtitle: form.value.footer_banner.subtitle || '',
+          button_label: form.value.footer_banner.button_label || '',
+          button_link: form.value.footer_banner.button_link || '',
+          background_color: form.value.footer_banner.background_color || '#111827',
+          text_color: form.value.footer_banner.text_color || '#ffffff',
+        },
         pages_seo: Object.fromEntries(
           Object.entries(form.value.pages_seo).map(([slug, p]) => [slug, {
             seo_title: p.seo_title || null,
