@@ -256,6 +256,25 @@
                     </button>
                   </div>
 
+                  <!-- Image Hover Zoom toggle -->
+                  <div class="flex items-center justify-between py-1.5 px-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <p class="text-sm font-medium text-gray-700">Enable Image Hover Zoom</p>
+                      <p class="text-xs text-gray-400">Show magnified preview on desktop hover</p>
+                    </div>
+                    <button
+                      type="button"
+                      @click="form.hover_zoom_enabled = !form.hover_zoom_enabled"
+                      class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                      :class="form.hover_zoom_enabled ? 'bg-primary-600' : 'bg-gray-300'"
+                    >
+                      <span
+                        class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-200"
+                        :class="form.hover_zoom_enabled ? 'translate-x-[18px]' : 'translate-x-[3px]'"
+                      />
+                    </button>
+                  </div>
+
                   <!-- Backorder toggle -->
                   <div class="flex items-center justify-between py-1.5 px-3 bg-gray-50 rounded-lg">
                     <div>

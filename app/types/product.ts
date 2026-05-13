@@ -31,6 +31,7 @@ export interface Product {
 export interface ProductDetail extends Product {
   category_id?: number | null
   backorder_charge_policy?: 'charged_now' | 'charged_later'
+  hover_zoom_enabled?: boolean
   seo_title?: string | null
   seo_description?: string | null
   og_image_url?: string | null
