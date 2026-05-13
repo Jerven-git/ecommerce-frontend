@@ -89,9 +89,9 @@
                 </div>
               </td>
               <td class="px-6 py-3.5 text-right text-gray-700 font-medium">{{ row.order_count }}</td>
-              <td class="px-6 py-3.5 text-right text-gray-700">${{ formatNumber(row.subtotal) }}</td>
-              <td class="px-6 py-3.5 text-right text-gray-900 font-semibold">${{ formatNumber(row.tax_collected) }}</td>
-              <td class="px-6 py-3.5 text-right text-gray-700">${{ formatNumber(row.total) }}</td>
+              <td class="px-6 py-3.5 text-right text-gray-700">{{ format(row.subtotal) }}</td>
+              <td class="px-6 py-3.5 text-right text-gray-900 font-semibold">{{ format(row.tax_collected) }}</td>
+              <td class="px-6 py-3.5 text-right text-gray-700">{{ format(row.total) }}</td>
               <td class="px-6 py-3.5 text-right text-gray-500">{{ row.tax_rate != null ? row.tax_rate + '%' : '-' }}</td>
             </tr>
           </tbody>
@@ -99,9 +99,9 @@
             <tr class="bg-gray-50 font-semibold text-sm">
               <td class="px-6 py-3.5 text-gray-900">Total</td>
               <td class="px-6 py-3.5 text-right text-gray-900">{{ totals.orders }}</td>
-              <td class="px-6 py-3.5 text-right text-gray-900">${{ formatNumber(totals.subtotal) }}</td>
-              <td class="px-6 py-3.5 text-right text-gray-900">${{ formatNumber(totals.taxCollected) }}</td>
-              <td class="px-6 py-3.5 text-right text-gray-900">${{ formatNumber(totals.total) }}</td>
+              <td class="px-6 py-3.5 text-right text-gray-900">{{ format(totals.subtotal) }}</td>
+              <td class="px-6 py-3.5 text-right text-gray-900">{{ format(totals.taxCollected) }}</td>
+              <td class="px-6 py-3.5 text-right text-gray-900">{{ format(totals.total) }}</td>
               <td class="px-6 py-3.5"></td>
             </tr>
           </tfoot>
@@ -115,6 +115,7 @@
 definePageMeta({ middleware: 'auth' })
 
 const { $apiFetch } = useNuxtApp()
+const { format } = useCurrency()
 
 const loading = ref(false)
 const exporting = ref(false)
@@ -146,10 +147,6 @@ const totals = computed(() => ({
   taxCollected: report.value.reduce((sum, r) => sum + r.tax_collected, 0),
   total: report.value.reduce((sum, r) => sum + r.total, 0),
 }))
-
-function formatNumber(n: number): string {
-  return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-}
 
 async function loadReport() {
   loading.value = true

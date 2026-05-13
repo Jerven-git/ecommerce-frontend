@@ -113,7 +113,7 @@
 
           <!-- Price -->
           <div class="mt-6">
-            <span class="text-3xl font-bold text-gray-900">${{ Number(product.price).toFixed(2) }}</span>
+            <span class="text-3xl font-bold text-gray-900">{{ format(Number(product.price)) }}</span>
             <p class="text-sm text-[var(--color-secondary)] mt-1">Shipping will calculated at checkout</p>
           </div>
 
@@ -254,6 +254,7 @@ import type { ProductDetail } from '~/types/product'
 const route = useRoute()
 const { $apiFetch } = useNuxtApp()
 const cartStore = useCartStore()
+const { format } = useCurrency()
 
 const product = ref<ProductDetail | null>(null)
 const loading = ref(true)

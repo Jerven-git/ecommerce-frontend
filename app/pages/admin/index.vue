@@ -139,7 +139,7 @@
               </div>
               <div class="min-w-0">
                 <p class="text-sm font-semibold text-gray-900 truncate">{{ order.customer_name }}</p>
-                <p class="text-xs text-gray-400">Order #{{ order.id }} · ${{ parseFloat(String(order.total_amount)).toFixed(2) }}</p>
+                <p class="text-xs text-gray-400">Order #{{ order.id }} · {{ formatIn(parseFloat(String(order.total_amount)), order.currency) }}</p>
               </div>
             </div>
             <span
@@ -181,6 +181,7 @@ interface Order {
   id: number
   customer_name: string
   total_amount: string | number
+  currency: string
   status: string
   created_at: string
 }
@@ -205,10 +206,15 @@ const formatCompact = (num: number): string => {
   return num.toLocaleString()
 }
 
+const { shopCurrency, format, formatIn } = useCurrency()
+
 const formatCurrency = (num: number): string => {
-  if (num >= 1_000_000) return '$' + (num / 1_000_000).toFixed(2) + 'M'
-  if (num >= 1_000) return '$' + (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'K'
-  return '$' + num.toFixed(2)
+  const sym = shopCurrency.value.symbol
+  const before = shopCurrency.value.symbol_position !== 'after'
+  const compact = (n: string) => before ? `${sym}${n}` : `${n} ${sym}`
+  if (num >= 1_000_000) return compact((num / 1_000_000).toFixed(2) + 'M')
+  if (num >= 1_000) return compact((num / 1_000).toFixed(1).replace(/\.0$/, '') + 'K')
+  return format(num)
 }
 
 const loadDashboardData = async () => {

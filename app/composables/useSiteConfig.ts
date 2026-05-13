@@ -218,7 +218,7 @@ export interface ShopPromo {
   perks: string[]
 }
 
-export type ModuleKey = 'shop' | 'blog' | 'services' | 'about' | 'contact'
+export type ModuleKey = 'shop' | 'blog' | 'services' | 'about' | 'contact' | 'commissions'
 
 export type ModulesEnabled = Record<ModuleKey, boolean>
 
@@ -284,6 +284,7 @@ export interface SiteConfig {
   logo_alt_text: string | null
   header_cta: HeaderCta
   footer_banner: FooterBanner
+  currency_code: string
   updated_at: string
 }
 
@@ -317,6 +318,7 @@ export const DEFAULT_MODULES_ENABLED: ModulesEnabled = {
   services: true,
   about: true,
   contact: true,
+  commissions: false,
 }
 
 export const DEFAULT_THEME: SiteTheme = {

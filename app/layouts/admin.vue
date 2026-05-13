@@ -178,6 +178,19 @@
             </svg>
             <span class="font-medium">Discounts</span>
           </NuxtLink>
+
+          <NuxtLink
+            v-if="isEnabled('commissions')"
+            to="/admin/commissions"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
+            :class="linkClass('/admin/commissions')"
+            @click="closeSidebarOnMobile"
+          >
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+            <span class="font-medium">Commissions</span>
+          </NuxtLink>
         </nav>
 
         <!-- Settings group -->
@@ -331,6 +344,7 @@
 <script setup lang="ts">
 const authStore = useAuthStore()
 const route = useRoute()
+const { isEnabled } = useModules()
 const guideRef = ref<{ startGuide: () => void } | null>(null)
 
 // default is CLOSED
@@ -372,6 +386,7 @@ const pageTitle = computed(() => {
   if (route.path.startsWith('/admin/orders')) return 'Orders'
   if (route.path.startsWith('/admin/settings')) return 'Settings'
   if (route.path.startsWith('/admin/discounts')) return 'Discount Codes'
+  if (route.path.startsWith('/admin/commissions')) return 'Commissions'
   if (route.path.startsWith('/admin/shipping')) return 'Shipping'
   return 'Admin'
 })

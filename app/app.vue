@@ -10,6 +10,7 @@
 
 <script setup lang="ts">
 const { siteConfig, fetchSiteConfig } = useSiteConfig()
+const { fetchCatalog: fetchCurrencyCatalog } = useCurrency()
 useTheme()
 
 useRealtime({
@@ -30,6 +31,7 @@ useHead({
 
 onMounted(() => {
   fetchSiteConfig()
+  fetchCurrencyCatalog()
   useFavoritesStore().load()
 })
 </script>

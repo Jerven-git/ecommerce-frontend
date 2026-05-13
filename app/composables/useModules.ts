@@ -25,6 +25,7 @@ const MODULE_PREFIXES: Record<ModuleKey, string[]> = {
   services: ['/services'],
   about: ['/about'],
   contact: ['/contact'],
+  commissions: ['/commissions'],
 }
 
 export interface ModuleDescriptor {
@@ -43,6 +44,7 @@ export const MODULE_LIST: ModuleDescriptor[] = [
   { key: 'services', label: 'Services', description: 'The public /services page.' },
   { key: 'about',    label: 'About',    description: 'The public /about page.' },
   { key: 'contact',  label: 'Contact',  description: 'The public /contact page.' },
+  { key: 'commissions', label: 'Commissions', description: 'Custom artwork / quote request form at /commissions and the admin Commissions inbox.' },
 ]
 
 export function useModules() {

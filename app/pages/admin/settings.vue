@@ -499,6 +499,7 @@ const form = ref({
   default_og_image_url: '',
   canonical_base_url: '',
   logo_alt_text: '',
+  currency_code: 'USD',
   header_cta: { enabled: false, label: '', link: '' },
   footer_banner: {
     enabled: false,
@@ -835,6 +836,7 @@ async function loadSettings() {
         default_og_image_url: response.data.default_og_image_url || '',
         canonical_base_url: response.data.canonical_base_url || '',
         logo_alt_text: response.data.logo_alt_text || '',
+        currency_code: response.data.currency_code || 'USD',
         header_cta: {
           enabled: !!response.data.header_cta?.enabled,
           label: response.data.header_cta?.label || '',
@@ -982,6 +984,7 @@ async function saveSettings() {
         default_og_image_url: form.value.default_og_image_url || null,
         canonical_base_url: form.value.canonical_base_url || null,
         logo_alt_text: form.value.logo_alt_text || null,
+        currency_code: form.value.currency_code || 'USD',
         header_cta: {
           enabled: !!form.value.header_cta.enabled,
           label: form.value.header_cta.label || '',

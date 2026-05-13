@@ -8,7 +8,7 @@
         <div v-for="item in items" :key="item.id">
           <div class="flex justify-between items-start gap-2">
             <span class="text-sm text-gray-600 leading-snug">{{ item.name }} <span class="text-gray-400">&times;{{ item.quantity }}</span></span>
-            <span class="text-sm font-medium text-gray-900 shrink-0">${{ (item.price * item.quantity).toFixed(2) }}</span>
+            <span class="text-sm font-medium text-gray-900 shrink-0">{{ format(item.price * item.quantity) }}</span>
           </div>
           <div v-if="item.quantity > item.stock && item.can_backorder" class="mt-1">
             <span class="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
@@ -66,7 +66,7 @@
             <div>
               <p class="text-xs font-bold text-green-700 font-mono tracking-wider">{{ appliedDiscount.code }}</p>
               <p class="text-xs text-green-600">
-                {{ appliedDiscount.type === 'percentage' ? `${appliedDiscount.value}% off` : `$${parseFloat(String(appliedDiscount.value)).toFixed(2)} off` }}
+                {{ appliedDiscount.type === 'percentage' ? `${appliedDiscount.value}% off` : `${format(parseFloat(String(appliedDiscount.value)))} off` }}
               </p>
             </div>
           </div>
@@ -84,18 +84,18 @@
         <!-- Subtotal with tax info -->
         <div class="flex justify-between text-sm text-gray-600">
           <span>Subtotal</span>
-          <span class="font-medium text-gray-900">${{ rawSubtotal.toFixed(2) }}</span>
+          <span class="font-medium text-gray-900">{{ format(rawSubtotal) }}</span>
         </div>
 
         <template v-if="taxInfo.enabled">
           <div class="bg-gray-50 rounded-lg px-3 py-2.5 space-y-1.5">
             <div v-if="taxInfo.mode === 'inclusive'" class="flex justify-between text-xs text-gray-500">
               <span>Excluding tax</span>
-              <span class="font-medium text-gray-700">${{ subtotal.toFixed(2) }}</span>
+              <span class="font-medium text-gray-700">{{ format(subtotal) }}</span>
             </div>
             <div v-else class="flex justify-between text-xs text-gray-500">
               <span>Including tax</span>
-              <span class="font-medium text-gray-700">${{ (subtotal + taxAmount).toFixed(2) }}</span>
+              <span class="font-medium text-gray-700">{{ format(subtotal + taxAmount) }}</span>
             </div>
             <p v-if="taxInfo.mode === 'inclusive'" class="text-[10px] text-gray-400 pt-0.5">
               Prices include tax — tax is calculated on the ex-tax amount
@@ -109,7 +109,7 @@
         <!-- Discount (applied before tax) -->
         <div v-if="appliedDiscount" class="flex justify-between text-sm text-green-700">
           <span>Discount ({{ appliedDiscount.code }})</span>
-          <span class="font-semibold">-${{ discountAmount.toFixed(2) }}</span>
+          <span class="font-semibold">-{{ format(discountAmount) }}</span>
         </div>
 
         <!-- Shipping -->
@@ -138,19 +138,19 @@
         <div v-else class="flex justify-between text-sm text-gray-600">
           <span>Shipping</span>
           <span v-if="shippingCalculation.free_shipping" class="font-semibold text-green-600">FREE</span>
-          <span v-else class="font-medium text-gray-900">${{ shippingCost.toFixed(2) }}</span>
+          <span v-else class="font-medium text-gray-900">{{ format(shippingCost) }}</span>
         </div>
 
         <!-- Tax line -->
         <div v-if="taxInfo.enabled" class="flex justify-between text-sm text-gray-600">
           <span>{{ taxInfo.name }} ({{ taxInfo.rate }}%)</span>
-          <span class="font-medium text-gray-900">+ ${{ taxAmount.toFixed(2) }}</span>
+          <span class="font-medium text-gray-900">+ {{ format(taxAmount) }}</span>
         </div>
       </div>
 
       <div class="flex justify-between items-center pt-4">
         <span class="font-bold text-gray-900">Total</span>
-        <span class="text-xl font-bold text-gray-900">${{ finalTotal.toFixed(2) }}</span>
+        <span class="text-xl font-bold text-gray-900">{{ format(finalTotal) }}</span>
       </div>
 
       <NuxtLink to="/cart" class="btn-secondary w-full block text-center mt-5">
@@ -162,6 +162,8 @@
 
 <script setup lang="ts">
 import type { AppliedDiscount } from '~/composables/useCheckoutDiscount'
+
+const { format } = useCurrency()
 
 defineProps<{
   items: any[]
