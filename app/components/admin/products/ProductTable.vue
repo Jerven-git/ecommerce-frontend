@@ -35,7 +35,7 @@
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-              ${{ parseFloat(String(product.price)).toFixed(2) }}
+              {{ format(parseFloat(String(product.price))) }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center gap-2">
@@ -114,4 +114,6 @@ defineEmits<{
   edit: [product: Product]
   delete: [id: number]
 }>()
+
+const { format } = useCurrency()
 </script>

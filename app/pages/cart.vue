@@ -69,7 +69,7 @@
                 <!-- Info -->
                 <div class="flex-1 min-w-0">
                   <h3 class="font-semibold text-gray-900 truncate">{{ item.name }}</h3>
-                  <p class="text-sm text-gray-400 mt-0.5">${{ item.price.toFixed(2) }} each &middot; {{ item.weight }} kg</p>
+                  <p class="text-sm text-gray-400 mt-0.5">{{ format(item.price) }} each &middot; {{ item.weight }} kg</p>
                   <!-- Backorder indicator -->
                   <div v-if="item.quantity > item.stock && item.can_backorder" class="mt-1.5 flex items-center gap-1.5">
                     <span class="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">
@@ -96,7 +96,7 @@
 
                 <!-- Line Total + Remove -->
                 <div class="text-right shrink-0">
-                  <p class="font-bold text-gray-900">${{ (item.price * item.quantity).toFixed(2) }}</p>
+                  <p class="font-bold text-gray-900">{{ format(item.price * item.quantity) }}</p>
                   <button
                     @click="cartStore.removeItem(item.id)"
                     class="text-xs text-gray-400 hover:text-red-500 transition-colors mt-1"
@@ -115,7 +115,7 @@
               <div class="space-y-3 pb-4 border-b border-gray-100">
                 <div class="flex justify-between text-sm text-gray-600">
                   <span>Subtotal ({{ cartStore.itemCount }} item{{ cartStore.itemCount === 1 ? '' : 's' }})</span>
-                  <span class="font-medium text-gray-900">${{ cartStore.rawSubtotal.toFixed(2) }}</span>
+                  <span class="font-medium text-gray-900">{{ format(cartStore.rawSubtotal) }}</span>
                 </div>
 
                 <!-- Tax Breakdown -->
@@ -123,11 +123,11 @@
                   <div class="bg-gray-50 rounded-lg px-3 py-2.5 space-y-1.5">
                     <div class="flex justify-between text-xs text-gray-500">
                       <span>Net price</span>
-                      <span class="font-medium text-gray-700">${{ cartStore.subtotal.toFixed(2) }}</span>
+                      <span class="font-medium text-gray-700">{{ format(cartStore.subtotal) }}</span>
                     </div>
                     <div class="flex justify-between text-xs text-gray-500">
                       <span>{{ cartStore.taxInfo.name }} ({{ cartStore.taxInfo.rate }}%)</span>
-                      <span class="font-medium text-gray-700">+ ${{ cartStore.taxAmount.toFixed(2) }}</span>
+                      <span class="font-medium text-gray-700">+ {{ format(cartStore.taxAmount) }}</span>
                     </div>
                     <p v-if="cartStore.taxInfo.mode === 'inclusive'" class="text-[10px] text-gray-400 pt-0.5">
                       Tax is included in the displayed price
@@ -145,13 +145,13 @@
                     v-if="cartStore.shippingCalculation?.free_shipping"
                     class="font-semibold text-green-600"
                   >FREE</span>
-                  <span v-else class="font-medium text-gray-900">${{ cartStore.shippingCost.toFixed(2) }}</span>
+                  <span v-else class="font-medium text-gray-900">{{ format(cartStore.shippingCost) }}</span>
                 </div>
               </div>
 
               <div class="flex justify-between items-center py-4">
                 <span class="font-bold text-gray-900">Total</span>
-                <span class="text-xl font-bold text-gray-900">${{ cartStore.grandTotal.toFixed(2) }}</span>
+                <span class="text-xl font-bold text-gray-900">{{ format(cartStore.grandTotal) }}</span>
               </div>
 
               <NuxtLink
@@ -189,6 +189,7 @@
 
 <script setup lang="ts">
 const cartStore = useCartStore()
+const { format } = useCurrency()
 
 onMounted(() => {
   cartStore.calculateTax()

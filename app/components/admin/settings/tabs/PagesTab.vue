@@ -64,6 +64,7 @@
 
       <!-- Homepage SEO -->
       <AdminSeoFields
+        data-guide="seo-fields"
         v-model:seo-title="form.pages_seo.home.seo_title"
         v-model:seo-description="form.pages_seo.home.seo_description"
         v-model:og-image-url="form.pages_seo.home.og_image_url"

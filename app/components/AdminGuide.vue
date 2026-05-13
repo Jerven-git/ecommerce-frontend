@@ -18,7 +18,6 @@
                   :height="spotlight.h"
                   rx="12"
                   fill="black"
-                  style="transition: x 0.35s ease-out, y 0.35s ease-out, width 0.35s ease-out, height 0.35s ease-out;"
                 />
               </mask>
             </defs>
@@ -39,7 +38,6 @@
               left: spotlight.x + 'px',
               width: spotlight.w + 'px',
               height: spotlight.h + 'px',
-              transition: 'all 0.35s ease-out',
             }"
           >
             <div class="absolute inset-0 rounded-xl ring-4 ring-primary-400/20 animate-pulse" />
@@ -184,6 +182,10 @@ const spotlight = ref<SpotlightRect | null>(null)
 const arrowSide = ref<'top' | 'bottom' | 'left' | 'right' | null>(null)
 const tooltipPos = ref<{ top: string; left: string }>({ top: '50%', left: '50%' })
 const tooltipCardRef = ref<HTMLElement | null>(null)
+// True while we're navigating to / scrolling into / measuring a new step.
+// Suppresses scroll-driven `recalculate` calls so the tooltip can't slide
+// through every intermediate position while the page smooth-scrolls under it.
+const settling = ref(false)
 
 const steps = guideSteps
 
@@ -260,18 +262,19 @@ const centerTooltip = () => {
   tooltipPos.value = { top: '50%', left: '50%' }
 }
 
+// No top/left CSS transition — the tooltip snaps to each step's position
+// and uses the Transition wrapper's fade/scale for the only visible motion.
+// This avoids any "travel" between steps and any jiggle from the two-pass
+// height measurement inside focusStep.
 const tooltipStyle = computed(() => {
-  const base = { transition: 'top 0.35s ease-out, left 0.35s ease-out, transform 0.35s ease-out' }
   if (!spotlight.value) {
     return {
-      ...base,
       top: tooltipPos.value.top,
       left: tooltipPos.value.left,
       transform: 'translate(-50%, -50%)',
     }
   }
   return {
-    ...base,
     top: tooltipPos.value.top,
     left: tooltipPos.value.left,
   }
@@ -285,15 +288,24 @@ const getScrollContainer = (): Element | null => {
 
 // ── Wait for target element to appear in the DOM ──
 
-const waitForElement = (selector: string, timeout = 5000): Promise<Element | null> => {
+// Element is "ready" only if it actually has layout — querySelector can
+// return an element inside a `display:none` ancestor (e.g. a hidden sub-tab),
+// which yields a 0×0 rect and a vanished highlight. We wait until the
+// element has real width/height before resolving.
+const isLaidOut = (el: Element): boolean => {
+  const rect = el.getBoundingClientRect()
+  return rect.width > 0 && rect.height > 0
+}
+
+const waitForElement = (selector: string, timeout = 1500): Promise<Element | null> => {
   return new Promise((resolve) => {
     const el = document.querySelector(selector)
-    if (el) return resolve(el)
+    if (el && isLaidOut(el)) return resolve(el)
 
     const start = Date.now()
     const interval = setInterval(() => {
       const found = document.querySelector(selector)
-      if (found) {
+      if (found && isLaidOut(found)) {
         clearInterval(interval)
         resolve(found)
       } else if (Date.now() - start > timeout) {
@@ -341,10 +353,19 @@ const focusStep = async () => {
   const currentUrl = route.fullPath.split('#')[0]
   const needsNav = route.path !== stepPath || currentUrl !== s.route
 
+  // Clear the previous step's spotlight immediately so a stale highlight
+  // never lingers while we navigate or wait for the new target to mount.
+  spotlight.value = null
+  arrowSide.value = null
+  // Block scroll-driven recalculation until the step has fully settled —
+  // smooth-scrolling to the target fires dozens of scroll events that would
+  // otherwise drag the tooltip through every intermediate position.
+  settling.value = true
+
   if (needsNav) {
     transitioning.value = true
     await navigateTo(s.route)
-    await new Promise(r => setTimeout(r, 150))
+    await new Promise(r => setTimeout(r, 200))
     transitioning.value = false
   }
 
@@ -364,6 +385,9 @@ const focusStep = async () => {
   } else {
     centerTooltip()
   }
+
+  // Let the slide-in animation finish before re-enabling live recalculation.
+  setTimeout(() => { settling.value = false }, 350)
 }
 
 // ── Navigation ──
@@ -443,9 +467,10 @@ const onKeydown = (e: KeyboardEvent) => {
 
 // Re-calculate position on resize or scroll
 const recalculate = () => {
+  if (settling.value) return
   if (visible.value && currentStep.value.target) {
     const el = document.querySelector(currentStep.value.target)
-    if (el) {
+    if (el && isLaidOut(el)) {
       computePosition(el.getBoundingClientRect(), currentStep.value.prefer || 'right')
     }
   }

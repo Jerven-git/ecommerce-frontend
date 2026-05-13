@@ -134,7 +134,7 @@
               <!-- Value -->
               <td class="px-6 py-4 whitespace-nowrap">
                 <span class="text-sm font-semibold text-gray-900">
-                  {{ discount.type === 'percentage' ? `${discount.value}%` : `$${parseFloat(String(discount.value)).toFixed(2)}` }}
+                  {{ discount.type === 'percentage' ? `${discount.value}%` : format(parseFloat(String(discount.value))) }}
                 </span>
               </td>
 
@@ -393,6 +393,8 @@
 definePageMeta({
   middleware: 'auth'
 })
+
+const { format } = useCurrency()
 
 interface Discount {
   id: number

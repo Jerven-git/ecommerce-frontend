@@ -169,6 +169,7 @@ const headerCta = computed(() => siteConfig.value?.header_cta ?? null)
 const allNavLinks = [
   { to: '/', label: 'Home', module: null },
   { to: '/shop', label: 'Shop', module: 'shop' as const },
+  { to: '/commissions', label: 'Commissions', module: 'commissions' as const },
   { to: '/services', label: 'Services', module: 'services' as const },
   { to: '/blog', label: 'Blog', module: 'blog' as const },
   { to: '/about', label: 'About', module: 'about' as const },

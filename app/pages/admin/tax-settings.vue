@@ -93,8 +93,8 @@
                     <p class="text-xs text-gray-500 mt-0.5">Tax is already included in the displayed price</p>
                     <div class="mt-2.5 p-3 bg-white rounded-lg border border-gray-100 text-xs space-y-0.5">
                       <p class="text-gray-500 font-medium mb-1">Example</p>
-                      <p class="text-gray-700">Product price: <span class="font-semibold">${{ (100 * (1 + form.tax_rate / 100)).toFixed(2) }}</span></p>
-                      <p class="text-gray-400">Includes ${{ (100 * form.tax_rate / 100).toFixed(2) }} {{ form.tax_name }} ({{ form.tax_rate }}%)</p>
+                      <p class="text-gray-700">Product price: <span class="font-semibold">{{ format(100 * (1 + form.tax_rate / 100)) }}</span></p>
+                      <p class="text-gray-400">Includes {{ format(100 * form.tax_rate / 100) }} {{ form.tax_name }} ({{ form.tax_rate }}%)</p>
                     </div>
                   </div>
                 </button>
@@ -117,9 +117,9 @@
                     <p class="text-xs text-gray-500 mt-0.5">Tax is added separately at checkout</p>
                     <div class="mt-2.5 p-3 bg-white rounded-lg border border-gray-100 text-xs space-y-0.5">
                       <p class="text-gray-500 font-medium mb-1">Example</p>
-                      <p class="text-gray-700">Product price: <span class="font-semibold">$100.00</span></p>
-                      <p class="text-gray-700">{{ form.tax_name }} ({{ form.tax_rate }}%): <span class="font-semibold">+ ${{ (100 * form.tax_rate / 100).toFixed(2) }}</span></p>
-                      <p class="text-gray-700 font-semibold pt-1 mt-0.5 border-t border-gray-100">Total: ${{ (100 * (1 + form.tax_rate / 100)).toFixed(2) }}</p>
+                      <p class="text-gray-700">Product price: <span class="font-semibold">{{ format(100) }}</span></p>
+                      <p class="text-gray-700">{{ form.tax_name }} ({{ form.tax_rate }}%): <span class="font-semibold">+ {{ format(100 * form.tax_rate / 100) }}</span></p>
+                      <p class="text-gray-700 font-semibold pt-1 mt-0.5 border-t border-gray-100">Total: {{ format(100 * (1 + form.tax_rate / 100)) }}</p>
                     </div>
                   </div>
                 </button>
@@ -308,24 +308,24 @@
             <template v-if="form.tax_display_mode === 'inclusive'">
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-500">Price shown to customer</span>
-                <span class="text-sm font-bold text-gray-900">${{ previewPrice.toFixed(2) }}</span>
+                <span class="text-sm font-bold text-gray-900">{{ format(previewPrice) }}</span>
               </div>
               <p class="text-xs text-gray-400">
-                Includes ${{ calculateTaxAmount.toFixed(2) }} {{ form.tax_name }} at {{ form.tax_rate }}%
+                Includes {{ format(calculateTaxAmount) }} {{ form.tax_name }} at {{ form.tax_rate }}%
               </p>
             </template>
             <template v-else>
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-500">Base price</span>
-                <span class="text-sm text-gray-700">${{ previewPrice.toFixed(2) }}</span>
+                <span class="text-sm text-gray-700">{{ format(previewPrice) }}</span>
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-500">{{ form.tax_name }} ({{ form.tax_rate }}%)</span>
-                <span class="text-sm text-gray-700">+ ${{ calculateTaxAmount.toFixed(2) }}</span>
+                <span class="text-sm text-gray-700">+ {{ format(calculateTaxAmount) }}</span>
               </div>
               <div class="flex items-center justify-between pt-2 mt-1 border-t border-gray-200">
                 <span class="text-sm font-semibold text-gray-900">Total</span>
-                <span class="text-sm font-bold text-gray-900">${{ calculateTotal.toFixed(2) }}</span>
+                <span class="text-sm font-bold text-gray-900">{{ format(calculateTotal) }}</span>
               </div>
             </template>
           </div>
@@ -350,6 +350,7 @@ definePageMeta({ middleware: 'auth' })
 
 const { $apiFetch } = useNuxtApp()
 const { getStates } = useRegions()
+const { format } = useCurrency()
 
 // --- State ---
 

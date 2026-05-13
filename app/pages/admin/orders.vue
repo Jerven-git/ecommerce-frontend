@@ -311,7 +311,7 @@
                 <span class="text-sm text-gray-700 truncate">{{ item.product_name }}</span>
               </div>
               <span class="text-sm font-semibold text-gray-900 shrink-0 ml-3">
-                ${{ (parseFloat(String(item.product_price)) * item.quantity).toFixed(2) }}
+                {{ formatIn(parseFloat(String(item.product_price)) * item.quantity, order.currency) }}
               </span>
             </div>
           </div>
@@ -323,23 +323,23 @@
         <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 space-y-1.5">
           <div class="flex items-center justify-between">
             <span class="text-xs text-gray-400">Subtotal</span>
-            <span class="text-sm text-gray-600">${{ toFixed(order.subtotal) }}</span>
+            <span class="text-sm text-gray-600">{{ formatIn(parseFloat(String(order.subtotal)), order.currency) }}</span>
           </div>
           <div v-if="parseFloat(String(order.tax_amount)) > 0" class="flex items-center justify-between">
             <span class="text-xs text-gray-400">Tax</span>
-            <span class="text-sm text-gray-600">${{ toFixed(order.tax_amount) }}</span>
+            <span class="text-sm text-gray-600">{{ formatIn(parseFloat(String(order.tax_amount)), order.currency) }}</span>
           </div>
           <div v-if="parseFloat(String(order.shipping_amount)) > 0" class="flex items-center justify-between">
             <span class="text-xs text-gray-400">Shipping</span>
-            <span class="text-sm text-gray-600">${{ toFixed(order.shipping_amount) }}</span>
+            <span class="text-sm text-gray-600">{{ formatIn(parseFloat(String(order.shipping_amount)), order.currency) }}</span>
           </div>
           <div v-if="parseFloat(String(order.discount_amount)) > 0" class="flex items-center justify-between">
             <span class="text-xs text-green-500">Discount <span v-if="order.discount_code" class="font-mono">({{ order.discount_code }})</span></span>
-            <span class="text-sm text-green-600">-${{ toFixed(order.discount_amount) }}</span>
+            <span class="text-sm text-green-600">-{{ formatIn(parseFloat(String(order.discount_amount)), order.currency) }}</span>
           </div>
           <div class="flex items-center justify-between pt-1.5 border-t border-gray-200">
             <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Total</span>
-            <span class="text-lg font-bold text-gray-900">${{ toFixed(order.total_amount) }}</span>
+            <span class="text-lg font-bold text-gray-900">{{ formatIn(parseFloat(String(order.total_amount)), order.currency) }}</span>
           </div>
         </div>
       </div>
@@ -459,6 +459,7 @@ interface Order {
   customer_phone?: string
   shipping_address: string
   total_amount: string | number
+  currency: string
   subtotal: string | number
   tax_amount: string | number
   shipping_amount: string | number
@@ -632,6 +633,7 @@ const onModalConfirm = async () => {
 }
 
 const toFixed = (value: string | number) => parseFloat(String(value)).toFixed(2)
+const { formatIn } = useCurrency()
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {

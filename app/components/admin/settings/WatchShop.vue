@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-5">
     <!-- ═══════════ Enable + Heading ═══════════ -->
-    <section class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <section data-guide="settings-watchshop" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center shrink-0">

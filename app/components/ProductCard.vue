@@ -32,7 +32,7 @@
 
       <div class="mt-auto">
         <div class="flex items-center justify-between mb-4">
-          <span class="text-2xl font-bold text-primary-600">${{ product.price }}</span>
+          <span class="text-2xl font-bold text-primary-600">{{ format(Number(product.price)) }}</span>
           <StockBadge :stock="product.stock" :can-backorder="product.can_backorder" variant="text" />
         </div>
 
@@ -57,6 +57,7 @@ const props = defineProps<{
 }>()
 
 const cartStore = useCartStore()
+const { format } = useCurrency()
 
 const orderable = computed(() => isOrderable(props.product))
 

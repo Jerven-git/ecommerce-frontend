@@ -154,7 +154,7 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
       shipping_options: deliveryMethod.value === 'delivery'
         ? selectedShippingAddOns.value
         : [],
-      discount_code: appliedDiscount.value?.code ?? null
+      discount_code: appliedDiscount.value?.code ?? null,
     }
   }
 

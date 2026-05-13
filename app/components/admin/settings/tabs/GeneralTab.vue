@@ -74,6 +74,49 @@
       </div>
     </div>
 
+    <!-- Shop currency -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+      <div>
+        <p class="text-sm font-semibold text-gray-900">Shop currency</p>
+        <p class="text-xs text-gray-400">All product prices, cart totals, and orders use this currency. Customers cannot change it.</p>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-gray-700 mb-1">Currency</label>
+        <select
+          v-model="form.currency_code"
+          class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white"
+        >
+          <option v-for="c in catalog" :key="c.code" :value="c.code">
+            {{ gatewaySupport(c.code).length === 0 ? '⚠️ ' : '' }}{{ c.code }} — {{ c.name }} ({{ c.symbol }})
+            {{ gatewaySupport(c.code).length > 0 && gatewaySupport(c.code).length < 3
+              ? ` — ${gatewayLabels(c.code)} only`
+              : '' }}
+          </option>
+        </select>
+        <div
+          v-if="selectedGateways.length === 0"
+          class="mt-2 flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg"
+        >
+          <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4a2 2 0 00-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" />
+          </svg>
+          <div class="text-xs text-amber-800 leading-relaxed">
+            <p class="font-semibold">No bundled payment gateway supports {{ form.currency_code }}.</p>
+            <p class="mt-0.5">PayPal, Square, and Stripe cannot process this currency. You'll need a regional provider before going live.</p>
+          </div>
+        </div>
+        <p
+          v-else-if="selectedGateways.length < 3"
+          class="text-[11px] text-amber-700 mt-1"
+        >
+          ⚠️ Only {{ gatewayLabels(form.currency_code) }} supports {{ form.currency_code }}. Make sure your account is set up.
+        </p>
+        <p v-else class="text-[11px] text-gray-400 mt-1">
+          Supported by PayPal, Square, and Stripe.
+        </p>
+      </div>
+    </div>
+
     <!-- Header call-to-action button -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
       <div class="flex items-center justify-between gap-4">
@@ -292,6 +335,7 @@
 
 <script setup lang="ts">
 import type { MediaCollection } from '~/composables/useMediaUpload'
+import type { ModuleKey } from '~/composables/useSiteConfig'
 
 const props = defineProps<{
   form: Record<string, any>
@@ -303,9 +347,25 @@ const emit = defineEmits<{
   'media-remove': [collection: MediaCollection]
 }>()
 
-const ALL_PAGE_OPTIONS: Array<{ value: string; label: string; module: 'shop' | 'blog' | 'services' | 'about' | 'contact' | null }> = [
+const { catalog, fetchCatalog, gatewaySupport } = useCurrency()
+onMounted(() => { fetchCatalog() })
+
+const GATEWAY_DISPLAY: Record<string, string> = {
+  paypal: 'PayPal',
+  square: 'Square',
+  stripe: 'Stripe',
+}
+
+function gatewayLabels(code: string): string {
+  return gatewaySupport(code).map(g => GATEWAY_DISPLAY[g] ?? g).join(' / ')
+}
+
+const selectedGateways = computed(() => gatewaySupport(props.form.currency_code ?? 'USD'))
+
+const ALL_PAGE_OPTIONS: Array<{ value: string; label: string; module: ModuleKey | null }> = [
   { value: '/', label: 'Home', module: null },
   { value: '/shop', label: 'Shop', module: 'shop' },
+  { value: '/commissions', label: 'Commissions', module: 'commissions' },
   { value: '/services', label: 'Services', module: 'services' },
   { value: '/blog', label: 'Blog', module: 'blog' },
   { value: '/about', label: 'About', module: 'about' },
