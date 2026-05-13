@@ -74,7 +74,7 @@ export default defineNuxtConfig({
     server: {
       hmr: {
         protocol: 'ws',
-        host: '0.0.0.0',
+        host: 'localhost',
         port: 24678,
         clientPort: 8000,
         path: '/__vite_hmr',

@@ -44,7 +44,7 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
 
   const isFormValid = computed(() => {
     const hasPayment = selectedPaymentMethod.value || allDeferredBackorder.value
-    const baseInfo = form.value.customer_name && form.value.customer_email && hasPayment
+    const baseInfo = form.value.customer_name && form.value.customer_email && form.value.customer_phone && hasPayment
 
     if (deliveryMethod.value === 'pickup') {
       // Country/state only required when regional tax rules exist

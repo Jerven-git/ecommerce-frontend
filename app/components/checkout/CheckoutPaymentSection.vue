@@ -13,7 +13,7 @@
       </div>
       <button
         @click="$emit('placeDeferredBackorder')"
-        :disabled="submitting || !isFormValid"
+        :disabled="submitting"
         class="btn-primary w-full"
       >
         {{ submitting ? 'Processing…' : 'Place Backorder' }}
@@ -73,25 +73,25 @@
 
     <!-- Payment UI (Stripe / Redirect) -->
     <div
-      v-if="selectedMethod && selectedMethod !== 'cash' && canShowPaymentUI && !allDeferredBackorder"
+      v-if="selectedMethod && selectedMethod !== 'cash' && !allDeferredBackorder"
       class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-5"
     >
       <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Payment</h2>
 
       <!-- Stripe -->
       <div v-if="selectedMethod === 'stripe'">
-        <div v-if="!createdOrderId" class="space-y-4">
+        <div v-if="!canShowPaymentUI || !createdOrderId" class="space-y-4">
           <p class="text-sm text-gray-500">Click continue to create your order and load the card form.</p>
           <button
             @click="$emit('createOrder')"
-            :disabled="submitting || !isFormValid"
+            :disabled="submitting"
             class="btn-primary w-full"
           >
             {{ submitting ? 'Processing…' : 'Continue to Card Payment' }}
           </button>
         </div>
         <StripePayment
-          v-else
+          v-if="canShowPaymentUI && createdOrderId"
           :order-id="String(createdOrderId)"
           :amount="finalTotal"
           :publishable-key="stripePublishableKey ?? ''"
@@ -106,7 +106,7 @@
         <p class="text-sm text-gray-500">You will be redirected to complete payment.</p>
         <button
           @click="$emit('placeRedirect')"
-          :disabled="submitting || !isFormValid"
+          :disabled="submitting"
           class="btn-primary w-full"
         >
           {{ submitting ? 'Processing…' : 'Place Order & Pay' }}
@@ -121,7 +121,7 @@
       <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Place Order</h2>
       <button
         @click="$emit('placeCash')"
-        :disabled="submitting || !isFormValid"
+        :disabled="submitting"
         class="btn-primary w-full"
       >
         {{ submitting ? 'Processing…' : 'Place Order (Cash on Delivery)' }}

@@ -22,6 +22,7 @@
               v-model:customer-email="form.customer_email"
               v-model:customer-phone="form.customer_phone"
               :store-country="storeCountry"
+              :submitted="formSubmitted"
               @update:dial-code="phoneDialCode = $event"
             />
 
@@ -36,6 +37,7 @@
               v-model:postcode="form.postcode"
               :state-options="checkoutStateOptions"
               :city-options="checkoutCityOptions"
+              :submitted="formSubmitted"
             />
 
             <!-- Billing Region for Pickup (needed for tax determination, only when regional tax rules exist) -->
@@ -44,15 +46,28 @@
               <p class="text-xs text-gray-400 mb-4">Required to determine applicable tax for your order</p>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Country</label>
-                  <CountrySelect v-model="form.country" placeholder="Select country" required />
+                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Country *</label>
+                  <CountrySelect
+                    v-model="form.country"
+                    placeholder="Select country"
+                    required
+                    @update:model-value="pickupTouched.country = true"
+                  />
+                  <p v-if="(pickupTouched.country || formSubmitted) && !form.country" class="mt-1 text-xs text-red-600">Country is required.</p>
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">State / Region</label>
-                  <select v-model="form.state" class="input-field" required :disabled="!form.country">
+                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">State / Region *</label>
+                  <select
+                    v-model="form.state"
+                    :class="['input-field', (pickupTouched.state || formSubmitted) && !form.state ? '!border-red-300 focus:!ring-red-200' : '']"
+                    required
+                    :disabled="!form.country"
+                    @blur="pickupTouched.state = true"
+                  >
                     <option value="">Select state</option>
                     <option v-for="s in checkoutStateOptions" :key="s" :value="s">{{ s }}</option>
                   </select>
+                  <p v-if="(pickupTouched.state || formSubmitted) && !form.state" class="mt-1 text-xs text-red-600">State / region is required.</p>
                 </div>
               </div>
             </div>
@@ -105,10 +120,10 @@
               :stripe-publishable-key="getPaymentConfig('stripe')?.publishable_key ?? null"
               :customer-email="form.customer_email"
               @update:selected-method="selectedPaymentMethod = $event"
-              @create-order="createOrderOnly"
-              @place-redirect="placeOrderAndRedirect"
-              @place-cash="placeCashOrder"
-              @place-deferred-backorder="placeDeferredBackorder"
+              @create-order="attemptOrder(createOrderOnly)"
+              @place-redirect="attemptOrder(placeOrderAndRedirect)"
+              @place-cash="attemptOrder(placeCashOrder)"
+              @place-deferred-backorder="attemptOrder(placeDeferredBackorder)"
               @stripe-success="handleStripeSuccess"
               @payment-error="handlePaymentError"
             />
@@ -167,6 +182,14 @@
 
 <script setup lang="ts">
 const cartStore = useCartStore()
+
+const pickupTouched = reactive({ country: false, state: false })
+const formSubmitted = ref(false)
+
+function attemptOrder(fn: () => void | Promise<void>) {
+  formSubmitted.value = true
+  fn()
+}
 
 const {
   form, deliveryMethod, storeCountry, phoneDialCode, rememberDetails,
