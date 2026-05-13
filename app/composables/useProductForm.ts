@@ -14,6 +14,7 @@ export interface ProductFormData {
   category_id: number | null
   category_ids: number[]
   is_active: boolean
+  hover_zoom_enabled: boolean
   allow_backorder: boolean
   backorder_charge_policy: 'charged_now' | 'charged_later'
   seo_title: string
@@ -37,6 +38,7 @@ function defaultFormData(): ProductFormData {
     category_id: null,
     category_ids: [],
     is_active: true,
+    hover_zoom_enabled: false,
     allow_backorder: false,
     backorder_charge_policy: 'charged_later',
     seo_title: '',
@@ -191,6 +193,7 @@ export function useProductForm() {
       category_id: product.category_id,
       category_ids: product.categories?.map((c: any) => c.id) || (product.category_id ? [product.category_id] : []),
       is_active: product.is_active,
+      hover_zoom_enabled: (product as any).hover_zoom_enabled ?? false,
       allow_backorder: product.allow_backorder ?? false,
       backorder_charge_policy: product.backorder_charge_policy ?? 'charged_later',
       seo_title: (product as any).seo_title ?? '',
@@ -258,6 +261,7 @@ export function useProductForm() {
         formData.append('category_ids[]', String(id))
       }
       formData.append('is_active', form.value.is_active ? '1' : '0')
+      formData.append('hover_zoom_enabled', form.value.hover_zoom_enabled ? '1' : '0')
       formData.append('allow_backorder', form.value.allow_backorder ? '1' : '0')
       formData.append('backorder_charge_policy', form.value.backorder_charge_policy)
       if (form.value.seo_title.trim()) formData.append('seo_title', form.value.seo_title.trim())

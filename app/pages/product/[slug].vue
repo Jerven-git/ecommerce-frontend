@@ -49,41 +49,48 @@
         <div class="relative">
           <div class="sticky top-8">
             <!-- Main Image -->
-            <div class="relative aspect-square bg-gray-100 rounded-2xl overflow-hidden group">
-              <img
-                v-if="activeImage"
-                :src="activeImage.url"
-                :alt="activeImage.alt || product.name"
-                class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105 cursor-zoom-in"
-                loading="eager"
-                fetchpriority="high"
-                decoding="async"
-                @click="showLightbox = true"
-              />
-              <ProductImagePlaceholder v-else size="lg" />
+            <ProductImageZoom
+              :enabled="zoomEnabled"
+              :image-url="activeImage?.url || ''"
+              class="block"
+            >
+              <div class="relative aspect-square bg-gray-100 rounded-2xl overflow-hidden group">
+                <img
+                  v-if="activeImage"
+                  :src="activeImage.url"
+                  :alt="activeImage.alt || product.name"
+                  class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                  :class="{ 'cursor-crosshair': zoomEnabled, 'cursor-zoom-in': !zoomEnabled }"
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
+                  @click="showLightbox = true"
+                />
+                <ProductImagePlaceholder v-else size="lg" />
 
-              <!-- Prev / Next Arrows (only if multiple images) -->
-              <template v-if="allImages.length > 1">
-                <button
-                  @click.stop="prevImage"
-                  class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-md text-gray-700 hover:bg-white transition-all opacity-0 group-hover:opacity-100"
-                >
-                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <button
-                  @click.stop="nextImage"
-                  class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-md text-gray-700 hover:bg-white transition-all opacity-0 group-hover:opacity-100"
-                >
-                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </template>
+                <!-- Prev / Next Arrows (only if multiple images) -->
+                <template v-if="allImages.length > 1">
+                  <button
+                    @click.stop="prevImage"
+                    class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-md text-gray-700 hover:bg-white transition-all opacity-0 group-hover:opacity-100"
+                  >
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button
+                    @click.stop="nextImage"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-md text-gray-700 hover:bg-white transition-all opacity-0 group-hover:opacity-100"
+                  >
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </template>
 
-              <FavoriteButton :product-id="product.id" size="md" />
-            </div>
+                <FavoriteButton :product-id="product.id" size="md" />
+              </div>
+            </ProductImageZoom>
 
             <!-- Thumbnail Strip -->
             <div v-if="allImages.length > 1" class="flex gap-2 mt-3 overflow-x-auto pb-1">
@@ -223,13 +230,20 @@
             </button>
           </template>
 
-          <img
-            :src="activeImage.url"
-            :alt="activeImage.alt || product?.name"
-            class="relative max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
-            decoding="async"
-            @click.stop
-          />
+          <div @click.stop class="inline-block max-w-full max-h-[85vh]">
+            <ProductImageZoom
+              :enabled="zoomEnabled"
+              :image-url="activeImage.url"
+              fit-mode="contain"
+            >
+              <img
+                :src="activeImage.url"
+                :alt="activeImage.alt || product?.name"
+                class="relative max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+                decoding="async"
+              />
+            </ProductImageZoom>
+          </div>
 
           <!-- Lightbox dot indicators -->
           <div v-if="allImages.length > 1" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2" @click.stop>
@@ -284,6 +298,8 @@ const nextImage = () => {
   if (allImages.value.length <= 1) return
   activeIndex.value = (activeIndex.value + 1) % allImages.value.length
 }
+
+const zoomEnabled = computed(() => !!product.value?.hover_zoom_enabled)
 
 const canOrder = computed(() => !!product.value && isOrderable(product.value))
 
