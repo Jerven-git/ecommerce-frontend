@@ -26,6 +26,7 @@ const MODULE_PREFIXES: Record<ModuleKey, string[]> = {
   about: ['/about'],
   contact: ['/contact'],
   commissions: ['/commissions'],
+  gift_cards: ['/gift-cards'],
 }
 
 export interface ModuleDescriptor {
@@ -45,6 +46,7 @@ export const MODULE_LIST: ModuleDescriptor[] = [
   { key: 'about',    label: 'About',    description: 'The public /about page.' },
   { key: 'contact',  label: 'Contact',  description: 'The public /contact page.' },
   { key: 'commissions', label: 'Commissions', description: 'Custom artwork / quote request form at /commissions and the admin Commissions inbox.' },
+  { key: 'gift_cards', label: 'Gift Cards', description: 'Gift card purchase page at /gift-cards. Customers buy a code, recipient gets it by email, redeemable at checkout.' },
 ]
 
 export function useModules() {

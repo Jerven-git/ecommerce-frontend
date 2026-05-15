@@ -146,9 +146,16 @@
             :applying-discount="applyingDiscount"
             :discount-error="discountError"
             :discount-amount="discountAmount"
+            v-model:gift-card-code="giftCardCode"
+            :applied-gift-card="appliedGiftCard"
+            :validating-gift-card="validatingGiftCard"
+            :gift-card-error="giftCardError"
+            :gift-card-amount="giftCardAmount"
             :final-total="finalTotal"
             @apply-discount="applyDiscount"
             @remove-discount="removeDiscount"
+            @validate-gift-card="validateGiftCard"
+            @remove-gift-card="removeGiftCard"
           />
 
         </div>
@@ -181,6 +188,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGiftCardCheckout } from '~/composables/useGiftCard'
+
 const cartStore = useCartStore()
 
 const pickupTouched = reactive({ country: false, state: false })
@@ -209,6 +218,11 @@ const {
 } = useCheckoutDiscount()
 
 const {
+  giftCardCode, appliedGiftCard, validatingGiftCard,
+  giftCardError, giftCardAmount, validateGiftCard, removeGiftCard
+} = useGiftCardCheckout()
+
+const {
   paymentMethods, selectedPaymentMethod, loadingPaymentMethods,
   submitting, error, busyQueue, busyMessage, createdOrderId,
   allDeferredBackorder, isFormValid, canShowPaymentUI, finalTotal,
@@ -220,6 +234,7 @@ const {
   form, deliveryMethod, phoneDialCode,
   selectedShippingMethod, selectedShippingAddOns,
   appliedDiscount, discountAmount,
+  appliedGiftCard, giftCardAmount,
   saveDetailsToStorage
 })
 

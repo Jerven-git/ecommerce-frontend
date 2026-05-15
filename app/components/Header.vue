@@ -170,6 +170,7 @@ const allNavLinks = [
   { to: '/', label: 'Home', module: null },
   { to: '/shop', label: 'Shop', module: 'shop' as const },
   { to: '/commissions', label: 'Commissions', module: 'commissions' as const },
+  { to: '/gift-cards', label: 'Gift Cards', module: 'gift_cards' as const },
   { to: '/services', label: 'Services', module: 'services' as const },
   { to: '/blog', label: 'Blog', module: 'blog' as const },
   { to: '/about', label: 'About', module: 'about' as const },

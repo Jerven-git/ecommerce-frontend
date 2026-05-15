@@ -48,9 +48,10 @@
                 v-model="form.customer_name"
                 type="text"
                 maxlength="255"
-                required
-                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+                class="w-full px-3 py-2.5 text-sm border rounded-lg focus:border-primary-400 focus:ring-2 outline-none"
+                :class="formAttempted && fieldErrors.customer_name ? 'border-red-300 focus:ring-red-100' : 'border-gray-200 focus:ring-primary-100'"
               />
+              <p v-if="formAttempted && fieldErrors.customer_name" class="mt-1 text-xs text-red-600">{{ fieldErrors.customer_name }}</p>
             </div>
             <div>
               <label class="block text-xs font-semibold text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
@@ -58,9 +59,10 @@
                 v-model="form.customer_email"
                 type="email"
                 maxlength="255"
-                required
-                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+                class="w-full px-3 py-2.5 text-sm border rounded-lg focus:border-primary-400 focus:ring-2 outline-none"
+                :class="formAttempted && fieldErrors.customer_email ? 'border-red-300 focus:ring-red-100' : 'border-gray-200 focus:ring-primary-100'"
               />
+              <p v-if="formAttempted && fieldErrors.customer_email" class="mt-1 text-xs text-red-600">{{ fieldErrors.customer_email }}</p>
             </div>
           </div>
 
@@ -70,7 +72,7 @@
               v-model="form.customer_phone"
               type="tel"
               maxlength="50"
-              class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+              class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-100 outline-none"
             />
           </div>
 
@@ -81,9 +83,10 @@
               type="text"
               maxlength="255"
               placeholder="e.g. Mountain landscape at sunrise"
-              required
-              class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+              class="w-full px-3 py-2.5 text-sm border rounded-lg focus:border-primary-400 focus:ring-2 outline-none"
+              :class="formAttempted && fieldErrors.title ? 'border-red-300 focus:ring-red-100' : 'border-gray-200 focus:ring-primary-100'"
             />
+            <p v-if="formAttempted && fieldErrors.title" class="mt-1 text-xs text-red-600">{{ fieldErrors.title }}</p>
           </div>
 
           <div>
@@ -93,9 +96,10 @@
               rows="5"
               maxlength="5000"
               placeholder="Subject, mood, colors, anything that matters to you…"
-              required
-              class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none resize-y"
+              class="w-full px-3 py-2.5 text-sm border rounded-lg focus:border-primary-400 focus:ring-2 outline-none resize-y"
+              :class="formAttempted && fieldErrors.description ? 'border-red-300 focus:ring-red-100' : 'border-gray-200 focus:ring-primary-100'"
             ></textarea>
+            <p v-if="formAttempted && fieldErrors.description" class="mt-1 text-xs text-red-600">{{ fieldErrors.description }}</p>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
@@ -103,7 +107,7 @@
               <label class="block text-xs font-semibold text-gray-700 mb-1">Budget range</label>
               <select
                 v-model="form.budget_range"
-                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-100 outline-none"
               >
                 <option value="">Not sure yet</option>
                 <option>Under $500</option>
@@ -119,7 +123,7 @@
                 type="text"
                 maxlength="100"
                 placeholder="Oil, watercolor…"
-                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-100 outline-none"
               />
             </div>
             <div>
@@ -129,7 +133,7 @@
                 type="text"
                 maxlength="100"
                 placeholder="A2, 60×90cm…"
-                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-100 outline-none"
               />
             </div>
           </div>
@@ -141,7 +145,7 @@
                 v-model="form.deadline"
                 type="date"
                 :min="minDeadline"
-                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+                class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-100 outline-none"
               />
             </div>
             <div>
@@ -198,6 +202,23 @@ const submitted = ref(false)
 const submittedName = ref('')
 const submittedEmail = ref('')
 
+const formAttempted = ref(false)
+
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+const fieldErrors = computed(() => ({
+  customer_name: !form.value.customer_name.trim() ? 'Your name is required.' : null,
+  customer_email: !form.value.customer_email.trim()
+    ? 'Email is required.'
+    : !isValidEmail(form.value.customer_email) ? 'Enter a valid email address.' : null,
+  title: !form.value.title.trim() ? 'A short title is required.' : null,
+  description: !form.value.description.trim() ? 'Please describe the piece you have in mind.' : null,
+}))
+
+const hasFieldErrors = computed(() => Object.values(fieldErrors.value).some(Boolean))
+
 const minDeadline = computed(() => {
   const d = new Date()
   d.setDate(d.getDate() + 1)
@@ -210,9 +231,8 @@ function onFileChange(e: Event): void {
 }
 
 async function onSubmit(): Promise<void> {
-  if (submitting.value) {
-    return
-  }
+  formAttempted.value = true
+  if (hasFieldErrors.value || submitting.value) return
   submitting.value = true
   error.value = null
 

@@ -218,7 +218,7 @@ export interface ShopPromo {
   perks: string[]
 }
 
-export type ModuleKey = 'shop' | 'blog' | 'services' | 'about' | 'contact' | 'commissions'
+export type ModuleKey = 'shop' | 'blog' | 'services' | 'about' | 'contact' | 'commissions' | 'gift_cards'
 
 export type ModulesEnabled = Record<ModuleKey, boolean>
 
@@ -319,6 +319,7 @@ export const DEFAULT_MODULES_ENABLED: ModulesEnabled = {
   about: true,
   contact: true,
   commissions: false,
+  gift_cards: false,
 }
 
 export const DEFAULT_THEME: SiteTheme = {

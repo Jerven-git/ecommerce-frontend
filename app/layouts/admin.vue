@@ -191,6 +191,19 @@
             </svg>
             <span class="font-medium">Commissions</span>
           </NuxtLink>
+
+          <NuxtLink
+            v-if="isEnabled('gift_cards')"
+            to="/admin/gift-cards"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
+            :class="linkClass('/admin/gift-cards')"
+            @click="closeSidebarOnMobile"
+          >
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+            </svg>
+            <span class="font-medium">Gift Cards</span>
+          </NuxtLink>
         </nav>
 
         <!-- Settings group -->
@@ -387,6 +400,7 @@ const pageTitle = computed(() => {
   if (route.path.startsWith('/admin/settings')) return 'Settings'
   if (route.path.startsWith('/admin/discounts')) return 'Discount Codes'
   if (route.path.startsWith('/admin/commissions')) return 'Commissions'
+  if (route.path.startsWith('/admin/gift-cards')) return 'Gift Cards'
   if (route.path.startsWith('/admin/shipping')) return 'Shipping'
   return 'Admin'
 })

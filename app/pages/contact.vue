@@ -128,18 +128,20 @@
                 <!-- Form -->
                 <form v-else key="form" @submit.prevent="handleSubmit" class="space-y-4">
                   <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Your Name</label>
-                    <input v-model="form.name" type="text" required class="input-field" placeholder="John Doe" />
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Your Name <span class="text-red-500">*</span></label>
+                    <input v-model="form.name" type="text" placeholder="John Doe" :class="['input-field', formAttempted && fieldErrors.name ? '!border-red-300' : '']" />
+                    <p v-if="formAttempted && fieldErrors.name" class="mt-1 text-xs text-red-600">{{ fieldErrors.name }}</p>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Email Address</label>
-                    <input v-model="form.email" type="email" required class="input-field" placeholder="you@email.com" />
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Email Address <span class="text-red-500">*</span></label>
+                    <input v-model="form.email" type="email" placeholder="you@email.com" :class="['input-field', formAttempted && fieldErrors.email ? '!border-red-300' : '']" />
+                    <p v-if="formAttempted && fieldErrors.email" class="mt-1 text-xs text-red-600">{{ fieldErrors.email }}</p>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Subject</label>
-                    <select v-model="form.subject" required class="input-field">
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Subject <span class="text-red-500">*</span></label>
+                    <select v-model="form.subject" :class="['input-field', formAttempted && fieldErrors.subject ? '!border-red-300' : '']">
                       <option value="" disabled>Select a topic</option>
                       <option value="order">Order Issue</option>
                       <option value="shipping">Shipping & Delivery</option>
@@ -147,11 +149,13 @@
                       <option value="product">Product Question</option>
                       <option value="other">Other</option>
                     </select>
+                    <p v-if="formAttempted && fieldErrors.subject" class="mt-1 text-xs text-red-600">{{ fieldErrors.subject }}</p>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Message</label>
-                    <textarea v-model="form.message" required rows="4" class="input-field resize-none" placeholder="Tell us how we can help..."></textarea>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Message <span class="text-red-500">*</span></label>
+                    <textarea v-model="form.message" rows="4" placeholder="Tell us how we can help..." :class="['input-field resize-none', formAttempted && fieldErrors.message ? '!border-red-300' : '']"></textarea>
+                    <p v-if="formAttempted && fieldErrors.message" class="mt-1 text-xs text-red-600">{{ fieldErrors.message }}</p>
                   </div>
 
                   <Transition
@@ -295,6 +299,23 @@ const success = ref(false)
 const submitError = ref('')
 const { execute: executeRecaptcha } = useRecaptcha()
 
+const formAttempted = ref(false)
+
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+const fieldErrors = computed(() => ({
+  name: !form.value.name.trim() ? 'Your name is required.' : null,
+  email: !form.value.email.trim()
+    ? 'Email is required.'
+    : !isValidEmail(form.value.email) ? 'Enter a valid email address.' : null,
+  subject: !form.value.subject ? 'Please select a topic.' : null,
+  message: !form.value.message.trim() ? 'Message is required.' : null,
+}))
+
+const hasFieldErrors = computed(() => Object.values(fieldErrors.value).some(Boolean))
+
 const contactEntries = computed(() => {
   const entries = siteConfig.value?.contact_entries?.filter(e => e.email || e.phone)
   if (entries?.length) return entries
@@ -367,6 +388,8 @@ watch(() => siteConfig.value?.contact_image_url, (url) => {
 }, { immediate: true })
 
 const handleSubmit = async () => {
+  formAttempted.value = true
+  if (hasFieldErrors.value) return
   submitting.value = true
   success.value = false
   submitError.value = ''
