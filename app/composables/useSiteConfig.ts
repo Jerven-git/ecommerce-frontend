@@ -301,6 +301,7 @@ export interface FooterBanner {
   button_label: string
   button_link: string
   background_color: string
+  background_color_to: string
   text_color: string
 }
 

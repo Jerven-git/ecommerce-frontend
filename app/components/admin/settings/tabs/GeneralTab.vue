@@ -266,9 +266,9 @@
             </div>
           </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Background color</label>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Background color (from)</label>
             <div class="flex items-center gap-2">
               <input
                 v-model="form.footer_banner.background_color"
@@ -279,6 +279,23 @@
                 v-model="form.footer_banner.background_color"
                 type="text"
                 maxlength="7"
+                class="flex-1 px-3 py-2 text-sm font-mono border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+              />
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Background color (to) <span class="font-normal text-gray-400">— gradient end</span></label>
+            <div class="flex items-center gap-2">
+              <input
+                v-model="bannerColorTo"
+                type="color"
+                class="h-10 w-12 rounded-lg border border-gray-200 cursor-pointer"
+              />
+              <input
+                v-model="form.footer_banner.background_color_to"
+                type="text"
+                maxlength="7"
+                placeholder="same as from"
                 class="flex-1 px-3 py-2 text-sm font-mono border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
               />
             </div>
@@ -361,6 +378,11 @@ function gatewayLabels(code: string): string {
 }
 
 const selectedGateways = computed(() => gatewaySupport(props.form.currency_code ?? 'USD'))
+
+const bannerColorTo = computed({
+  get: (): string => props.form.footer_banner?.background_color_to || props.form.footer_banner?.background_color || '#111827',
+  set: (val: string) => { props.form.footer_banner.background_color_to = val },
+})
 
 const ALL_PAGE_OPTIONS: Array<{ value: string; label: string; module: ModuleKey | null }> = [
   { value: '/', label: 'Home', module: null },
