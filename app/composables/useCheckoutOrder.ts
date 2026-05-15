@@ -1,5 +1,6 @@
 import type { CheckoutFormData } from './useCheckoutForm'
 import type { AppliedDiscount } from './useCheckoutDiscount'
+import type { AppliedGiftCard } from './useGiftCard'
 
 interface UseCheckoutOrderOptions {
   form: Ref<CheckoutFormData>
@@ -9,6 +10,8 @@ interface UseCheckoutOrderOptions {
   selectedShippingAddOns: Ref<string[]>
   appliedDiscount: Ref<AppliedDiscount | null>
   discountAmount: ComputedRef<number>
+  appliedGiftCard: Ref<AppliedGiftCard | null>
+  giftCardAmount: ComputedRef<number>
   saveDetailsToStorage?: () => void
 }
 
@@ -20,6 +23,7 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
     form, deliveryMethod, phoneDialCode,
     selectedShippingMethod, selectedShippingAddOns,
     appliedDiscount, discountAmount,
+    appliedGiftCard, giftCardAmount,
     saveDetailsToStorage
   } = opts
 
@@ -66,18 +70,17 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
 
   const finalTotal = computed(() => {
     // When full order totals are calculated (includes discount + shipping), use directly
-    if (cartStore.taxCalculation?.taxable_amount !== undefined) {
-      return cartStore.taxCalculation.total
-    }
-
-    // Fallback: basic calculation
     const base = (() => {
+      if (cartStore.taxCalculation?.taxable_amount !== undefined) {
+        return cartStore.taxCalculation.total
+      }
       if (deliveryMethod.value === 'pickup') {
         return cartStore.subtotal + cartStore.taxAmount
       }
       return cartStore.grandTotal
     })()
-    return Math.max(0, base - discountAmount.value)
+    const afterDiscount = Math.max(0, base - discountAmount.value)
+    return Math.max(0, afterDiscount - giftCardAmount.value)
   })
 
   const getPaymentConfig = (methodId: string) => {
@@ -155,6 +158,7 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
         ? selectedShippingAddOns.value
         : [],
       discount_code: appliedDiscount.value?.code ?? null,
+      gift_card_code: appliedGiftCard.value?.code ?? null,
     }
   }
 

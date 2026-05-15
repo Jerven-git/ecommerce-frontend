@@ -366,6 +366,7 @@ const ALL_PAGE_OPTIONS: Array<{ value: string; label: string; module: ModuleKey 
   { value: '/', label: 'Home', module: null },
   { value: '/shop', label: 'Shop', module: 'shop' },
   { value: '/commissions', label: 'Commissions', module: 'commissions' },
+  { value: '/gift-cards', label: 'Gift Cards', module: 'gift_cards' },
   { value: '/services', label: 'Services', module: 'services' },
   { value: '/blog', label: 'Blog', module: 'blog' },
   { value: '/about', label: 'About', module: 'about' },
