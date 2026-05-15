@@ -147,7 +147,7 @@
               Prices include tax — tax is calculated on the ex-tax amount
             </p>
             <p v-else class="text-[10px] text-gray-400 pt-0.5">
-              Prices exclude tax — tax is added at checkout
+              Prices exclude tax: tax is added at checkout
             </p>
           </div>
         </template>

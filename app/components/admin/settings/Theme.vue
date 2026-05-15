@@ -224,16 +224,24 @@ export interface ThemeForm {
   badge_in_stock_color: string
 }
 
+interface PresetCovers {
+  about: string
+  blog: string
+  services: string
+  contact: string
+}
+
 interface Props {
   modelValue: ThemeForm
   savedTheme: ThemeForm
   savedHero: { image: string, mime: string }
+  savedCovers: PresetCovers
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
   'update:modelValue': [value: ThemeForm]
-  'preset-applied': [value: { heroImage: string, heroMediaMime: string }]
+  'preset-applied': [value: { heroImage: string, heroMediaMime: string, covers: PresetCovers }]
 }>()
 
 const availableFonts = AVAILABLE_FONTS
@@ -292,11 +300,20 @@ function isActivePreset(preset: ThemePreset): boolean {
 function togglePreset(preset: ThemePreset) {
   if (!isActivePreset(preset)) {
     emit('update:modelValue', presetToTheme(preset))
-    emit('preset-applied', { heroImage: preset.heroImage, heroMediaMime: preset.heroMediaMime })
+    emit('preset-applied', {
+      heroImage: preset.heroImage,
+      heroMediaMime: preset.heroMediaMime,
+      covers: {
+        about: preset.aboutImage,
+        blog: preset.blogImage,
+        services: preset.servicesImage,
+        contact: preset.contactImage,
+      },
+    })
     return
   }
-  // Deselect: revert to the last-saved theme + hero. If the saved state IS
-  // this preset, fall back to empty so the toggle still does something visible.
+  // Deselect: revert to the last-saved theme + hero/covers. If the saved state
+  // IS this preset, fall back to empty so the toggle still does something visible.
   const target = themeMatches(props.savedTheme, presetToTheme(preset))
     ? DEFAULT_THEME
     : props.savedTheme
@@ -306,6 +323,12 @@ function togglePreset(preset: ThemePreset) {
   emit('preset-applied', {
     heroImage: heroMatchesPreset ? '' : props.savedHero.image,
     heroMediaMime: heroMatchesPreset ? '' : props.savedHero.mime,
+    covers: {
+      about: props.savedCovers.about === preset.aboutImage ? '' : props.savedCovers.about,
+      blog: props.savedCovers.blog === preset.blogImage ? '' : props.savedCovers.blog,
+      services: props.savedCovers.services === preset.servicesImage ? '' : props.savedCovers.services,
+      contact: props.savedCovers.contact === preset.contactImage ? '' : props.savedCovers.contact,
+    },
   })
 }
 </script>
