@@ -96,6 +96,10 @@ export interface ThemePreset {
   texture: string
   heroImage: string
   heroMediaMime: string
+  aboutImage: string
+  blogImage: string
+  servicesImage: string
+  contactImage: string
 }
 
 export const THEME_PRESETS: ThemePreset[] = [
@@ -107,8 +111,12 @@ export const THEME_PRESETS: ThemePreset[] = [
     headingFont: 'Inter',
     bodyFont: 'Inter',
     texture: 'none',
-    heroImage: '/images/window.webp',
+    heroImage: '/images/OceanBlue/window.webp',
     heroMediaMime: 'image/webp',
+    aboutImage: '/images/OceanBlue/ocean-about.webp',
+    blogImage: '/images/OceanBlue/ocean-blog.webp',
+    servicesImage: '/images/OceanBlue/ocean-services.webp',
+    contactImage: '/images/OceanBlue/ocean-contact.webp',
   },
   {
     name: 'Forest Green',
@@ -118,8 +126,12 @@ export const THEME_PRESETS: ThemePreset[] = [
     headingFont: 'Montserrat',
     bodyFont: 'Open Sans',
     texture: 'dots',
-    heroImage: '/images/food.webp',
+    heroImage: '/images/ForestGreen/food.webp',
     heroMediaMime: 'image/webp',
+    aboutImage: '/images/ForestGreen/forest-about.webp',
+    blogImage: '/images/ForestGreen/forest-blog.webp',
+    servicesImage: '/images/ForestGreen/forest-services.webp',
+    contactImage: '/images/ForestGreen/forest-contact.webp',
   },
   {
     name: 'Warm Sunset',
@@ -129,8 +141,12 @@ export const THEME_PRESETS: ThemePreset[] = [
     headingFont: 'Poppins',
     bodyFont: 'Lato',
     texture: 'none',
-    heroImage: '/images/wedding.webp',
+    heroImage: '/images/WarmSunset/wedding.webp',
     heroMediaMime: 'image/webp',
+    aboutImage: '/images/WarmSunset/sunset-about.webp',
+    blogImage: '/images/WarmSunset/sunset-blog.webp',
+    servicesImage: '/images/WarmSunset/sunset-services.webp',
+    contactImage: '/images/WarmSunset/sunset-contact.webp',
   },
   {
     name: 'Soft Lavender',
@@ -140,8 +156,12 @@ export const THEME_PRESETS: ThemePreset[] = [
     headingFont: 'Playfair Display',
     bodyFont: 'Lato',
     texture: 'dots',
-    heroImage: '/images/woman.webp',
+    heroImage: '/images/SoftLavender/woman.webp',
     heroMediaMime: 'image/webp',
+    aboutImage: '/images/SoftLavender/lavender-about.webp',
+    blogImage: '/images/SoftLavender/lavender-blog.webp',
+    servicesImage: '/images/SoftLavender/lavender-services.webp',
+    contactImage: '/images/SoftLavender/lavender-contact.webp',
   },
   {
     name: 'Arte Gallery',
@@ -151,8 +171,12 @@ export const THEME_PRESETS: ThemePreset[] = [
     headingFont: 'Playfair Display',
     bodyFont: 'Lora',
     texture: 'none',
-    heroImage: '/images/mountain-art.webp',
+    heroImage: '/images/ArteGallery/mountain-art.webp',
     heroMediaMime: 'image/webp',
+    aboutImage: '/images/ArteGallery/gallery-about.webp',
+    blogImage: '/images/ArteGallery/gallery-blog.webp',
+    servicesImage: '/images/ArteGallery/gallery-services.webp',
+    contactImage: '/images/ArteGallery/gallery-contact.webp',
   },
   {
     name: 'Minimal Mono',
@@ -162,8 +186,12 @@ export const THEME_PRESETS: ThemePreset[] = [
     headingFont: 'Inter',
     bodyFont: 'Inter',
     texture: 'grid',
-    heroImage: '/images/laptop.webp',
+    heroImage: '/images/MinimalMono/laptop.webp',
     heroMediaMime: 'image/webp',
+    aboutImage: '/images/MinimalMono/mono-about.webp',
+    blogImage: '/images/MinimalMono/mono-blog.webp',
+    servicesImage: '/images/MinimalMono/mono-services.webp',
+    contactImage: '/images/MinimalMono/mono-contact.webp',
   },
 ]
 

@@ -379,6 +379,7 @@ const heroStyle = computed(() => {
   }
 })
 
+
 const preloadImage = (url: string) => {
   imageLoading.value = true
   imageLoaded.value = false

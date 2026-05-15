@@ -32,7 +32,7 @@
 
       <div class="mt-auto">
         <div class="flex items-center justify-between mb-4">
-          <span class="text-2xl font-bold text-primary-600">{{ format(Number(product.price)) }}</span>
+          <span class="text-lg font-bold text-primary-600">{{ format(Number(product.price)) }}</span>
           <StockBadge :stock="product.stock" :can-backorder="product.can_backorder" variant="text" />
         </div>
 

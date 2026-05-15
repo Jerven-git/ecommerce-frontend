@@ -199,6 +199,7 @@ const emit = defineEmits<{
 
 const isHeroVideo = computed(() => props.modelValue.hero_media_mime?.startsWith('video/'))
 
+
 const cropPreviews = [
   { label: 'Mobile', aspect: '3 / 4' },
   { label: 'Desktop', aspect: '16 / 9' },

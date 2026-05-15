@@ -67,6 +67,7 @@
         :form="form"
         :saved-theme="savedTheme"
         :saved-hero="savedHero"
+        :saved-covers="savedCovers"
         @preset-applied="onPresetApplied"
       />
 
@@ -212,6 +213,9 @@ const savedTheme = ref({
 // Snapshot of the last-saved hero media — used as the revert target when
 // deselecting a preset, mirroring how savedTheme reverts the colours.
 const savedHero = ref({ image: '', mime: '' })
+
+// Snapshot of the last-saved page cover images for the same reason.
+const savedCovers = ref({ about: '', blog: '', services: '', contact: '' })
 
 const { showToast } = useAdminToast()
 
@@ -578,23 +582,54 @@ function onMediaRemove(collection: MediaCollection) {
       }
     }
   }
+
+  const coverPresetMap: Partial<Record<MediaCollection, keyof ThemePreset>> = {
+    about: 'aboutImage',
+    blog: 'blogImage',
+    services: 'servicesImage',
+    contact: 'contactImage',
+  }
+  const presetImageKey = coverPresetMap[collection]
+  if (presetImageKey) {
+    const wasPresetCover = !!previousUrl && previousUrl.startsWith('/images/')
+    if (!wasPresetCover) {
+      const active = findActiveThemePreset()
+      if (active) {
+        ;(form.value[urlFields[collection]] as string) = active[presetImageKey] as string
+      }
+    }
+  }
 }
 
-function onPresetApplied({ heroImage, heroMediaMime }: { heroImage: string, heroMediaMime: string }) {
+function onPresetApplied({ heroImage, heroMediaMime, covers }: { heroImage: string, heroMediaMime: string, covers: { about: string, blog: string, services: string, contact: string } }) {
   // Protect a user-uploaded hero: if the current hero is a real upload
   // (not a preset URL) or a pending in-session upload, leave it alone.
-  // Presets then apply colours/fonts only.
   const hasPendingUpload = !!media.pending.hero
   const current = form.value.hero_image_url
   const isPresetOrEmpty = !current || current.startsWith('/images/')
 
-  if (hasPendingUpload || !isPresetOrEmpty) return
+  if (!hasPendingUpload && isPresetOrEmpty) {
+    media.markDeleted('hero')
+    form.value.hero_image_url = heroImage
+    form.value.hero_media_mime = heroMediaMime
+  }
 
-  // Current hero is empty or a preset URL — safe to swap. markDeleted clears
-  // any stale preview and queues deletion of a server-side preset Media (if any).
-  media.markDeleted('hero')
-  form.value.hero_image_url = heroImage
-  form.value.hero_media_mime = heroMediaMime
+  // Apply cover images only when the current value is empty or already a preset
+  // image — never overwrite a user-uploaded cover.
+  const coverMap: Record<string, keyof typeof form.value> = {
+    about: 'about_image_url',
+    blog: 'blog_image_url',
+    services: 'services_image_url',
+    contact: 'contact_image_url',
+  }
+  for (const [key, formKey] of Object.entries(coverMap)) {
+    const currentCover = form.value[formKey] as string
+    const coverIsPresetOrEmpty = !currentCover || currentCover.startsWith('/images/')
+    const hasPendingCover = !!(media.pending as Record<string, unknown>)[key]
+    if (!hasPendingCover && coverIsPresetOrEmpty) {
+      (form.value[formKey] as string) = covers[key as keyof typeof covers]
+    }
+  }
 }
 
 // --- Contact entries ---
@@ -873,6 +908,12 @@ async function loadSettings() {
 
       savedTheme.value = { ...form.value.theme }
       savedHero.value = { image: form.value.hero_image_url, mime: form.value.hero_media_mime }
+      savedCovers.value = {
+        about: form.value.about_image_url,
+        blog: form.value.blog_image_url,
+        services: form.value.services_image_url,
+        contact: form.value.contact_image_url,
+      }
     }
   } catch (err: any) {
     console.error("Error loading settings:", err)
@@ -915,8 +956,10 @@ async function saveSettings() {
         about_content: form.value.about_content,
         about_overlay_color: form.value.about_overlay_color,
         about_overlay_opacity: form.value.about_overlay_opacity,
+        about_image_url: form.value.about_image_url || null,
         contact_overlay_color: form.value.contact_overlay_color,
         contact_overlay_opacity: form.value.contact_overlay_opacity,
+        contact_image_url: form.value.contact_image_url || null,
         contact_email: form.value.contact_email,
         contact_phone: form.value.contact_phone,
         contact_entries: form.value.contact_entries,
@@ -977,9 +1020,11 @@ async function saveSettings() {
         blog_page: form.value.blog_page,
         blog_overlay_color: form.value.blog_overlay_color,
         blog_overlay_opacity: form.value.blog_overlay_opacity,
+        blog_image_url: form.value.blog_image_url || null,
         services_page: form.value.services_page,
         services_overlay_color: form.value.services_overlay_color,
         services_overlay_opacity: form.value.services_overlay_opacity,
+        services_image_url: form.value.services_image_url || null,
         modules_enabled: form.value.modules_enabled,
         default_seo_title: form.value.default_seo_title || null,
         default_seo_description: form.value.default_seo_description || null,
