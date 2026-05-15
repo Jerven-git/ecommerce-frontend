@@ -1,7 +1,12 @@
 <template>
   <section
     v-if="banner?.enabled && banner.heading"
-    :style="{ backgroundColor: banner.background_color, color: banner.text_color }"
+    :style="{
+      background: banner.background_color_to
+        ? `linear-gradient(to right, ${banner.background_color}, ${banner.background_color_to})`
+        : banner.background_color,
+      color: banner.text_color,
+    }"
     class="py-8 px-4 sm:px-6 lg:px-8"
   >
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">

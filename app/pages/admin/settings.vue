@@ -508,6 +508,7 @@ const form = ref({
     button_label: '',
     button_link: '',
     background_color: '#111827',
+    background_color_to: '',
     text_color: '#ffffff',
   },
   pages_seo: {
@@ -849,6 +850,7 @@ async function loadSettings() {
           button_label: response.data.footer_banner?.button_label || '',
           button_link: response.data.footer_banner?.button_link || '',
           background_color: response.data.footer_banner?.background_color || '#111827',
+          background_color_to: response.data.footer_banner?.background_color_to || '',
           text_color: response.data.footer_banner?.text_color || '#ffffff',
         },
         pages_seo: (() => {
@@ -997,6 +999,7 @@ async function saveSettings() {
           button_label: form.value.footer_banner.button_label || '',
           button_link: form.value.footer_banner.button_link || '',
           background_color: form.value.footer_banner.background_color || '#111827',
+          background_color_to: form.value.footer_banner.background_color_to || '',
           text_color: form.value.footer_banner.text_color || '#ffffff',
         },
         pages_seo: Object.fromEntries(
