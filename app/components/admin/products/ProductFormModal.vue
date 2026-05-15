@@ -177,6 +177,8 @@
                   <!-- Product Images (unified gallery for both new and existing products) -->
                   <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1.5">Product Images</label>
+
+                    <!-- Image tiles: saved + staged -->
                     <div v-if="galleryImages.length || stagedPreviews.length" class="flex flex-wrap gap-2 mb-3">
                       <div v-for="img in galleryImages" :key="`saved-${img.id}`" class="relative flex flex-col gap-1">
                         <div class="relative">
@@ -201,8 +203,20 @@
                         />
                       </div>
                       <div v-for="(preview, i) in stagedPreviews" :key="`staged-${preview.key}`" class="relative">
-                        <img :src="preview.url" :alt="preview.name" class="h-20 w-20 rounded-lg object-cover border border-dashed border-primary-300 opacity-90" />
-                        <span class="absolute bottom-1 left-1 right-1 text-[9px] font-semibold text-white bg-primary-600/80 rounded px-1 py-0.5 text-center truncate">Pending</span>
+                        <img
+                          :src="preview.url"
+                          :alt="preview.name"
+                          class="h-20 w-20 rounded-lg object-cover"
+                          :class="preview.oversized
+                            ? 'border-2 border-red-400 opacity-60'
+                            : 'border border-dashed border-primary-300 opacity-90'"
+                        />
+                        <span
+                          class="absolute bottom-1 left-1 right-1 text-[9px] font-semibold text-white rounded px-1 py-0.5 text-center truncate"
+                          :class="preview.oversized ? 'bg-red-500/90' : 'bg-primary-600/80'"
+                        >
+                          {{ preview.oversized ? 'Too large' : 'Pending' }}
+                        </span>
                         <button
                           type="button"
                           @click="$emit('removeStagedFile', i)"
@@ -221,20 +235,14 @@
 
                     <div class="flex items-center gap-3">
                       <input
-                        ref="galleryInputRef"
                         type="file"
                         accept="image/*"
                         multiple
                         @change="$emit('gallerySelected', $event)"
                         class="block w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
                       />
-                      <span
-                        v-if="galleryFilesCount > 0"
-                        class="shrink-0 text-xs text-gray-500 font-medium"
-                      >
-                        {{ galleryFilesCount }} file(s) ready
-                      </span>
                     </div>
+                    <p class="text-[11px] text-gray-400 mt-1">Max 2 MB per image. Files over the limit are highlighted and will be skipped on save.</p>
                   </div>
 
                   <!-- Active toggle -->
@@ -367,8 +375,6 @@ import type { Product } from '~/composables/useProducts'
 import type { ProductFormData } from '~/composables/useProductForm'
 import type { Category } from '~/composables/useProductCategories'
 
-const galleryInputRef = ref<HTMLInputElement | null>(null)
-
 const props = defineProps<{
   showModal: boolean
   submitting: boolean
@@ -378,21 +384,12 @@ const props = defineProps<{
   computedVolumeCbm: number
   galleryImages: { id: number; url: string; alt_text?: string | null; legacy?: boolean }[]
   galleryFilesCount: number
-  stagedPreviews: { key: string; url: string; name: string }[]
+  stagedPreviews: { key: string; url: string; name: string; oversized: boolean }[]
   allCategories: Category[]
   selectedCategoryIds: Set<number>
   catPickerExpanded: Set<number>
   categoryBreadcrumb: string
 }>()
-
-// Clear the native file input whenever staged files get flushed (after upload,
-// after save, or on modal close). The composable can't reach this DOM node
-// directly, so the modal owns the reset.
-watch(() => props.galleryFilesCount, (count, prev) => {
-  if (count === 0 && prev && prev > 0 && galleryInputRef.value) {
-    galleryInputRef.value.value = ''
-  }
-})
 
 defineEmits<{
   close: []

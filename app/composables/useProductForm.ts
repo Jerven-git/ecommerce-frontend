@@ -73,16 +73,18 @@ export function useProductForm() {
   const galleryFiles = ref<File[]>([])
   const galleryInput = ref<HTMLInputElement | null>(null)
 
-  // Object-URL previews for staged (not-yet-uploaded) files. Kept in sync
-  // with galleryFiles via a watcher that revokes the previous URLs so the
-  // browser can reclaim the blob memory.
-  const stagedPreviews = ref<{ key: string; url: string; name: string }[]>([])
+  const MAX_IMAGE_SIZE = 2 * 1024 * 1024 // 2 MB
+
+  // Object-URL previews for staged files. Oversized ones are shown as tiles
+  // with an error state; they are excluded from the actual upload.
+  const stagedPreviews = ref<{ key: string; url: string; name: string; oversized: boolean }[]>([])
   watch(galleryFiles, (files) => {
     for (const p of stagedPreviews.value) URL.revokeObjectURL(p.url)
     stagedPreviews.value = files.map((file, i) => ({
       key: `${file.name}-${file.size}-${i}`,
       url: URL.createObjectURL(file),
       name: file.name,
+      oversized: file.size > MAX_IMAGE_SIZE,
     }))
   })
 
@@ -100,17 +102,20 @@ export function useProductForm() {
   })
 
   const onGallerySelected = (event: Event) => {
-    const files = (event.target as HTMLInputElement).files
-    if (files) galleryFiles.value = Array.from(files)
+    const input = event.target as HTMLInputElement
+    const incoming = Array.from(input.files || [])
+    // Append all files — oversized ones are shown highlighted but not uploaded.
+    if (incoming.length) galleryFiles.value = [...galleryFiles.value, ...incoming]
   }
 
   // POSTs galleryFiles to the given product id and refreshes the gallery
   // from the response media list. Called by saveProduct after the product
   // is created or updated.
   const uploadGalleryFilesTo = async (productId: number) => {
-    if (!galleryFiles.value.length) return
+    const validFiles = galleryFiles.value.filter(f => f.size <= MAX_IMAGE_SIZE)
+    if (!validFiles.length) return
     const formData = new FormData()
-    for (const file of galleryFiles.value) {
+    for (const file of validFiles) {
       formData.append('images[]', file)
     }
     const res = await $apiFetch<{ data: any }>(`/products/${productId}/images`, {
