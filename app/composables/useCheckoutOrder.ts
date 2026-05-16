@@ -149,7 +149,8 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
       payment_method: selectedPaymentMethod.value,
       items: cartStore.items.map(item => ({
         product_id: item.id,
-        quantity: item.quantity
+        quantity: item.quantity,
+        variant_id: item.variantId ?? null,
       })),
       shipping_method: deliveryMethod.value === 'delivery'
         ? selectedShippingMethod.value

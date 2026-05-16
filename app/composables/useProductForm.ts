@@ -1,5 +1,30 @@
 import type { Product } from './useProducts'
 
+export interface OptionValueDraft {
+  id: number | null
+  label: string
+  image_url: string | null
+  position: number
+}
+
+export interface OptionDraft {
+  id: number | null
+  name: string
+  position: number
+  values: OptionValueDraft[]
+}
+
+export interface VariantDraft {
+  id: number | null
+  sku: string
+  price: number | null
+  stock: number
+  image_url: string | null
+  is_active: boolean
+  // optionIndex → value array index within that option (not the DB id)
+  selectedValueIds: Record<number, number>
+}
+
 export interface ProductFormData {
   name: string
   description: string
@@ -172,6 +197,263 @@ export function useProductForm() {
     }
   }
 
+  // ── Variant Editor State ────────────────────────────────────────────────────
+  const variantOptions = ref<OptionDraft[]>([])
+  const variantDrafts = ref<VariantDraft[]>([])
+  const variantsSaving = ref(false)
+  const variantsError = ref<string | null>(null)
+
+  const resetVariantState = () => {
+    variantOptions.value = []
+    variantDrafts.value = []
+    variantsError.value = null
+  }
+
+  const loadVariants = async (productId: number) => {
+    try {
+      const res = await $apiFetch<{ data: { options: any[]; variants: any[] } }>(
+        `/products/${productId}/variants`,
+        { method: 'GET' }
+      )
+      const { options, variants } = res?.data ?? { options: [], variants: [] }
+
+      variantOptions.value = options.map((opt: any, optIdx: number) => ({
+        id: opt.id,
+        name: opt.name,
+        position: optIdx,
+        values: (opt.values ?? []).map((v: any, vIdx: number) => ({
+          id: v.id,
+          label: v.label,
+          image_url: v.image_url ?? null,
+          position: vIdx,
+        })),
+      }))
+
+      variantDrafts.value = variants.map((v: any) => {
+        const selectedValueIds: Record<number, number> = {}
+        variantOptions.value.forEach((opt, optIdx) => {
+          const match = (v.option_values ?? []).find(
+            (ov: any) => ov.pivot?.product_option_id === opt.id
+          )
+          if (match) {
+            const valIdx = opt.values.findIndex((val: any) => val.id === match.id)
+            if (valIdx !== -1) selectedValueIds[optIdx] = valIdx
+          }
+        })
+        return {
+          id: v.id,
+          sku: v.sku ?? '',
+          price: v.price !== null ? Number(v.price) : null,
+          stock: v.stock ?? 0,
+          image_url: v.image_url ?? null,
+          is_active: v.is_active ?? true,
+          selectedValueIds,
+        }
+      })
+    } catch {
+      // Silently fail — variants section will show empty state.
+    }
+  }
+
+  const addOption = () => {
+    variantOptions.value.push({
+      id: null,
+      name: '',
+      position: variantOptions.value.length,
+      values: [],
+    })
+  }
+
+  const removeOption = (optIdx: number) => {
+    variantOptions.value.splice(optIdx, 1)
+    variantOptions.value.forEach((opt, i) => { opt.position = i })
+
+    // Re-index draft selectedValueIds: drop removed key, shift higher keys down
+    variantDrafts.value = variantDrafts.value.map(draft => {
+      const newIds: Record<number, number> = {}
+      for (const [k, v] of Object.entries(draft.selectedValueIds)) {
+        const key = Number(k)
+        if (key < optIdx) newIds[key] = v
+        else if (key > optIdx) newIds[key - 1] = v
+      }
+      return { ...draft, selectedValueIds: newIds }
+    })
+
+    // Deduplicate combos that became identical after the dimension was removed
+    const seen = new Set<string>()
+    variantDrafts.value = variantDrafts.value.filter(draft => {
+      const key = JSON.stringify(draft.selectedValueIds)
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+  }
+
+  const addOptionValue = (optIdx: number) => {
+    const opt = variantOptions.value[optIdx]
+    if (!opt) return
+    opt.values.push({ id: null, label: '', image_url: null, position: opt.values.length })
+    generateVariants()
+  }
+
+  const removeOptionValue = (optIdx: number, valIdx: number) => {
+    variantOptions.value[optIdx]?.values.splice(valIdx, 1)
+    variantOptions.value[optIdx]?.values.forEach((v, i) => { v.position = i })
+
+    // Remove variants that used this value; shift higher indices down
+    variantDrafts.value = variantDrafts.value
+      .filter(draft => draft.selectedValueIds[optIdx] !== valIdx)
+      .map(draft => {
+        const idx = draft.selectedValueIds[optIdx]
+        if (idx !== undefined && idx > valIdx) {
+          return { ...draft, selectedValueIds: { ...draft.selectedValueIds, [optIdx]: idx - 1 } }
+        }
+        return draft
+      })
+  }
+
+  const generateVariants = () => {
+    if (variantOptions.value.some(o => o.values.length === 0)) return
+
+    // Cartesian product using value array indices (not DB ids — handles unsaved values too)
+    const combinations = variantOptions.value.reduce<Record<number, number>[]>(
+      (acc, opt, optIdx) => {
+        if (acc.length === 0) return opt.values.map((_, vIdx) => ({ [optIdx]: vIdx }))
+        return acc.flatMap(existing => opt.values.map((_, vIdx) => ({ ...existing, [optIdx]: vIdx })))
+      },
+      []
+    )
+
+    for (const combo of combinations) {
+      const alreadyExists = variantDrafts.value.some(draft =>
+        variantOptions.value.every((_, i) => draft.selectedValueIds[i] === combo[i])
+      )
+      if (!alreadyExists) {
+        variantDrafts.value.push({
+          id: null, sku: '', price: null, stock: 0, image_url: null, is_active: true,
+          selectedValueIds: { ...combo },
+        })
+      }
+    }
+  }
+
+  const variantLabel = (draft: VariantDraft): string => {
+    return variantOptions.value.map((opt, i) => {
+      const valIdx = draft.selectedValueIds[i]
+      return valIdx !== undefined ? (opt.values[valIdx]?.label ?? '—') : '—'
+    }).join(' / ')
+  }
+
+  const saveVariants = async (productId: number) => {
+    variantsSaving.value = true
+    variantsError.value = null
+
+    try {
+      const optCount = variantOptions.value.length
+
+      const buildOptionsPayload = () =>
+        variantOptions.value.map((opt, i) => ({
+          id: opt.id,
+          name: opt.name,
+          position: i,
+          values: opt.values.map((v, j) => ({
+            id: v.id,
+            label: v.label,
+            image_url: v.image_url ?? null,
+            position: j,
+          })),
+        }))
+
+      const buildVariantRow = (draft: VariantDraft) => ({
+        id: draft.id,
+        sku: draft.sku || null,
+        price: draft.price,
+        stock: draft.stock,
+        image_url: draft.image_url,
+        is_active: draft.is_active,
+        option_value_ids: Object.entries(draft.selectedValueIds)
+          .map(([k, valIdx]) => variantOptions.value[Number(k)]?.values[valIdx]?.id)
+          .filter((id): id is number => typeof id === 'number'),
+      })
+
+      // Only include variants that cover every current option dimension
+      const completeDrafts = variantDrafts.value.filter(d =>
+        variantOptions.value.every((_, i) => d.selectedValueIds[i] !== undefined)
+      )
+
+      const hasNewValues = variantOptions.value.some(
+        opt => opt.id === null || opt.values.some(v => v.id === null)
+      )
+
+      if (hasNewValues) {
+        // Phase 1: save options to get real DB ids, preserving already-saved complete variants
+        const savedComplete = completeDrafts
+          .filter(d => d.id !== null)
+          .map(buildVariantRow)
+          .filter(d => d.option_value_ids.length === optCount)
+
+        const phase1 = await $apiFetch<{ data: { options: any[] } }>(
+          `/products/${productId}/variants/sync`,
+          { method: 'POST', body: { options: buildOptionsPayload(), variants: savedComplete } }
+        )
+
+        // Stamp real ids onto local option/value drafts so Phase 2 can resolve them
+        ;(phase1?.data?.options ?? []).forEach((savedOpt: any, oi: number) => {
+          const localOpt = variantOptions.value[oi]
+          if (!localOpt) return
+          localOpt.id = savedOpt.id
+          ;(savedOpt.values ?? []).forEach((savedVal: any, vi: number) => {
+            const localVal = localOpt.values[vi]
+            if (localVal) localVal.id = savedVal.id
+          })
+        })
+      }
+
+      // Phase 2 (always): full sync — real ids now available for all values
+      const fullVariants = completeDrafts
+        .map(buildVariantRow)
+        .filter(d => d.option_value_ids.length === optCount)
+
+      await $apiFetch(`/products/${productId}/variants/sync`, {
+        method: 'POST',
+        body: { options: buildOptionsPayload(), variants: fullVariants },
+      })
+
+      await loadVariants(productId)
+    } catch (err: any) {
+      variantsError.value = err?.data?.message || 'Failed to save variants.'
+    } finally {
+      variantsSaving.value = false
+    }
+  }
+  const uploadVariantImage = async (productId: number, variantIdx: number, file: File) => {
+    const draft = variantDrafts.value[variantIdx]
+    if (!draft?.id) return
+    const formData = new FormData()
+    formData.append('image', file)
+    try {
+      const res = await $apiFetch<{ data: { image_url: string } }>(
+        `/products/${productId}/variants/${draft.id}/image`,
+        { method: 'POST', body: formData }
+      )
+      draft.image_url = res.data.image_url
+    } catch (err) {
+      console.error('Failed to upload variant image:', err)
+    }
+  }
+
+  const deleteVariantImage = async (productId: number, variantIdx: number) => {
+    const draft = variantDrafts.value[variantIdx]
+    if (!draft?.id) return
+    try {
+      await $apiFetch(`/products/${productId}/variants/${draft.id}/image`, { method: 'DELETE' })
+      draft.image_url = null
+    } catch (err) {
+      console.error('Failed to delete variant image:', err)
+    }
+  }
+  // ── End Variant Editor State ─────────────────────────────────────────────────
+
   const openAddModal = () => {
     editingProduct.value = null
     form.value = defaultFormData()
@@ -179,6 +461,7 @@ export function useProductForm() {
     galleryFiles.value = []
     if (galleryInput.value) galleryInput.value.value = ''
     formError.value = null
+    resetVariantState()
     showModal.value = true
   }
 
@@ -232,6 +515,10 @@ export function useProductForm() {
     }
 
     formError.value = null
+    resetVariantState()
+    if (product.id) {
+      loadVariants(product.id)
+    }
     showModal.value = true
   }
 
@@ -241,6 +528,7 @@ export function useProductForm() {
     formError.value = null
     galleryFiles.value = []
     if (galleryInput.value) galleryInput.value.value = ''
+    resetVariantState()
   }
 
   const saveProduct = async (onSuccess?: () => Promise<void>) => {
@@ -287,6 +575,10 @@ export function useProductForm() {
             console.error('Error uploading images after product update:', err)
             formError.value = err?.data?.message || 'Product saved but image upload failed'
           }
+        }
+        if (variantOptions.value.length > 0) {
+          await saveVariants(editingProduct.value.id)
+          if (variantsError.value) return
         }
       } else {
         // Create the product, then upload any staged gallery files against
@@ -336,5 +628,19 @@ export function useProductForm() {
     openEditModal,
     closeModal,
     saveProduct,
+    variantOptions,
+    variantDrafts,
+    variantsSaving,
+    variantsError,
+    loadVariants,
+    addOption,
+    removeOption,
+    addOptionValue,
+    removeOptionValue,
+    generateVariants,
+    variantLabel,
+    saveVariants,
+    uploadVariantImage,
+    deleteVariantImage,
   }
 }

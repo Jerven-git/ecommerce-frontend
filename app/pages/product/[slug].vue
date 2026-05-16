@@ -120,8 +120,65 @@
 
           <!-- Price -->
           <div class="mt-6">
-            <span class="text-3xl font-bold text-gray-900">{{ format(Number(product.price)) }}</span>
+            <div class="flex items-baseline gap-2">
+              <span v-if="hasVariants && !selectedVariant" class="text-sm font-medium text-gray-400 mr-0.5">From</span>
+              <span class="text-3xl font-bold text-gray-900">{{ format(hasVariants && !selectedVariant ? fromPrice : effectivePrice) }}</span>
+            </div>
             <p class="text-sm text-[var(--color-secondary)] mt-1">Shipping will calculated at checkout</p>
+          </div>
+
+          <!-- Option Selectors -->
+          <div v-if="hasVariants" class="mt-6 space-y-4">
+            <div v-for="option in product.options" :key="option.id">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">{{ option.name }}</label>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="value in option.values"
+                  :key="value.id"
+                  type="button"
+                  @click="selectedValues[option.id] = selectedValues[option.id] === value.id ? null : value.id"
+                  :disabled="isValueUnavailable(option.id, value.id)"
+                  class="relative border-2 rounded-lg transition-all font-medium disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden"
+                  :class="selectedValues[option.id] === value.id
+                    ? 'border-[var(--color-secondary)]'
+                    : 'border-gray-200 hover:border-gray-400'"
+                >
+                  <!-- With variant image: image tile + label below -->
+                  <template v-if="variantImageForValue(option.id, value.id)">
+                    <img
+                      :src="variantImageForValue(option.id, value.id)!"
+                      :alt="value.label"
+                      class="w-16 h-16 object-cover block"
+                    />
+                    <span
+                      class="block text-xs font-semibold px-1.5 py-1 text-center"
+                      :class="selectedValues[option.id] === value.id ? 'bg-[var(--color-secondary)]/10 text-gray-900' : 'bg-white text-gray-700'"
+                    >{{ value.label }}</span>
+                  </template>
+                  <!-- Without variant image: plain text pill (+ optional swatch dot) -->
+                  <template v-else>
+                    <span class="flex items-center gap-1.5 px-3 py-1.5 text-sm"
+                      :class="selectedValues[option.id] === value.id ? 'bg-[var(--color-secondary)]/10 text-gray-900' : 'bg-white text-gray-700'"
+                    >
+                      <img v-if="value.image_url" :src="value.image_url" class="w-4 h-4 rounded-full object-cover" :alt="value.label" />
+                      {{ value.label }}
+                    </span>
+                  </template>
+                  <!-- Selected tick -->
+                  <span
+                    v-if="selectedValues[option.id] === value.id"
+                    class="absolute top-1 right-1 w-4 h-4 rounded-full bg-[var(--color-secondary)] flex items-center justify-center"
+                  >
+                    <svg class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </span>
+                </button>
+              </div>
+            </div>
+            <p v-if="incompleteOptionNames.length" class="text-sm text-amber-600">
+              Please select {{ incompleteOptionNames.join(', ') }} to continue.
+            </p>
           </div>
 
           <!-- Divider -->
@@ -138,7 +195,12 @@
 
           <!-- Stock -->
           <div class="flex items-center gap-2 mb-6">
-            <StockBadge :stock="product.stock" :can-backorder="product.can_backorder" variant="dot" />
+            <StockBadge
+              v-if="!hasVariants || selectedVariant"
+              :stock="effectiveStock"
+              :can-backorder="product.can_backorder"
+              variant="dot"
+            />
           </div>
 
           <!-- Quantity -->
@@ -159,7 +221,7 @@
               </span>
               <button
                 @click="quantity++"
-                :disabled="!product.can_backorder && quantity >= product.stock"
+                :disabled="(!hasVariants || !!selectedVariant) && !product.can_backorder && quantity >= effectiveStock"
                 class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -173,9 +235,12 @@
           <button
             @click="addToCart"
             :disabled="!canOrder"
-            class="w-full py-3.5 px-6 text-sm font-bold uppercase tracking-wider text-white bg-[var(--color-secondary)] hover:bg-[var(--color-secondary-600)] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full py-3.5 px-6 text-sm font-bold uppercase tracking-wider rounded-lg transition-colors duration-200 cursor-pointer disabled:cursor-not-allowed"
+            :class="canOrder
+              ? 'text-white bg-[var(--color-secondary)] hover:bg-[var(--color-secondary-600)]'
+              : 'text-gray-400 bg-gray-100 cursor-not-allowed'"
           >
-            {{ canOrder ? 'Proceed to Cart' : 'Out of Stock' }}
+            {{ canOrder ? 'Proceed to Cart' : (hasVariants && !selectedVariant ? 'Select Options' : 'Out of Stock') }}
           </button>
 
         </div>
@@ -263,7 +328,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ProductDetail } from '~/types/product'
+import type { ProductDetail, ProductVariant } from '~/types/product'
 
 const route = useRoute()
 const { $apiFetch } = useNuxtApp()
@@ -277,17 +342,101 @@ const quantity = ref(1)
 const showLightbox = ref(false)
 const activeIndex = ref(0)
 
-// Build image list from media array (with alt_text), falling back to image_url.
+// ── Variant selection ────────────────────────────────────────────────────────
+const hasVariants = computed(() => (product.value?.options?.length ?? 0) > 0)
+
+// optionId → selected valueId (null = not yet chosen)
+const selectedValues = ref<Record<number, number | null>>({})
+
+watch(product, (p) => {
+  if (p?.options) {
+    selectedValues.value = Object.fromEntries(p.options.map(o => [o.id, null]))
+  }
+}, { immediate: true })
+
+const selectedVariant = computed<ProductVariant | null>(() => {
+  if (!hasVariants.value || !product.value?.variants) return null
+  const allChosen = product.value.options!.every(o => selectedValues.value[o.id] !== null)
+  if (!allChosen) return null
+  return product.value.variants.find(v =>
+    v.is_active &&
+    v.option_values.every(ov =>
+      selectedValues.value[ov.pivot.product_option_id] === ov.id
+    )
+  ) ?? null
+})
+
+// Grey out values that would lead to no available variant
+function isValueUnavailable(optionId: number, valueId: number): boolean {
+  if (!product.value?.variants) return false
+  const hypo = { ...selectedValues.value, [optionId]: valueId }
+  return !product.value.variants.some(v =>
+    v.is_active &&
+    (v.stock > 0 || !!product.value!.can_backorder) &&
+    v.option_values.every(ov => {
+      const sel = hypo[ov.pivot.product_option_id]
+      return sel === null || sel === ov.id
+    })
+  )
+}
+
+const incompleteOptionNames = computed(() =>
+  (product.value?.options ?? [])
+    .filter(o => selectedValues.value[o.id] === null)
+    .map(o => o.name)
+)
+
+// Returns the image_url of the first active variant that contains the given option value.
+// Used to show a variant photo thumbnail on the option button.
+function variantImageForValue(optionId: number, valueId: number): string | null {
+  return product.value?.variants?.find(v =>
+    v.is_active && v.option_values.some(ov => ov.pivot.product_option_id === optionId && ov.id === valueId)
+  )?.image_url ?? null
+}
+
+const effectivePrice = computed(() => {
+  if (selectedVariant.value?.price !== undefined && selectedVariant.value.price !== null) {
+    return Number(selectedVariant.value.price)
+  }
+  return Number(product.value?.price ?? 0)
+})
+
+// Lowest price across all active variants (or product base price if no overrides).
+const fromPrice = computed(() => {
+  const variants = product.value?.variants?.filter(v => v.is_active) ?? []
+  if (!variants.length) return Number(product.value?.price ?? 0)
+  const prices = variants.map(v => v.price !== null && v.price !== undefined ? Number(v.price) : Number(product.value!.price))
+  return Math.min(...prices)
+})
+
+const effectiveStock = computed(() => {
+  if (hasVariants.value) return selectedVariant.value?.stock ?? 0
+  return product.value?.stock ?? 0
+})
+// ── End variant selection ─────────────────────────────────────────────────────
+
+// Product gallery — never includes variant images, only product media.
 const allImages = computed<{ url: string; alt: string | null }[]>(() => {
   if (!product.value) return []
   const fromMedia = (product.value.media || [])
     .filter(m => m.collection === 'gallery')
     .map(m => ({ url: m.url, alt: m.alt_text ?? null }))
-  if (fromMedia.length) return fromMedia
-  return product.value.image_url ? [{ url: product.value.image_url, alt: null }] : []
+  return fromMedia.length
+    ? fromMedia
+    : product.value.image_url ? [{ url: product.value.image_url, alt: null }] : []
 })
 
-const activeImage = computed(() => allImages.value[activeIndex.value] || null)
+// When a variant with its own image is selected, show that image in the main slot.
+// Gallery thumbnails always reflect the product gallery; clicking one overrides the variant image.
+const activeImage = computed(() => {
+  if (selectedVariant.value?.image_url && activeIndex.value === 0) {
+    return { url: selectedVariant.value.image_url, alt: null }
+  }
+  return allImages.value[activeIndex.value] || null
+})
+
+// When variant changes, reset to index 0 so the variant image shows immediately.
+watch(selectedVariant, () => { activeIndex.value = 0 })
 
 const prevImage = () => {
   if (allImages.value.length <= 1) return
@@ -301,12 +450,40 @@ const nextImage = () => {
 
 const zoomEnabled = computed(() => !!product.value?.hover_zoom_enabled)
 
-const canOrder = computed(() => !!product.value && isOrderable(product.value))
+const canOrder = computed(() => {
+  if (!product.value) return false
+  if (hasVariants.value) {
+    if (!selectedVariant.value) return false
+    return selectedVariant.value.stock > 0 || !!product.value.can_backorder
+  }
+  return isOrderable(product.value)
+})
 
 const addToCart = () => {
   if (!product.value || !canOrder.value) return
+
+  let variantPayload: Parameters<typeof cartStore.addItem>[1] = undefined
+  if (selectedVariant.value) {
+    const selectedOptions: Record<string, string> = {}
+    for (const opt of product.value.options ?? []) {
+      const valueId = selectedValues.value[opt.id]
+      const valueLabel = opt.values.find(v => v.id === valueId)?.label ?? ''
+      selectedOptions[opt.name] = valueLabel
+    }
+    const label = Object.values(selectedOptions).join(' / ')
+    variantPayload = {
+      id: selectedVariant.value.id,
+      sku: selectedVariant.value.sku ?? null,
+      price: selectedVariant.value.price !== null ? Number(selectedVariant.value.price) : null,
+      image_url: selectedVariant.value.image_url ?? null,
+      stock: selectedVariant.value.stock,
+      selectedOptions,
+      label,
+    }
+  }
+
   for (let i = 0; i < quantity.value; i++) {
-    cartStore.addItem(product.value)
+    cartStore.addItem(product.value, variantPayload)
   }
   navigateTo('/cart')
 }

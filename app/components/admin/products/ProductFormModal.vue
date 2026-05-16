@@ -41,9 +41,15 @@
                         <input v-model.number="form.price" type="number" step="0.01" min="0" required class="flex-1 px-2.5 py-2 text-sm outline-none w-0" placeholder="0.00" />
                       </div>
                     </div>
-                    <div>
+                    <div v-if="variantOptions.length === 0">
                       <label class="block text-xs font-medium text-gray-600 mb-1">Stock <span class="text-red-400">*</span></label>
                       <input v-model.number="form.stock" type="number" min="0" required class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-primary-400 focus:ring-1 focus:ring-primary-400 outline-none transition-all" placeholder="0" />
+                    </div>
+                    <div v-else class="flex items-start gap-2 px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg">
+                      <svg class="w-3.5 h-3.5 text-blue-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <p class="text-xs text-blue-600">Stock is managed per variant below.</p>
                     </div>
                   </div>
                 </fieldset>
@@ -326,6 +332,29 @@
                   description-placeholder="Defaults to product description"
                 />
 
+                <!-- Section: Variants -->
+                <fieldset class="space-y-3">
+                  <legend class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Product Variants</legend>
+                  <div v-if="!editingProduct" class="p-3 bg-amber-50 border border-amber-100 rounded-xl text-xs text-amber-800">
+                    Save the product first, then re-open it to add variants.
+                  </div>
+                  <AdminProductsProductVariantEditor
+                    v-else
+                    :variant-options="variantOptions"
+                    :variant-drafts="variantDrafts"
+                    :variants-error="variantsError"
+                    :base-price="form.price"
+                    :product-id="editingProduct?.id ?? null"
+                    @add-option="$emit('addOption')"
+                    @remove-option="(i) => $emit('removeOption', i)"
+                    @add-option-value="(i) => $emit('addOptionValue', i)"
+                    @remove-option-value="(i, j) => $emit('removeOptionValue', i, j)"
+                    @remove-variant="(i) => $emit('removeVariant', i)"
+                    @upload-variant-image="(idx, file) => $emit('uploadVariantImage', idx, file)"
+                    @delete-variant-image="(idx) => $emit('deleteVariantImage', idx)"
+                  />
+                </fieldset>
+
                 <!-- Form error -->
                 <Transition
                   enter-active-class="transition-all duration-200"
@@ -372,7 +401,7 @@
 
 <script setup lang="ts">
 import type { Product } from '~/composables/useProducts'
-import type { ProductFormData } from '~/composables/useProductForm'
+import type { ProductFormData, OptionDraft, VariantDraft } from '~/composables/useProductForm'
 import type { Category } from '~/composables/useProductCategories'
 
 const props = defineProps<{
@@ -389,6 +418,9 @@ const props = defineProps<{
   selectedCategoryIds: Set<number>
   catPickerExpanded: Set<number>
   categoryBreadcrumb: string
+  variantOptions: OptionDraft[]
+  variantDrafts: VariantDraft[]
+  variantsError: string | null
 }>()
 
 defineEmits<{
@@ -400,5 +432,12 @@ defineEmits<{
   toggleCategory: [id: number]
   toggleCatExpand: [id: number]
   clearCategory: []
+  addOption: []
+  removeOption: [optIdx: number]
+  addOptionValue: [optIdx: number]
+  removeOptionValue: [optIdx: number, valIdx: number]
+  removeVariant: [dIdx: number]
+  uploadVariantImage: [variantIdx: number, file: File]
+  deleteVariantImage: [variantIdx: number]
 }>()
 </script>

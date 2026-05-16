@@ -32,11 +32,18 @@
 
       <div class="mt-auto">
         <div class="flex items-center justify-between mb-4">
-          <span class="text-lg font-bold text-primary-600">{{ format(Number(product.price)) }}</span>
-          <StockBadge :stock="product.stock" :can-backorder="product.can_backorder" variant="text" />
+          <div class="flex items-baseline gap-1">
+            <span v-if="hasVariants" class="text-xs text-gray-400 font-medium">From</span>
+            <span class="text-lg font-bold text-primary-600">{{ format(Number(product.price)) }}</span>
+          </div>
+          <StockBadge v-if="!hasVariants" :stock="product.stock" :can-backorder="product.can_backorder" variant="text" />
         </div>
 
+        <NuxtLink v-if="hasVariants" :to="`/product/${product.slug}`" class="w-full btn-primary text-center block">
+          Select Options
+        </NuxtLink>
         <button
+          v-else
           @click="addToCart"
           :disabled="!orderable"
           class="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
@@ -59,6 +66,7 @@ const props = defineProps<{
 const cartStore = useCartStore()
 const { format } = useCurrency()
 
+const hasVariants = computed(() => (props.product.variants_count ?? 0) > 0)
 const orderable = computed(() => isOrderable(props.product))
 
 const addToCart = () => {

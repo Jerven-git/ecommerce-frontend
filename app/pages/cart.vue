@@ -43,7 +43,7 @@
           <div class="lg:col-span-2 space-y-4">
             <div
               v-for="(item, index) in cartStore.items"
-              :key="item.id"
+              :key="`${item.id}-${item.variantId ?? 'base'}`"
               class="card-stagger bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
               :style="{ animationDelay: `${index * 60}ms` }"
             >
@@ -69,6 +69,9 @@
                 <!-- Info -->
                 <div class="flex-1 min-w-0">
                   <h3 class="font-semibold text-gray-900 truncate">{{ item.name }}</h3>
+                  <p v-if="item.selectedOptions && Object.keys(item.selectedOptions).length" class="text-xs text-gray-500 mt-0.5">
+                    {{ Object.entries(item.selectedOptions).map(([k, v]) => `${k}: ${v}`).join(' · ') }}
+                  </p>
                   <p class="text-sm text-gray-400 mt-0.5">{{ format(item.price) }} each &middot; {{ item.weight }} kg</p>
                   <!-- Backorder indicator -->
                   <div v-if="item.quantity > item.stock && item.can_backorder" class="mt-1.5 flex items-center gap-1.5">
@@ -84,12 +87,12 @@
                 <!-- Quantity Controls -->
                 <div class="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-xl p-1 shrink-0">
                   <button
-                    @click="cartStore.updateQuantity(item.id, item.quantity - 1)"
+                    @click="cartStore.updateQuantity(item.id, item.quantity - 1, item.variantId)"
                     class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-500 hover:bg-white hover:text-gray-900 hover:shadow-sm transition-all text-lg font-medium"
                   >−</button>
                   <span class="w-8 text-center text-sm font-semibold text-gray-900">{{ item.quantity }}</span>
                   <button
-                    @click="cartStore.updateQuantity(item.id, item.quantity + 1)"
+                    @click="cartStore.updateQuantity(item.id, item.quantity + 1, item.variantId)"
                     class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-500 hover:bg-white hover:text-gray-900 hover:shadow-sm transition-all text-lg font-medium"
                   >+</button>
                 </div>
@@ -98,7 +101,7 @@
                 <div class="text-right shrink-0">
                   <p class="font-bold text-gray-900">{{ format(item.price * item.quantity) }}</p>
                   <button
-                    @click="cartStore.removeItem(item.id)"
+                    @click="cartStore.removeItem(item.id, item.variantId)"
                     class="text-xs text-gray-400 hover:text-red-500 transition-colors mt-1"
                   >Remove</button>
                 </div>

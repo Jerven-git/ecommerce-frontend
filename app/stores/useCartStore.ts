@@ -2,6 +2,9 @@ import { defineStore } from 'pinia'
 
 interface CartItem {
   id: number
+  variantId?: number | null
+  variantSku?: string | null
+  selectedOptions?: Record<string, string> | null
   name: string
   price: number
   quantity: number
@@ -15,6 +18,16 @@ interface CartItem {
   stock: number
   can_backorder: boolean
   backorder_charge_policy?: 'charged_now' | 'charged_later'
+}
+
+interface VariantPayload {
+  id: number
+  sku?: string | null
+  price?: number | null
+  image_url?: string | null
+  stock: number
+  selectedOptions?: Record<string, string>
+  label?: string
 }
 
 interface TaxCalculation {
@@ -136,16 +149,29 @@ export const useCartStore = defineStore('cart', {
   },
 
   actions: {
-    addItem(product: any) {
-      const existingItem = this.items.find(item => item.id === product.id)
+    addItem(product: any, variant?: VariantPayload) {
+      const variantId = variant?.id ?? null
+      const existingItem = this.items.find(
+        item => item.id === product.id && (item.variantId ?? null) === variantId
+      )
 
       if (existingItem) {
         existingItem.quantity++
       } else {
+        const price = variant
+          ? (variant.price !== null && variant.price !== undefined ? variant.price : parseFloat(product.price))
+          : parseFloat(product.price)
+        const stock = variant ? variant.stock : parseInt(product.stock || 0)
+        const image_url = variant?.image_url ?? product.image_url
+        const name = variant?.label ? `${product.name} (${variant.label})` : product.name
+
         this.items.push({
           id: product.id,
-          name: product.name,
-          price: parseFloat(product.price),
+          variantId,
+          variantSku: variant?.sku ?? null,
+          selectedOptions: variant?.selectedOptions ?? null,
+          name,
+          price,
           quantity: 1,
           weight: parseFloat(product.weight || 0),
           length_cm: parseFloat(product.length_cm || 0),
@@ -153,8 +179,8 @@ export const useCartStore = defineStore('cart', {
           height_cm: parseFloat(product.height_cm || 0),
           volume_cbm: parseFloat(product.volume_cbm || 0),
           shipping_calc_type: product.shipping_calc_type || 'weight',
-          image_url: product.image_url,
-          stock: parseInt(product.stock || 0),
+          image_url,
+          stock,
           can_backorder: !!product.can_backorder,
           backorder_charge_policy: product.backorder_charge_policy || 'charged_later',
         })
@@ -164,8 +190,11 @@ export const useCartStore = defineStore('cart', {
       this.calculateShipping()
     },
 
-    removeItem(productId: number) {
-      const index = this.items.findIndex(item => item.id === productId)
+    removeItem(productId: number, variantId?: number | null) {
+      const vid = variantId ?? null
+      const index = this.items.findIndex(
+        item => item.id === productId && (item.variantId ?? null) === vid
+      )
       if (index > -1) {
         this.items.splice(index, 1)
         this.calculateTax()
@@ -173,11 +202,14 @@ export const useCartStore = defineStore('cart', {
       }
     },
 
-    updateQuantity(productId: number, quantity: number) {
-      const item = this.items.find(item => item.id === productId)
+    updateQuantity(productId: number, quantity: number, variantId?: number | null) {
+      const vid = variantId ?? null
+      const item = this.items.find(
+        item => item.id === productId && (item.variantId ?? null) === vid
+      )
       if (item) {
         if (quantity <= 0) {
-          this.removeItem(productId)
+          this.removeItem(productId, vid)
         } else {
           item.quantity = quantity
           this.calculateTax()

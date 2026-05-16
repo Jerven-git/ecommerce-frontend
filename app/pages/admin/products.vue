@@ -108,6 +108,9 @@
       :selected-category-ids="categories.selectedCategoryIds.value"
       :cat-picker-expanded="categories.catPickerExpanded.value"
       :category-breadcrumb="categories.categoryBreadcrumb.value"
+      :variant-options="productForm.variantOptions.value"
+      :variant-drafts="productForm.variantDrafts.value"
+      :variants-error="productForm.variantsError.value"
       @close="productForm.closeModal"
       @save="productForm.saveProduct(products.loadProducts)"
       @gallery-selected="productForm.onGallerySelected"
@@ -116,6 +119,13 @@
       @toggle-category="(id: number) => categories.toggleCategory(id, productForm.form.value)"
       @toggle-cat-expand="categories.toggleCatPickerExpand"
       @clear-category="categories.clearCategorySelection(productForm.form.value)"
+      @add-option="productForm.addOption"
+      @remove-option="productForm.removeOption"
+      @add-option-value="productForm.addOptionValue"
+      @remove-option-value="(i: number, j: number) => productForm.removeOptionValue(i, j)"
+      @remove-variant="(i: number) => productForm.variantDrafts.value.splice(i, 1)"
+      @upload-variant-image="(idx: number, file: File) => productForm.editingProduct.value && productForm.uploadVariantImage(productForm.editingProduct.value.id, idx, file)"
+      @delete-variant-image="(idx: number) => productForm.editingProduct.value && productForm.deleteVariantImage(productForm.editingProduct.value.id, idx)"
     />
   </div>
 </template>
