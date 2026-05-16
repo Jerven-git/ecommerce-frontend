@@ -43,7 +43,16 @@
 
       <p class="text-sm text-gray-600 leading-relaxed mb-6">{{ product.description || 'No description available.' }}</p>
 
+      <NuxtLink
+        v-if="hasVariants"
+        :to="`/product/${product.slug}`"
+        @click="emit('close')"
+        class="w-full btn-primary text-center block"
+      >
+        Select Options
+      </NuxtLink>
       <button
+        v-else
         @click="addToCart"
         :disabled="!orderable"
         class="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
@@ -117,6 +126,7 @@ const emit = defineEmits<{
 const cartStore = useCartStore()
 const showLightbox = ref(false)
 
+const hasVariants = computed(() => (props.product.variants_count ?? 0) > 0)
 const orderable = computed(() => isOrderable(props.product))
 
 const addToCart = () => {

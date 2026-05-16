@@ -39,12 +39,25 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center gap-2">
-                <span
-                  class="text-sm font-medium"
-                  :class="product.stock === 0 ? 'text-red-500' : product.stock <= 5 ? 'text-amber-600' : 'text-gray-800'"
-                >
-                  {{ product.stock }}
-                </span>
+                <template v-if="product.variants_count > 0">
+                  <span
+                    class="text-sm font-medium"
+                    :class="(product.active_variants_sum_stock ?? 0) === 0 ? 'text-red-500' : (product.active_variants_sum_stock ?? 0) <= 5 ? 'text-amber-600' : 'text-gray-800'"
+                  >
+                    {{ product.active_variants_sum_stock ?? 0 }}
+                  </span>
+                  <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-500" title="Stock is tracked per variant">
+                    {{ product.variants_count }}v
+                  </span>
+                </template>
+                <template v-else>
+                  <span
+                    class="text-sm font-medium"
+                    :class="product.stock === 0 ? 'text-red-500' : product.stock <= 5 ? 'text-amber-600' : 'text-gray-800'"
+                  >
+                    {{ product.stock }}
+                  </span>
+                </template>
                 <span
                   v-if="product.allow_backorder"
                   class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-primary-50 text-primary-600"

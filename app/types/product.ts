@@ -5,6 +5,32 @@ export interface ProductMedia {
   alt_text?: string | null
 }
 
+export interface ProductOptionValue {
+  id: number
+  label: string
+  image_url?: string | null
+  position: number
+}
+
+export interface ProductOption {
+  id: number
+  name: string
+  position: number
+  values: ProductOptionValue[]
+}
+
+export interface ProductVariant {
+  id: number
+  sku?: string | null
+  price?: number | null
+  stock: number
+  image_url?: string | null
+  is_active: boolean
+  option_values: (ProductOptionValue & {
+    pivot: { product_option_id: number }
+  })[]
+}
+
 /**
  * Public/storefront product shape returned by `/products` and rendered
  * by ProductCard, ProductViewModal, and shop/index listings.
@@ -21,6 +47,7 @@ export interface Product {
   category?: string
   categories?: { id: number; name: string }[]
   is_active?: boolean
+  variants_count?: number
   created_at?: string
   updated_at?: string
 }
@@ -37,4 +64,6 @@ export interface ProductDetail extends Product {
   og_image_url?: string | null
   noindex?: boolean
   media?: ProductMedia[]
+  options?: ProductOption[]
+  variants?: ProductVariant[]
 }
