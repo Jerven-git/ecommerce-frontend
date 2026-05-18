@@ -4,7 +4,10 @@ interface User {
   id: number
   name: string
   email: string
+  roles?: string[]
+  role?: string
   is_admin?: boolean
+  is_super_admin?: boolean
   email_verified_at?: string | null
   created_at?: string
   updated_at?: string
@@ -36,6 +39,9 @@ export const useAuthStore = defineStore('auth', {
   getters: {
     isAdmin: (state) => {
       return state.user?.is_admin === true
+    },
+    isSuperAdmin: (state) => {
+      return state.user?.is_super_admin === true
     }
   },
 
