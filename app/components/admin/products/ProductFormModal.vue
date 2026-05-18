@@ -1,5 +1,5 @@
 <template>
-  <BaseModal :open="showModal" size="2xl" body-class="px-6 py-5" @close="$emit('close')">
+  <BaseModal :open="showModal" size="3xl" body-class="px-6 py-5" @close="$emit('close')">
     <template #header>
       <div class="flex items-center gap-3 min-w-0">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :class="editingProduct ? 'bg-primary-50' : 'bg-green-50'">
