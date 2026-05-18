@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-type Size = 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+type Size = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
 
 const props = withDefaults(defineProps<{
   open: boolean
@@ -91,6 +91,7 @@ const sizeClass = computed(() => ({
   lg: 'max-w-lg',
   xl: 'max-w-xl',
   '2xl': 'max-w-2xl',
+  '3xl': 'max-w-3xl',
 }[props.size]))
 
 // Track mousedown on backdrop so a drag-release over the backdrop doesn't close
