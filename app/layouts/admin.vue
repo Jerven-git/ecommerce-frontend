@@ -2,6 +2,8 @@
   <!-- Admin Guide -->
   <AdminGuide ref="guideRef" />
 
+  <SuperAdminImpersonationBanner />
+
   <!-- Fixed-height shell so ONLY main content scrolls -->
   <div class="h-screen bg-gray-50 flex overflow-hidden">
     <!-- Mobile overlay -->
@@ -221,6 +223,18 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5V4H2v16h5m10 0v-2a4 4 0 00-4-4H11a4 4 0 00-4 4v2m10 0H7m10-11a3 3 0 11-6 0 3 3 0 016 0zm-8 0a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             <span class="font-medium">Admin Users</span>
+          </NuxtLink>
+
+          <NuxtLink
+            v-if="authStore.isSuperAdmin"
+            to="/super-admin"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors text-purple-700 hover:bg-purple-50"
+            @click="closeSidebarOnMobile"
+          >
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17 9 21l3-2 3 2-.75-4M3 4h18l-2 13H5L3 4Z" />
+            </svg>
+            <span class="font-medium">Super Admin</span>
           </NuxtLink>
 
           <NuxtLink

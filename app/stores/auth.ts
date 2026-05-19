@@ -8,9 +8,42 @@ interface User {
   role?: string
   is_admin?: boolean
   is_super_admin?: boolean
+  is_impersonating?: boolean
+  impersonator?: { id: number; name: string; email: string; is_super_admin?: boolean } | null
+  store_id?: number | null
+  store?: { id: number; name: string; slug: string } | null
+  status?: 'active' | 'disabled'
   email_verified_at?: string | null
   created_at?: string
   updated_at?: string
+}
+
+/**
+ * localStorage key used to remember the last logged-in admin's store slug.
+ * Used by useSiteConfig to ask the public /site-config endpoint for the
+ * right store's theme even when the visitor is logged out — handy in dev
+ * where there is no per-store domain.
+ */
+const LAST_STORE_SLUG_KEY = 'ssu:last_store_slug'
+
+function rememberStoreSlug(slug: string | null | undefined): void {
+  if (!import.meta.client) return
+  try {
+    if (slug) {
+      window.localStorage.setItem(LAST_STORE_SLUG_KEY, slug)
+    }
+  } catch {
+    // localStorage unavailable (private mode, quota, etc.) — silently ignore.
+  }
+}
+
+export function getRememberedStoreSlug(): string | null {
+  if (!import.meta.client) return null
+  try {
+    return window.localStorage.getItem(LAST_STORE_SLUG_KEY)
+  } catch {
+    return null
+  }
 }
 
 interface LoginResponse {
@@ -42,7 +75,10 @@ export const useAuthStore = defineStore('auth', {
     },
     isSuperAdmin: (state) => {
       return state.user?.is_super_admin === true
-    }
+    },
+    isImpersonating: (state) => {
+      return state.user?.is_impersonating === true
+    },
   },
 
   actions: {
@@ -105,6 +141,14 @@ export const useAuthStore = defineStore('auth', {
           this.isAuthenticated = true
           this.twoFactorRequired = false
           this.twoFactorEmail = null
+
+          rememberStoreSlug(response.user.store?.slug)
+
+          // The site config cache is keyed in Nuxt useState, so it survives
+          // logout/login of different admins. Force-refresh so the new admin's
+          // theme replaces whoever was logged in before.
+          const { fetchSiteConfig } = useSiteConfig()
+          await fetchSiteConfig(true)
         }
 
         return response
@@ -183,6 +227,11 @@ export const useAuthStore = defineStore('auth', {
         this.isAuthenticated = false
         this.twoFactorRequired = false
         this.twoFactorEmail = null
+
+        // Drop the previous admin's cached theme so the login page (and any
+        // next admin who logs in) doesn't render with the wrong store's data.
+        const { fetchSiteConfig } = useSiteConfig()
+        await fetchSiteConfig(true)
       } catch (error: any) {
         this.error = error?.data?.message || 'Logout failed'
         throw error
@@ -205,6 +254,7 @@ export const useAuthStore = defineStore('auth', {
         if (response.user) {
           this.user = response.user
           this.isAuthenticated = true
+          rememberStoreSlug(response.user.store?.slug)
         } else {
           this.user = null
           this.isAuthenticated = false
