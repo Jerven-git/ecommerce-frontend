@@ -1,3 +1,5 @@
+import { getRememberedStoreSlug } from '~/stores/auth'
+
 export interface SiteTheme {
   primary_color: string
   secondary_color: string
@@ -366,7 +368,15 @@ export function useSiteConfig() {
     pending.value = true
     try {
       const { $apiFetch } = useNuxtApp()
-      const res = await $apiFetch<{ data: SiteConfig }>('/site-config')
+      // Hint the backend with the last-known store slug so the public endpoint
+      // can return the right theme for unauthenticated visitors (e.g. the
+      // admin login page after logout, before per-store routing exists).
+      // Backend ignores the hint when the request is authenticated — the
+      // session user's store always wins.
+      const lastSlug = getRememberedStoreSlug()
+      const res = await $apiFetch<{ data: SiteConfig }>('/site-config', {
+        params: lastSlug ? { store: lastSlug } : undefined,
+      })
       // Merge theme + module defaults so missing keys are always present
       const data = res.data
       data.theme = { ...DEFAULT_THEME, ...(data.theme ?? {}) }

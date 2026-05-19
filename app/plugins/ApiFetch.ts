@@ -49,6 +49,16 @@ export default defineNuxtPlugin(() => {
     onResponseError({ response }) {
             if (response.status === 419) {
             console.error("CSRF token mismatch - token may have expired")
+            } else if (response.status === 403 && (response._data as any)?.code === 'account_disabled') {
+                if (process.client) {
+                    const authStore = useAuthStore()
+                    authStore.user = null
+                    authStore.isAuthenticated = false
+                    authStore.twoFactorRequired = false
+                    authStore.twoFactorEmail = null
+                    authStore.error = (response._data as any)?.message || 'Your account has been disabled.'
+                    navigateTo('/admin/login')
+                }
             } else if (response.status === 401) {
             console.error("Unauthorized - user may need to login again")
             // Session expired — clear auth state and redirect to login
