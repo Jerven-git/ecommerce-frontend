@@ -41,18 +41,8 @@
                   <p class="text-xs text-gray-400 mt-0.5">Accept cash on delivery or pickup</p>
                 </div>
               </div>
-              <button
-                type="button"
-                @click="form.cash_enabled = !form.cash_enabled"
-                class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                :class="form.cash_enabled ? 'bg-primary-600' : 'bg-gray-200'"
-                :aria-checked="form.cash_enabled"
-                role="switch"
-              >
-                <span
-                  class="inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform"
-                  :class="form.cash_enabled ? 'translate-x-6' : 'translate-x-1'"
-                ></span>
+              <button type="button" @click="form.cash_enabled = !form.cash_enabled" class="payment-toggle" :class="form.cash_enabled ? 'bg-primary-600' : 'bg-gray-200'" :aria-checked="form.cash_enabled" role="switch">
+                <span class="payment-toggle-knob" :class="form.cash_enabled ? 'translate-x-6' : 'translate-x-1'"></span>
               </button>
             </div>
           </div>
@@ -69,32 +59,25 @@
                   <p class="text-xs text-gray-400 mt-0.5">Accept credit/debit cards via Stripe</p>
                 </div>
               </div>
-              <button
-                type="button"
-                @click="form.stripe_enabled = !form.stripe_enabled"
-                class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                :class="form.stripe_enabled ? 'bg-primary-600' : 'bg-gray-200'"
-                :aria-checked="form.stripe_enabled"
-                role="switch"
-              >
-                <span
-                  class="inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform"
-                  :class="form.stripe_enabled ? 'translate-x-6' : 'translate-x-1'"
-                ></span>
+              <button type="button" @click="form.stripe_enabled = !form.stripe_enabled" class="payment-toggle" :class="form.stripe_enabled ? 'bg-primary-600' : 'bg-gray-200'" :aria-checked="form.stripe_enabled" role="switch">
+                <span class="payment-toggle-knob" :class="form.stripe_enabled ? 'translate-x-6' : 'translate-x-1'"></span>
               </button>
             </div>
-            <Transition
-              enter-active-class="transition duration-150 ease-out"
-              enter-from-class="opacity-0 -translate-y-1"
-              enter-to-class="opacity-100 translate-y-0"
-              leave-active-class="transition duration-100 ease-in"
-              leave-from-class="opacity-100"
-              leave-to-class="opacity-0"
-            >
-              <div v-if="form.stripe_enabled" class="mt-3 ml-[52px] px-3 py-2 bg-primary-50 rounded-lg">
-                <p class="text-xs text-primary-700">
-                  Set <code class="font-mono font-semibold">STRIPE_SECRET_KEY</code> in your server environment variables.
-                </p>
+            <Transition v-bind="expandTransition">
+              <div v-if="form.stripe_enabled" class="mt-4 ml-[52px] space-y-4">
+                <div>
+                  <label class="payment-label">Publishable key</label>
+                  <input v-model="form.stripe_publishable_key" type="text" class="payment-input" placeholder="pk_live_…" autocomplete="off" />
+                </div>
+                <div>
+                  <label class="payment-label">Secret key <CredentialBadge :configured="configured.stripe_secret_key" /></label>
+                  <input v-model="form.stripe_secret_key" type="password" class="payment-input" :placeholder="secretPlaceholder(configured.stripe_secret_key)" autocomplete="off" />
+                </div>
+                <div>
+                  <label class="payment-label">Webhook signing secret <CredentialBadge :configured="configured.stripe_webhook_secret" /></label>
+                  <input v-model="form.stripe_webhook_secret" type="password" class="payment-input" :placeholder="secretPlaceholder(configured.stripe_webhook_secret)" autocomplete="off" />
+                </div>
+                <WebhookUrlField :url="webhookUrls.stripe" />
               </div>
             </Transition>
           </div>
@@ -111,32 +94,32 @@
                   <p class="text-xs text-gray-400 mt-0.5">Accept payments via PayPal</p>
                 </div>
               </div>
-              <button
-                type="button"
-                @click="form.paypal_enabled = !form.paypal_enabled"
-                class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                :class="form.paypal_enabled ? 'bg-primary-600' : 'bg-gray-200'"
-                :aria-checked="form.paypal_enabled"
-                role="switch"
-              >
-                <span
-                  class="inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform"
-                  :class="form.paypal_enabled ? 'translate-x-6' : 'translate-x-1'"
-                ></span>
+              <button type="button" @click="form.paypal_enabled = !form.paypal_enabled" class="payment-toggle" :class="form.paypal_enabled ? 'bg-primary-600' : 'bg-gray-200'" :aria-checked="form.paypal_enabled" role="switch">
+                <span class="payment-toggle-knob" :class="form.paypal_enabled ? 'translate-x-6' : 'translate-x-1'"></span>
               </button>
             </div>
-            <Transition
-              enter-active-class="transition duration-150 ease-out"
-              enter-from-class="opacity-0 -translate-y-1"
-              enter-to-class="opacity-100 translate-y-0"
-              leave-active-class="transition duration-100 ease-in"
-              leave-from-class="opacity-100"
-              leave-to-class="opacity-0"
-            >
-              <div v-if="form.paypal_enabled" class="mt-3 ml-[52px] px-3 py-2 bg-primary-50 rounded-lg">
-                <p class="text-xs text-primary-700">
-                  Set <code class="font-mono font-semibold">PAYPAL_CLIENT_ID</code> in your server environment variables.
-                </p>
+            <Transition v-bind="expandTransition">
+              <div v-if="form.paypal_enabled" class="mt-4 ml-[52px] space-y-4">
+                <div>
+                  <label class="payment-label">Mode</label>
+                  <select v-model="form.paypal_mode" class="payment-input">
+                    <option value="sandbox">Sandbox (test)</option>
+                    <option value="live">Live</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="payment-label">Client ID</label>
+                  <input v-model="form.paypal_client_id" type="text" class="payment-input" placeholder="AY…" autocomplete="off" />
+                </div>
+                <div>
+                  <label class="payment-label">Secret <CredentialBadge :configured="configured.paypal_secret" /></label>
+                  <input v-model="form.paypal_secret" type="password" class="payment-input" :placeholder="secretPlaceholder(configured.paypal_secret)" autocomplete="off" />
+                </div>
+                <div>
+                  <label class="payment-label">Webhook ID</label>
+                  <input v-model="form.paypal_webhook_id" type="text" class="payment-input" placeholder="WH-…" autocomplete="off" />
+                </div>
+                <WebhookUrlField :url="webhookUrls.paypal" />
               </div>
             </Transition>
           </div>
@@ -153,32 +136,36 @@
                   <p class="text-xs text-gray-400 mt-0.5">Accept payments via Square</p>
                 </div>
               </div>
-              <button
-                type="button"
-                @click="form.square_enabled = !form.square_enabled"
-                class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                :class="form.square_enabled ? 'bg-primary-600' : 'bg-gray-200'"
-                :aria-checked="form.square_enabled"
-                role="switch"
-              >
-                <span
-                  class="inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform"
-                  :class="form.square_enabled ? 'translate-x-6' : 'translate-x-1'"
-                ></span>
+              <button type="button" @click="form.square_enabled = !form.square_enabled" class="payment-toggle" :class="form.square_enabled ? 'bg-primary-600' : 'bg-gray-200'" :aria-checked="form.square_enabled" role="switch">
+                <span class="payment-toggle-knob" :class="form.square_enabled ? 'translate-x-6' : 'translate-x-1'"></span>
               </button>
             </div>
-            <Transition
-              enter-active-class="transition duration-150 ease-out"
-              enter-from-class="opacity-0 -translate-y-1"
-              enter-to-class="opacity-100 translate-y-0"
-              leave-active-class="transition duration-100 ease-in"
-              leave-from-class="opacity-100"
-              leave-to-class="opacity-0"
-            >
-              <div v-if="form.square_enabled" class="mt-3 ml-[52px] px-3 py-2 bg-gray-100 rounded-lg">
-                <p class="text-xs text-gray-600">
-                  Set <code class="font-mono font-semibold">SQUARE_ACCESS_TOKEN</code> in your server environment variables.
-                </p>
+            <Transition v-bind="expandTransition">
+              <div v-if="form.square_enabled" class="mt-4 ml-[52px] space-y-4">
+                <div>
+                  <label class="payment-label">Mode</label>
+                  <select v-model="form.square_mode" class="payment-input">
+                    <option value="sandbox">Sandbox (test)</option>
+                    <option value="live">Live</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="payment-label">Application ID</label>
+                  <input v-model="form.square_application_id" type="text" class="payment-input" placeholder="sq0idp-…" autocomplete="off" />
+                </div>
+                <div>
+                  <label class="payment-label">Location ID</label>
+                  <input v-model="form.square_location_id" type="text" class="payment-input" placeholder="L…" autocomplete="off" />
+                </div>
+                <div>
+                  <label class="payment-label">Access token <CredentialBadge :configured="configured.square_access_token" /></label>
+                  <input v-model="form.square_access_token" type="password" class="payment-input" :placeholder="secretPlaceholder(configured.square_access_token)" autocomplete="off" />
+                </div>
+                <div>
+                  <label class="payment-label">Webhook signature key <CredentialBadge :configured="configured.square_webhook_secret" /></label>
+                  <input v-model="form.square_webhook_secret" type="password" class="payment-input" :placeholder="secretPlaceholder(configured.square_webhook_secret)" autocomplete="off" />
+                </div>
+                <WebhookUrlField :url="webhookUrls.square" />
               </div>
             </Transition>
           </div>
@@ -196,8 +183,7 @@
           <div>
             <p class="text-sm font-semibold text-gray-900 mb-1">Security Notice</p>
             <p class="text-xs text-gray-500 leading-relaxed">
-              Payment credentials are stored in server environment variables (<code class="font-mono">.env</code>) and are never exposed to the frontend or stored in the database.
-              Use test/sandbox mode during development.
+              Secret keys are encrypted before they are stored and are never sent back to the browser — saved secrets show only as “Configured”. Leave a secret field blank to keep the current value. Use Sandbox/test mode while setting up.
             </p>
           </div>
         </div>
@@ -220,22 +206,59 @@ definePageMeta({
 })
 
 const { $apiFetch } = useNuxtApp()
-
 const { showToast } = useAdminToast()
 
 const loading = ref(true)
 const saving = ref(false)
 const error = ref<string | null>(null)
 
-const form = ref({
+const expandTransition = {
+  enterActiveClass: 'transition duration-150 ease-out',
+  enterFromClass: 'opacity-0 -translate-y-1',
+  enterToClass: 'opacity-100 translate-y-0',
+  leaveActiveClass: 'transition duration-100 ease-in',
+  leaveFromClass: 'opacity-100',
+  leaveToClass: 'opacity-0',
+}
+
+const blankForm = () => ({
   cash_enabled: true,
-
   stripe_enabled: false,
-
   paypal_enabled: false,
+  square_enabled: false,
 
-  square_enabled: false
+  stripe_publishable_key: '',
+  stripe_secret_key: '',
+  stripe_webhook_secret: '',
+
+  paypal_client_id: '',
+  paypal_secret: '',
+  paypal_mode: 'sandbox',
+  paypal_webhook_id: '',
+
+  square_application_id: '',
+  square_access_token: '',
+  square_location_id: '',
+  square_webhook_secret: '',
+  square_mode: 'sandbox',
 })
+
+const form = ref(blankForm())
+
+// Whether each secret already has a value stored (the value itself is never sent
+// to the browser). Drives the "Configured" badge + placeholder.
+const configured = ref({
+  stripe_secret_key: false,
+  stripe_webhook_secret: false,
+  paypal_secret: false,
+  square_access_token: false,
+  square_webhook_secret: false,
+})
+
+const webhookUrls = ref<{ stripe?: string; paypal?: string; square?: string }>({})
+
+const secretPlaceholder = (isConfigured: boolean) =>
+  isConfigured ? 'Configured — leave blank to keep' : 'Not set'
 
 const loadSettings = async () => {
   loading.value = true
@@ -243,16 +266,30 @@ const loadSettings = async () => {
 
   try {
     const response = await $apiFetch<any>('/payment-settings', { method: 'GET' })
-
-    if (response?.data) {
+    webhookUrls.value = response?.webhook_urls ?? {}
+    const data = response?.data
+    if (data) {
       form.value = {
-        cash_enabled: response.data.cash_enabled ?? true,
-
-        stripe_enabled: response.data.stripe_enabled ?? false,
-
-        paypal_enabled: response.data.paypal_enabled ?? false,
-
-        square_enabled: response.data.square_enabled ?? false
+        ...blankForm(),
+        cash_enabled: data.cash_enabled ?? true,
+        stripe_enabled: data.stripe_enabled ?? false,
+        paypal_enabled: data.paypal_enabled ?? false,
+        square_enabled: data.square_enabled ?? false,
+        // Public identifiers are returned and prefilled; secrets stay blank.
+        stripe_publishable_key: data.stripe_publishable_key ?? '',
+        paypal_client_id: data.paypal_client_id ?? '',
+        paypal_mode: data.paypal_mode ?? 'sandbox',
+        paypal_webhook_id: data.paypal_webhook_id ?? '',
+        square_application_id: data.square_application_id ?? '',
+        square_location_id: data.square_location_id ?? '',
+        square_mode: data.square_mode ?? 'sandbox',
+      }
+      configured.value = {
+        stripe_secret_key: !!data.stripe_secret_key_configured,
+        stripe_webhook_secret: !!data.stripe_webhook_secret_configured,
+        paypal_secret: !!data.paypal_secret_configured,
+        square_access_token: !!data.square_access_token_configured,
+        square_webhook_secret: !!data.square_webhook_secret_configured,
       }
     }
   } catch (err: any) {
@@ -267,9 +304,11 @@ const saveSettings = async () => {
   saving.value = true
 
   try {
+    // Send the whole form; the backend leaves blank credential fields unchanged,
+    // so empty secret inputs never wipe a stored secret.
     await $apiFetch('/payment-settings', {
       method: 'PATCH',
-      body: form.value
+      body: form.value,
     })
 
     showToast('Payment settings saved', 'success')
@@ -284,3 +323,18 @@ const saveSettings = async () => {
 
 onMounted(loadSettings)
 </script>
+
+<style scoped>
+.payment-toggle {
+  @apply relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+}
+.payment-toggle-knob {
+  @apply inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform;
+}
+.payment-label {
+  @apply flex items-center gap-2 text-xs font-medium text-gray-600 mb-1.5;
+}
+.payment-input {
+  @apply w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+}
+</style>
