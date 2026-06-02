@@ -52,8 +52,8 @@
             class="mt-0.5 w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
           />
           <div class="flex-1">
-            <p class="text-sm font-medium text-gray-800">Hero image flows under header</p>
-            <p class="text-xs text-gray-500 mt-0.5">When on, the hero image extends behind a transparent header for a full-bleed look. When off, the header sits as its own band above the hero.</p>
+            <p class="text-sm font-medium text-gray-800">Cover images flow under header</p>
+            <p class="text-xs text-gray-500 mt-0.5">When on, the cover image extends behind a transparent header for a full-bleed look — on the homepage hero and the About, Contact, Blog, and Services banners. When off, the header sits as its own band above the cover.</p>
           </div>
         </label>
         <Transition
@@ -66,7 +66,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <p class="text-xs text-amber-800 leading-relaxed">
-              Use a darker image, or increase the overlay opacity below, so the header navigation stays readable on top of the hero.
+              Applies to the homepage hero and the About, Contact, Blog, and Services cover banners. Use darker images, or increase each page's overlay opacity, so the header navigation stays readable on top.
             </p>
           </div>
         </Transition>

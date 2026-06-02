@@ -143,12 +143,21 @@ export interface ContactPagePromise {
   description: string
 }
 
+export interface ContactPageFaq {
+  question: string
+  answer: string
+}
+
 export interface ContactPage {
   info_title: string
   info_subtitle: string
   info_description: string
   info_badge: string
   promises: ContactPagePromise[]
+  faq_label?: string
+  faq_heading?: string
+  faq_subtitle?: string
+  faqs?: ContactPageFaq[]
 }
 
 export interface ShopHeader {
@@ -231,6 +240,9 @@ export interface SiteConfig {
   logo_url: string | null
   favicon_url: string | null
   cart_icon_url: string | null
+  footer_logo_url: string | null
+  logo_size: number | null
+  footer_logo_size: number | null
   hero_title: string | null
   hero_subtitle: string | null
   hero_overlay_color: string
@@ -286,6 +298,7 @@ export interface SiteConfig {
   logo_alt_text: string | null
   header_cta: HeaderCta
   footer_banner: FooterBanner
+  footer: Footer
   currency_code: string
   updated_at: string
 }
@@ -305,6 +318,15 @@ export interface FooterBanner {
   background_color: string
   background_color_to: string
   text_color: string
+}
+
+export interface Footer {
+  tagline: string
+  copyright_text: string
+  show_tagline: boolean
+  show_quick_links: boolean
+  show_contact_info: boolean
+  show_social_links: boolean
 }
 
 export interface PageSeo {

@@ -234,13 +234,105 @@
           </div>
         </div>
       </div>
+
+      <!-- ═══════════ FAQs Display ═══════════ -->
+      <div class="rounded-xl border border-gray-200 overflow-hidden">
+        <div class="flex items-center justify-between gap-3 px-3 py-1.5 bg-gray-100 border-b border-gray-200">
+          <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-red-300"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-yellow-300"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-green-300"></span>
+            <span class="ml-2 text-[10px] text-gray-400 font-medium">FAQs</span>
+          </div>
+          <span class="text-[10px] text-gray-400">{{ faqs.length }} / 30</span>
+        </div>
+
+        <div class="bg-white p-4 space-y-3">
+          <!-- Section header (eyebrow / heading / subtitle) -->
+          <div class="rounded-lg border border-gray-100 bg-gray-50/60 p-4 space-y-2">
+            <input
+              :value="contactPage.faq_label ?? 'FAQ'"
+              @input="updateField('faq_label', ($event.target as HTMLInputElement).value)"
+              type="text"
+              class="edit-inline text-[10px] font-semibold text-gray-400 uppercase tracking-[0.2em] text-center"
+              placeholder="Eyebrow label (e.g. FAQ)"
+              maxlength="50"
+            />
+            <input
+              :value="contactPage.faq_heading ?? 'Common Questions'"
+              @input="updateField('faq_heading', ($event.target as HTMLInputElement).value)"
+              type="text"
+              class="edit-inline text-lg font-bold text-gray-900 text-center"
+              placeholder="Heading (e.g. Common Questions)"
+              maxlength="100"
+            />
+            <input
+              :value="contactPage.faq_subtitle ?? ''"
+              @input="updateField('faq_subtitle', ($event.target as HTMLInputElement).value)"
+              type="text"
+              class="edit-inline text-xs text-gray-500 text-center"
+              placeholder="Subtitle shown under the heading"
+              maxlength="255"
+            />
+          </div>
+
+          <p v-if="!faqs.length" class="text-center text-xs text-gray-400 py-4">
+            No FAQs yet. Add common questions and answers to help visitors.
+          </p>
+
+          <div
+            v-for="(faq, i) in faqs"
+            :key="i"
+            class="group/faq relative p-4 rounded-xl border border-gray-100 hover:border-primary-200 transition-all space-y-2"
+          >
+            <button
+              type="button"
+              class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/faq:opacity-100 transition-opacity shadow-sm hover:bg-red-600 z-10"
+              @click="removeFaq(i)"
+              aria-label="Remove FAQ"
+            >
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider shrink-0">Q{{ i + 1 }}</span>
+              <input
+                :value="faq.question"
+                @input="updateFaq(i, 'question', ($event.target as HTMLInputElement).value)"
+                type="text"
+                class="edit-inline text-sm font-semibold text-gray-900 flex-1"
+                placeholder="Question (e.g. How do I track my order?)"
+                maxlength="255"
+              />
+            </div>
+            <textarea
+              :value="faq.answer"
+              @input="updateFaq(i, 'answer', ($event.target as HTMLTextAreaElement).value)"
+              rows="3"
+              class="edit-inline text-xs text-gray-500 leading-relaxed resize-none w-full"
+              placeholder="Answer shown when the question is expanded"
+              maxlength="1000"
+            ></textarea>
+          </div>
+
+          <button
+            v-if="faqs.length < 30"
+            type="button"
+            class="w-full rounded-xl border-2 border-dashed border-gray-200 py-3 flex items-center justify-center gap-1.5 text-gray-300 hover:text-primary-500 hover:border-primary-300 transition-all"
+            @click="addFaq"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            <span class="text-[11px] font-medium">Add FAQ</span>
+          </button>
+        </div>
+      </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
 import type { MediaCollection } from '~/composables/useMediaUpload'
-import type { ContactPage } from '~/composables/useSiteConfig'
+import type { ContactPage, ContactPageFaq } from '~/composables/useSiteConfig'
 import { DEFAULT_THEME } from '~/composables/useSiteConfig'
 import { DEFAULT_ICON } from '~/composables/useHighlightIcons'
 
@@ -290,6 +382,21 @@ function removePromiseItem(index: number) {
 
 function addPromiseItem() {
   emit('update:contact-page', { ...props.contactPage, promises: [...props.contactPage.promises, { icon: DEFAULT_ICON, title: '', description: '' }] })
+}
+
+const faqs = computed<ContactPageFaq[]>(() => props.contactPage.faqs ?? [])
+
+function updateFaq(index: number, key: keyof ContactPageFaq, value: string) {
+  const next = faqs.value.map((item, i) => i === index ? { ...item, [key]: value } : item)
+  emit('update:contact-page', { ...props.contactPage, faqs: next })
+}
+
+function removeFaq(index: number) {
+  emit('update:contact-page', { ...props.contactPage, faqs: faqs.value.filter((_, i) => i !== index) })
+}
+
+function addFaq() {
+  emit('update:contact-page', { ...props.contactPage, faqs: [...faqs.value, { question: '', answer: '' }] })
 }
 </script>
 

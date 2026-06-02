@@ -222,9 +222,9 @@
     <section class="section-accent border-t border-gray-100 py-16">
       <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div ref="faqHeadingRef" class="reveal text-center mb-10">
-          <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">FAQ</p>
-          <h2 class="text-3xl font-bold text-gray-900 mb-2">Common Questions</h2>
-          <p class="text-sm text-gray-500">Can't find what you need? Use the form above to reach us directly.</p>
+          <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">{{ faqLabel }}</p>
+          <h2 class="text-3xl font-bold text-gray-900 mb-2">{{ faqHeading }}</h2>
+          <p class="text-sm text-gray-500">{{ faqSubtitle }}</p>
         </div>
 
         <div class="space-y-2">
@@ -331,7 +331,7 @@ const toggleFaq = (i: number) => {
   openFaq.value = openFaq.value === i ? null : i
 }
 
-const faqs = [
+const defaultFaqs = [
   {
     question: 'How do I track my order?',
     answer: 'Once your order has shipped, you\'ll receive a confirmation email with a tracking number. You can use this to track your package in real time on our shipping partner\'s website.'
@@ -353,6 +353,11 @@ const faqs = [
     answer: 'Yes! We ship to most countries worldwide. International shipping times and costs vary by destination and will be calculated at checkout.'
   },
 ]
+
+const faqs = computed(() => contactPage.value.faqs?.length ? contactPage.value.faqs : defaultFaqs)
+const faqLabel = computed(() => contactPage.value.faq_label || 'FAQ')
+const faqHeading = computed(() => contactPage.value.faq_heading || 'Common Questions')
+const faqSubtitle = computed(() => contactPage.value.faq_subtitle || "Can't find what you need? Use the form above to reach us directly.")
 
 const heroStyle = computed(() => {
   const imageUrl = siteConfig.value?.contact_image_url

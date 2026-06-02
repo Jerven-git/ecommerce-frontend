@@ -1,17 +1,17 @@
 <template>
   <footer class="bg-white border-t border-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 gap-8" :class="gridColsClass">
         <div>
           <NuxtLink to="/" class="inline-block mb-4">
-            <img v-if="siteConfig?.logo_url" :src="siteConfig.logo_url" :alt="siteConfig.site_name" class="h-32 w-auto object-contain" />
+            <img v-if="footerLogoUrl" :src="footerLogoUrl" :alt="siteConfig?.site_name" :style="{ height: footerLogoHeight + 'px' }" class="w-auto object-contain" />
             <span v-else class="text-2xl font-bold tracking-tight" :style="{ color: siteConfig?.theme?.primary_color || '#6898ED' }">
               {{ siteConfig?.site_name || 'Store' }}
             </span>
           </NuxtLink>
-          <p class="text-sm text-gray-500">Your trusted online shopping destination</p>
+          <p v-if="showTagline && tagline" class="text-sm text-gray-500">{{ tagline }}</p>
 
-          <div v-if="socialLinks.length" class="flex items-center gap-3 mt-5">
+          <div v-if="showSocial && socialLinks.length" class="flex items-center gap-3 mt-5">
             <a
               v-for="link in socialLinks"
               :key="link.platform + link.url"
@@ -26,7 +26,7 @@
           </div>
         </div>
 
-        <div v-if="quickLinks.length">
+        <div v-if="showQuickLinks && quickLinks.length">
           <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Quick Links</h4>
           <ul class="space-y-2">
             <li v-for="link in quickLinks" :key="link.to">
@@ -35,17 +35,22 @@
           </ul>
         </div>
 
-        <div>
+        <div v-if="showContact">
           <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Contact Info</h4>
           <ul class="space-y-2">
-            <li class="text-sm text-gray-500">{{ siteConfig?.contact_email || 'contact@store.com' }}</li>
-            <li class="text-sm text-gray-500">{{ siteConfig?.contact_phone || '+1234567890' }}</li>
+            <template v-if="contactLines.length">
+              <li v-for="(line, i) in contactLines" :key="i" class="text-sm text-gray-500">{{ line }}</li>
+            </template>
+            <template v-else>
+              <li class="text-sm text-gray-500">contact@store.com</li>
+              <li class="text-sm text-gray-500">+1234567890</li>
+            </template>
           </ul>
         </div>
       </div>
 
       <div class="border-t border-gray-100 mt-8 pt-8 text-center">
-        <p class="text-sm text-gray-400">&copy; {{ new Date().getFullYear() }} {{ siteConfig?.site_name || 'Store' }}. All rights reserved.</p>
+        <p class="text-sm text-gray-400">{{ copyrightText }}</p>
       </div>
     </div>
   </footer>
@@ -53,6 +58,8 @@
 
 <script setup lang="ts">
 const { siteConfig } = useSiteConfig()
+const footerLogoUrl = computed(() => siteConfig.value?.footer_logo_url || siteConfig.value?.logo_url || null)
+const footerLogoHeight = computed(() => siteConfig.value?.footer_logo_size || 128)
 const { isEnabled } = useModules()
 
 const allQuickLinks = [
@@ -93,4 +100,51 @@ const socialLinks = computed(() =>
       icon: SOCIAL_ICONS[s.platform.toLowerCase()] || 'heroicons:globe-alt',
     })),
 )
+
+const contactLines = computed(() => {
+  const lines: string[] = []
+  const entries = siteConfig.value?.contact_entries?.filter(e => e.email || e.phone) ?? []
+  if (entries.length) {
+    for (const e of entries) {
+      if (e.email) lines.push(e.email)
+      if (e.phone) lines.push(e.phone)
+    }
+    return lines
+  }
+  if (siteConfig.value?.contact_email) lines.push(siteConfig.value.contact_email)
+  if (siteConfig.value?.contact_phone) lines.push(siteConfig.value.contact_phone)
+  return lines
+})
+
+const showTagline = computed(() => siteConfig.value?.footer?.show_tagline ?? true)
+const showSocial = computed(() => siteConfig.value?.footer?.show_social_links ?? true)
+const showQuickLinks = computed(() => siteConfig.value?.footer?.show_quick_links ?? true)
+const showContact = computed(() => siteConfig.value?.footer?.show_contact_info ?? true)
+
+const tagline = computed(() =>
+  siteConfig.value?.footer?.tagline ?? 'Your trusted online shopping destination',
+)
+
+const copyrightText = computed(() => {
+  const template = siteConfig.value?.footer?.copyright_text || '© {year} {site_name}. All rights reserved.'
+  const year = String(new Date().getFullYear())
+  const siteName = siteConfig.value?.site_name || 'Store'
+  return template.replace(/\{year\}/g, year).replace(/\{site_name\}/g, siteName)
+})
+
+// Visible column count drives the grid (logo column is always visible).
+const visibleColumns = computed(() => {
+  let n = 1
+  if (showQuickLinks.value && quickLinks.value.length) n++
+  if (showContact.value) n++
+  return n
+})
+
+const gridColsClass = computed(() => {
+  switch (visibleColumns.value) {
+    case 1: return 'md:grid-cols-1'
+    case 2: return 'md:grid-cols-2'
+    default: return 'md:grid-cols-3'
+  }
+})
 </script>

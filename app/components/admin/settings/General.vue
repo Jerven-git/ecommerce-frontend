@@ -70,6 +70,36 @@
           />
         </div>
       </div>
+
+      <!-- Header logo size -->
+      <div class="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
+        <div class="flex items-center justify-between mb-2">
+          <label for="logoSizeRange" class="text-sm font-medium text-gray-700">Header logo size</label>
+          <span class="text-xs font-mono text-gray-500 tabular-nums">{{ modelValue.logo_size }}px</span>
+        </div>
+        <input
+          id="logoSizeRange"
+          type="range"
+          min="20"
+          max="64"
+          step="1"
+          :value="modelValue.logo_size"
+          @input="emit('update:modelValue', { ...modelValue, logo_size: Number(($event.target as HTMLInputElement).value) })"
+          class="w-full accent-primary-600 cursor-pointer"
+        />
+        <p class="text-[11px] text-gray-400 mt-1">
+          Height of the logo in the header bar — the width scales automatically so the logo keeps its proportions and stays crisp at any size.
+        </p>
+        <div v-if="modelValue.logo_url" class="mt-3 flex items-center gap-3 overflow-hidden rounded-lg border border-gray-200 bg-white px-3 py-2">
+          <span class="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-gray-400">Preview</span>
+          <img
+            :src="modelValue.logo_url"
+            :style="{ height: modelValue.logo_size + 'px' }"
+            class="w-auto max-w-full object-contain"
+            alt="Header logo preview"
+          />
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -83,6 +113,7 @@ interface Props {
     logo_url: string
     favicon_url: string
     cart_icon_url: string
+    logo_size: number
   }
   mediaUploading: Record<string, boolean>
 }
