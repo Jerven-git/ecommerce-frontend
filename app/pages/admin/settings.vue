@@ -176,11 +176,12 @@ watch(activeTab, (tab) => {
 
 // --- Media upload composable ---
 const media = useMediaUpload({
-  collections: ['logo', 'favicon', 'cart_icon', 'hero', 'about', 'contact', 'blog', 'services', 'showcase_video'],
+  collections: ['logo', 'favicon', 'cart_icon', 'footer_logo', 'hero', 'about', 'contact', 'blog', 'services', 'showcase_video'],
   limits: {
     logo:      { maxMB: 2,  label: 'Logo' },
     favicon:   { maxMB: 2,  label: 'Site icon' },
     cart_icon: { maxMB: 2,  label: 'Cart icon' },
+    footer_logo: { maxMB: 2, label: 'Footer logo' },
     hero:    { maxMB: 10, label: 'Hero media', accept: ['image/', 'video/'] },
     about:   { maxMB: 10, label: 'About image' },
     contact: { maxMB: 10, label: 'Contact image' },
@@ -350,6 +351,9 @@ const form = ref({
   logo_url: "",
   favicon_url: "",
   cart_icon_url: "",
+  footer_logo_url: "",
+  logo_size: 36,
+  footer_logo_size: 128,
   hero_title: "",
   hero_subtitle: "",
   hero_overlay_color: "#000000",
@@ -470,6 +474,10 @@ const form = ref({
       { icon: 'heroicons:users', title: 'Expert Help', description: 'Our trained support team is ready to resolve any issue.' },
       { icon: 'heroicons:lock-closed', title: '100% Private', description: 'Your details are always kept safe and never shared.' },
     ],
+    faq_label: 'FAQ',
+    faq_heading: 'Common Questions',
+    faq_subtitle: "Can't find what you need? Use the form above to reach us directly.",
+    faqs: [] as Array<{ question: string; answer: string }>,
   },
   blog_image_url: "",
   blog_overlay_color: "#000000",
@@ -515,6 +523,14 @@ const form = ref({
     background_color_to: '',
     text_color: '#ffffff',
   },
+  footer: {
+    tagline: 'Your trusted online shopping destination',
+    copyright_text: '© {year} {site_name}. All rights reserved.',
+    show_tagline: true,
+    show_quick_links: true,
+    show_contact_info: true,
+    show_social_links: true,
+  },
   pages_seo: {
     home: { seo_title: '', seo_description: '', og_image_url: '', noindex: false, cover_alt_text: '' },
     about: { seo_title: '', seo_description: '', og_image_url: '', noindex: false, cover_alt_text: '' },
@@ -530,6 +546,7 @@ const urlFields: Record<MediaCollection, keyof typeof form.value> = {
   logo: 'logo_url',
   favicon: 'favicon_url',
   cart_icon: 'cart_icon_url',
+  footer_logo: 'footer_logo_url',
   hero: 'hero_image_url',
   about: 'about_image_url',
   contact: 'contact_image_url',
@@ -668,6 +685,9 @@ async function loadSettings() {
         logo_url: response.data.logo_url || "",
         favicon_url: response.data.favicon_url || "",
         cart_icon_url: response.data.cart_icon_url || "",
+        footer_logo_url: response.data.footer_logo_url || "",
+        logo_size: response.data.logo_size ?? 36,
+        footer_logo_size: response.data.footer_logo_size ?? 128,
         hero_title: response.data.hero_title || "",
         hero_subtitle: response.data.hero_subtitle || "",
         hero_overlay_color: response.data.hero_overlay_color || "#000000",
@@ -823,6 +843,19 @@ async function loadSettings() {
           if (cp.promises) {
             cp.promises = cp.promises.map((item: any, i: number) => ({ icon: promiseIcons[i] || 'heroicons:check-circle', ...item }))
           }
+          const defaultFaqs = [
+            { question: 'How do I track my order?', answer: 'Once your order has shipped, you\'ll receive a confirmation email with a tracking number. You can use this to track your package in real time on our shipping partner\'s website.' },
+            { question: 'What is your return policy?', answer: 'We accept returns within 30 days of delivery. Items must be in their original condition and packaging. Simply contact us with your order number and we\'ll guide you through the process.' },
+            { question: 'How long does shipping take?', answer: 'Standard shipping takes 3–7 business days. Expedited shipping (1–3 business days) is available at checkout for an additional fee. Orders are processed within 1 business day.' },
+            { question: 'Can I change or cancel my order?', answer: 'Orders can be modified or cancelled within 1 hour of placing them. After that, the order enters processing and can no longer be changed. Please contact us immediately if you need to make a change.' },
+            { question: 'Do you offer international shipping?', answer: 'Yes! We ship to most countries worldwide. International shipping times and costs vary by destination and will be calculated at checkout.' },
+          ]
+          cp.faqs = Array.isArray(cp.faqs) && cp.faqs.length
+            ? cp.faqs.map((f: any) => ({ question: f?.question ?? '', answer: f?.answer ?? '' }))
+            : defaultFaqs
+          cp.faq_label = cp.faq_label ?? 'FAQ'
+          cp.faq_heading = cp.faq_heading ?? 'Common Questions'
+          cp.faq_subtitle = cp.faq_subtitle ?? "Can't find what you need? Use the form above to reach us directly."
           return cp
         })(),
         blog_image_url: response.data.blog_image_url || "",
@@ -887,6 +920,14 @@ async function loadSettings() {
           background_color: response.data.footer_banner?.background_color || '#111827',
           background_color_to: response.data.footer_banner?.background_color_to || '',
           text_color: response.data.footer_banner?.text_color || '#ffffff',
+        },
+        footer: {
+          tagline: response.data.footer?.tagline ?? 'Your trusted online shopping destination',
+          copyright_text: response.data.footer?.copyright_text ?? '© {year} {site_name}. All rights reserved.',
+          show_tagline: response.data.footer?.show_tagline ?? true,
+          show_quick_links: response.data.footer?.show_quick_links ?? true,
+          show_contact_info: response.data.footer?.show_contact_info ?? true,
+          show_social_links: response.data.footer?.show_social_links ?? true,
         },
         pages_seo: (() => {
           const slugs = ['home', 'about', 'contact', 'shop', 'blog', 'services'] as const
@@ -1031,6 +1072,8 @@ async function saveSettings() {
         default_og_image_url: form.value.default_og_image_url || null,
         canonical_base_url: form.value.canonical_base_url || null,
         logo_alt_text: form.value.logo_alt_text || null,
+        logo_size: form.value.logo_size,
+        footer_logo_size: form.value.footer_logo_size,
         currency_code: form.value.currency_code || 'USD',
         header_cta: {
           enabled: !!form.value.header_cta.enabled,
@@ -1046,6 +1089,14 @@ async function saveSettings() {
           background_color: form.value.footer_banner.background_color || '#111827',
           background_color_to: form.value.footer_banner.background_color_to || '',
           text_color: form.value.footer_banner.text_color || '#ffffff',
+        },
+        footer: {
+          tagline: form.value.footer.tagline ?? '',
+          copyright_text: form.value.footer.copyright_text ?? '',
+          show_tagline: !!form.value.footer.show_tagline,
+          show_quick_links: !!form.value.footer.show_quick_links,
+          show_contact_info: !!form.value.footer.show_contact_info,
+          show_social_links: !!form.value.footer.show_social_links,
         },
         pages_seo: Object.fromEntries(
           Object.entries(form.value.pages_seo).map(([slug, p]) => [slug, {

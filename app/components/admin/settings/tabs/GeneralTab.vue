@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-5">
     <AdminSettingsGeneral
-      :model-value="{ site_name: form.site_name, logo_url: form.logo_url, favicon_url: form.favicon_url, cart_icon_url: form.cart_icon_url }"
+      :model-value="{ site_name: form.site_name, logo_url: form.logo_url, favicon_url: form.favicon_url, cart_icon_url: form.cart_icon_url, logo_size: form.logo_size }"
       :media-uploading="mediaUploading"
       @update:model-value="Object.assign(form, $event)"
       @media-select="(f: File, c: MediaCollection) => emit('media-select', f, c)"
@@ -319,6 +319,18 @@
         </div>
       </div>
     </div>
+
+    <AdminSettingsFooter
+      :footer="form.footer"
+      :footer-logo-url="form.footer_logo_url"
+      :header-logo-url="form.logo_url"
+      :footer-logo-size="form.footer_logo_size"
+      :media-uploading="mediaUploading"
+      @update:footer="form.footer = $event"
+      @update:footer-logo-size="form.footer_logo_size = $event"
+      @media-select="(f: File, c: MediaCollection) => emit('media-select', f, c)"
+      @media-remove="(c: MediaCollection) => emit('media-remove', c)"
+    />
 
     <!-- Canonical base URL + logo alt text -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">

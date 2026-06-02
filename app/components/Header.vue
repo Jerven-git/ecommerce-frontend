@@ -1,7 +1,7 @@
 <template>
   <header
     :class="[
-      isFullBleedHomepage ? 'fixed w-full' : 'sticky',
+      isFullBleedPage ? 'fixed w-full' : 'sticky',
       'top-0 z-50 transition-all duration-300',
       isTransparent
         ? 'bg-transparent border-b border-transparent'
@@ -17,7 +17,8 @@
             v-if="siteConfig?.logo_url"
             :src="siteConfig.logo_url"
             :alt="siteConfig.logo_alt_text || siteConfig.site_name"
-            class="h-9 w-auto object-contain"
+            :style="{ height: logoHeight + 'px' }"
+            class="w-auto object-contain"
           />
           <span
             v-else
@@ -165,6 +166,7 @@ const mobileMenuOpen = ref(false)
 
 const favoritesEnabled = computed(() => siteConfig.value?.favorites_enabled ?? false)
 const headerCta = computed(() => siteConfig.value?.header_cta ?? null)
+const logoHeight = computed(() => siteConfig.value?.logo_size || 36)
 
 const allNavLinks = [
   { to: '/', label: 'Home', module: null },
@@ -181,16 +183,19 @@ const navLinks = computed(() =>
   allNavLinks.filter(l => l.module === null || isEnabled(l.module))
 )
 
-// Transparent header only on the homepage AND only when the admin has
-// opted into the full-bleed hero (image flows under header). Otherwise
-// the header behaves like a normal sticky band and never goes transparent.
-const isHomepage = computed(() => route.path === '/')
-const isFullBleedHomepage = computed(() =>
-  isHomepage.value && (siteConfig.value?.hero_full_bleed ?? false)
+// Full-bleed transparent header applies on every page that renders a top
+// cover-image banner — Home (hero) plus About/Contact/Blog/Services — and
+// only when the admin opted into the "image flows under header" setting.
+// Pages without a banner (Shop, Cart, product/checkout) keep the normal
+// solid sticky band so the header never floats over white content.
+const BANNER_PATHS = new Set(['/', '/about', '/contact', '/blog', '/services'])
+const isBannerPage = computed(() => BANNER_PATHS.has(route.path))
+const isFullBleedPage = computed(() =>
+  isBannerPage.value && (siteConfig.value?.hero_full_bleed ?? false)
 )
 const scrollY = ref(0)
 const isTransparent = computed(() =>
-  isFullBleedHomepage.value && scrollY.value < 50 && !mobileMenuOpen.value
+  isFullBleedPage.value && scrollY.value < 50 && !mobileMenuOpen.value
 )
 
 function onScroll() {
