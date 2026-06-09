@@ -95,8 +95,9 @@
 
     <AdminSettingsSaveFooter
       :saving="saving"
+      :dirty="isDirty"
       @save="requestSave"
-      @reset="loadSettings"
+      @discard="requestDiscard"
     />
 
     <AdminToast />
@@ -113,10 +114,22 @@
       @confirm="confirmSave"
       @cancel="saveConfirmOpen = false"
     />
+
+    <!-- Confirm discard modal -->
+    <ConfirmModal
+      :open="discardConfirmOpen"
+      title="Discard changes?"
+      message="This reverts every unsaved change on this page back to the last saved version. This can't be undone."
+      confirm-text="Discard changes"
+      variant="danger"
+      @confirm="confirmDiscard"
+      @cancel="discardConfirmOpen = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { onBeforeRouteLeave } from 'vue-router'
 import type { MediaCollection } from '~/composables/useMediaUpload'
 import { THEME_PRESETS, type ThemePreset } from '~/composables/useTheme'
 import { DEFAULT_MODULES_ENABLED, type ModulesEnabled } from '~/composables/useSiteConfig'
@@ -220,16 +233,9 @@ const savedCovers = ref({ about: '', blog: '', services: '', contact: '' })
 
 const { showToast } = useAdminToast()
 
-// --- Save confirmation modal ---
+// --- Save / discard confirmation modals ---
 const saveConfirmOpen = ref(false)
-
-const tabSuccessMessages: Record<TabId, string> = {
-  general: 'General settings have been updated',
-  appearance: 'Theme has been applied',
-  pages: 'Page content has been saved',
-  popup: 'Popup settings have been saved',
-  modules: 'Module visibility has been updated',
-}
+const discardConfirmOpen = ref(false)
 
 const tabConfirmMessages: Record<TabId, string> = {
   general: 'Apply your general settings changes to the site?',
@@ -335,6 +341,16 @@ function requestSave() {
 async function confirmSave() {
   await saveSettings()
   saveConfirmOpen.value = false
+}
+
+function requestDiscard() {
+  if (saving.value || !isDirty.value) return
+  discardConfirmOpen.value = true
+}
+
+async function confirmDiscard() {
+  discardConfirmOpen.value = false
+  await loadSettings()
 }
 
 const form = ref({
@@ -540,6 +556,13 @@ const form = ref({
     services: { seo_title: '', seo_description: '', og_image_url: '', noindex: false, cover_alt_text: '' },
   } as Record<string, { seo_title: string; seo_description: string; og_image_url: string; noindex: boolean; cover_alt_text: string }>,
 })
+
+// --- Unsaved-changes tracking ---
+// Snapshot of the form as last loaded/saved. `isDirty` compares the live form
+// against it so we can disable Save when nothing changed and guard navigation.
+// Media selections flow through the form (object URLs), so they count as dirty too.
+const savedSnapshot = ref('')
+const isDirty = computed(() => savedSnapshot.value !== '' && JSON.stringify(form.value) !== savedSnapshot.value)
 
 // Map collection -> form field
 const urlFields: Record<MediaCollection, keyof typeof form.value> = {
@@ -955,6 +978,10 @@ async function loadSettings() {
         services: form.value.services_image_url,
         contact: form.value.contact_image_url,
       }
+
+      // Baseline for unsaved-changes detection — must be the last thing set
+      // after the form is fully populated.
+      savedSnapshot.value = JSON.stringify(form.value)
     }
   } catch (err: any) {
     console.error("Error loading settings:", err)
@@ -1118,7 +1145,9 @@ async function saveSettings() {
     // Notify other open tabs to re-fetch and apply the new theme
     broadcastConfigUpdate()
 
-    showToast(tabSuccessMessages[activeTab.value], 'success')
+    // A save always persists the whole config, not just the active tab —
+    // so the message says so rather than implying a single tab was saved.
+    showToast('All settings saved', 'success')
     await loadSettings()
   } catch (err: any) {
     console.error("Save failed:", err?.data || err)
@@ -1128,6 +1157,29 @@ async function saveSettings() {
   }
 }
 
-onMounted(loadSettings)
-onBeforeUnmount(() => media.cleanup())
+// --- Unsaved-changes guards ---
+// Warn before a full page unload (refresh / tab close / external link).
+function handleBeforeUnload(e: BeforeUnloadEvent) {
+  if (isDirty.value && !saving.value) {
+    e.preventDefault()
+    e.returnValue = ''
+  }
+}
+
+// Warn before in-app navigation away (sidebar links, back button, etc.).
+onBeforeRouteLeave(() => {
+  if (isDirty.value && !saving.value) {
+    return window.confirm('You have unsaved changes. Leave without saving?')
+  }
+  return true
+})
+
+onMounted(() => {
+  loadSettings()
+  window.addEventListener('beforeunload', handleBeforeUnload)
+})
+onBeforeUnmount(() => {
+  media.cleanup()
+  window.removeEventListener('beforeunload', handleBeforeUnload)
+})
 </script>

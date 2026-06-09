@@ -57,246 +57,70 @@
 
       <!-- Sidebar scroll area -->
       <div class="sidebar-scroll flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-6">
-        <!-- Navigation -->
-        <nav data-guide="sidebar-nav" class="space-y-0.5">
-          <p class="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Navigation</p>
-
-          <NuxtLink
-            to="/admin"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin')"
-            @click="closeSidebarOnMobile"
+        <!-- Day-to-day navigation -->
+        <div data-guide="sidebar-nav" class="flex flex-col gap-6">
+          <nav
+            v-for="group in mainGroups"
+            :key="group.heading"
+            class="space-y-0.5"
           >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6" />
-            </svg>
-            <span class="font-medium">Dashboard</span>
-          </NuxtLink>
+            <p class="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ group.heading }}</p>
+            <template v-for="item in group.items" :key="item.to">
+              <NuxtLink
+                v-if="!item.show || item.show()"
+                :to="item.to"
+                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
+                :class="linkClass(item.to)"
+                @click="closeSidebarOnMobile"
+              >
+                <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    v-for="(d, i) in item.paths"
+                    :key="i"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    :d="d"
+                  />
+                </svg>
+                <span class="font-medium">{{ item.label }}</span>
+              </NuxtLink>
+            </template>
+          </nav>
+        </div>
 
-          <NuxtLink
-            to="/admin/products"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/products')"
-            @click="closeSidebarOnMobile"
+        <!-- Settings & access -->
+        <div data-guide="sidebar-settings" class="flex flex-col gap-6">
+          <nav
+            v-for="group in settingsGroups"
+            :key="group.heading"
+            v-show="group.items.some(item => !item.show || item.show())"
+            class="space-y-0.5"
           >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
-            <span class="font-medium">Products</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/categories"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/categories')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-            </svg>
-            <span class="font-medium">Categories</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/posts"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/posts')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-            </svg>
-            <span class="font-medium">Blog Posts</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/post-categories"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/post-categories')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h10M4 18h10" />
-            </svg>
-            <span class="font-medium">Blog Categories</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/services"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/services')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
-            <span class="font-medium">Services</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/service-categories"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/service-categories')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-            </svg>
-            <span class="font-medium">Service Categories</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/orders"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/orders')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span class="font-medium">Orders</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/backorders"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/backorders')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span class="font-medium">Backorders</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/discounts"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/discounts')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-            </svg>
-            <span class="font-medium">Discounts</span>
-          </NuxtLink>
-
-          <NuxtLink
-            v-if="isEnabled('commissions')"
-            to="/admin/commissions"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/commissions')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
-            <span class="font-medium">Commissions</span>
-          </NuxtLink>
-
-          <NuxtLink
-            v-if="isEnabled('gift_cards')"
-            to="/admin/gift-cards"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/gift-cards')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-            </svg>
-            <span class="font-medium">Gift Cards</span>
-          </NuxtLink>
-        </nav>
-
-        <!-- Settings group -->
-        <nav data-guide="sidebar-settings" class="space-y-0.5">
-          <p class="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Settings</p>
-
-          <NuxtLink
-            v-if="authStore.isSuperAdmin"
-            to="/admin/users"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/users')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5V4H2v16h5m10 0v-2a4 4 0 00-4-4H11a4 4 0 00-4 4v2m10 0H7m10-11a3 3 0 11-6 0 3 3 0 016 0zm-8 0a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span class="font-medium">Admin Users</span>
-          </NuxtLink>
-
-          <NuxtLink
-            v-if="authStore.isSuperAdmin"
-            to="/super-admin"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors text-purple-700 hover:bg-purple-50"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17 9 21l3-2 3 2-.75-4M3 4h18l-2 13H5L3 4Z" />
-            </svg>
-            <span class="font-medium">Super Admin</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/settings"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/settings')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span class="font-medium">Site Settings</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/shipping"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/shipping')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
-            </svg>
-            <span class="font-medium">Shipping</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/tax-settings"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/tax-settings')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
-            <span class="font-medium">Tax</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/tax-report"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/tax-report')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span class="font-medium">Tax Report</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/payment-settings"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            :class="linkClass('/admin/payment-settings')"
-            @click="closeSidebarOnMobile"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            </svg>
-            <span class="font-medium">Payments</span>
-          </NuxtLink>
-        </nav>
+            <p class="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ group.heading }}</p>
+            <template v-for="item in group.items" :key="item.to">
+              <NuxtLink
+                v-if="!item.show || item.show()"
+                :to="item.to"
+                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
+                :class="item.accent === 'purple' ? 'text-purple-700 hover:bg-purple-50' : linkClass(item.to)"
+                @click="closeSidebarOnMobile"
+              >
+                <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    v-for="(d, i) in item.paths"
+                    :key="i"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    :d="d"
+                  />
+                </svg>
+                <span class="font-medium">{{ item.label }}</span>
+              </NuxtLink>
+            </template>
+          </nav>
+        </div>
 
         <!-- Spacer -->
         <div class="flex-1"></div>
@@ -387,6 +211,86 @@ const route = useRoute()
 const { isEnabled } = useModules()
 const guideRef = ref<{ startGuide: () => void } | null>(null)
 
+interface NavItem {
+  to: string
+  label: string
+  /** Header title; defaults to `label` when omitted. */
+  title?: string
+  /** SVG path `d` strings rendered inside the icon. */
+  paths: string[]
+  /** Optional visibility predicate (module flag / role gate). */
+  show?: () => boolean
+  /** Optional accent styling (e.g. the Super Admin link). */
+  accent?: 'purple'
+}
+
+interface NavGroup {
+  heading: string
+  items: NavItem[]
+}
+
+// Day-to-day work — spotlighted by the guide as "Main menu".
+const mainGroups: NavGroup[] = [
+  {
+    heading: 'Overview',
+    items: [
+      { to: '/admin', label: 'Dashboard', paths: ['M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6'] },
+    ],
+  },
+  {
+    heading: 'Catalog',
+    items: [
+      { to: '/admin/products', label: 'Products', paths: ['M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'] },
+      { to: '/admin/categories', label: 'Categories', paths: ['M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'] },
+      { to: '/admin/services', label: 'Services', paths: ['M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'] },
+      { to: '/admin/service-categories', label: 'Service Categories', paths: ['M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z'] },
+    ],
+  },
+  {
+    heading: 'Content',
+    items: [
+      { to: '/admin/posts', label: 'Blog Posts', paths: ['M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z'] },
+      { to: '/admin/post-categories', label: 'Blog Categories', paths: ['M4 6h16M4 10h16M4 14h10M4 18h10'] },
+    ],
+  },
+  {
+    heading: 'Sales',
+    items: [
+      { to: '/admin/orders', label: 'Orders', paths: ['M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'] },
+      { to: '/admin/backorders', label: 'Backorders', paths: ['M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'] },
+      { to: '/admin/discounts', label: 'Discounts', title: 'Discount Codes', paths: ['M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'] },
+      { to: '/admin/gift-cards', label: 'Gift Cards', show: () => isEnabled('gift_cards'), paths: ['M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7'] },
+      { to: '/admin/commissions', label: 'Commissions', show: () => isEnabled('commissions'), paths: ['M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z'] },
+    ],
+  },
+  {
+    heading: 'Reports',
+    items: [
+      { to: '/admin/tax-report', label: 'Tax Report', paths: ['M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'] },
+    ],
+  },
+]
+
+// Set-up-once configuration & access control — spotlighted as "Settings menu".
+const settingsGroups: NavGroup[] = [
+  {
+    heading: 'Settings',
+    items: [
+      { to: '/admin/settings', label: 'Site Settings', title: 'Settings', paths: ['M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z', 'M15 12a3 3 0 11-6 0 3 3 0 016 0z'] },
+      { to: '/admin/shipping', label: 'Shipping', paths: ['M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z', 'M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0'] },
+      { to: '/admin/tax-settings', label: 'Tax', paths: ['M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z'] },
+      { to: '/admin/payment-settings', label: 'Payments', paths: ['M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z'] },
+    ],
+  },
+  {
+    heading: 'Access',
+    items: [
+      { to: '/admin/users', label: 'Admin Users', show: () => authStore.isSuperAdmin, paths: ['M17 20h5V4H2v16h5m10 0v-2a4 4 0 00-4-4H11a4 4 0 00-4 4v2m10 0H7m10-11a3 3 0 11-6 0 3 3 0 016 0zm-8 0a3 3 0 11-6 0 3 3 0 016 0z'] },
+      { to: '/super-admin', label: 'Super Admin', show: () => authStore.isSuperAdmin, accent: 'purple', paths: ['M9.75 17 9 21l3-2 3 2-.75-4M3 4h18l-2 13H5L3 4Z'] },
+    ],
+  },
+]
+
 // default is CLOSED
 const sidebarOpen = ref(
   typeof window !== 'undefined'
@@ -417,32 +321,24 @@ const handleLogout = async () => {
   navigateTo('/')
 }
 
+const isActivePath = (path: string) => {
+  if (path === '/admin') return route.path === '/admin' || route.path === '/admin/'
+  return route.path === path || route.path.startsWith(path + '/')
+}
+
+// Header title is derived from the same nav data — no separate hardcoded map to
+// drift out of sync. Most-specific match wins (e.g. /admin/products over /admin).
+const allItems = [...mainGroups, ...settingsGroups].flatMap(g => g.items)
+
 const pageTitle = computed(() => {
-  if (route.path === '/admin') return 'Admin Dashboard'
-  if (route.path.startsWith('/admin/products')) return 'Products'
-  if (route.path.startsWith('/admin/post-categories')) return 'Blog Categories'
-  if (route.path.startsWith('/admin/posts')) return 'Blog Posts'
-  if (route.path.startsWith('/admin/backorders')) return 'Backorders'
-  if (route.path.startsWith('/admin/orders')) return 'Orders'
-  if (route.path.startsWith('/admin/users')) return 'Admin Users'
-  if (route.path.startsWith('/admin/settings')) return 'Settings'
-  if (route.path.startsWith('/admin/discounts')) return 'Discount Codes'
-  if (route.path.startsWith('/admin/commissions')) return 'Commissions'
-  if (route.path.startsWith('/admin/gift-cards')) return 'Gift Cards'
-  if (route.path.startsWith('/admin/shipping')) return 'Shipping'
-  return 'Admin'
+  const match = allItems.find(item => isActivePath(item.to))
+  return match?.title ?? match?.label ?? 'Admin'
 })
 
 const linkClass = (path: string) => {
-  const isDashboard = path === '/admin'
-  const isActive = isDashboard
-    ? (route.path === '/admin' || route.path === '/admin/')
-    : (route.path === path || route.path.startsWith(path + '/'))
-
   const active = 'bg-primary-50 ring-1 ring-primary-200 text-primary-800'
   const inactive = 'bg-white hover:bg-gray-100 text-gray-700'
-
-  return isActive ? active : inactive
+  return isActivePath(path) ? active : inactive
 }
 </script>
 
