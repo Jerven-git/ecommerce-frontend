@@ -2,6 +2,9 @@
   <!-- Admin Guide -->
   <AdminGuide ref="guideRef" />
 
+  <!-- AI help assistant -->
+  <AdminAssistant />
+
   <SuperAdminImpersonationBanner />
 
   <!-- Fixed-height shell so ONLY main content scrolls -->
