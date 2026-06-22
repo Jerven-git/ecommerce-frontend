@@ -1,59 +1,51 @@
 <template>
-  <div class="card hover:shadow-xl transition-shadow group cursor-pointer flex flex-col h-full">
-    <!-- Image with hover overlay -->
-    <NuxtLink :to="`/product/${product.slug}`" class="block">
-      <div class="relative w-full overflow-hidden rounded-lg bg-gray-200 mb-4">
-        <SmoothImage
-          v-if="product.image_url"
-          :src="product.image_url"
-          :alt="product.name"
-          class="h-64 w-full object-cover object-center group-hover:scale-105"
-        />
-        <div v-else class="h-64 w-full bg-gray-300">
-          <ProductImagePlaceholder size="md" />
-        </div>
+  <NuxtLink :to="`/product/${product.slug}`" class="group block">
+    <!-- Image -->
+    <div class="relative aspect-[4/5] overflow-hidden rounded-xl bg-gray-100">
+      <SmoothImage
+        v-if="product.image_url"
+        :src="product.image_url"
+        :alt="product.name"
+        class="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]"
+        :class="hasHoverImage ? 'group-hover:opacity-0' : ''"
+      />
+      <div v-else class="absolute inset-0 bg-gray-200">
+        <ProductImagePlaceholder size="md" />
+      </div>
 
-        <FavoriteButton :product-id="product.id" size="sm" />
+      <!-- Secondary image crossfades in on hover -->
+      <SmoothImage
+        v-if="hasHoverImage"
+        :src="product.hover_image_url as string"
+        :alt="product.name"
+        class="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-[1200ms] ease-out group-hover:opacity-100"
+      />
 
-        <!-- Hover overlay -->
-        <div class="absolute inset-0 bg-white/5 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
-          <span class="translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-white text-sm font-semibold border border-white/20 shadow-lg">
+      <FavoriteButton :product-id="product.id" size="sm" />
+
+      <!-- Hover reveal: material · dimensions + view -->
+      <div class="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+        <div class="translate-y-2 transition-transform duration-500 group-hover:translate-y-0">
+          <p v-if="meta" class="text-[11px] font-medium uppercase tracking-[0.15em] text-white/75">{{ meta }}</p>
+          <span class="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-white">
             View
+            <svg class="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
           </span>
         </div>
       </div>
-    </NuxtLink>
-
-    <div class="flex flex-col flex-1">
-      <NuxtLink :to="`/product/${product.slug}`" class="block">
-        <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">{{ product.name }}</h3>
-        <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ product.description }}</p>
-      </NuxtLink>
-
-      <div class="mt-auto">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-baseline gap-1">
-            <span v-if="hasVariants" class="text-xs text-gray-400 font-medium">From</span>
-            <span class="text-lg font-bold text-primary-600">{{ format(Number(product.price)) }}</span>
-          </div>
-          <StockBadge v-if="!hasVariants" :stock="product.stock" :can-backorder="product.can_backorder" variant="text" />
-        </div>
-
-        <NuxtLink v-if="hasVariants" :to="`/product/${product.slug}`" class="w-full btn-primary text-center block">
-          Select Options
-        </NuxtLink>
-        <button
-          v-else
-          @click="addToCart"
-          :disabled="!orderable"
-          class="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {{ orderable ? 'Add to Cart' : 'Out of Stock' }}
-        </button>
-      </div>
     </div>
 
-  </div>
+    <!-- Caption: title + muted material + de-emphasized price -->
+    <div class="mt-3.5 text-center">
+      <h3 class="text-sm font-medium tracking-tight text-gray-900 line-clamp-1">{{ product.name }}</h3>
+      <p v-if="product.material" class="mt-0.5 text-xs text-gray-400 line-clamp-1">{{ product.material }}</p>
+      <p class="mt-1.5 text-xs tracking-wide text-gray-400">
+        <span v-if="hasVariants">from </span>{{ format(Number(product.price)) }}
+      </p>
+    </div>
+  </NuxtLink>
 </template>
 
 <script setup lang="ts">
@@ -63,13 +55,13 @@ const props = defineProps<{
   product: Product
 }>()
 
-const cartStore = useCartStore()
 const { format } = useCurrency()
 
 const hasVariants = computed(() => (props.product.variants_count ?? 0) > 0)
-const orderable = computed(() => isOrderable(props.product))
+const hasHoverImage = computed(() => !!props.product.hover_image_url)
 
-const addToCart = () => {
-  cartStore.addItem(props.product)
-}
+// Spec metadata shown on hover, e.g. "Solid oak · 180 × 90 × 75 cm".
+const meta = computed(() =>
+  [props.product.material, props.product.dimensions].filter(Boolean).join(' · '),
+)
 </script>

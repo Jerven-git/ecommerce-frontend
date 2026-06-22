@@ -42,6 +42,9 @@ export interface Product {
   description: string
   price: number | string
   image_url?: string
+  hover_image_url?: string | null
+  material?: string | null
+  dimensions?: string | null
   stock: number
   can_backorder: boolean
   category?: string

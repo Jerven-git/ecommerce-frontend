@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-5">
     <AdminSettingsGeneral
-      :model-value="{ site_name: form.site_name, logo_url: form.logo_url, favicon_url: form.favicon_url, cart_icon_url: form.cart_icon_url, logo_size: form.logo_size }"
+      :model-value="{ site_name: form.site_name, logo_url: form.logo_url, favicon_url: form.favicon_url, cart_icon_url: form.cart_icon_url, logo_size: form.logo_size, hero_full_bleed: form.hero_full_bleed }"
       :media-uploading="mediaUploading"
       @update:model-value="Object.assign(form, $event)"
       @media-select="(f: File, c: MediaCollection) => emit('media-select', f, c)"

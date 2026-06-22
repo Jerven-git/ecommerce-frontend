@@ -216,6 +216,116 @@
         </div>
       </div>
 
+      <!-- ═══════════ Statement ═══════════ -->
+      <div class="rounded-xl border border-gray-200 overflow-hidden">
+        <div class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 border-b border-gray-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-red-300"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-yellow-300"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-green-300"></span>
+          <span class="ml-2 text-[10px] text-gray-400 font-medium">Statement</span>
+          <label class="ml-auto inline-flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              class="sr-only peer"
+              :checked="localStatement.enabled"
+              @change="updateStatementField('enabled', ($event.target as HTMLInputElement).checked)"
+            />
+            <span class="relative w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-primary-500 transition-colors">
+              <span class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></span>
+            </span>
+            <span class="text-[10px] font-semibold text-gray-500">{{ localStatement.enabled ? 'On' : 'Off' }}</span>
+          </label>
+        </div>
+        <div class="bg-white p-6 space-y-4">
+          <p class="text-[11px] text-gray-400">An editorial band on the homepage — a short statement beside an optional image. Shown only when enabled and a quote is written.</p>
+
+          <!-- Image -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Image</label>
+            <AdminMediaUploader
+              overlay
+              :url="imageUrl"
+              :uploading="mediaUploading.homepage_statement ?? false"
+              label="Image"
+              hint="JPG, PNG — max 10 MB · portrait works best"
+              input-id="statementImageInput"
+              preview-class="w-full h-48 object-cover"
+              dropzone-class="h-36"
+              @select="(f: File) => emit('media-select', f, 'homepage_statement')"
+              @remove="emit('media-remove', 'homepage_statement')"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Eyebrow</label>
+            <input
+              :value="localStatement.eyebrow"
+              @input="updateStatementField('eyebrow', ($event.target as HTMLInputElement).value)"
+              type="text" maxlength="100"
+              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+              placeholder="Our Promise"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Quote</label>
+            <textarea
+              :value="localStatement.quote"
+              @input="updateStatementField('quote', ($event.target as HTMLTextAreaElement).value)"
+              rows="4" maxlength="1000"
+              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none resize-none leading-relaxed"
+              placeholder="A short statement that captures what your store stands for…"
+            ></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Attribution</label>
+              <input
+                :value="localStatement.attribution"
+                @input="updateStatementField('attribution', ($event.target as HTMLInputElement).value)"
+                type="text" maxlength="100"
+                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+                placeholder="e.g. Jane Doe"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Role / Title</label>
+              <input
+                :value="localStatement.role"
+                @input="updateStatementField('role', ($event.target as HTMLInputElement).value)"
+                type="text" maxlength="100"
+                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+                placeholder="e.g. Founder"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Button label</label>
+              <input
+                :value="localStatement.cta_label"
+                @input="updateStatementField('cta_label', ($event.target as HTMLInputElement).value)"
+                type="text" maxlength="50"
+                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+                placeholder="Optional — e.g. Learn more"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Button link</label>
+              <input
+                :value="localStatement.cta_link"
+                @input="updateStatementField('cta_link', ($event.target as HTMLInputElement).value)"
+                type="text" maxlength="500"
+                class="w-full px-3 py-2 text-sm font-mono border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+                placeholder="/about"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- ═══════════ Newsletter ═══════════ -->
       <div class="rounded-xl border border-gray-200 overflow-hidden">
         <div class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 border-b border-gray-200">
@@ -275,15 +385,23 @@
 </template>
 
 <script setup lang="ts">
-import type { HomepageSteps, HomepageFeatures, HomepageStats, HomepageNewsletter } from '~/composables/useSiteConfig'
+import type { HomepageSteps, HomepageFeatures, HomepageStats, HomepageStatement, HomepageNewsletter } from '~/composables/useSiteConfig'
+import type { MediaCollection } from '~/composables/useMediaUpload'
 import { DEFAULT_THEME } from '~/composables/useSiteConfig'
 import { DEFAULT_ICON } from '~/composables/useHighlightIcons'
+
+// Statement form omits the server-owned image_url, which round-trips through
+// the media upload form field (statement image) rather than this object.
+type StatementForm = Omit<HomepageStatement, 'image_url'>
 
 interface Props {
   steps: HomepageSteps
   features: HomepageFeatures
   stats: HomepageStats
+  statement: StatementForm
   newsletter: HomepageNewsletter
+  imageUrl: string
+  mediaUploading: Record<string, boolean>
 }
 
 const props = defineProps<Props>()
@@ -292,7 +410,10 @@ const emit = defineEmits<{
   'update:steps': [value: HomepageSteps]
   'update:features': [value: HomepageFeatures]
   'update:stats': [value: HomepageStats]
+  'update:statement': [value: StatementForm]
   'update:newsletter': [value: HomepageNewsletter]
+  'media-select': [file: File, collection: MediaCollection]
+  'media-remove': [collection: MediaCollection]
 }>()
 
 const { siteConfig } = useSiteConfig()
@@ -304,6 +425,7 @@ const themeColors = computed(() => ({
 const localSteps = computed(() => props.steps)
 const localFeatures = computed(() => props.features)
 const localStats = computed(() => props.stats)
+const localStatement = computed(() => props.statement)
 const localNewsletter = computed(() => props.newsletter)
 
 // Steps
@@ -343,6 +465,11 @@ function addStatItem() {
 }
 function removeStatItem(index: number) {
   emit('update:stats', { items: localStats.value.items.filter((_, i) => i !== index) })
+}
+
+// Statement
+function updateStatementField<K extends keyof StatementForm>(key: K, value: StatementForm[K]) {
+  emit('update:statement', { ...localStatement.value, [key]: value })
 }
 
 // Newsletter

@@ -100,6 +100,36 @@
           />
         </div>
       </div>
+
+      <!-- Header layout toggle -->
+      <div class="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
+        <label class="flex items-start gap-3 cursor-pointer">
+          <input
+            :checked="modelValue.hero_full_bleed"
+            @change="emit('update:modelValue', { ...modelValue, hero_full_bleed: ($event.target as HTMLInputElement).checked })"
+            type="checkbox"
+            class="mt-0.5 w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+          />
+          <div class="flex-1">
+            <p class="text-sm font-medium text-gray-800">Cover images flow under header</p>
+            <p class="text-xs text-gray-500 mt-0.5">When on, the cover image extends behind a transparent header for a full-bleed look — on the homepage hero and the About, Contact, Blog, and Services banners. When off, the header sits as its own band above the cover.</p>
+          </div>
+        </label>
+        <Transition
+          enter-active-class="transition duration-200 ease-out"
+          enter-from-class="opacity-0 -translate-y-1"
+          enter-to-class="opacity-100 translate-y-0"
+        >
+          <div v-if="modelValue.hero_full_bleed" class="mt-3 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+            <svg class="w-4 h-4 shrink-0 mt-0.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p class="text-xs text-amber-800 leading-relaxed">
+              Applies to the homepage hero and the About, Contact, Blog, and Services cover banners. Use darker images, or increase each page's overlay opacity, so the header navigation stays readable on top.
+            </p>
+          </div>
+        </Transition>
+      </div>
     </div>
   </section>
 </template>
@@ -114,6 +144,7 @@ interface Props {
     favicon_url: string
     cart_icon_url: string
     logo_size: number
+    hero_full_bleed: boolean
   }
   mediaUploading: Record<string, boolean>
 }

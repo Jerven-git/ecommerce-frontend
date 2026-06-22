@@ -1,6 +1,6 @@
 import { uploadFileWithProgress } from '~/utils/uploadFileWithProgress'
 
-export type MediaCollection = 'logo' | 'favicon' | 'cart_icon' | 'footer_logo' | 'hero' | 'about' | 'contact' | 'blog' | 'services' | 'showcase_video'
+export type MediaCollection = 'logo' | 'favicon' | 'cart_icon' | 'footer_logo' | 'hero' | 'about' | 'contact' | 'blog' | 'services' | 'showcase_video' | 'homepage_statement' | 'story_image_a' | 'story_image_b'
 
 export interface UploadLimits {
   maxMB: number

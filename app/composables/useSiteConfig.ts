@@ -160,6 +160,37 @@ export interface ContactPage {
   faqs?: ContactPageFaq[]
 }
 
+export interface HomepageStatement {
+  enabled: boolean
+  eyebrow: string
+  quote: string
+  attribution: string
+  role: string
+  cta_label: string
+  cta_link: string
+  image_url: string | null
+}
+
+export interface StoryPageSection {
+  heading: string
+  body: string
+  cta_label: string
+  cta_link: string
+  image_position: 'left' | 'right'
+  image_url: string | null
+}
+
+export interface StoryPage {
+  enabled: boolean
+  hero: {
+    eyebrow: string
+    heading: string
+    subtitle: string
+  }
+  section_a: StoryPageSection
+  section_b: StoryPageSection
+}
+
 export interface ShopHeader {
   label: string
   heading: string
@@ -254,6 +285,7 @@ export interface SiteConfig {
   hero_media_mime: string | null
   about_content: string | null
   about_image_url: string | null
+  story_page: StoryPage | null
   about_overlay_color: string
   about_overlay_opacity: number
   contact_image_url: string | null
@@ -273,6 +305,7 @@ export interface SiteConfig {
   homepage_steps: HomepageSteps | null
   homepage_features: HomepageFeatures | null
   homepage_stats: HomepageStats | null
+  homepage_statement: HomepageStatement | null
   homepage_newsletter: HomepageNewsletter | null
   homepage_showcase: HomepageShowcase | null
   homepage_watch_shop: HomepageWatchShop | null

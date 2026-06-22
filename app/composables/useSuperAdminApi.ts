@@ -57,6 +57,7 @@ interface AdminUserInput {
   password?: string
   password_confirmation?: string
   role?: 'admin' | 'super_admin'
+  store_id?: number | null
   store_name?: string
   store_slug?: string
   status?: 'active' | 'disabled'

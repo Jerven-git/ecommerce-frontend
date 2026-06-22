@@ -48,6 +48,40 @@
         </button>
       </div>
     </form>
+
+    <section v-if="store" class="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-gray-900">Admins</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Admins who manage this store. A store can have several.</p>
+        </div>
+        <NuxtLink
+          :to="`/super-admin/admins/new?store_id=${store.id}`"
+          class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors shrink-0"
+        >
+          Add admin
+        </NuxtLink>
+      </div>
+
+      <p v-if="storeAdmins.length === 0" class="text-sm text-gray-400">No admins assigned to this store yet.</p>
+      <ul v-else class="divide-y divide-gray-100">
+        <li v-for="a in storeAdmins" :key="a.id" class="flex items-center justify-between gap-4 py-3">
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-gray-900 truncate">{{ a.name }}</p>
+            <p class="text-xs text-gray-400 truncate">{{ a.email }}</p>
+          </div>
+          <div class="flex items-center gap-3 shrink-0">
+            <span
+              class="px-2 py-0.5 text-xs font-medium rounded"
+              :class="a.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-600'"
+            >
+              {{ a.status }}
+            </span>
+            <NuxtLink :to="`/super-admin/admins/${a.id}`" class="text-purple-700 hover:underline text-sm">Edit</NuxtLink>
+          </div>
+        </li>
+      </ul>
+    </section>
   </div>
 </template>
 
@@ -58,6 +92,7 @@ const api = useSuperAdminApi()
 
 const id = Number(route.params.id)
 const store = ref<Store | null>(null)
+const storeAdmins = ref<AdminUser[]>([])
 const loading = ref(true)
 const saving = ref(false)
 const deleting = ref(false)
@@ -66,9 +101,10 @@ const form = ref({ name: '', slug: '', status: 'active' as 'active' | 'inactive'
 
 onMounted(async () => {
   try {
-    const result = await api.showStore(id)
-    store.value = result.data
-    form.value = { name: result.data.name, slug: result.data.slug, status: result.data.status }
+    const [storeResult, adminsResult] = await Promise.all([api.showStore(id), api.listAdmins()])
+    store.value = storeResult.data
+    form.value = { name: storeResult.data.name, slug: storeResult.data.slug, status: storeResult.data.status }
+    storeAdmins.value = adminsResult.data.filter((a) => a.store?.id === id)
   } finally {
     loading.value = false
   }
