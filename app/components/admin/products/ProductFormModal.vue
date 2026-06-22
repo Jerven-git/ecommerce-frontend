@@ -35,6 +35,14 @@
                       ></textarea>
                     </div>
                     <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Material</label>
+                      <input v-model="form.material" type="text" maxlength="255" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-primary-400 focus:ring-1 focus:ring-primary-400 outline-none transition-all" placeholder="e.g. Solid oak" />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Dimensions</label>
+                      <input v-model="form.dimensions" type="text" maxlength="100" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-primary-400 focus:ring-1 focus:ring-primary-400 outline-none transition-all" placeholder="e.g. 180 × 90 × 75 cm" />
+                    </div>
+                    <div>
                       <label class="block text-xs font-medium text-gray-600 mb-1">Price <span class="text-red-400">*</span></label>
                       <div class="flex rounded-lg border border-gray-200 overflow-hidden focus-within:ring-1 focus-within:ring-primary-400 focus-within:border-primary-400 transition-all">
                         <span class="px-2.5 flex items-center bg-gray-50 text-gray-400 text-sm border-r border-gray-200 select-none">$</span>
@@ -251,6 +259,45 @@
                     <p class="text-[11px] text-gray-400 mt-1">Max 2 MB per image. Files over the limit are highlighted and will be skipped on save.</p>
                   </div>
 
+                  <!-- Secondary hover image -->
+                  <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1.5">Hover image <span class="text-gray-400 font-normal">· revealed on hover</span></label>
+                    <div class="flex items-center gap-3">
+                      <div class="relative shrink-0">
+                        <img
+                          v-if="hoverImageUrl"
+                          :src="hoverImageUrl"
+                          alt="Hover image preview"
+                          class="h-20 w-28 rounded-lg object-cover border border-gray-200"
+                        />
+                        <div v-else class="h-20 w-28 rounded-lg border border-dashed border-gray-200 bg-gray-50 flex items-center justify-center text-gray-300">
+                          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <button
+                          v-if="hoverImageUrl"
+                          type="button"
+                          @click="$emit('removeHoverImage')"
+                          class="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white shadow-md ring-2 ring-white transition-colors"
+                          title="Remove hover image"
+                          aria-label="Remove hover image"
+                        >
+                          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        @change="$emit('hoverImageSelected', $event)"
+                        class="block w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
+                      />
+                    </div>
+                    <p class="text-[11px] text-gray-400 mt-1">Max 2 MB. Uploads when you save.</p>
+                  </div>
+
                   <!-- Active toggle -->
                   <div class="flex items-center justify-between py-1.5 px-3 bg-gray-50 rounded-lg">
                     <div>
@@ -323,7 +370,7 @@
                   </div>
                 </fieldset>
 
-                <SeoFields
+                <AdminSeoFields
                   v-model:seo-title="form.seo_title"
                   v-model:seo-description="form.seo_description"
                   v-model:og-image-url="form.og_image_url"
@@ -414,6 +461,7 @@ const props = defineProps<{
   galleryImages: { id: number; url: string; alt_text?: string | null; legacy?: boolean }[]
   galleryFilesCount: number
   stagedPreviews: { key: string; url: string; name: string; oversized: boolean }[]
+  hoverImageUrl: string | null
   allCategories: Category[]
   selectedCategoryIds: Set<number>
   catPickerExpanded: Set<number>
@@ -429,6 +477,8 @@ defineEmits<{
   gallerySelected: [event: Event]
   removeStagedFile: [index: number]
   deleteGalleryImage: [mediaId: number]
+  hoverImageSelected: [event: Event]
+  removeHoverImage: []
   toggleCategory: [id: number]
   toggleCatExpand: [id: number]
   clearCategory: []

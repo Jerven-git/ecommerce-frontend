@@ -112,6 +112,9 @@
           <button @click="$emit('start-add', category.id)" class="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors" title="Add subcategory">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
           </button>
+          <button @click="$emit('edit-cover', category)" class="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors" :class="{ 'text-amber-500': category.image_url }" title="Cover image">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+          </button>
           <button @click="$emit('start-edit', category)" class="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors" title="Rename">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
           </button>
@@ -175,6 +178,7 @@
           @start-edit="$emit('start-edit', $event)"
           @save-edit="$emit('save-edit', $event)"
           @cancel-edit="$emit('cancel-edit')"
+          @edit-cover="$emit('edit-cover', $event)"
           @update:edit-name="$emit('update:edit-name', $event)"
           @confirm-delete="$emit('confirm-delete', $event)"
           @start-add="$emit('start-add', $event)"
@@ -194,6 +198,9 @@
 interface Category {
   id: number
   name: string
+  slug?: string | null
+  image_url?: string | null
+  overlay_opacity?: number | null
   parent_id: number | null
   sort_order: number
   children?: Category[]
@@ -219,6 +226,7 @@ const emit = defineEmits<{
   'start-edit': [cat: Category]
   'save-edit': [cat: Category]
   'cancel-edit': []
+  'edit-cover': [cat: Category]
   'update:edit-name': [value: string]
   'confirm-delete': [cat: Category]
   'start-add': [parentId: number]

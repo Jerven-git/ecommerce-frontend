@@ -127,6 +127,14 @@
             <p class="text-sm text-[var(--color-secondary)] mt-1">Shipping will calculated at checkout</p>
           </div>
 
+          <!-- Specifications -->
+          <dl v-if="specs.length" class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 border-t border-gray-100 pt-6">
+            <div v-for="spec in specs" :key="spec.label" class="flex flex-col gap-0.5">
+              <dt class="text-[11px] font-medium uppercase tracking-[0.15em] text-gray-400">{{ spec.label }}</dt>
+              <dd class="text-sm text-gray-800">{{ spec.value }}</dd>
+            </div>
+          </dl>
+
           <!-- Option Selectors -->
           <div v-if="hasVariants" class="mt-6 space-y-4">
             <div v-for="option in product.options" :key="option.id">
@@ -247,6 +255,36 @@
       </div>
     </div>
 
+    <!-- Related products -->
+    <section v-if="product && relatedProducts.length" class="border-t border-gray-100 mt-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+        <div class="text-center mb-12">
+          <p class="text-[11px] font-medium uppercase tracking-[0.25em] text-gray-400 mb-3">{{ relatedByCategory ? 'From the Same Category' : 'Continue Exploring' }}</p>
+          <h2 class="text-2xl sm:text-3xl font-normal tracking-tight text-gray-900">You May Also Like</h2>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
+          <ProductCard
+            v-for="related in relatedProducts"
+            :key="related.id"
+            :product="related"
+          />
+        </div>
+
+        <div class="text-center mt-14">
+          <NuxtLink
+            :to="product.category_id ? `/shop?category_id=${product.category_id}` : '/shop'"
+            class="group inline-flex items-center gap-2 text-sm font-medium tracking-wide text-gray-900 border-b border-gray-300 pb-1 hover:border-gray-900 transition-colors"
+          >
+            View All Products
+            <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </NuxtLink>
+        </div>
+      </div>
+    </section>
+
     <!-- Lightbox -->
     <Teleport to="body">
       <Transition
@@ -328,7 +366,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ProductDetail, ProductVariant } from '~/types/product'
+import type { Product, ProductDetail, ProductVariant } from '~/types/product'
 
 const route = useRoute()
 const { $apiFetch } = useNuxtApp()
@@ -385,6 +423,16 @@ const incompleteOptionNames = computed(() =>
     .filter(o => selectedValues.value[o.id] === null)
     .map(o => o.name)
 )
+
+// Generic spec list — only includes fields the admin has filled in.
+const specs = computed(() => {
+  const p = product.value
+  if (!p) return []
+  const rows: { label: string; value: string }[] = []
+  if (p.material) rows.push({ label: 'Material', value: p.material })
+  if (p.dimensions) rows.push({ label: 'Dimensions', value: p.dimensions })
+  return rows
+})
 
 // Returns the image_url of the first active variant that contains the given option value.
 // Used to show a variant photo thumbnail on the option button.
@@ -488,6 +536,45 @@ const addToCart = () => {
   navigateTo('/cart')
 }
 
+// ── Related products ──────────────────────────────────────────────────────
+const relatedProducts = ref<Product[]>([])
+const relatedByCategory = ref(false)
+const RELATED_LIMIT = 4
+
+const fetchRelated = async () => {
+  const p = product.value
+  if (!p) return
+  relatedProducts.value = []
+
+  const pick = (list: Product[]) =>
+    list.filter(r => r.id !== p.id && r.is_active !== false).slice(0, RELATED_LIMIT)
+
+  try {
+    // Prefer products from the same category; fall back to other recent products.
+    if (p.category_id) {
+      const res = await $apiFetch<{ data: Product[] }>('/products', {
+        method: 'GET',
+        query: { is_active: 1, category_id: p.category_id, per_page: RELATED_LIMIT + 1 },
+      })
+      const picked = pick(res?.data ?? [])
+      if (picked.length) {
+        relatedProducts.value = picked
+        relatedByCategory.value = true
+        return
+      }
+    }
+
+    const res = await $apiFetch<{ data: Product[] }>('/products', {
+      method: 'GET',
+      query: { is_active: 1, per_page: RELATED_LIMIT + 1 },
+    })
+    relatedProducts.value = pick(res?.data ?? [])
+    relatedByCategory.value = false
+  } catch (err) {
+    console.error('Error fetching related products:', err)
+  }
+}
+
 const fetchProduct = async () => {
   loading.value = true
   error.value = null
@@ -495,6 +582,7 @@ const fetchProduct = async () => {
     const response = await $apiFetch<{ data: ProductDetail }>(`/products/${route.params.slug}`, { method: 'GET' })
     if (response?.data) {
       product.value = response.data
+      fetchRelated()
     }
   } catch (err: any) {
     console.error('Error fetching product:', err)

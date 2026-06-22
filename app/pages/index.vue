@@ -213,6 +213,39 @@
       </div>
     </section>
 
+    <!-- Statement (editorial band) -->
+    <section v-if="showStatement" class="py-20 bg-white border-t border-gray-100">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 gap-10 lg:gap-16 items-center" :class="statement?.image_url ? 'md:grid-cols-2' : 'md:grid-cols-1'">
+          <!-- Image -->
+          <div v-if="statement?.image_url" :ref="addRevealRef" class="reveal">
+            <img :src="statement.image_url" :alt="statement.attribution || statement.eyebrow || 'Statement'" class="w-full aspect-[4/5] object-cover rounded-2xl" />
+          </div>
+
+          <!-- Statement -->
+          <div :ref="addRevealRef" class="reveal" :class="statement?.image_url ? '' : 'max-w-3xl mx-auto text-center'" style="transition-delay: 0.1s">
+            <p v-if="statement?.eyebrow" class="text-xs font-semibold uppercase tracking-[0.2em] mb-5" :style="{ color: 'var(--color-primary)' }">{{ statement.eyebrow }}</p>
+            <blockquote class="text-2xl sm:text-3xl font-light leading-relaxed text-gray-900 whitespace-pre-line">{{ statement?.quote }}</blockquote>
+            <div v-if="statement?.attribution" class="mt-7">
+              <p class="text-sm font-semibold text-gray-900">{{ statement.attribution }}</p>
+              <p v-if="statement.role" class="text-xs text-gray-400 mt-0.5">{{ statement.role }}</p>
+            </div>
+            <NuxtLink
+              v-if="statement?.cta_label && statement?.cta_link"
+              :to="statement.cta_link"
+              class="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold transition-opacity hover:opacity-70"
+              :style="{ color: 'var(--color-primary)' }"
+            >
+              {{ statement.cta_label }}
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Newsletter CTA -->
     <section class="py-20 text-white relative overflow-hidden" :style="{ backgroundColor: 'var(--color-secondary)' }">
       <div class="absolute inset-0 opacity-5 pointer-events-none">
@@ -293,6 +326,10 @@ const defaultFeatures: HomepageFeature[] = [
   { icon: 'heroicons:currency-dollar', title: 'Best Prices', description: 'Competitive pricing on all our products.' },
   { icon: 'heroicons:bolt', title: 'Fast Delivery', description: 'Quick and reliable shipping to your doorstep.' },
 ]
+
+// Editorial "Statement" band — shown only when enabled and a quote is written.
+const statement = computed(() => siteConfig.value?.homepage_statement)
+const showStatement = computed(() => !!(statement.value?.enabled && statement.value?.quote?.trim()))
 
 const defaultStats = [
   { value: '500+', label: 'Products' },

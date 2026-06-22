@@ -116,6 +116,7 @@
             @start-edit="startEdit"
             @save-edit="saveEdit"
             @cancel-edit="cancelEdit"
+            @edit-cover="openCover"
             @update:edit-name="editName = $event"
             @confirm-delete="confirmDelete"
             @start-add="startAddChild"
@@ -140,6 +141,16 @@
       @confirm="executeDelete"
       @cancel="deleteTarget = null"
     />
+
+    <!-- Category cover image -->
+    <AdminCategoryCoverModal
+      :open="!!coverTarget"
+      :category="coverTarget"
+      @close="coverTarget = null"
+      @saved="onCoverSaved"
+    />
+
+    <AdminToast />
   </div>
 </template>
 
@@ -149,6 +160,9 @@ definePageMeta({ layout: 'admin' })
 interface Category {
   id: number
   name: string
+  slug?: string | null
+  image_url?: string | null
+  overlay_opacity?: number | null
   parent_id: number | null
   sort_order: number
   children?: Category[]
@@ -178,6 +192,16 @@ const editName = ref('')
 
 // Delete
 const deleteTarget = ref<Category | null>(null)
+
+// Cover image
+const coverTarget = ref<Category | null>(null)
+function openCover(cat: Category) {
+  coverTarget.value = cat
+}
+function onCoverSaved() {
+  coverTarget.value = null
+  fetchCategories()
+}
 
 // Search
 const searchQuery = ref('')
@@ -243,6 +267,9 @@ function normalizeCategories(cats: any[]): Category[] {
   return (cats || []).map(c => ({
     ...c,
     id: Number(c.id),
+    slug: c.slug ?? null,
+    image_url: c.image_url ?? null,
+    overlay_opacity: c.overlay_opacity ?? null,
     parent_id: c.parent_id != null ? Number(c.parent_id) : null,
     children: normalizeCategories(c.children || c.children_recursive || []),
   }))

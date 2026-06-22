@@ -8,7 +8,7 @@
 
     <h1 class="text-2xl font-bold text-gray-900">{{ isNew ? 'Create admin' : 'Edit admin' }}</h1>
     <p v-if="isNew" class="text-sm text-gray-500">
-      Creating an admin provisions a dedicated store with default settings. Super admins do not get a store.
+      An admin belongs to a store — assign them to an existing one or provision a new store. Super admins do not get a store.
     </p>
 
     <div v-if="loading && !isNew" class="text-sm text-gray-400">Loading…</div>
@@ -40,33 +40,47 @@
         <p class="text-xs text-gray-400 mt-1">Role is fixed at creation. To change it, delete this account and create a new one.</p>
       </div>
 
-      <div v-if="isNew && form.role === 'admin'" class="grid gap-4 md:grid-cols-2 bg-purple-50/40 border border-purple-100 rounded-xl p-4">
-        <div class="md:col-span-2">
-          <p class="text-xs font-semibold text-purple-800 uppercase tracking-wide">New store</p>
-          <p class="text-xs text-purple-700/70 mt-0.5">A fresh store with default settings will be provisioned for this admin.</p>
-        </div>
+      <div v-if="isNew && form.role === 'admin'" class="space-y-4 bg-purple-50/40 border border-purple-100 rounded-xl p-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Store name</label>
-          <input v-model="form.store_name" type="text" required class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400" />
+          <p class="text-xs font-semibold text-purple-800 uppercase tracking-wide">Store</p>
+          <p class="text-xs text-purple-700/70 mt-0.5">Assign this admin to an existing store, or provision a new one.</p>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Store slug (optional)</label>
-          <input v-model="form.store_slug" type="text" pattern="[a-z0-9-]+" placeholder="auto-generated" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white font-mono focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400" />
+        <div class="flex flex-wrap gap-4 text-sm">
+          <label class="inline-flex items-center gap-2">
+            <input v-model="storeMode" type="radio" value="existing" /> Existing store
+          </label>
+          <label class="inline-flex items-center gap-2">
+            <input v-model="storeMode" type="radio" value="new" /> New store
+          </label>
+        </div>
+        <div v-if="storeMode === 'existing'">
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Store</label>
+          <select v-model.number="form.store_id" required class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400">
+            <option :value="null" disabled>Select a store…</option>
+            <option v-for="s in stores" :key="s.id" :value="s.id">{{ s.name }} ({{ s.slug }})</option>
+          </select>
+        </div>
+        <div v-else class="grid gap-4 md:grid-cols-2">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Store name</label>
+            <input v-model="form.store_name" type="text" required class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Store slug (optional)</label>
+            <input v-model="form.store_slug" type="text" pattern="[a-z0-9-]+" placeholder="auto-generated" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white font-mono focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400" />
+          </div>
         </div>
       </div>
 
-      <div v-if="!isNew && admin?.store">
+      <div v-if="!isNew && form.role === 'admin'">
         <label class="block text-sm font-medium text-gray-700 mb-1.5">Store</label>
-        <div class="flex items-center justify-between px-3 py-2 border border-gray-100 rounded-xl bg-gray-50">
-          <div>
-            <p class="text-sm text-gray-700">{{ admin.store.name }}</p>
-            <p class="text-xs text-gray-400 font-mono">{{ admin.store.slug }}</p>
-          </div>
-          <NuxtLink :to="`/super-admin/stores/${admin.store.id}`" class="text-xs text-purple-700 hover:underline">
-            Edit store →
-          </NuxtLink>
-        </div>
-        <p class="text-xs text-gray-400 mt-1">Store assignment is permanent (strict 1:1).</p>
+        <select v-model.number="form.store_id" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400">
+          <option v-for="s in stores" :key="s.id" :value="s.id">{{ s.name }} ({{ s.slug }})</option>
+        </select>
+        <p class="text-xs text-gray-400 mt-1">
+          Reassigning moves this admin to another store. A store keeps working as long as it has at least one admin.
+          <NuxtLink v-if="admin?.store" :to="`/super-admin/stores/${admin.store.id}`" class="text-purple-700 hover:underline">Edit current store →</NuxtLink>
+        </p>
       </div>
 
       <div class="grid gap-4 md:grid-cols-2">
@@ -105,7 +119,7 @@
           class="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl disabled:opacity-50"
           @click="del"
         >
-          {{ deleting ? 'Deleting…' : 'Delete admin + store' }}
+          {{ deleting ? 'Deleting…' : 'Delete admin' }}
         </button>
       </div>
     </form>
@@ -121,6 +135,8 @@ const isNew = computed(() => route.params.id === 'new')
 const id = computed(() => Number(route.params.id))
 
 const admin = ref<AdminUser | null>(null)
+const stores = ref<Store[]>([])
+const storeMode = ref<'existing' | 'new'>('existing')
 const loading = ref(!isNew.value)
 const saving = ref(false)
 const deleting = ref(false)
@@ -130,6 +146,7 @@ const form = ref({
   name: '',
   email: '',
   role: 'admin' as 'admin' | 'super_admin',
+  store_id: null as number | null,
   store_name: '',
   store_slug: '',
   password: '',
@@ -138,20 +155,39 @@ const form = ref({
 })
 
 onMounted(async () => {
-  if (!isNew.value) {
-    try {
-      const adminsResult = await api.listAdmins()
-      const found = adminsResult.data.find((a) => a.id === id.value) ?? null
-      admin.value = found
-      if (found) {
-        form.value.name = found.name
-        form.value.email = found.email
-        form.value.role = found.role
-        form.value.status = found.status
-      }
-    } finally {
-      loading.value = false
+  // Stores are needed both to pick an existing store on create and to reassign
+  // on edit. Default to "new store" only when none exist yet.
+  try {
+    const storesResult = await api.listStores()
+    stores.value = storesResult.data
+  } catch {
+    stores.value = []
+  }
+
+  if (isNew.value) {
+    const preselect = Number(route.query.store_id)
+    if (preselect && stores.value.some((s) => s.id === preselect)) {
+      storeMode.value = 'existing'
+      form.value.store_id = preselect
+    } else if (stores.value.length === 0) {
+      storeMode.value = 'new'
     }
+    return
+  }
+
+  try {
+    const adminsResult = await api.listAdmins()
+    const found = adminsResult.data.find((a) => a.id === id.value) ?? null
+    admin.value = found
+    if (found) {
+      form.value.name = found.name
+      form.value.email = found.email
+      form.value.role = found.role
+      form.value.status = found.status
+      form.value.store_id = found.store?.id ?? null
+    }
+  } finally {
+    loading.value = false
   }
 })
 
@@ -168,8 +204,12 @@ const save = async () => {
         password_confirmation: form.value.password_confirmation,
       }
       if (form.value.role === 'admin') {
-        payload.store_name = form.value.store_name
-        if (form.value.store_slug) payload.store_slug = form.value.store_slug
+        if (storeMode.value === 'existing') {
+          payload.store_id = form.value.store_id
+        } else {
+          payload.store_name = form.value.store_name
+          if (form.value.store_slug) payload.store_slug = form.value.store_slug
+        }
       }
       const result = await api.createAdmin(payload as never)
       router.push(`/super-admin/admins/${result.data.id}`)
@@ -178,6 +218,10 @@ const save = async () => {
         name: form.value.name,
         email: form.value.email,
         status: form.value.status,
+      }
+      // Reassign store when it changed (admins only; super admins have none).
+      if (form.value.role === 'admin' && form.value.store_id && form.value.store_id !== (admin.value?.store?.id ?? null)) {
+        payload.store_id = form.value.store_id
       }
       if (form.value.password) {
         payload.password = form.value.password
@@ -193,7 +237,7 @@ const save = async () => {
 }
 
 const del = async () => {
-  if (!confirm('Delete this admin AND their store? The store will be soft-deleted (recoverable). All store data stays in the database for now.')) return
+  if (!confirm('Delete this admin? If they are the last admin of their store, the store is also soft-deleted (recoverable). Stores with other admins are kept.')) return
   deleting.value = true
   try {
     await api.deleteAdmin(id.value)

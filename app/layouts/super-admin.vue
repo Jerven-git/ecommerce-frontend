@@ -29,12 +29,6 @@
       </nav>
 
       <div class="p-4 border-t border-gray-100 space-y-2">
-        <NuxtLink
-          to="/admin"
-          class="block px-3 py-2 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
-        >
-          ← Back to store admin
-        </NuxtLink>
         <button
           class="block w-full text-left px-3 py-2 text-xs text-gray-500 hover:text-red-600 hover:bg-gray-50 rounded-lg transition-colors"
           @click="handleLogout"

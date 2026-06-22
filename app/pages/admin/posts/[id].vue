@@ -210,7 +210,7 @@
         </Teleport>
 
         <!-- SEO -->
-        <SeoFields
+        <AdminSeoFields
           v-model:seo-title="form.seo_title"
           v-model:seo-description="form.seo_description"
           v-model:og-image-url="form.og_image_url"

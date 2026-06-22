@@ -1,0 +1,553 @@
+<template>
+  <div class="min-h-screen flex flex-col">
+
+    <!-- Category Hero (shown when a category with a cover is active) -->
+    <section
+      v-if="activeCategory && activeCategory.image_url"
+      class="relative text-white overflow-hidden"
+      :style="categoryHeroStyle"
+    >
+      <div class="absolute inset-0" :style="{ backgroundColor: '#000000', opacity: (activeCategory.overlay_opacity ?? 45) / 100 }" />
+      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+        <p class="hero-stagger text-xs font-semibold uppercase tracking-widest text-white/70 mb-2" style="animation-delay: 0.1s">{{ siteConfig?.shop_header?.label || 'Collection' }}</p>
+        <h1 class="hero-stagger text-4xl font-bold drop-shadow-md" style="animation-delay: 0.25s">{{ activeCategory.name }}</h1>
+      </div>
+    </section>
+
+    <!-- Page Header (default, or when the active category has no cover) -->
+    <div v-else class="bg-white border-b border-gray-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <p class="hero-stagger text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1" style="animation-delay: 0.1s">{{ siteConfig?.shop_header?.label || 'Collection' }}</p>
+        <h1 class="hero-stagger text-3xl font-bold text-gray-900" style="animation-delay: 0.25s">{{ activeCategory?.name || siteConfig?.shop_header?.heading || 'Collection' }}</h1>
+        <p class="hero-stagger text-sm text-gray-500 mt-1" style="animation-delay: 0.4s">{{ siteConfig?.shop_header?.subtitle || 'Browse our full collection' }}</p>
+      </div>
+    </div>
+
+    <!-- Category Slider -->
+    <div v-if="categories.length" class="bg-white border-b border-gray-100">
+      <!-- Root level categories -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div
+          :ref="el => setSliderRef(el as HTMLElement | null, 0)"
+          class="category-slider flex items-center gap-2 sm:gap-3 overflow-x-auto py-3 sm:py-4"
+          @scroll="() => updateScrollArrows(0)"
+        >
+          <button
+            @click="selectAtLevel(0, null)"
+            class="whitespace-nowrap px-4 sm:px-5 py-[7px] sm:py-2 rounded-full text-[13px] font-medium transition-all duration-200 shrink-0 cursor-pointer select-none"
+            :class="!selectedPath[0]
+              ? 'bg-[var(--color-secondary)] text-white shadow-md'
+              : 'bg-white text-gray-600 border border-gray-200 hover:border-[var(--color-secondary-300)] hover:text-[var(--color-secondary)] hover:-translate-y-px'"
+          >
+            All
+          </button>
+          <button
+            v-for="cat in categoryLevels[0]"
+            :key="cat.id"
+            @click="selectAtLevel(0, cat)"
+            class="whitespace-nowrap px-4 sm:px-5 py-[7px] sm:py-2 rounded-full text-[13px] font-medium transition-all duration-200 shrink-0 cursor-pointer select-none"
+            :class="selectedPath[0]?.id === cat.id
+              ? 'bg-[var(--color-secondary)] text-white shadow-md'
+              : 'bg-white text-gray-600 border border-gray-200 hover:border-[var(--color-secondary-300)] hover:text-[var(--color-secondary)] hover:-translate-y-px'"
+          >
+            {{ cat.name }}
+          </button>
+        </div>
+
+        <!-- Scroll arrows for root -->
+        <ShopScrollArrow :visible="!!sliderScrollState[0]?.left" direction="left" @scroll="scrollSlider(0, 'left')" />
+        <ShopScrollArrow :visible="!!sliderScrollState[0]?.right" direction="right" @scroll="scrollSlider(0, 'right')" />
+      </div>
+
+      <!-- Subcategory levels with line connector -->
+      <TransitionGroup name="sublevel">
+        <div
+          v-for="(level, idx) in subCategoryLevels"
+          :key="'sub-' + idx + '-' + (selectedPath[idx]?.id ?? 'none')"
+          class="bg-gradient-to-b from-gray-50 to-white border-t border-gray-100"
+        >
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <!-- Connecting line & label -->
+            <div class="flex items-center gap-2 pt-2 sm:pt-3 pb-1">
+              <div class="w-1.5 h-1.5 rounded-full bg-[var(--color-secondary)] shadow-[0_0_0_3px_rgba(var(--color-secondary-rgb,99,102,241),0.15)] shrink-0" />
+              <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+              <span class="text-[10px] sm:text-xs font-medium text-gray-400 uppercase tracking-wider shrink-0 px-1">
+                {{ selectedPath[idx]?.name }}
+              </span>
+              <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+            </div>
+
+            <!-- Subcategory pills -->
+            <div
+              :ref="el => setSliderRef(el as HTMLElement | null, idx + 1)"
+              class="category-slider flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-3 sm:pb-4 pt-1"
+              @scroll="() => updateScrollArrows(idx + 1)"
+            >
+              <button
+                @click="selectAtLevel(idx + 1, null)"
+                class="whitespace-nowrap px-3.5 sm:px-4 py-[5px] sm:py-1.5 rounded-lg text-xs font-medium transition-all duration-200 shrink-0 cursor-pointer select-none"
+                :class="!selectedPath[idx + 1]
+                  ? 'bg-[var(--color-secondary)] text-white shadow-sm'
+                  : 'bg-gray-50 text-gray-500 border border-gray-200 hover:bg-white hover:border-[var(--color-secondary-300)] hover:text-[var(--color-secondary)]'"
+              >
+                All {{ selectedPath[idx]?.name ?? '' }}
+              </button>
+              <button
+                v-for="cat in level"
+                :key="cat.id"
+                @click="selectAtLevel(idx + 1, cat)"
+                class="whitespace-nowrap px-3.5 sm:px-4 py-[5px] sm:py-1.5 rounded-lg text-xs font-medium transition-all duration-200 shrink-0 cursor-pointer select-none"
+                :class="selectedPath[idx + 1]?.id === cat.id
+                  ? 'bg-[var(--color-secondary)] text-white shadow-sm'
+                  : 'bg-gray-50 text-gray-500 border border-gray-200 hover:bg-white hover:border-[var(--color-secondary-300)] hover:text-[var(--color-secondary)]'"
+              >
+                {{ cat.name }}
+              </button>
+            </div>
+
+            <!-- Scroll arrows for subcategory -->
+            <ShopScrollArrow :visible="!!sliderScrollState[idx + 1]?.left" direction="left" small @scroll="scrollSlider(idx + 1, 'left')" />
+            <ShopScrollArrow :visible="!!sliderScrollState[idx + 1]?.right" direction="right" small @scroll="scrollSlider(idx + 1, 'right')" />
+          </div>
+        </div>
+      </TransitionGroup>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white border-b border-gray-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex gap-3">
+
+          <!-- Search -->
+          <div class="flex-1 flex items-center rounded-xl border border-gray-200 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500/20 focus-within:border-primary-400 transition-all bg-white">
+            <span class="flex items-center pl-3.5 pr-2 text-gray-400 shrink-0">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
+              </svg>
+            </span>
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search products..."
+              class="flex-1 py-2.5 pr-3.5 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none"
+              @input="debouncedFetch"
+            />
+          </div>
+
+          <!-- Sort -->
+          <select
+            v-model="sortBy"
+            class="py-2.5 px-3.5 text-sm text-gray-700 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 transition-all"
+            @change="fetchProducts"
+          >
+            <option value="newest">Newest First</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="name">Name: A to Z</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 section-accent">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
+
+        <!-- Skeleton -->
+        <ShopProductSkeleton v-if="loading" />
+
+        <!-- Error -->
+        <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center max-w-sm mx-auto mt-8">
+          <div class="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-3">
+            <svg class="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <p class="text-sm font-medium text-red-600 mb-4">{{ error }}</p>
+          <button @click="fetchProducts" class="btn-primary">Retry</button>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else-if="products.length === 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center max-w-sm mx-auto mt-8">
+          <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-7 h-7 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13M7 13L5.4 5M17 21a1 1 0 100-2 1 1 0 000 2zm-10 0a1 1 0 100-2 1 1 0 000 2z" />
+            </svg>
+          </div>
+          <p class="text-sm font-semibold text-gray-900 mb-1">No products found</p>
+          <p class="text-sm text-gray-400 mb-5">Try adjusting your search or filter to find what you're looking for.</p>
+          <button @click="clearFilters" class="btn-secondary">Clear Filters</button>
+        </div>
+
+        <!-- Product Grid with stagger -->
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div
+            v-for="product in products"
+            :key="product.id"
+            :ref="addCardRevealRef"
+            class="card-stagger"
+          >
+            <ProductCard :product="product" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Promo Banner -->
+    <div ref="promoRef" class="reveal">
+      <ShopPromoBanner />
+    </div>
+
+  </div>
+</template>
+
+<script setup lang="ts">
+import type { Product } from '~/types/product'
+
+interface Category {
+  id: number
+  name: string
+  slug: string | null
+  image_url: string | null
+  overlay_opacity: number | null
+  parent_id: number | null
+  sort_order: number
+  children: Category[]
+}
+
+interface ProductsResponse {
+  data: Product[]
+}
+
+interface CategoriesResponse {
+  data: Category[]
+}
+
+const { $apiFetch } = useNuxtApp()
+const { siteConfig } = useSiteConfig()
+const route = useRoute()
+
+// Scroll reveal
+const { revealRef: promoRef } = useScrollReveal()
+const { addRevealRef: addCardRevealRef } = useScrollRevealAll({ threshold: 0.1 })
+
+const products = ref<Product[]>([])
+const categories = ref<Category[]>([])
+const loading = ref(true)
+const error = ref<string | null>(null)
+const searchQuery = ref('')
+const sortBy = ref('newest')
+
+// Multi-level category selection: selectedPath[0] = root selection, [1] = sub, etc.
+const selectedPath = ref<(Category | null)[]>([])
+
+// Computed: the levels of category pills to show
+const categoryLevels = computed(() => {
+  const levels: Category[][] = [categories.value]
+  for (const selected of selectedPath.value) {
+    if (!selected || !selected.children?.length) break
+    levels.push(selected.children)
+  }
+  return levels
+})
+
+// Subcategory levels only (excludes root level)
+const subCategoryLevels = computed(() => categoryLevels.value.slice(1))
+
+// The deepest selected category ID (used for API filtering)
+const activeCategoryId = computed(() => {
+  for (let i = selectedPath.value.length - 1; i >= 0; i--) {
+    if (selectedPath.value[i]) return selectedPath.value[i]!.id
+  }
+  return null
+})
+
+// The deepest selected category object (drives the category hero).
+const activeCategory = computed<Category | null>(() => {
+  for (let i = selectedPath.value.length - 1; i >= 0; i--) {
+    if (selectedPath.value[i]) return selectedPath.value[i]!
+  }
+  return null
+})
+
+const categoryHeroStyle = computed(() => {
+  const url = activeCategory.value?.image_url
+  if (url) {
+    return {
+      backgroundImage: `url(${url})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundColor: '#1e293b',
+    }
+  }
+  return {}
+})
+
+const selectAtLevel = (levelIndex: number, cat: Category | null) => {
+  // Truncate path to this level and set selection
+  const newPath = selectedPath.value.slice(0, levelIndex)
+  newPath[levelIndex] = cat
+  selectedPath.value = newPath
+  fetchProducts()
+}
+
+// Slider refs (non-reactive — never read in template, only used in handlers)
+const sliderRefs = new Map<number, HTMLElement>()
+const sliderScrollState = ref<Record<number, { left: boolean; right: boolean }>>({})
+
+const setSliderRef = (el: HTMLElement | null, index: number) => {
+  if (el) {
+    sliderRefs.set(index, el)
+    nextTick(() => updateScrollArrows(index))
+  } else {
+    sliderRefs.delete(index)
+  }
+}
+
+const updateScrollArrows = (index: number) => {
+  const el = sliderRefs.get(index)
+  if (!el) return
+  const left = el.scrollLeft > 0
+  const right = el.scrollLeft + el.clientWidth < el.scrollWidth - 1
+  const current = sliderScrollState.value[index]
+  if (current?.left === left && current?.right === right) return
+  sliderScrollState.value = {
+    ...sliderScrollState.value,
+    [index]: { left, right },
+  }
+}
+
+const scrollSlider = (index: number, direction: 'left' | 'right') => {
+  const el = sliderRefs.get(index)
+  if (!el) return
+  el.scrollBy({ left: direction === 'left' ? -200 : 200, behavior: 'smooth' })
+}
+
+const getSortParams = () => {
+  switch (sortBy.value) {
+    case 'price-low':  return { sort: 'price', order: 'asc' }
+    case 'price-high': return { sort: 'price', order: 'desc' }
+    case 'name':       return { sort: 'name', order: 'asc' }
+    case 'newest':
+    default:           return { sort: 'created_at', order: 'desc' }
+  }
+}
+
+const clearFilters = () => {
+  searchQuery.value = ''
+  selectedPath.value = []
+  sortBy.value = 'newest'
+  fetchProducts()
+}
+
+function normalizeCategories(cats: any[]): Category[] {
+  return (cats || []).map(c => ({
+    ...c,
+    id: Number(c.id),
+    parent_id: c.parent_id != null ? Number(c.parent_id) : null,
+    children: normalizeCategories(c.children || c.children_recursive || []),
+  }))
+}
+
+const fetchCategories = async () => {
+  try {
+    const response = await $apiFetch<CategoriesResponse>('/categories', { method: 'GET' })
+    if (response?.data) {
+      categories.value = normalizeCategories(response.data)
+    }
+  } catch (err) {
+    console.error('Error fetching categories:', err)
+  }
+}
+
+const fetchProducts = async () => {
+  loading.value = true
+  error.value = null
+
+  try {
+    const sortParams = getSortParams()
+    const queryParams: Record<string, any> = { is_active: 1, ...sortParams }
+
+    if (activeCategoryId.value) queryParams.category_id = activeCategoryId.value
+    if (searchQuery.value) queryParams.search = searchQuery.value
+
+    const response = await $apiFetch<ProductsResponse>('/products', {
+      method: 'GET',
+      query: queryParams
+    })
+
+    if (response?.data) {
+      products.value = response.data
+    }
+  } catch (err: any) {
+    console.error('Error fetching products:', err)
+    error.value = err?.data?.message || 'Failed to load products. Please try again.'
+  } finally {
+    loading.value = false
+    nextTick(() => {
+      for (const idx of sliderRefs.keys()) {
+        updateScrollArrows(idx)
+      }
+    })
+  }
+}
+
+let debounceTimer: ReturnType<typeof setTimeout>
+const debouncedFetch = () => {
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(fetchProducts, 500)
+}
+
+// Build the [root, sub, ...] selection path that leads to the given category id,
+// so a deep link from `/collection?category_id=42` opens with that branch already selected.
+function buildPathToCategory(tree: Category[], targetId: number): Category[] | null {
+  for (const cat of tree) {
+    if (cat.id === targetId) return [cat]
+    if (cat.children?.length) {
+      const childPath = buildPathToCategory(cat.children, targetId)
+      if (childPath) return [cat, ...childPath]
+    }
+  }
+  return null
+}
+
+// Find a category anywhere in the tree by its slug.
+function findCategoryBySlug(tree: Category[], slug: string): Category | null {
+  for (const cat of tree) {
+    if (cat.slug === slug) return cat
+    if (cat.children?.length) {
+      const found = findCategoryBySlug(cat.children, slug)
+      if (found) return found
+    }
+  }
+  return null
+}
+
+// Preselect a category from the URL. Supports both `?category=<slug>` and the
+// legacy `?category_id=<id>` deep link. Returns true if it changed the selection.
+function applyCategoryFromQuery(): boolean {
+  const bySlug = typeof route.query.category === 'string' ? route.query.category : null
+  let targetId: number | null = null
+
+  if (bySlug) {
+    const found = findCategoryBySlug(categories.value, bySlug)
+    if (found) targetId = found.id
+  } else {
+    const queryCategoryId = Number(route.query.category_id)
+    if (Number.isFinite(queryCategoryId) && queryCategoryId > 0) targetId = queryCategoryId
+  }
+
+  if (targetId !== null) {
+    const path = buildPathToCategory(categories.value, targetId)
+    if (path) {
+      selectedPath.value = path
+      return true
+    }
+  }
+  return false
+}
+
+// React to navigation between categories while already on this page.
+watch(() => [route.query.category, route.query.category_id], () => {
+  if (applyCategoryFromQuery()) fetchProducts()
+})
+
+onMounted(async () => {
+  await fetchCategories()
+  applyCategoryFromQuery()
+  fetchProducts()
+})
+
+useStaticPageSeo('shop')
+</script>
+
+<style scoped>
+/* Page header staggered entrance */
+.hero-stagger {
+  opacity: 0;
+  animation: hero-fade-up 0.7s ease forwards;
+}
+
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hidden scrollbar for category sliders */
+.category-slider {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+.category-slider::-webkit-scrollbar {
+  display: none;
+}
+
+/* Sublevel transition */
+.sublevel-enter-active {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+.sublevel-leave-active {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+.sublevel-enter-from {
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(-8px);
+}
+.sublevel-enter-to {
+  opacity: 1;
+  max-height: 120px;
+  transform: translateY(0);
+}
+.sublevel-leave-from {
+  opacity: 1;
+  max-height: 120px;
+  transform: translateY(0);
+}
+.sublevel-leave-to {
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(-8px);
+}
+
+/* Product card stagger pop-up — scroll triggered, row-by-row */
+.card-stagger {
+  opacity: 0;
+  transform: translateY(24px) scale(0.94);
+}
+
+.card-stagger.reveal-visible {
+  animation: card-pop-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes card-pop-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-stagger,
+  .card-stagger.reveal-visible,
+  .hero-stagger {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+</style>

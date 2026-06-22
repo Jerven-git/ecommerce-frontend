@@ -28,6 +28,8 @@ export interface VariantDraft {
 export interface ProductFormData {
   name: string
   description: string
+  material: string
+  dimensions: string
   price: number
   stock: number
   weight: number
@@ -52,6 +54,8 @@ function defaultFormData(): ProductFormData {
   return {
     name: '',
     description: '',
+    material: '',
+    dimensions: '',
     price: 0,
     stock: 0,
     weight: 0,
@@ -82,6 +86,42 @@ export function useProductForm() {
   const formError = ref<string | null>(null)
   const editingProduct = ref<Product | null>(null)
   const form = ref<ProductFormData>(defaultFormData())
+
+  // Secondary "hover" image — a single staged file. `hoverImageUrl` holds the
+  // already-saved URL; `hoverPreview` is an object URL for a freshly picked
+  // file; `hoverCleared` marks that the saved image should be removed on save.
+  const hoverFile = ref<File | null>(null)
+  const hoverPreview = ref<string | null>(null)
+  const hoverImageUrl = ref<string | null>(null)
+  const hoverCleared = ref(false)
+
+  const hoverDisplayUrl = computed(
+    () => hoverPreview.value || (hoverCleared.value ? null : hoverImageUrl.value),
+  )
+
+  function resetHoverImage() {
+    if (hoverPreview.value) URL.revokeObjectURL(hoverPreview.value)
+    hoverFile.value = null
+    hoverPreview.value = null
+    hoverImageUrl.value = null
+    hoverCleared.value = false
+  }
+
+  function onHoverImageSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0]
+    if (!file) return
+    if (hoverPreview.value) URL.revokeObjectURL(hoverPreview.value)
+    hoverFile.value = file
+    hoverPreview.value = URL.createObjectURL(file)
+    hoverCleared.value = false
+  }
+
+  function removeHoverImage() {
+    if (hoverPreview.value) URL.revokeObjectURL(hoverPreview.value)
+    hoverFile.value = null
+    hoverPreview.value = null
+    hoverCleared.value = true
+  }
 
   // Unified product images — gallery works for both new and existing products.
   // Staged galleryFiles are uploaded by saveProduct after the product is
@@ -457,6 +497,7 @@ export function useProductForm() {
   const openAddModal = () => {
     editingProduct.value = null
     form.value = defaultFormData()
+    resetHoverImage()
     galleryImages.value = []
     galleryFiles.value = []
     if (galleryInput.value) galleryInput.value.value = ''
@@ -470,6 +511,8 @@ export function useProductForm() {
     form.value = {
       name: product.name,
       description: product.description,
+      material: (product as any).material ?? '',
+      dimensions: (product as any).dimensions ?? '',
       price: parseFloat(product.price as string),
       stock: product.stock,
       weight: parseFloat(String(product.weight || 0)),
@@ -489,6 +532,8 @@ export function useProductForm() {
       og_image_url: (product as any).og_image_url ?? '',
       noindex: !!(product as any).noindex,
     }
+    resetHoverImage()
+    hoverImageUrl.value = (product as any).hover_image_url ?? null
     galleryFiles.value = []
     galleryImages.value = []
     if (galleryInput.value) galleryInput.value.value = ''
@@ -526,6 +571,7 @@ export function useProductForm() {
     showModal.value = false
     editingProduct.value = null
     formError.value = null
+    resetHoverImage()
     galleryFiles.value = []
     if (galleryInput.value) galleryInput.value.value = ''
     resetVariantState()
@@ -539,6 +585,8 @@ export function useProductForm() {
       const formData = new FormData()
       formData.append('name', form.value.name)
       formData.append('description', form.value.description)
+      formData.append('material', form.value.material)
+      formData.append('dimensions', form.value.dimensions)
       formData.append('price', String(form.value.price))
       formData.append('stock', String(form.value.stock))
       formData.append('weight', String(form.value.weight))
@@ -561,6 +609,14 @@ export function useProductForm() {
       if (form.value.seo_description.trim()) formData.append('seo_description', form.value.seo_description.trim())
       if (form.value.og_image_url.trim()) formData.append('og_image_url', form.value.og_image_url.trim())
       formData.append('noindex', form.value.noindex ? '1' : '0')
+
+      // Secondary hover image: send a freshly picked file, or an empty string
+      // to clear a previously-saved one.
+      if (hoverFile.value) {
+        formData.append('hover_image', hoverFile.value)
+      } else if (hoverCleared.value) {
+        formData.append('hover_image_url', '')
+      }
 
       if (editingProduct.value) {
         formData.append('_method', 'PATCH')
@@ -624,6 +680,9 @@ export function useProductForm() {
     onGallerySelected,
     removeStagedFile,
     deleteGalleryImage,
+    hoverDisplayUrl,
+    onHoverImageSelected,
+    removeHoverImage,
     openAddModal,
     openEditModal,
     closeModal,

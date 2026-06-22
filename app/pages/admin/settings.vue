@@ -189,7 +189,7 @@ watch(activeTab, (tab) => {
 
 // --- Media upload composable ---
 const media = useMediaUpload({
-  collections: ['logo', 'favicon', 'cart_icon', 'footer_logo', 'hero', 'about', 'contact', 'blog', 'services', 'showcase_video'],
+  collections: ['logo', 'favicon', 'cart_icon', 'footer_logo', 'hero', 'about', 'contact', 'blog', 'services', 'showcase_video', 'homepage_statement', 'story_image_a', 'story_image_b'],
   limits: {
     logo:      { maxMB: 2,  label: 'Logo' },
     favicon:   { maxMB: 2,  label: 'Site icon' },
@@ -201,6 +201,9 @@ const media = useMediaUpload({
     blog:    { maxMB: 10, label: 'Blog image' },
     services:{ maxMB: 10, label: 'Services image' },
     showcase_video: { maxMB: 25, label: 'Showcase video', accept: ['video/'] },
+    homepage_statement: { maxMB: 10, label: 'Statement image' },
+    story_image_a: { maxMB: 10, label: 'Story section 1 image' },
+    story_image_b: { maxMB: 10, label: 'Story section 2 image' },
   },
   apiFetch: $apiFetch,
 })
@@ -381,6 +384,14 @@ const form = ref({
   hero_media_mime: "",
   about_content: "",
   about_image_url: "",
+  story_page: {
+    enabled: false,
+    hero: { eyebrow: 'Our Story', heading: 'Our Story', subtitle: '' },
+    section_a: { heading: '', body: '', cta_label: '', cta_link: '/shop', image_position: 'right', image_url: null },
+    section_b: { heading: '', body: '', cta_label: '', cta_link: '/contact', image_position: 'left', image_url: null },
+  } as import('~/composables/useSiteConfig').StoryPage,
+  story_image_a_url: "",
+  story_image_b_url: "",
   about_overlay_color: "#000000",
   about_overlay_opacity: 45,
   contact_image_url: "",
@@ -423,6 +434,16 @@ const form = ref({
       { value: '24/7', label: 'Support' },
     ],
   },
+  homepage_statement: {
+    enabled: false,
+    eyebrow: 'Our Promise',
+    quote: '',
+    attribution: '',
+    role: '',
+    cta_label: '',
+    cta_link: '',
+  },
+  homepage_statement_image_url: "",
   homepage_newsletter: {
     label: 'Stay in the loop',
     heading: "Don't miss a deal.",
@@ -576,6 +597,9 @@ const urlFields: Record<MediaCollection, keyof typeof form.value> = {
   blog: 'blog_image_url',
   services: 'services_image_url',
   showcase_video: 'showcase_video_url',
+  homepage_statement: 'homepage_statement_image_url',
+  story_image_a: 'story_image_a_url',
+  story_image_b: 'story_image_b_url',
 }
 
 // --- Media event handlers ---
@@ -722,6 +746,29 @@ async function loadSettings() {
         hero_media_mime: response.data.hero_media_mime || "",
         about_content: response.data.about_content || "",
         about_image_url: response.data.about_image_url || "",
+        story_page: (() => {
+          const s = response.data.story_page ?? {}
+          const sec = (raw: any, fallbackPos: 'left' | 'right', fallbackLink: string) => ({
+            heading: raw?.heading ?? '',
+            body: raw?.body ?? '',
+            cta_label: raw?.cta_label ?? '',
+            cta_link: raw?.cta_link ?? fallbackLink,
+            image_position: raw?.image_position === 'left' || raw?.image_position === 'right' ? raw.image_position : fallbackPos,
+            image_url: raw?.image_url ?? null,
+          })
+          return {
+            enabled: s.enabled ?? false,
+            hero: {
+              eyebrow: s.hero?.eyebrow ?? 'Our Story',
+              heading: s.hero?.heading ?? 'Our Story',
+              subtitle: s.hero?.subtitle ?? '',
+            },
+            section_a: sec(s.section_a, 'right', '/shop'),
+            section_b: sec(s.section_b, 'left', '/contact'),
+          }
+        })(),
+        story_image_a_url: response.data.story_page?.section_a?.image_url || "",
+        story_image_b_url: response.data.story_page?.section_b?.image_url || "",
         about_overlay_color: response.data.about_overlay_color || "#000000",
         about_overlay_opacity: response.data.about_overlay_opacity ?? 45,
         contact_image_url: response.data.contact_image_url || "",
@@ -781,6 +828,19 @@ async function loadSettings() {
             { value: '24/7', label: 'Support' },
           ],
         },
+        homepage_statement: (() => {
+          const s = response.data.homepage_statement ?? {}
+          return {
+            enabled: s.enabled ?? false,
+            eyebrow: s.eyebrow ?? 'Our Promise',
+            quote: s.quote ?? '',
+            attribution: s.attribution ?? '',
+            role: s.role ?? '',
+            cta_label: s.cta_label ?? '',
+            cta_link: s.cta_link ?? '',
+          }
+        })(),
+        homepage_statement_image_url: response.data.homepage_statement?.image_url || "",
         homepage_newsletter: response.data.homepage_newsletter ?? {
           label: 'Stay in the loop', heading: "Don't miss a deal.",
           subtitle: 'Get the latest products, exclusive offers, and updates delivered straight to your inbox.',
@@ -1025,6 +1085,13 @@ async function saveSettings() {
         about_overlay_color: form.value.about_overlay_color,
         about_overlay_opacity: form.value.about_overlay_opacity,
         about_image_url: form.value.about_image_url || null,
+        // image_url per section is server-owned (comes from the media upload);
+        // merge the resolved URLs back into each section object on save.
+        story_page: {
+          ...form.value.story_page,
+          section_a: { ...form.value.story_page.section_a, image_url: form.value.story_image_a_url || null },
+          section_b: { ...form.value.story_page.section_b, image_url: form.value.story_image_b_url || null },
+        },
         contact_overlay_color: form.value.contact_overlay_color,
         contact_overlay_opacity: form.value.contact_overlay_opacity,
         contact_image_url: form.value.contact_image_url || null,
@@ -1047,6 +1114,12 @@ async function saveSettings() {
         homepage_steps: form.value.homepage_steps,
         homepage_features: form.value.homepage_features,
         homepage_stats: form.value.homepage_stats,
+        // image_url is server-owned (comes from the media upload); merge the
+        // resolved URL back into the statement object on save.
+        homepage_statement: {
+          ...form.value.homepage_statement,
+          image_url: form.value.homepage_statement_image_url || null,
+        },
         homepage_newsletter: form.value.homepage_newsletter,
         // Strip server-owned fields (video_url/poster come from media,
         // video_status is owned by OptimizeShowcaseVideoJob).
