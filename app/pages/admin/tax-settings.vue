@@ -335,8 +335,9 @@
 
     <AdminSettingsSaveFooter
       :saving="saving"
+      :dirty="isDirty"
       @save="saveAll"
-      @reset="loadAll"
+      @discard="loadAll"
     />
 
     <AdminToast />
@@ -392,6 +393,10 @@ const allRegionRule = ref<TaxRuleForm>({
 
 const countryRules = ref<TaxRuleForm[]>([])
 const stateRules = ref<TaxRuleForm[]>([])
+
+const savedSnapshot = ref('')
+const dirtyForm = () => ({ form: form.value, allRegionRule: allRegionRule.value, countryRules: countryRules.value, stateRules: stateRules.value })
+const isDirty = computed(() => savedSnapshot.value !== '' && JSON.stringify(dirtyForm()) !== savedSnapshot.value)
 
 // --- Computed ---
 
@@ -526,6 +531,8 @@ async function loadAll() {
     if (countryRules.value.length > 0 || allRegionRule.value.enabled) {
       showRegional.value = true
     }
+
+    savedSnapshot.value = JSON.stringify(dirtyForm())
   } catch (err: any) {
     console.error('Error loading tax settings:', err)
     showToast(err?.data?.message || 'Failed to load tax settings', 'error')

@@ -192,8 +192,9 @@
 
     <AdminSettingsSaveFooter
       :saving="saving"
+      :dirty="isDirty"
       @save="saveSettings"
-      @reset="loadSettings"
+      @discard="loadSettings"
     />
 
     <AdminToast />
@@ -245,6 +246,9 @@ const blankForm = () => ({
 
 const form = ref(blankForm())
 
+const savedSnapshot = ref('')
+const isDirty = computed(() => savedSnapshot.value !== '' && JSON.stringify(form.value) !== savedSnapshot.value)
+
 // Whether each secret already has a value stored (the value itself is never sent
 // to the browser). Drives the "Configured" badge + placeholder.
 const configured = ref({
@@ -292,6 +296,7 @@ const loadSettings = async () => {
         square_webhook_secret: !!data.square_webhook_secret_configured,
       }
     }
+    savedSnapshot.value = JSON.stringify(form.value)
   } catch (err: any) {
     console.error('Error loading payment settings:', err)
     error.value = err?.data?.message || 'Failed to load payment settings'

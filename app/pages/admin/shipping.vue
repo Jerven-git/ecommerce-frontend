@@ -323,8 +323,9 @@
 
     <AdminSettingsSaveFooter
       :saving="saving"
+      :dirty="isDirty"
       @save="saveSettings"
-      @reset="loadSettings"
+      @discard="loadSettings"
     />
 
     <AdminToast />
@@ -490,6 +491,10 @@ const shippingZones = ref<ShippingZone[]>([
   }
 ])
 
+const savedSnapshot = ref('')
+const dirtyForm = () => ({ form: form.value, zones: shippingZones.value })
+const isDirty = computed(() => savedSnapshot.value !== '' && JSON.stringify(dirtyForm()) !== savedSnapshot.value)
+
 const loadSettings = async () => {
   loading.value = true
   error.value = null
@@ -542,6 +547,7 @@ const loadSettings = async () => {
         })
       }
     }
+    savedSnapshot.value = JSON.stringify(dirtyForm())
   } catch (err: any) {
     console.error('Error loading shipping settings:', err)
     error.value = err?.data?.message || 'Failed to load shipping settings'
