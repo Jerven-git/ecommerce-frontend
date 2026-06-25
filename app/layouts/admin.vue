@@ -130,17 +130,18 @@
 
         <!-- View Store + Account (bottom) -->
         <div class="space-y-1 pb-2">
-          <NuxtLink
-            to="/"
+          <a
+            :href="storeUrl"
             class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
             @click="closeSidebarOnMobile"
             target="_blank"
+            rel="noopener"
           >
             <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
             <span class="font-medium">View Store</span>
-          </NuxtLink>
+          </a>
 
           <!-- Account row -->
           <div class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-gray-50">
@@ -184,16 +185,17 @@
               </svg>
               Guide
             </button>
-            <NuxtLink
-              to="/"
+            <a
+              :href="storeUrl"
               class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-800 transition-colors"
               target="_blank"
+              rel="noopener"
             >
               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
               View Store
-            </NuxtLink>
+            </a>
           </div>
         </div>
       </header>
@@ -213,6 +215,32 @@ const authStore = useAuthStore()
 const route = useRoute()
 const { isEnabled } = useModules()
 const guideRef = ref<{ startGuide: () => void } | null>(null)
+const runtimeConfig = useRuntimeConfig()
+
+/**
+ * Absolute URL to the admin's own storefront. Prefers the store's custom domain
+ * (e.g. nazareck.com); otherwise falls back to its subdomain under the
+ * configured base domain (e.g. acme.localhost). The current port is preserved
+ * so it works in local dev (:8000) and production (no port) alike. Opening the
+ * apex ("/") would just bounce to the login, so "View Store" must target the
+ * store's real host.
+ */
+const storeUrl = computed<string>(() => {
+  if (!import.meta.client) return '/'
+
+  const store = authStore.user?.store
+  const { protocol, port, host: currentHost } = window.location
+  const portSuffix = port ? `:${port}` : ''
+  const baseDomain = (runtimeConfig.public.storefrontBaseDomain as string) || 'localhost'
+
+  const host = store?.domain
+    ? store.domain
+    : store?.slug
+      ? `${store.slug}.${baseDomain}`
+      : currentHost
+
+  return `${protocol}//${host}${portSuffix}`
+})
 
 interface NavItem {
   to: string

@@ -24,6 +24,17 @@
       </div>
 
       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Custom Domain</label>
+        <p class="text-xs text-gray-400 mb-2">Point your domain's DNS A record to your server IP.</p>
+        <input
+          v-model="form.domain"
+          type="text"
+          placeholder="nazareck.com"
+          class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white font-mono focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400"
+        />
+      </div>
+
+      <div>
         <label class="inline-flex items-center gap-2 text-sm">
           <input type="checkbox" :checked="form.status === 'active'" :disabled="store.is_default && form.status === 'active'" @change="form.status = ($event.target as HTMLInputElement).checked ? 'active' : 'inactive'" />
           <span>Active</span>
@@ -97,13 +108,18 @@ const loading = ref(true)
 const saving = ref(false)
 const deleting = ref(false)
 const saveError = ref<string | null>(null)
-const form = ref({ name: '', slug: '', status: 'active' as 'active' | 'inactive' })
+const form = ref({ name: '', slug: '', domain: '' as string | null, status: 'active' as 'active' | 'inactive' })
 
 onMounted(async () => {
   try {
     const [storeResult, adminsResult] = await Promise.all([api.showStore(id), api.listAdmins()])
     store.value = storeResult.data
-    form.value = { name: storeResult.data.name, slug: storeResult.data.slug, status: storeResult.data.status }
+    form.value = {
+      name: storeResult.data.name,
+      slug: storeResult.data.slug,
+      domain: storeResult.data.domain ?? '',
+      status: storeResult.data.status,
+    }
     storeAdmins.value = adminsResult.data.filter((a) => a.store?.id === id)
   } finally {
     loading.value = false
@@ -114,8 +130,13 @@ const save = async () => {
   saving.value = true
   saveError.value = null
   try {
-    const result = await api.updateStore(id, form.value)
+    const payload = {
+      ...form.value,
+      domain: form.value.domain?.trim() || null,
+    }
+    const result = await api.updateStore(id, payload)
     store.value = result.data
+    form.value.domain = result.data.domain ?? ''
   } catch (err: any) {
     saveError.value = err?.data?.message || 'Failed to save'
   } finally {

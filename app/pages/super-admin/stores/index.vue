@@ -24,7 +24,7 @@
         <thead class="bg-gray-50 border-b border-gray-100">
           <tr class="text-left text-xs uppercase tracking-wide text-gray-500">
             <th class="px-6 py-3">Name</th>
-            <th class="px-6 py-3">Slug</th>
+            <th class="px-6 py-3">Domains</th>
             <th class="px-6 py-3">Status</th>
             <th class="px-6 py-3">Admins</th>
             <th class="px-6 py-3"></th>
@@ -43,8 +43,12 @@
                 <span class="font-medium text-gray-900">{{ s.name }}</span>
                 <span v-if="s.is_default" class="px-2 py-0.5 text-[10px] font-medium rounded bg-purple-50 text-purple-700 uppercase">default</span>
               </div>
+              <div class="text-xs text-gray-400 font-mono mt-0.5">{{ s.slug }}</div>
             </td>
-            <td class="px-6 py-4 text-gray-500 font-mono text-xs">{{ s.slug }}</td>
+            <td class="px-6 py-4">
+              <span v-if="s.domain" class="text-xs font-mono text-purple-700">{{ s.domain }}</span>
+              <span v-else class="text-xs text-gray-400">—</span>
+            </td>
             <td class="px-6 py-4">
               <span
                 class="px-2 py-0.5 text-xs font-medium rounded"

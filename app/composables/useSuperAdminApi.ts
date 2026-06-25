@@ -2,6 +2,7 @@ export interface Store {
   id: number
   name: string
   slug: string
+  domain: string | null
   status: 'active' | 'inactive'
   is_default: boolean
   default_currency_id: number | null
@@ -47,6 +48,7 @@ export interface Paginated<T> {
 interface StoreInput {
   name: string
   slug?: string
+  domain?: string | null
   status?: 'active' | 'inactive'
   default_currency_id?: number | null
 }

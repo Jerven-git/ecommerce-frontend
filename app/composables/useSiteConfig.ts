@@ -266,6 +266,12 @@ export type ModulesEnabled = Record<ModuleKey, boolean>
 
 export interface SiteConfig {
   id: number
+  /**
+   * False when the request Host is the bare apex (no custom domain or store
+   * subdomain). The storefront-host middleware sends these visitors to the
+   * admin login instead of rendering a default store.
+   */
+  is_storefront_host: boolean
   site_name: string
   theme: SiteTheme
   logo_url: string | null
@@ -393,6 +399,10 @@ export const DEFAULT_THEME: SiteTheme = {
 export const DEFAULT_IN_STOCK_COLOR = '#16a34a'
 
 const DEFAULT_CONFIG: Partial<SiteConfig> = {
+  // Assume a storefront host by default so a failed/errored config fetch never
+  // bounces a real storefront to the admin login. Only an explicit `false` from
+  // the backend (bare apex) triggers the redirect.
+  is_storefront_host: true,
   theme: { ...DEFAULT_THEME },
   modules_enabled: { ...DEFAULT_MODULES_ENABLED },
 }
