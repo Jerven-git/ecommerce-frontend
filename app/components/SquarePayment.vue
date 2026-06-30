@@ -24,11 +24,14 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   amount: number
   applicationId: string
   locationId: string
-}>()
+  environment?: 'sandbox' | 'production'
+}>(), {
+  environment: 'production',
+})
 
 const emit = defineEmits<{
   (e: 'success', paymentId: string): void
@@ -46,9 +49,12 @@ let card: any = null
 
 const loadSquare = async () => {
   try {
-    // Load Square SDK
+    // Load Square SDK — sandbox vs production must match the merchant's
+    // configured square_mode, otherwise tokenization fails against live creds.
     const script = document.createElement('script')
-    script.src = 'https://sandbox.web.squarecdn.com/v1/square.js'
+    script.src = props.environment === 'sandbox'
+      ? 'https://sandbox.web.squarecdn.com/v1/square.js'
+      : 'https://web.squarecdn.com/v1/square.js'
     script.async = true
     
     await new Promise((resolve, reject) => {
