@@ -216,20 +216,6 @@
             </button>
           </div>
         </form>
-
-        <!-- Footer -->
-        <div
-          class="mt-8 pt-6 border-t border-white/[0.08] text-center"
-          :class="mounted ? 'animate-stagger-5' : 'opacity-0'"
-        >
-          <NuxtLink
-            to="/"
-            class="inline-flex items-center gap-1.5 text-sm text-white/40 hover:text-white hover:gap-2.5 transition-all duration-200"
-          >
-            <Icon name="mdi:arrow-left" class="w-4 h-4" />
-            Back to Store
-          </NuxtLink>
-        </div>
       </div>
     </div>
   </div>
