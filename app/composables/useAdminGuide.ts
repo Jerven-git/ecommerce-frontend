@@ -268,7 +268,7 @@ export const guideSteps: GuideStep[] = [
     description: 'Each card shows everything about one order — customer info, what they bought, how they paid, shipping details, and status.',
     icon: icons.doc, iconBg: 'bg-green-50',
     route: '/admin/orders', target: '[data-guide="order-list"]', prefer: 'left',
-    tips: ['Move it through statuses as you go', 'Confirm cash payments and paste in tracking numbers from here'],
+    tips: ['Move it through statuses as you go', 'Paste in tracking numbers from here'],
   },
 
   // ── Backorders ───────────────────────────────────────────
@@ -549,7 +549,7 @@ export const guideSteps: GuideStep[] = [
     description: 'Pick how customers pay. Enable at least one before you open up shop.',
     icon: icons.card, iconBg: 'bg-green-50',
     route: '/admin/payment-settings', target: '[data-guide="payment-methods"]', prefer: 'right',
-    tips: ['Cash on collection/delivery, Stripe, PayPal, or Square — turn on what suits you'],
+    tips: ['Stripe, PayPal, or Square — turn on what suits you'],
   },
   {
     title: 'A note on payment security',
