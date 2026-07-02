@@ -36,7 +36,7 @@
         <svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <p class="text-xs text-amber-800 font-medium">No payment methods available. Please enable them in Admin → Payment Settings.</p>
+        <p class="text-xs text-amber-800 font-medium">Online payment isn't available for this store right now. Please contact the store to complete your order.</p>
       </div>
 
       <!-- Method tiles -->
@@ -73,7 +73,7 @@
 
     <!-- Payment UI (Stripe / Redirect) -->
     <div
-      v-if="selectedMethod && selectedMethod !== 'cash' && !allDeferredBackorder"
+      v-if="selectedMethod && !allDeferredBackorder"
       class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-5"
     >
       <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Payment</h2>
@@ -115,19 +115,6 @@
 
       <ErrorAlert v-if="error" :message="error" />
     </div>
-
-    <!-- Cash on Delivery -->
-    <div v-if="selectedMethod === 'cash' && !allDeferredBackorder" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-5">
-      <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Place Order</h2>
-      <button
-        @click="$emit('placeCash')"
-        :disabled="submitting"
-        class="btn-primary w-full"
-      >
-        {{ submitting ? 'Processing…' : 'Place Order (Cash on Delivery)' }}
-      </button>
-      <ErrorAlert v-if="error" :message="error" />
-    </div>
   </div>
 </template>
 
@@ -151,7 +138,6 @@ defineEmits<{
   'update:selectedMethod': [value: string]
   'createOrder': []
   'placeRedirect': []
-  'placeCash': []
   'placeDeferredBackorder': []
   'stripeSuccess': [paymentId: string]
   'paymentError': [error: string]

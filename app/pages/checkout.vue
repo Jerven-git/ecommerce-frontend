@@ -122,7 +122,6 @@
               @update:selected-method="selectedPaymentMethod = $event"
               @create-order="attemptOrder(createOrderOnly)"
               @place-redirect="attemptOrder(placeOrderAndRedirect)"
-              @place-cash="attemptOrder(placeCashOrder)"
               @place-deferred-backorder="attemptOrder(placeDeferredBackorder)"
               @stripe-success="handleStripeSuccess"
               @payment-error="handlePaymentError"
@@ -229,7 +228,7 @@ const {
   getPaymentConfig, loadPaymentMethods,
   createOrderOnly, placeOrderAndRedirect,
   handleStripeSuccess, handlePaymentError,
-  placeDeferredBackorder, placeCashOrder
+  placeDeferredBackorder
 } = useCheckoutOrder({
   form, deliveryMethod, phoneDialCode,
   selectedShippingMethod, selectedShippingAddOns,

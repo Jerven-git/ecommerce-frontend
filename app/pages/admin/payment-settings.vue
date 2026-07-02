@@ -29,24 +29,6 @@
       <!-- Payment Methods -->
       <section data-guide="payment-methods" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="divide-y divide-gray-100">
-          <!-- Cash -->
-          <div class="px-6 py-5">
-            <div class="flex items-center justify-between gap-4">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
-                  <Icon name="mdi:cash" class="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <p class="text-sm font-semibold text-gray-900">Cash Payment</p>
-                  <p class="text-xs text-gray-400 mt-0.5">Accept cash on delivery or pickup</p>
-                </div>
-              </div>
-              <button type="button" @click="form.cash_enabled = !form.cash_enabled" class="payment-toggle" :class="form.cash_enabled ? 'bg-primary-600' : 'bg-gray-200'" :aria-checked="form.cash_enabled" role="switch">
-                <span class="payment-toggle-knob" :class="form.cash_enabled ? 'translate-x-6' : 'translate-x-1'"></span>
-              </button>
-            </div>
-          </div>
-
           <!-- Stripe -->
           <div class="px-6 py-5">
             <div class="flex items-center justify-between gap-4">
@@ -223,7 +205,6 @@ const expandTransition = {
 }
 
 const blankForm = () => ({
-  cash_enabled: true,
   stripe_enabled: false,
   paypal_enabled: false,
   square_enabled: false,
@@ -275,7 +256,6 @@ const loadSettings = async () => {
     if (data) {
       form.value = {
         ...blankForm(),
-        cash_enabled: data.cash_enabled ?? true,
         stripe_enabled: data.stripe_enabled ?? false,
         paypal_enabled: data.paypal_enabled ?? false,
         square_enabled: data.square_enabled ?? false,

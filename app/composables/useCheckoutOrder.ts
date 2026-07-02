@@ -281,30 +281,6 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
     }
   }
 
-  const placeCashOrder = async () => {
-    if (!isFormValid.value) return
-
-    submitting.value = true
-    error.value = null
-
-    try {
-      await fetchWithRetry('/orders', {
-        method: 'POST',
-        body: buildOrderData()
-      })
-
-      saveDetailsToStorage?.()
-      cartStore.clearCart()
-      sessionStorage.setItem('order_completed', '1')
-      navigateTo('/order-success')
-    } catch (err: any) {
-      error.value = err?.data?.message || err?.message || 'Failed to place order.'
-    } finally {
-      submitting.value = false
-      busyQueue.value = false
-    }
-  }
-
   return {
     paymentMethods,
     selectedPaymentMethod,
@@ -325,6 +301,5 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
     handleStripeSuccess,
     handlePaymentError,
     placeDeferredBackorder,
-    placeCashOrder,
   }
 }
