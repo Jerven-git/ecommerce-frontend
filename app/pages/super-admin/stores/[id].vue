@@ -24,14 +24,64 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Custom Domain</label>
-        <p class="text-xs text-gray-400 mb-2">Point your domain's DNS A record to your server IP.</p>
+        <div class="flex items-center justify-between gap-2 mb-1.5">
+          <label class="block text-sm font-medium text-gray-700">Custom Domain</label>
+          <span
+            v-if="store.domain"
+            class="px-2 py-0.5 text-xs font-medium rounded"
+            :class="store.domain_verified ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'"
+          >
+            {{ store.domain_verified ? 'Verified — live' : 'Not verified' }}
+          </span>
+        </div>
+
+        <p class="text-xs text-gray-400 mb-2">
+          Point an A record for this domain at
+          <span v-if="expectedIps.length" class="font-mono text-gray-600">{{ expectedIps.join(' or ') }}</span>
+          <span v-else>your server</span>, then verify it. A domain only serves traffic once verified.
+        </p>
+
         <input
           v-model="form.domain"
           type="text"
           placeholder="nazareck.com"
-          class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white font-mono focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400"
+          autocomplete="off"
+          spellcheck="false"
+          class="w-full px-3 py-2 text-sm border rounded-xl bg-white font-mono focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+          :class="domainInputClass"
         />
+
+        <p v-if="checking" class="mt-1.5 text-xs text-gray-400">Checking…</p>
+
+        <template v-else-if="check">
+          <p v-if="!check.valid || !check.available" class="mt-1.5 text-xs text-red-600">
+            {{ check.reason }}
+          </p>
+          <p v-else-if="check.dns?.points_at_server" class="mt-1.5 text-xs text-green-700">
+            Available, and DNS already points here. Save, then verify.
+          </p>
+          <p v-else-if="check.dns?.resolves" class="mt-1.5 text-xs text-amber-700">
+            Available, but it currently resolves to
+            <span class="font-mono">{{ check.dns.addresses.join(', ') }}</span>. Update its A record.
+          </p>
+          <p v-else class="mt-1.5 text-xs text-gray-400">
+            Available. It doesn't resolve yet — DNS can take a while to propagate.
+          </p>
+        </template>
+
+        <div v-if="store.domain" class="mt-3 flex items-center gap-3">
+          <button
+            type="button"
+            :disabled="verifying || domainDirty"
+            class="px-3 py-1.5 text-xs font-medium text-purple-700 border border-purple-200 rounded-lg hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="verifyDomain"
+          >
+            {{ verifying ? 'Verifying…' : (store.domain_verified ? 'Re-check DNS' : 'Verify domain') }}
+          </button>
+          <p v-if="domainDirty" class="text-xs text-gray-400">Save your change before verifying.</p>
+          <p v-else-if="verifyError" class="text-xs text-red-600">{{ verifyError }}</p>
+          <p v-else-if="verifyMessage" class="text-xs text-green-700">{{ verifyMessage }}</p>
+        </div>
       </div>
 
       <div>
@@ -110,6 +160,32 @@ const deleting = ref(false)
 const saveError = ref<string | null>(null)
 const form = ref({ name: '', slug: '', domain: '' as string | null, status: 'active' as 'active' | 'inactive' })
 
+const checking = ref(false)
+const check = ref<DomainAvailability | null>(null)
+const verifying = ref(false)
+const verifyMessage = ref<string | null>(null)
+const verifyError = ref<string | null>(null)
+
+/** Normalise the way the API does, so "WWW.X.com" doesn't read as a pending edit. */
+const canonical = (value: string | null | undefined) => {
+  const domain = (value ?? '').trim().toLowerCase()
+  return domain.startsWith('www.') ? domain.slice(4) : domain
+}
+
+/** Verification acts on the saved domain, so block it while an edit is pending. */
+const domainDirty = computed(() => canonical(form.value.domain) !== canonical(store.value?.domain))
+
+const expectedIps = computed(() => check.value?.expected_ips ?? [])
+
+const domainInputClass = computed(() => {
+  if (!form.value.domain?.trim() || checking.value || !check.value) {
+    return 'border-gray-200 focus:border-purple-400'
+  }
+  return check.value.valid && check.value.available
+    ? 'border-green-300 focus:border-green-400'
+    : 'border-red-300 focus:border-red-400'
+})
+
 onMounted(async () => {
   try {
     const [storeResult, adminsResult] = await Promise.all([api.showStore(id), api.listAdmins()])
@@ -121,10 +197,70 @@ onMounted(async () => {
       status: storeResult.data.status,
     }
     storeAdmins.value = adminsResult.data.filter((a) => a.store?.id === id)
+    if (form.value.domain) runCheck(form.value.domain)
   } finally {
     loading.value = false
   }
 })
+
+let checkTimer: ReturnType<typeof setTimeout> | undefined
+let checkSeq = 0
+
+const runCheck = async (domain: string) => {
+  const seq = ++checkSeq
+  checking.value = true
+  try {
+    const result = await api.checkDomain(domain, id)
+    // Drop responses that a newer keystroke has already superseded.
+    if (seq === checkSeq) check.value = result
+  } catch {
+    if (seq === checkSeq) check.value = null
+  } finally {
+    if (seq === checkSeq) checking.value = false
+  }
+}
+
+watch(() => form.value.domain, (domain) => {
+  clearTimeout(checkTimer)
+  verifyMessage.value = null
+  verifyError.value = null
+
+  const trimmed = (domain ?? '').trim()
+  if (!trimmed) {
+    checkSeq++
+    checking.value = false
+    check.value = null
+    return
+  }
+
+  checkTimer = setTimeout(() => runCheck(trimmed), 400)
+})
+
+onUnmounted(() => clearTimeout(checkTimer))
+
+const verifyDomain = async () => {
+  verifying.value = true
+  verifyMessage.value = null
+  verifyError.value = null
+  try {
+    const result = await api.verifyStoreDomain(id)
+    verifyMessage.value = result.message
+    if (store.value) {
+      store.value.domain_verified = result.data.domain_verified
+      store.value.domain_verified_at = result.data.domain_verified_at
+    }
+  } catch (err: any) {
+    verifyError.value = err?.data?.message || 'Verification failed'
+    // A DNS re-check that fails revokes verification server-side; mirror that.
+    // Other 422s (no domain, verification unconfigured) leave it untouched.
+    if (err?.data?.dns && store.value) {
+      store.value.domain_verified = false
+      store.value.domain_verified_at = null
+    }
+  } finally {
+    verifying.value = false
+  }
+}
 
 const save = async () => {
   saving.value = true
@@ -138,7 +274,7 @@ const save = async () => {
     store.value = result.data
     form.value.domain = result.data.domain ?? ''
   } catch (err: any) {
-    saveError.value = err?.data?.message || 'Failed to save'
+    saveError.value = err?.data?.errors?.domain?.[0] || err?.data?.message || 'Failed to save'
   } finally {
     saving.value = false
   }

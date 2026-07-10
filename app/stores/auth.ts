@@ -11,7 +11,7 @@ interface User {
   is_impersonating?: boolean
   impersonator?: { id: number; name: string; email: string; is_super_admin?: boolean } | null
   store_id?: number | null
-  store?: { id: number; name: string; slug: string; domain: string | null } | null
+  store?: { id: number; name: string; slug: string; domain: string | null; domain_verified?: boolean } | null
   status?: 'active' | 'disabled'
   email_verified_at?: string | null
   created_at?: string

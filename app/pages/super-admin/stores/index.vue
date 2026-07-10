@@ -46,7 +46,10 @@
               <div class="text-xs text-gray-400 font-mono mt-0.5">{{ s.slug }}</div>
             </td>
             <td class="px-6 py-4">
-              <span v-if="s.domain" class="text-xs font-mono text-purple-700">{{ s.domain }}</span>
+              <div v-if="s.domain" class="flex items-center gap-2">
+                <span class="text-xs font-mono" :class="s.domain_verified ? 'text-purple-700' : 'text-gray-400'">{{ s.domain }}</span>
+                <span v-if="!s.domain_verified" class="px-1.5 py-0.5 text-[10px] font-medium rounded bg-amber-50 text-amber-700 uppercase">unverified</span>
+              </div>
               <span v-else class="text-xs text-gray-400">—</span>
             </td>
             <td class="px-6 py-4">

@@ -40,4 +40,16 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (siteConfig.value?.is_storefront_host === false) {
     return navigateTo('/admin/login')
   }
+
+  // Fallback canonical redirect. Production nginx issues a real 301 before the
+  // SPA ever loads (see nginx/conf.d/production.conf), so this only fires in
+  // environments not fronted by that config. Compare hostnames, not hosts, so a
+  // dev port never causes a redirect loop.
+  const canonicalHost = siteConfig.value?.canonical_host
+  if (import.meta.client && canonicalHost && window.location.hostname.toLowerCase() !== canonicalHost) {
+    const { protocol, port } = window.location
+    const portSuffix = port ? `:${port}` : ''
+    window.location.replace(`${protocol}//${canonicalHost}${portSuffix}${to.fullPath}`)
+    return
+  }
 })

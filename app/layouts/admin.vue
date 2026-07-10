@@ -233,7 +233,9 @@ const storeUrl = computed<string>(() => {
   const portSuffix = port ? `:${port}` : ''
   const baseDomain = (runtimeConfig.public.storefrontBaseDomain as string) || 'localhost'
 
-  const host = store?.domain
+  // An unverified custom domain doesn't resolve a storefront yet, so fall back
+  // to the slug subdomain rather than linking somewhere that bounces to login.
+  const host = store?.domain && store.domain_verified
     ? store.domain
     : store?.slug
       ? `${store.slug}.${baseDomain}`

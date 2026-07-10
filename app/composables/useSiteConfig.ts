@@ -272,6 +272,13 @@ export interface SiteConfig {
    * admin login instead of rendering a default store.
    */
   is_storefront_host: boolean
+  /**
+   * The single host this store should be reachable on — its verified custom
+   * domain, or its slug subdomain when it has none. Null when the host is
+   * bound to no store. Production nginx already 301s duplicates; the SPA
+   * redirect is a fallback for environments without that config.
+   */
+  canonical_host: string | null
   site_name: string
   theme: SiteTheme
   logo_url: string | null
@@ -403,6 +410,9 @@ const DEFAULT_CONFIG: Partial<SiteConfig> = {
   // bounces a real storefront to the admin login. Only an explicit `false` from
   // the backend (bare apex) triggers the redirect.
   is_storefront_host: true,
+  // Never redirect on a fallback config; only an explicit host from the backend
+  // may move the visitor.
+  canonical_host: null,
   theme: { ...DEFAULT_THEME },
   modules_enabled: { ...DEFAULT_MODULES_ENABLED },
 }
