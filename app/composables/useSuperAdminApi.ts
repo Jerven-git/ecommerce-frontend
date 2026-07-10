@@ -3,6 +3,8 @@ export interface Store {
   name: string
   slug: string
   domain: string | null
+  domain_verified_at: string | null
+  domain_verified: boolean
   status: 'active' | 'inactive'
   is_default: boolean
   default_currency_id: number | null
@@ -10,6 +12,34 @@ export interface Store {
   created_at: string
   updated_at: string
   deleted_at: string | null
+}
+
+export interface DomainDns {
+  resolves: boolean
+  addresses: string[]
+  points_at_server: boolean
+  expected_ips: string[]
+}
+
+/**
+ * `valid` — a well-formed domain we're allowed to accept.
+ * `available` — not already claimed by another store.
+ * `dns.points_at_server` — provably controlled by the claimant.
+ */
+export interface DomainAvailability {
+  domain: string
+  valid: boolean
+  available: boolean
+  reason: string | null
+  claimed_by: { id: number; name: string } | null
+  dns: DomainDns | null
+  expected_ips: string[]
+}
+
+export interface DomainVerification {
+  message: string
+  dns: DomainDns & { verified: boolean }
+  data: { id: number; domain: string; domain_verified_at: string | null; domain_verified: boolean }
 }
 
 export interface AdminUser {
@@ -82,6 +112,14 @@ export const useSuperAdminApi = () => {
       $apiFetch<{ data: Store }>(`/super-admin/stores/${id}/activate`, { method: 'POST' }),
     deactivateStore: (id: number) =>
       $apiFetch<{ data: Store }>(`/super-admin/stores/${id}/deactivate`, { method: 'POST' }),
+
+    // Custom domains
+    checkDomain: (domain: string, storeId?: number) =>
+      $apiFetch<DomainAvailability>('/super-admin/stores/domain-availability', {
+        params: { domain, ...(storeId ? { store_id: storeId } : {}) },
+      }),
+    verifyStoreDomain: (id: number) =>
+      $apiFetch<DomainVerification>(`/super-admin/stores/${id}/domain/verify`, { method: 'POST' }),
 
     // Admin users
     listAdmins: () => $apiFetch<{ data: AdminUser[] }>('/super-admin/users'),
