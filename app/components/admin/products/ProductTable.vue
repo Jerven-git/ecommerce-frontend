@@ -1,16 +1,16 @@
 <template>
-  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+  <div class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
       <table class="min-w-full">
         <thead>
           <tr class="border-b border-gray-100">
-            <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Product</th>
-            <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Price</th>
-            <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Stock</th>
-            <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Weight / Dims</th>
-            <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Category</th>
-            <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-3.5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
+            <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
+            <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
+            <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
+            <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Weight / Dims</th>
+            <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+            <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-50">
@@ -30,7 +30,7 @@
                 </div>
                 <div class="min-w-0">
                   <p class="text-sm font-semibold text-gray-900 truncate">{{ product.name }}</p>
-                  <p class="text-xs text-gray-400 truncate max-w-xs">{{ product.description }}</p>
+                  <p class="text-xs text-gray-500 truncate max-w-xs">{{ product.description }}</p>
                 </div>
               </div>
             </td>

@@ -1,18 +1,18 @@
 <template>
   <div class="pb-28">
     <!-- Page Header -->
-    <div class="mb-8">
-      <div class="flex items-center gap-2 text-sm text-gray-400 mb-2">
-        <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
-        <span>/</span>
-        <span class="text-gray-600 font-medium">Tax Report</span>
-      </div>
-      <h1 class="text-2xl font-bold text-gray-900">Tax Report</h1>
-      <p class="text-gray-500 text-sm mt-1">View tax collected by region and export for accounting</p>
-    </div>
+    <AdminPageHeader title="Tax Report" subtitle="View tax collected by region and export for accounting">
+      <template #breadcrumb>
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
+          <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
+          <span>/</span>
+          <span class="text-gray-600 font-medium">Tax Report</span>
+        </div>
+      </template>
+    </AdminPageHeader>
 
     <!-- Filters -->
-    <section data-guide="tax-report" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6">
+    <section data-guide="tax-report" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden mb-6">
       <div class="px-6 py-4 flex flex-wrap items-end gap-4">
         <div>
           <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">From</label>
@@ -47,8 +47,8 @@
     </section>
 
     <!-- Report Table -->
-    <section class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+    <section class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200/70 flex items-center justify-between">
         <p class="text-sm font-semibold text-gray-900">Tax Summary by Region</p>
         <div class="flex items-center gap-2">
           <button
@@ -64,9 +64,14 @@
         </div>
       </div>
 
-      <div v-if="report.length === 0 && !loading" class="px-6 py-16 text-center">
-        <p class="text-gray-400 text-sm">No data for the selected filters. Try adjusting the date range.</p>
-      </div>
+      <AdminSpinner v-if="loading && report.length === 0" label="Loading tax report…" />
+
+      <AdminEmptyState
+        v-if="report.length === 0 && !loading"
+        title="No tax data"
+        description="No data for the selected filters. Try adjusting the date range."
+        :icon="'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'"
+      />
 
       <div v-if="report.length > 0" class="overflow-x-auto">
         <table class="w-full text-sm">
@@ -85,7 +90,7 @@
               <td class="px-6 py-3.5">
                 <div>
                   <p class="font-medium text-gray-900">{{ row.region_label }}</p>
-                  <p v-if="row.tax_name" class="text-xs text-gray-400">{{ row.tax_name }}</p>
+                  <p v-if="row.tax_name" class="text-xs text-gray-500">{{ row.tax_name }}</p>
                 </div>
               </td>
               <td class="px-6 py-3.5 text-right text-gray-700 font-medium">{{ row.order_count }}</td>

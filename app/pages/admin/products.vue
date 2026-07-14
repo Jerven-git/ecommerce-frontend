@@ -1,27 +1,27 @@
 <template>
   <div>
     <!-- Page Header -->
-    <div class="mb-8 flex items-start justify-between gap-4">
-      <div>
-        <div class="flex items-center gap-2 text-sm text-gray-400 mb-2">
+    <AdminPageHeader title="Products" subtitle="Manage your store's product catalogue">
+      <template #breadcrumb>
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
           <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
           <span>/</span>
           <span class="text-gray-600 font-medium">Products</span>
         </div>
-        <h1 class="text-2xl font-bold text-gray-900">Products</h1>
-        <p class="text-gray-500 text-sm mt-1">Manage your store's product catalogue</p>
-      </div>
-      <button
-        data-guide="add-product-btn"
-        @click="productForm.openAddModal(); categories.initCategoryForProduct([])"
-        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shrink-0"
-      >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-        </svg>
-        Add Product
-      </button>
-    </div>
+      </template>
+      <template #actions>
+        <button
+          data-guide="add-product-btn"
+          @click="productForm.openAddModal(); categories.initCategoryForProduct([])"
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+          </svg>
+          Add Product
+        </button>
+      </template>
+    </AdminPageHeader>
 
     <!-- Filters -->
     <AdminProductsProductFilters
@@ -34,10 +34,7 @@
     />
 
     <!-- Loading -->
-    <div v-if="products.loading.value" class="flex flex-col items-center justify-center py-24 gap-3">
-      <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
-      <p class="text-sm text-gray-500">Loading products…</p>
-    </div>
+    <AdminSpinner v-if="products.loading.value" label="Loading products…" />
 
     <!-- Error -->
     <div v-else-if="products.error.value" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">
@@ -48,20 +45,31 @@
       </div>
       <p class="font-semibold text-gray-800 mb-1">Failed to load products</p>
       <p class="text-sm text-red-500 mb-6">{{ products.error.value }}</p>
-      <button @click="products.loadProducts" class="btn-primary">Retry</button>
+      <button
+        @click="products.loadProducts"
+        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
+      >
+        Retry
+      </button>
     </div>
 
     <!-- Empty state -->
-    <div v-else-if="products.products.value.length === 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
-      <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-        <svg class="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-        </svg>
-      </div>
-      <p class="font-semibold text-gray-700 mb-1">No products yet</p>
-      <p class="text-sm text-gray-400 mb-6">Add your first product to get started</p>
-      <button @click="productForm.openAddModal(); categories.initCategoryForProduct([])" class="btn-primary">Add Product</button>
-    </div>
+    <AdminCard v-else-if="products.products.value.length === 0">
+      <AdminEmptyState
+        title="No products yet"
+        description="Add your first product to get started"
+        :icon="'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'"
+      >
+        <template #action>
+          <button
+            @click="productForm.openAddModal(); categories.initCategoryForProduct([])"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
+          >
+            Add Product
+          </button>
+        </template>
+      </AdminEmptyState>
+    </AdminCard>
 
     <!-- Products table -->
     <AdminProductsProductTable

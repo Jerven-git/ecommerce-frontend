@@ -1,22 +1,20 @@
 <template>
   <div>
     <!-- Page Header -->
-    <div class="mb-8">
-      <div class="flex items-center gap-2 text-sm text-gray-400 mb-2">
-        <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
-        <span>/</span>
-        <span class="text-gray-600 font-medium">Backorders</span>
-      </div>
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900">Backorders</h1>
-          <p class="text-gray-500 text-sm mt-1">Manage out-of-stock orders awaiting fulfillment</p>
+    <AdminPageHeader title="Backorders" subtitle="Manage out-of-stock orders awaiting fulfillment">
+      <template #breadcrumb>
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
+          <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
+          <span>/</span>
+          <span class="text-gray-600 font-medium">Backorders</span>
         </div>
-        <button data-guide="backorder-settings-btn" @click="showSettings = true" class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors shrink-0">
+      </template>
+      <template #actions>
+        <button data-guide="backorder-settings-btn" @click="showSettings = true" class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-200/70 text-gray-600 hover:bg-gray-50 transition-colors shrink-0">
           Settings
         </button>
-      </div>
-    </div>
+      </template>
+    </AdminPageHeader>
 
     <!-- Order filter banner -->
     <div v-if="filterOrderId" class="mb-4 flex items-center justify-between bg-primary-50 border border-primary-200 rounded-xl px-4 py-3">
@@ -60,10 +58,7 @@
     </div>
 
     <!-- Loading -->
-    <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
-      <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
-      <p class="text-sm text-gray-500">Loading backorders...</p>
-    </div>
+    <AdminSpinner v-if="loading" label="Loading backorders…" />
 
     <!-- Error -->
     <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">
@@ -78,25 +73,23 @@
     </div>
 
     <!-- Empty state -->
-    <div v-else-if="backorders.length === 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
-      <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-        <svg class="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      </div>
-      <p class="font-semibold text-gray-700 mb-1">No backorders</p>
-      <p class="text-sm text-gray-400">Backorders will appear here when customers order out-of-stock items</p>
-    </div>
+    <AdminCard v-else-if="backorders.length === 0">
+      <AdminEmptyState
+        title="No backorders"
+        description="Backorders will appear here when customers order out-of-stock items"
+        icon="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </AdminCard>
 
     <!-- Backorders list -->
     <div v-else class="space-y-4">
-      <div
+      <AdminCard
         v-for="bo in backorders"
         :key="bo.id"
-        class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+        class="overflow-hidden"
       >
         <!-- Card header -->
-        <div class="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="px-6 py-4 border-b border-gray-200/70 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div class="flex items-center gap-3">
             <!-- Status dot -->
             <span
@@ -105,7 +98,7 @@
             />
             <div>
               <p class="text-sm font-semibold text-gray-900">Backorder #{{ bo.id }} · Order #{{ bo.order_id }}</p>
-              <p class="text-xs text-gray-400">{{ formatDate(bo.created_at) }}</p>
+              <p class="text-xs text-gray-500">{{ formatDate(bo.created_at) }}</p>
             </div>
           </div>
 
@@ -164,7 +157,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
           <!-- Customer -->
           <div class="px-6 py-4">
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Customer</p>
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2.5">Customer</p>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-900">{{ bo.order?.customer_name }}</p>
               <p class="text-sm text-gray-500">{{ bo.order?.customer_email }}</p>
@@ -173,7 +166,7 @@
 
           <!-- Product -->
           <div class="px-6 py-4">
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Product</p>
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2.5">Product</p>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-900">{{ bo.product?.name }}</p>
               <div class="flex items-center gap-3 text-sm text-gray-500">
@@ -186,12 +179,12 @@
 
           <!-- Payment info -->
           <div class="px-6 py-4">
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Payment</p>
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2.5">Payment</p>
             <div class="space-y-1">
               <p class="text-sm text-gray-700">
                 {{ chargePolicyLabel(bo.charge_policy) }}
               </p>
-              <p v-if="bo.token_expires_at && bo.status === 'notified'" class="text-xs text-gray-400">
+              <p v-if="bo.token_expires_at && bo.status === 'notified'" class="text-xs text-gray-500">
                 Link expires: {{ formatDate(bo.token_expires_at) }}
               </p>
               <p v-if="bo.paid_at" class="text-xs text-green-600 font-medium">
@@ -200,7 +193,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </AdminCard>
     </div>
 
     <!-- Pagination -->
@@ -232,7 +225,7 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-900">Enable Backorders</p>
-            <p class="text-xs text-gray-400 mt-0.5">Master switch for all backorder functionality</p>
+            <p class="text-xs text-gray-500 mt-0.5">Master switch for all backorder functionality</p>
           </div>
           <button
             @click="settings.backorder_enabled = !settings.backorder_enabled"
@@ -267,7 +260,7 @@
             max="720"
             class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
-          <p class="text-xs text-gray-400 mt-1">How long the payment link stays active after sending</p>
+          <p class="text-xs text-gray-500 mt-1">How long the payment link stays active after sending</p>
         </div>
       </div>
 

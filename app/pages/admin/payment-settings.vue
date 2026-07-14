@@ -1,19 +1,18 @@
 <template>
   <div class="pb-28">
     <!-- Page Header -->
-    <div class="mb-8">
-      <div class="flex items-center gap-2 text-sm text-gray-400 mb-2">
-        <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
-        <span>/</span>
-        <span class="text-gray-600 font-medium">Payment Settings</span>
-      </div>
-    </div>
+    <AdminPageHeader title="Payment Settings">
+      <template #breadcrumb>
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
+          <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
+          <span>/</span>
+          <span class="text-gray-600 font-medium">Payment Settings</span>
+        </div>
+      </template>
+    </AdminPageHeader>
 
     <!-- Loading -->
-    <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
-      <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
-      <p class="text-sm text-gray-500">Loading payment settings…</p>
-    </div>
+    <AdminSpinner v-if="loading" label="Loading payment settings…" />
 
     <div v-else class="space-y-6">
       <!-- Load error -->
@@ -27,7 +26,7 @@
       </div>
 
       <!-- Payment Methods -->
-      <section data-guide="payment-methods" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <section data-guide="payment-methods" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
         <div class="divide-y divide-gray-100">
           <!-- Stripe -->
           <div class="px-6 py-5">
@@ -38,7 +37,7 @@
                 </div>
                 <div>
                   <p class="text-sm font-semibold text-gray-900">Stripe</p>
-                  <p class="text-xs text-gray-400 mt-0.5">Accept credit/debit cards via Stripe</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Accept credit/debit cards via Stripe</p>
                 </div>
               </div>
               <button type="button" @click="form.stripe_enabled = !form.stripe_enabled" class="payment-toggle" :class="form.stripe_enabled ? 'bg-primary-600' : 'bg-gray-200'" :aria-checked="form.stripe_enabled" role="switch">
@@ -73,7 +72,7 @@
                 </div>
                 <div>
                   <p class="text-sm font-semibold text-gray-900">PayPal</p>
-                  <p class="text-xs text-gray-400 mt-0.5">Accept payments via PayPal</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Accept payments via PayPal</p>
                 </div>
               </div>
               <button type="button" @click="form.paypal_enabled = !form.paypal_enabled" class="payment-toggle" :class="form.paypal_enabled ? 'bg-primary-600' : 'bg-gray-200'" :aria-checked="form.paypal_enabled" role="switch">
@@ -115,7 +114,7 @@
                 </div>
                 <div>
                   <p class="text-sm font-semibold text-gray-900">Square</p>
-                  <p class="text-xs text-gray-400 mt-0.5">Accept payments via Square</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Accept payments via Square</p>
                 </div>
               </div>
               <button type="button" @click="form.square_enabled = !form.square_enabled" class="payment-toggle" :class="form.square_enabled ? 'bg-primary-600' : 'bg-gray-200'" :aria-checked="form.square_enabled" role="switch">

@@ -2,10 +2,7 @@
   <div class="space-y-8">
 
     <!-- Header -->
-    <header>
-      <h1 class="text-2xl font-bold text-gray-900">Gift Cards</h1>
-      <p class="text-sm text-gray-500 mt-0.5">Manage denominations and view issued gift card codes.</p>
-    </header>
+    <AdminPageHeader title="Gift Cards" subtitle="Manage denominations and view issued gift card codes." />
 
     <!-- Denominations -->
     <section>
@@ -14,11 +11,16 @@
         <button type="button" class="btn-primary text-sm px-4 py-2" @click="openDenomModal()">Add Denomination</button>
       </div>
 
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div v-if="loadingDenoms" class="p-8 text-center text-sm text-gray-500">Loading…</div>
-        <div v-else-if="denominations.length === 0" class="p-8 text-center text-sm text-gray-500">No denominations yet. Add one to enable gift card purchases.</div>
+      <div class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
+        <AdminSpinner v-if="loadingDenoms" label="Loading denominations…" />
+        <AdminEmptyState
+          v-else-if="denominations.length === 0"
+          title="No denominations yet"
+          description="Add one to enable gift card purchases."
+          :icon="'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7'"
+        />
         <table v-else class="w-full">
-          <thead class="bg-gray-50 border-b border-gray-100">
+          <thead class="bg-gray-50 border-b border-gray-200/70">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
               <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Label</th>
@@ -67,11 +69,16 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div v-if="loadingCards" class="p-8 text-center text-sm text-gray-500">Loading…</div>
-        <div v-else-if="cards.length === 0" class="p-8 text-center text-sm text-gray-500">No gift cards found.</div>
+      <div class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
+        <AdminSpinner v-if="loadingCards" label="Loading gift cards…" />
+        <AdminEmptyState
+          v-else-if="cards.length === 0"
+          title="No gift cards found"
+          description="Issued gift cards will appear here."
+          :icon="'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7'"
+        />
         <table v-else class="w-full">
-          <thead class="bg-gray-50 border-b border-gray-100">
+          <thead class="bg-gray-50 border-b border-gray-200/70">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Code</th>
               <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Recipient</th>
@@ -88,10 +95,10 @@
               </td>
               <td class="px-6 py-4">
                 <p class="text-sm text-gray-900">{{ c.recipient_name || c.recipient_email }}</p>
-                <p v-if="c.recipient_name" class="text-xs text-gray-400">{{ c.recipient_email }}</p>
+                <p v-if="c.recipient_name" class="text-xs text-gray-500">{{ c.recipient_email }}</p>
               </td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ formatIn(Number(c.original_amount), c.currency) }}</td>
-              <td class="px-6 py-4 text-sm font-semibold" :class="Number(c.balance) > 0 ? 'text-green-600' : 'text-gray-400'">
+              <td class="px-6 py-4 text-sm font-semibold" :class="Number(c.balance) > 0 ? 'text-green-600' : 'text-gray-500'">
                 {{ formatIn(Number(c.balance), c.currency) }}
               </td>
               <td class="px-6 py-4">
@@ -117,7 +124,7 @@
             <input v-model.number="denomForm.amount" type="number" min="1" step="0.01" class="input-field w-full" placeholder="25.00" />
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">Label <span class="text-gray-400 font-normal">(optional)</span></label>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Label <span class="text-gray-500 font-normal">(optional)</span></label>
             <input v-model="denomForm.label" type="text" class="input-field w-full" placeholder="e.g. Classic, Premium" />
           </div>
           <div class="flex items-center gap-2">

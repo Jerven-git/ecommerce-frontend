@@ -1,26 +1,23 @@
 <template>
   <div class="pb-28">
     <!-- Page Header -->
-    <div class="mb-8">
-      <div class="flex items-center gap-2 text-sm text-gray-400 mb-2">
-        <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
-        <span>/</span>
-        <span class="text-gray-600 font-medium">Tax Settings</span>
-      </div>
-      <h1 class="text-2xl font-bold text-gray-900">Tax Settings</h1>
-      <p class="text-gray-500 text-sm mt-1">Configure how tax is calculated and displayed for your store</p>
-    </div>
+    <AdminPageHeader title="Tax Settings" subtitle="Configure how tax is calculated and displayed for your store">
+      <template #breadcrumb>
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
+          <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
+          <span>/</span>
+          <span class="text-gray-600 font-medium">Tax Settings</span>
+        </div>
+      </template>
+    </AdminPageHeader>
 
     <!-- Loading -->
-    <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
-      <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
-      <p class="text-sm text-gray-500">Loading tax settings...</p>
-    </div>
+    <AdminSpinner v-if="loading" label="Loading tax settings…" />
 
     <div v-else class="space-y-6">
       <!-- Tax Configuration -->
-      <section data-guide="tax-config" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+      <section data-guide="tax-config" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200/70 flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
             <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
@@ -28,7 +25,7 @@
           </div>
           <div>
             <p class="text-sm font-semibold text-gray-900">Tax Configuration</p>
-            <p class="text-xs text-gray-400">Control tax calculation and display behaviour</p>
+            <p class="text-xs text-gray-500">Control tax calculation and display behaviour</p>
           </div>
         </div>
 
@@ -37,7 +34,7 @@
           <div class="flex items-center justify-between py-3 px-4 bg-gray-50 rounded-xl">
             <div>
               <p class="text-sm font-medium text-gray-900">Enable Tax</p>
-              <p class="text-xs text-gray-400 mt-0.5">Turn on tax calculation for all products</p>
+              <p class="text-xs text-gray-500 mt-0.5">Turn on tax calculation for all products</p>
             </div>
             <button
               type="button"
@@ -91,10 +88,10 @@
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-semibold text-gray-900">Tax Inclusive</p>
                     <p class="text-xs text-gray-500 mt-0.5">Tax is already included in the displayed price</p>
-                    <div class="mt-2.5 p-3 bg-white rounded-lg border border-gray-100 text-xs space-y-0.5">
+                    <div class="mt-2.5 p-3 bg-white rounded-lg border border-gray-200/70 text-xs space-y-0.5">
                       <p class="text-gray-500 font-medium mb-1">Example</p>
                       <p class="text-gray-700">Product price: <span class="font-semibold">{{ format(100 * (1 + form.tax_rate / 100)) }}</span></p>
-                      <p class="text-gray-400">Includes {{ format(100 * form.tax_rate / 100) }} {{ form.tax_name }} ({{ form.tax_rate }}%)</p>
+                      <p class="text-gray-500">Includes {{ format(100 * form.tax_rate / 100) }} {{ form.tax_name }} ({{ form.tax_rate }}%)</p>
                     </div>
                   </div>
                 </button>
@@ -115,11 +112,11 @@
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-semibold text-gray-900">Tax Exclusive</p>
                     <p class="text-xs text-gray-500 mt-0.5">Tax is added separately at checkout</p>
-                    <div class="mt-2.5 p-3 bg-white rounded-lg border border-gray-100 text-xs space-y-0.5">
+                    <div class="mt-2.5 p-3 bg-white rounded-lg border border-gray-200/70 text-xs space-y-0.5">
                       <p class="text-gray-500 font-medium mb-1">Example</p>
                       <p class="text-gray-700">Product price: <span class="font-semibold">{{ format(100) }}</span></p>
                       <p class="text-gray-700">{{ form.tax_name }} ({{ form.tax_rate }}%): <span class="font-semibold">+ {{ format(100 * form.tax_rate / 100) }}</span></p>
-                      <p class="text-gray-700 font-semibold pt-1 mt-0.5 border-t border-gray-100">Total: {{ format(100 * (1 + form.tax_rate / 100)) }}</p>
+                      <p class="text-gray-700 font-semibold pt-1 mt-0.5 border-t border-gray-200/70">Total: {{ format(100 * (1 + form.tax_rate / 100)) }}</p>
                     </div>
                   </div>
                 </button>
@@ -139,7 +136,7 @@
       </section>
 
       <!-- Regional Tax Rules (collapsible) -->
-      <section v-show="form.tax_enabled" data-guide="tax-regional" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <section v-show="form.tax_enabled" data-guide="tax-regional" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
         <button
           type="button"
           @click="showRegional = !showRegional"
@@ -156,7 +153,7 @@
                 <p class="text-sm font-semibold text-gray-900">Regional Tax Rules</p>
                 <HelpTip text="If you sell to multiple countries with different tax rates, you can set specific rates per country or state. For example, 10% GST for Australia and 0% for the US. If you only sell in one country, you can skip this." />
               </div>
-              <p class="text-xs text-gray-400">Optional &mdash; set different tax rates for different countries</p>
+              <p class="text-xs text-gray-500">Optional &mdash; set different tax rates for different countries</p>
             </div>
           </div>
           <svg class="w-5 h-5 text-gray-400 transition-transform" :class="showRegional ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -164,7 +161,7 @@
           </svg>
         </button>
 
-        <div v-if="showRegional" class="px-6 pb-5 space-y-3 border-t border-gray-100 pt-4">
+        <div v-if="showRegional" class="px-6 pb-5 space-y-3 border-t border-gray-200/70 pt-4">
           <!-- Add Country button -->
           <div class="flex justify-end">
             <button @click="addCountryRule" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-primary-600 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors">
@@ -237,7 +234,7 @@
             </div>
 
             <!-- State rules -->
-            <div v-if="rule._showStates && rule.country" class="border-t border-gray-100 bg-gray-50 px-4 py-3 space-y-2">
+            <div v-if="rule._showStates && rule.country" class="border-t border-gray-200/70 bg-gray-50 px-4 py-3 space-y-2">
               <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-1.5">
                   <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">State overrides</p>
@@ -246,7 +243,7 @@
                 <button @click="addStateRule(idx)" class="text-xs text-primary-600 hover:text-primary-700 font-medium">+ Add State</button>
               </div>
 
-              <div v-if="getStateRules(rule.country).length === 0" class="text-xs text-gray-400 py-2">
+              <div v-if="getStateRules(rule.country).length === 0" class="text-xs text-gray-500 py-2">
                 No state overrides. The country rate ({{ rule.tax_rate }}%) applies to all states.
               </div>
 
@@ -274,16 +271,18 @@
             </div>
           </div>
 
-          <div v-if="countryRules.length === 0" class="text-center py-6 text-gray-400">
-            <p class="text-sm">No country-specific rules.</p>
-            <p class="text-xs mt-1">Click "Add Country" to set different rates per region.</p>
-          </div>
+          <AdminEmptyState
+            v-if="countryRules.length === 0"
+            title="No country-specific rules"
+            description='Click "Add Country" to set different rates per region.'
+            :icon="'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z'"
+          />
         </div>
       </section>
 
       <!-- Tax Calculation Preview -->
-      <section v-show="form.tax_enabled" data-guide="tax-preview" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+      <section v-show="form.tax_enabled" data-guide="tax-preview" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200/70 flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
             <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -291,7 +290,7 @@
           </div>
           <div>
             <p class="text-sm font-semibold text-gray-900">Calculation Preview</p>
-            <p class="text-xs text-gray-400">Live preview with your current settings</p>
+            <p class="text-xs text-gray-500">Live preview with your current settings</p>
           </div>
         </div>
 
@@ -310,7 +309,7 @@
                 <span class="text-sm text-gray-500">Price shown to customer</span>
                 <span class="text-sm font-bold text-gray-900">{{ format(previewPrice) }}</span>
               </div>
-              <p class="text-xs text-gray-400">
+              <p class="text-xs text-gray-500">
                 Includes {{ format(calculateTaxAmount) }} {{ form.tax_name }} at {{ form.tax_rate }}%
               </p>
             </template>

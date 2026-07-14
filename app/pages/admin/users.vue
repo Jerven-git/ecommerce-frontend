@@ -1,28 +1,28 @@
 <template>
   <div class="pb-28 space-y-6">
-    <div class="flex items-start justify-between gap-4">
-      <div>
-        <div class="flex items-center gap-2 text-sm text-gray-400 mb-2">
+    <AdminPageHeader title="Admin Users" subtitle="Create and manage admin and super admin accounts.">
+      <template #breadcrumb>
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
           <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
           <span>/</span>
           <span class="text-gray-600 font-medium">Admin Users</span>
         </div>
-        <h1 class="text-2xl font-bold text-gray-900">Admin Users</h1>
-        <p class="text-sm text-gray-500 mt-1">Create and manage admin and super admin accounts.</p>
-      </div>
-      <button
-        v-if="isEditing"
-        type="button"
-        class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-        @click="resetForm"
-      >
-        New Admin
-      </button>
-    </div>
+      </template>
+      <template #actions>
+        <button
+          v-if="isEditing"
+          type="button"
+          class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+          @click="resetForm"
+        >
+          New Admin
+        </button>
+      </template>
+    </AdminPageHeader>
 
     <div class="grid gap-6 xl:grid-cols-[380px_minmax(0,1fr)]">
-      <section class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden h-fit">
-        <div class="px-6 py-5 border-b border-gray-100">
+      <section class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden h-fit">
+        <div class="px-6 py-5 border-b border-gray-200/70">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center shrink-0">
               <svg class="w-5 h-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -31,7 +31,7 @@
             </div>
             <div>
               <p class="text-sm font-semibold text-gray-900">{{ isEditing ? 'Edit admin account' : 'Create admin account' }}</p>
-              <p class="text-xs text-gray-400">{{ isEditing ? 'Update details or change role.' : 'Super admins can create admin access without seeders.' }}</p>
+              <p class="text-xs text-gray-500">{{ isEditing ? 'Update details or change role.' : 'Super admins can create admin access without seeders.' }}</p>
             </div>
           </div>
         </div>
@@ -124,11 +124,11 @@
         </form>
       </section>
 
-      <section class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-w-0">
-        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between gap-4">
+      <section class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden min-w-0">
+        <div class="px-6 py-5 border-b border-gray-200/70 flex items-center justify-between gap-4">
           <div>
             <p class="text-sm font-semibold text-gray-900">Current admin accounts</p>
-            <p class="text-xs text-gray-400">{{ users.length }} account{{ users.length === 1 ? '' : 's' }}</p>
+            <p class="text-xs text-gray-500">{{ users.length }} account{{ users.length === 1 ? '' : 's' }}</p>
           </div>
           <button
             type="button"
@@ -140,10 +140,7 @@
           </button>
         </div>
 
-        <div v-if="loading" class="px-6 py-16 flex flex-col items-center justify-center gap-3">
-          <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
-          <p class="text-sm text-gray-500">Loading admin users…</p>
-        </div>
+        <AdminSpinner v-if="loading" label="Loading admin users…" />
 
         <div v-else-if="loadError" class="p-6">
           <div class="rounded-2xl border border-red-100 bg-red-50 px-5 py-4 text-sm text-red-700">
@@ -151,10 +148,12 @@
           </div>
         </div>
 
-        <div v-else-if="!users.length" class="px-6 py-16 text-center">
-          <p class="text-sm font-medium text-gray-700">No admin accounts found.</p>
-          <p class="text-sm text-gray-400 mt-1">Create the first one from the form on the left.</p>
-        </div>
+        <AdminEmptyState
+          v-else-if="!users.length"
+          title="No admin accounts found."
+          description="Create the first one from the form on the left."
+          :icon="'M12 4a4 4 0 110 8 4 4 0 010-8zm-7 16a7 7 0 1114 0H5z'"
+        />
 
         <div v-else class="divide-y divide-gray-100">
           <article
@@ -179,7 +178,7 @@
                 </span>
               </div>
               <p class="text-sm text-gray-500 mt-1 break-all">{{ user.email }}</p>
-              <p class="text-xs text-gray-400 mt-2">Created {{ formatDate(user.created_at) }}</p>
+              <p class="text-xs text-gray-500 mt-2">Created {{ formatDate(user.created_at) }}</p>
             </div>
 
             <div class="flex items-center gap-2">
