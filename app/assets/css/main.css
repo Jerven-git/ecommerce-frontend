@@ -35,6 +35,11 @@
     /* Accent / surface */
     --color-accent: #F3F4F6;
 
+    /* Legible text on solid primary/secondary fills — overridden per-theme in
+       useTheme.ts based on the brand colour's luminance. */
+    --on-primary: #ffffff;
+    --on-secondary: #ffffff;
+
     /* Texture */
     --texture-pattern: none;
     --texture-size: auto;
@@ -77,11 +82,54 @@
     }
 
     .btn-primary {
-        @apply px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium;
+        @apply px-6 py-3 rounded-lg font-medium transition-colors;
+        background-color: var(--color-primary);
+        color: var(--on-primary, #fff);
+    }
+    .btn-primary:hover {
+        background-color: var(--color-primary-700);
     }
 
     .btn-secondary {
         @apply px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium;
+    }
+
+    /* Fluid editorial display scale (uses the theme heading font via h1–h6). */
+    .display-1 {
+        font-size: clamp(2.75rem, 1.6rem + 5vw, 5rem);
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+    }
+    .display-2 {
+        font-size: clamp(1.9rem, 1.2rem + 2.6vw, 3rem);
+        line-height: 1.06;
+        letter-spacing: -0.025em;
+    }
+
+    /* Reusable immersive hero background: layered, theme-driven gradient used as
+       the fallback when a page has no cover image (home / services / blog). */
+    .hero-media-gradient {
+        background:
+            radial-gradient(115% 85% at 78% 12%, color-mix(in srgb, var(--color-primary) 50%, transparent), transparent 58%),
+            radial-gradient(90% 78% at 6% 94%, color-mix(in srgb, var(--color-primary-800) 55%, transparent), transparent 55%),
+            linear-gradient(158deg, var(--color-secondary-950), var(--color-secondary-800) 55%, var(--color-secondary-900));
+    }
+    .hero-media-grain {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        opacity: 0.13;
+        mix-blend-mode: overlay;
+    }
+
+    /* Underlined "next" link with a nudging arrow. */
+    .link-arrow {
+        @apply inline-flex items-center gap-1.5 text-sm font-semibold transition-colors;
+        color: var(--color-primary-700);
+    }
+    .link-arrow svg {
+        transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .link-arrow:hover svg {
+        transform: translateX(3px);
     }
 
     .input-field {
@@ -96,10 +144,19 @@
     .reveal {
         opacity: 0;
         transform: translateY(24px);
-        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .reveal-visible {
         opacity: 1;
         transform: translateY(0);
+    }
+    /* Never let a class-triggered reveal gate content for users who opt out of
+       motion (or renderers where the observer never fires). */
+    @media (prefers-reduced-motion: reduce) {
+        .reveal {
+            opacity: 1;
+            transform: none;
+            transition: none;
+        }
     }
 }

@@ -2,35 +2,44 @@
   <div class="min-h-screen bg-gray-50">
 
     <!-- Hero -->
-    <div class="bg-white border-b border-gray-100">
-      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-        <div class="w-14 h-14 rounded-2xl bg-primary-50 flex items-center justify-center mx-auto mb-4">
-          <svg class="w-7 h-7 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-          </svg>
-        </div>
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Gift Cards</h1>
-        <p class="text-gray-500 text-sm max-w-md mx-auto">Give the gift of art. The recipient gets a code by email they can use at checkout.</p>
-      </div>
-    </div>
+    <section class="relative isolate flex min-h-[46vh] overflow-hidden text-white">
+      <div class="hero-media-gradient absolute inset-0" aria-hidden="true" />
+      <div class="hero-media-grain absolute inset-0" aria-hidden="true" />
+      <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" aria-hidden="true" />
 
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
+      <div class="relative z-10 mx-auto flex w-full max-w-3xl flex-col justify-end px-4 pb-14 pt-28 sm:px-6 lg:px-8">
+        <p class="hero-stagger mb-3 text-sm font-medium text-white/70" style="animation-delay: 0.15s">Gift cards</p>
+        <h1 class="hero-stagger display-1 font-bold leading-tight text-balance drop-shadow-sm" style="animation-delay: 0.3s">Give the gift of choice</h1>
+        <p class="hero-stagger mt-5 max-w-xl text-lg text-white/85" style="animation-delay: 0.45s">
+          Pick an amount, add a personal message, and we'll email the code straight to them.
+        </p>
+      </div>
+    </section>
+
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-6">
 
       <!-- Loading denominations -->
-      <div v-if="loadingDenominations" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center text-sm text-gray-500">
+      <div v-if="loadingDenominations" class="py-16 text-center text-sm text-gray-500">
         Loading…
       </div>
 
       <!-- No denominations configured -->
-      <div v-else-if="denominations.length === 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center text-sm text-gray-500">
-        Gift cards are not available at this time.
+      <div v-else-if="denominations.length === 0" class="flex flex-col items-center py-16 text-center">
+        <svg class="h-11 w-11 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+        </svg>
+        <p class="mt-4 text-lg font-semibold text-gray-900">Gift cards coming soon</p>
+        <p class="mt-1 max-w-xs text-gray-500">They're not available just yet — check back shortly.</p>
       </div>
 
       <template v-else>
 
         <!-- Step 1: Pick denomination -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-4">Choose Amount</h2>
+          <div class="mb-4 flex items-center gap-3">
+            <span class="flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold" :style="{ backgroundColor: 'var(--color-primary-50)', color: 'var(--color-primary-700)' }">1</span>
+            <h2 class="text-base font-semibold text-gray-900">Choose an amount</h2>
+          </div>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <button
               v-for="d in denominations"
@@ -51,30 +60,33 @@
 
         <!-- Step 2: Recipient & Sender details -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
-          <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest">Gift Details</h2>
+          <div class="flex items-center gap-3">
+            <span class="flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold" :style="{ backgroundColor: 'var(--color-primary-50)', color: 'var(--color-primary-700)' }">2</span>
+            <h2 class="text-base font-semibold text-gray-900">Gift details</h2>
+          </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-semibold text-gray-600 mb-1">Recipient Email <span class="text-red-500">*</span></label>
+              <label class="mb-1 block text-sm font-medium text-gray-700">Recipient Email <span class="text-red-500">*</span></label>
               <input v-model="form.recipient_email" type="email" placeholder="friend@example.com" :class="['input-field w-full', attempted && fieldErrors.recipient_email ? '!border-red-300' : '']" />
               <p v-if="attempted && fieldErrors.recipient_email" class="mt-1 text-xs text-red-600">{{ fieldErrors.recipient_email }}</p>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-gray-600 mb-1">Recipient Name</label>
+              <label class="mb-1 block text-sm font-medium text-gray-700">Recipient Name</label>
               <input v-model="form.recipient_name" type="text" class="input-field w-full" placeholder="Optional" />
             </div>
             <div>
-              <label class="block text-xs font-semibold text-gray-600 mb-1">Your Name <span class="text-red-500">*</span></label>
+              <label class="mb-1 block text-sm font-medium text-gray-700">Your Name <span class="text-red-500">*</span></label>
               <input v-model="form.customer_name" type="text" placeholder="Your name" :class="['input-field w-full', attempted && fieldErrors.customer_name ? '!border-red-300' : '']" />
               <p v-if="attempted && fieldErrors.customer_name" class="mt-1 text-xs text-red-600">{{ fieldErrors.customer_name }}</p>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-gray-600 mb-1">Your Email <span class="text-red-500">*</span></label>
+              <label class="mb-1 block text-sm font-medium text-gray-700">Your Email <span class="text-red-500">*</span></label>
               <input v-model="form.customer_email" type="email" placeholder="your@email.com" :class="['input-field w-full', attempted && fieldErrors.customer_email ? '!border-red-300' : '']" />
               <p v-if="attempted && fieldErrors.customer_email" class="mt-1 text-xs text-red-600">{{ fieldErrors.customer_email }}</p>
             </div>
             <div class="sm:col-span-2">
-              <label class="block text-xs font-semibold text-gray-600 mb-1">Personal Message</label>
+              <label class="mb-1 block text-sm font-medium text-gray-700">Personal Message</label>
               <textarea v-model="form.message" rows="3" class="input-field w-full resize-none" placeholder="Add a personal note… (optional)" />
             </div>
           </div>
@@ -82,7 +94,10 @@
 
         <!-- Step 3: Payment method -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-4">Payment Method</h2>
+          <div class="mb-4 flex items-center gap-3">
+            <span class="flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold" :style="{ backgroundColor: 'var(--color-primary-50)', color: 'var(--color-primary-700)' }">3</span>
+            <h2 class="text-base font-semibold text-gray-900">Payment method</h2>
+          </div>
 
           <div v-if="loadingPaymentMethods" class="flex items-center gap-3 py-4">
             <div class="w-5 h-5 rounded-full border-2 border-primary-500 border-t-transparent animate-spin shrink-0"></div>
@@ -121,7 +136,7 @@
 
         <!-- Stripe payment element -->
         <div v-if="form.payment_method === 'stripe' && createdOrderId" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-4">Card Details</h2>
+          <h2 class="mb-4 text-base font-semibold text-gray-900">Card details</h2>
           <StripePayment
             :order-id="String(createdOrderId)"
             :amount="selectedDenomination ? Number(selectedDenomination.amount) : 0"
@@ -270,5 +285,17 @@ useSeoMeta({ title: 'Gift Cards' })
 <style scoped>
 .input-field {
   @apply px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-100 outline-none;
+}
+
+.hero-stagger {
+  opacity: 0;
+  animation: hero-fade-up 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes hero-fade-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-stagger { animation: none; opacity: 1; transform: none; }
 }
 </style>

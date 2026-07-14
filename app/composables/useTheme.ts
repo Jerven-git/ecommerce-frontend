@@ -1,5 +1,5 @@
 import { useSiteConfig, DEFAULT_THEME, DEFAULT_IN_STOCK_COLOR } from './useSiteConfig'
-import { generatePalette } from '~/utils/color'
+import { generatePalette, readableOn } from '~/utils/color'
 
 // Fonts available for selection. Any font added here must also be declared in
 // `fonts.families` in nuxt.config.ts so @nuxt/fonts self-hosts it.
@@ -215,6 +215,9 @@ export function useTheme() {
       root.setProperty(`--color-primary-${shade}`, color)
     }
     root.setProperty('--color-primary', String(primaryPalette['600']))
+    // Legible text colour for solid primary fills (buttons/bands), so a light
+    // brand colour (e.g. gold) gets near-black text instead of unreadable white.
+    root.setProperty('--on-primary', readableOn(String(primaryPalette['600'])))
 
     // Generate and apply secondary palette
     const secondaryPalette = generatePalette(secondary)
@@ -222,6 +225,7 @@ export function useTheme() {
       root.setProperty(`--color-secondary-${shade}`, color)
     }
     root.setProperty('--color-secondary', String(secondaryPalette['600']))
+    root.setProperty('--on-secondary', readableOn(String(secondaryPalette['600'])))
 
     // Accent / surface color
     root.setProperty('--color-accent', accent)

@@ -1,12 +1,49 @@
 <template>
   <div class="min-h-screen flex flex-col">
 
-    <!-- Page Header -->
+    <!-- Toolbar: heading + result count + search / sort -->
     <div class="bg-white border-b border-gray-100">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <p class="hero-stagger text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1" style="animation-delay: 0.1s">{{ siteConfig?.shop_header?.label || 'Store' }}</p>
-        <h1 class="hero-stagger text-3xl font-bold text-gray-900" style="animation-delay: 0.25s">{{ siteConfig?.shop_header?.heading || 'Shop All Products' }}</h1>
-        <p class="hero-stagger text-sm text-gray-500 mt-1" style="animation-delay: 0.4s">{{ siteConfig?.shop_header?.subtitle || 'Browse our full collection of quality items' }}</p>
+        <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+          <div>
+            <h1 class="hero-stagger display-2 font-bold text-gray-900" style="animation-delay: 0.15s">{{ siteConfig?.shop_header?.heading || 'Shop All Products' }}</h1>
+            <p class="hero-stagger mt-3 max-w-xl text-gray-600" style="animation-delay: 0.3s">{{ siteConfig?.shop_header?.subtitle || 'Browse our full collection of quality items' }}</p>
+          </div>
+          <p v-if="!loading && !error" class="shrink-0 text-sm text-gray-500 tabular-nums">
+            {{ products.length }} {{ products.length === 1 ? 'item' : 'items' }}
+          </p>
+        </div>
+
+        <!-- Search + Sort -->
+        <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+          <!-- Search -->
+          <div class="flex flex-1 items-center overflow-hidden rounded-xl border border-gray-200 bg-white transition-all focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-500/20">
+            <span class="flex shrink-0 items-center pl-4 pr-2 text-gray-400">
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
+              </svg>
+            </span>
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search products…"
+              class="flex-1 bg-transparent py-3 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none"
+              @input="debouncedFetch"
+            />
+          </div>
+
+          <!-- Sort -->
+          <select
+            v-model="sortBy"
+            class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 transition-all focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+            @change="fetchProducts"
+          >
+            <option value="newest">Newest First</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="name">Name: A to Z</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -100,42 +137,6 @@
       </TransitionGroup>
     </div>
 
-    <!-- Filters -->
-    <div class="bg-white border-b border-gray-100">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div class="flex gap-3">
-
-          <!-- Search -->
-          <div class="flex-1 flex items-center rounded-xl border border-gray-200 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500/20 focus-within:border-primary-400 transition-all bg-white">
-            <span class="flex items-center pl-3.5 pr-2 text-gray-400 shrink-0">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
-              </svg>
-            </span>
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Search products..."
-              class="flex-1 py-2.5 pr-3.5 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none"
-              @input="debouncedFetch"
-            />
-          </div>
-
-          <!-- Sort -->
-          <select
-            v-model="sortBy"
-            class="py-2.5 px-3.5 text-sm text-gray-700 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 transition-all"
-            @change="fetchProducts"
-          >
-            <option value="newest">Newest First</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="name">Name: A to Z</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
     <!-- Main Content -->
     <div class="flex-1 section-accent">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
@@ -144,30 +145,26 @@
         <ShopProductSkeleton v-if="loading" />
 
         <!-- Error -->
-        <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center max-w-sm mx-auto mt-8">
-          <div class="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-3">
-            <svg class="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <p class="text-sm font-medium text-red-600 mb-4">{{ error }}</p>
-          <button @click="fetchProducts" class="btn-primary">Retry</button>
+        <div v-else-if="error" class="flex flex-col items-center py-20 text-center">
+          <svg class="h-10 w-10 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="mt-4 max-w-xs font-medium text-red-600">{{ error }}</p>
+          <button @click="fetchProducts" class="btn-primary mt-6">Retry</button>
         </div>
 
         <!-- Empty State -->
-        <div v-else-if="products.length === 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center max-w-sm mx-auto mt-8">
-          <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
-            <svg class="w-7 h-7 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13M7 13L5.4 5M17 21a1 1 0 100-2 1 1 0 000 2zm-10 0a1 1 0 100-2 1 1 0 000 2z" />
-            </svg>
-          </div>
-          <p class="text-sm font-semibold text-gray-900 mb-1">No products found</p>
-          <p class="text-sm text-gray-400 mb-5">Try adjusting your search or filter to find what you're looking for.</p>
-          <button @click="clearFilters" class="btn-secondary">Clear Filters</button>
+        <div v-else-if="products.length === 0" class="flex flex-col items-center py-20 text-center">
+          <svg class="h-11 w-11 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13M7 13L5.4 5M17 21a1 1 0 100-2 1 1 0 000 2zm-10 0a1 1 0 100-2 1 1 0 000 2z" />
+          </svg>
+          <p class="mt-4 text-lg font-semibold text-gray-900">No products found</p>
+          <p class="mt-1 max-w-xs text-gray-500">Try adjusting your search or filters to find what you're looking for.</p>
+          <button @click="clearFilters" class="btn-primary mt-6">Clear filters</button>
         </div>
 
         <!-- Product Grid with stagger -->
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div v-else class="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-3 xl:grid-cols-4">
           <div
             v-for="product in products"
             :key="product.id"

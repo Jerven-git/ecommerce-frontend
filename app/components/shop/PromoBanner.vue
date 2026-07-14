@@ -1,44 +1,37 @@
 <template>
-  <section
-    class="relative overflow-hidden text-white py-16"
-    :style="{ background: `linear-gradient(135deg, var(--color-secondary), var(--color-primary), var(--color-primary-400))` }"
-  >
-    <!-- Floating orbs -->
-    <div class="orb absolute rounded-full opacity-15 bg-white w-[280px] h-[280px] -top-20 -left-[60px]" />
-    <div class="orb absolute rounded-full opacity-15 bg-white w-[200px] h-[200px] -bottom-[60px] right-[10%] [animation-delay:2s]" />
-    <div class="orb absolute rounded-full opacity-15 bg-white w-[140px] h-[140px] top-[30%] -right-10 [animation-delay:4s]" />
+  <section class="relative overflow-hidden bg-secondary-900 py-20 text-white">
+    <!-- Soft, theme-driven glow (replaces the floating orbs) -->
+    <div
+      class="pointer-events-none absolute inset-0"
+      aria-hidden="true"
+      :style="{ background: 'radial-gradient(65% 120% at 50% -10%, color-mix(in srgb, var(--color-primary) 42%, transparent), transparent 62%)' }"
+    />
 
-    <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <span class="inline-block bg-white/20 backdrop-blur-sm text-xs font-semibold px-4 py-1.5 rounded-full mb-5 tracking-widest uppercase">
-        {{ promo?.badge || 'Members get more' }}
-      </span>
-      <h2 class="text-4xl md:text-5xl font-bold mb-4 leading-tight whitespace-pre-line">
+    <div class="relative z-10 mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 text-center">
+      <p v-if="badge" class="mb-4 text-sm font-medium text-white/55">{{ badge }}</p>
+      <h2 class="display-2 font-bold whitespace-pre-line">
         {{ promo?.heading || 'New arrivals\nevery single week.' }}
       </h2>
-      <p class="text-base text-white/75 mb-8 max-w-lg mx-auto">
+      <p class="mx-auto mt-4 max-w-lg text-white/70">
         {{ promo?.subtitle || 'Stay ahead of the trend. Fresh drops, exclusive deals, and hand-picked collections — updated weekly just for you.' }}
       </p>
 
-      <div class="flex flex-wrap justify-center gap-3 mb-10">
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
         <div
           v-for="(perk, i) in displayPerks"
           :key="i"
-          class="flex items-center gap-2 bg-white/15 backdrop-blur-sm px-5 py-2.5 rounded-full text-sm font-medium"
+          class="flex items-center gap-2 text-sm text-white/85"
         >
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="h-4 w-4 shrink-0" :style="{ color: 'var(--color-primary-300)' }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="perkIcons[i % perkIcons.length]" />
           </svg>
           {{ perk }}
         </div>
       </div>
 
-      <NuxtLink
-        to="/shop"
-        class="inline-flex items-center gap-2 bg-white font-bold px-8 py-3.5 rounded-xl shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300"
-        :style="{ color: 'var(--color-primary-700)' }"
-      >
+      <NuxtLink to="/shop" class="promo-cta mt-10">
         {{ promo?.button_text || 'Shop New Arrivals' }}
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
         </svg>
       </NuxtLink>
@@ -50,6 +43,7 @@
 const { siteConfig } = useSiteConfig()
 
 const promo = computed(() => siteConfig.value?.shop_promo)
+const badge = computed(() => promo.value?.badge ?? 'Members get more')
 
 const defaultPerks = ['Free Shipping', 'Easy Returns', 'Secure Checkout']
 const displayPerks = computed(() => promo.value?.perks?.length ? promo.value.perks : defaultPerks)
@@ -62,12 +56,36 @@ const perkIcons = [
 </script>
 
 <style scoped>
-.orb {
-  animation: float 6s ease-in-out infinite;
+.promo-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  padding: 0.875rem 2rem;
+  font-weight: 600;
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 12px 34px -14px rgba(0, 0, 0, 0.7);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+}
+.promo-cta svg {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.promo-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 44px -16px rgba(0, 0, 0, 0.75);
+}
+.promo-cta:hover svg {
+  transform: translateX(3px);
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px) scale(1); }
-  50%      { transform: translateY(-18px) scale(1.04); }
+@media (prefers-reduced-motion: reduce) {
+  .promo-cta,
+  .promo-cta svg {
+    transition: none;
+  }
+  .promo-cta:hover {
+    transform: none;
+  }
 }
 </style>

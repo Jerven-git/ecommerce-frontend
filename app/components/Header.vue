@@ -2,17 +2,22 @@
   <header
     :class="[
       isFullBleedPage ? 'fixed w-full' : 'sticky',
-      'top-0 z-50 transition-all duration-300',
+      'top-0 z-50 transition-[background-color,box-shadow,border-color] duration-300',
       isTransparent
         ? 'bg-transparent border-b border-transparent'
-        : 'bg-white/80 backdrop-blur-md border-b border-gray-100'
+        : isScrolled
+          ? 'bg-white/90 backdrop-blur-md border-b border-gray-200/70 shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)]'
+          : 'bg-white/75 backdrop-blur-md border-b border-gray-100'
     ]"
   >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16 gap-4">
+      <div
+        class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 transition-[height] duration-300"
+        :class="isScrolled && !isTransparent ? 'h-14' : 'h-16'"
+      >
 
         <!-- Logo -->
-        <NuxtLink to="/" class="flex items-center shrink-0">
+        <NuxtLink to="/" class="flex items-center shrink-0 justify-self-start">
           <img
             v-if="siteConfig?.logo_url"
             :src="siteConfig.logo_url"
@@ -29,8 +34,8 @@
           </span>
         </NuxtLink>
 
-        <!-- Desktop nav -->
-        <nav class="hidden md:flex items-center gap-0.5">
+        <!-- Desktop nav (centered) -->
+        <nav class="hidden lg:flex items-center gap-7 justify-self-center">
           <template v-for="link in navLinks" :key="link.to">
             <!-- Item with category dropdown (Shop) -->
             <div
@@ -41,9 +46,11 @@
             >
               <NuxtLink
                 :to="link.to"
-                class="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-                :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
-                :active-class="isTransparent ? '!text-white !bg-white/15' : '!text-primary-600 !bg-primary-50 hover:!bg-primary-50'"
+                class="nav-link inline-flex items-center gap-1"
+                :class="[
+                  isTransparent ? 'text-white/85 hover:text-white' : 'text-gray-700 hover:text-gray-950',
+                  (isLinkActive(link.to) || openDropdown === link.to) ? 'nav-link-active ' + (isTransparent ? 'text-white' : 'text-gray-950') : '',
+                ]"
                 aria-haspopup="true"
                 :aria-expanded="openDropdown === link.to"
                 @focus="openMenu(link.to)"
@@ -112,21 +119,23 @@
             <NuxtLink
               v-else
               :to="link.to"
-              class="px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-              :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
-              :active-class="isTransparent ? '!text-white !bg-white/15' : '!text-primary-600 !bg-primary-50 hover:!bg-primary-50'"
+              class="nav-link"
+              :class="[
+                isTransparent ? 'text-white/85 hover:text-white' : 'text-gray-700 hover:text-gray-950',
+                isLinkActive(link.to) ? 'nav-link-active ' + (isTransparent ? 'text-white' : 'text-gray-950') : '',
+              ]"
             >{{ link.label }}</NuxtLink>
           </template>
         </nav>
 
         <!-- Right actions -->
-        <div class="flex items-center gap-1.5">
+        <div class="flex items-center gap-1.5 justify-self-end">
 
           <!-- Admin pill (desktop) -->
           <NuxtLink
             v-if="authStore.isAdmin"
             to="/admin"
-            class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+            class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
             :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'"
           >
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -168,7 +177,8 @@
             </svg>
             <span
               v-if="cartStore.itemCount > 0"
-              class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-primary-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none"
+              class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-primary-600 text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none"
+              :style="{ color: 'var(--on-primary, #fff)' }"
             >
               {{ cartStore.itemCount }}
             </span>
@@ -178,16 +188,17 @@
           <NuxtLink
             v-if="headerCta?.enabled && headerCta.label && headerCta.link"
             :to="headerCta.link"
-            class="hidden md:inline-flex items-center px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-colors"
+            class="hidden lg:inline-flex items-center px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-colors"
             :class="isTransparent
               ? 'bg-white text-gray-900 hover:bg-white/90'
-              : 'bg-primary-600 text-white hover:bg-primary-700'"
+              : 'bg-primary-600 hover:bg-primary-700'"
+            :style="isTransparent ? {} : { color: 'var(--on-primary, #fff)' }"
           >{{ headerCta.label }}</NuxtLink>
 
           <!-- Mobile hamburger / close -->
           <button
             @click="mobileMenuOpen = !mobileMenuOpen"
-            class="md:hidden p-2 rounded-lg transition-colors"
+            class="lg:hidden p-2 rounded-lg transition-colors"
             :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
             :aria-label="mobileMenuOpen ? 'Close menu' : 'Open menu'"
           >
@@ -210,14 +221,14 @@
         leave-from-class="opacity-100 translate-y-0"
         leave-to-class="opacity-0 -translate-y-1"
       >
-        <div v-if="mobileMenuOpen" class="md:hidden border-t border-gray-100 py-2">
+        <div v-if="mobileMenuOpen" class="lg:hidden border-t border-gray-100 py-2">
           <nav class="flex flex-col gap-0.5 max-h-[70vh] overflow-y-auto">
             <template v-for="link in navLinks" :key="link.to">
               <!-- Accordion item with categories (Shop) -->
               <div v-if="link.categories && link.categories.length">
                 <button
                   type="button"
-                  class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                  class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors"
                   :aria-expanded="mobileShopOpen"
                   @click="mobileShopOpen = !mobileShopOpen"
                 >
@@ -235,7 +246,7 @@
                   <template v-for="cat in link.categories" :key="cat.id">
                     <NuxtLink
                       :to="categoryLink(cat)"
-                      class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                      class="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors"
                       @click="closeMobile"
                     >{{ cat.name }}</NuxtLink>
                     <NuxtLink
@@ -253,7 +264,7 @@
               <NuxtLink
                 v-else
                 :to="link.to"
-                class="px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                class="px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors"
                 active-class="!text-primary-600 !bg-primary-50"
                 @click="closeMobile"
               >{{ link.label }}</NuxtLink>
@@ -344,6 +355,13 @@ const navLinks = computed(() =>
     }))
 )
 
+// Active-state matching: Home only on exact `/`, everything else on its own
+// section (so `/shop/…` keeps Shop lit but `/` doesn't light every link).
+function isLinkActive(to: string): boolean {
+  if (to === '/') return route.path === '/'
+  return route.path === to || route.path.startsWith(to + '/')
+}
+
 // --- Desktop dropdown open/close with hover intent ---
 const openDropdown = ref<string | null>(null)
 let closeTimer: ReturnType<typeof setTimeout> | undefined
@@ -379,6 +397,8 @@ const scrollY = ref(0)
 const isTransparent = computed(() =>
   isFullBleedPage.value && scrollY.value < 50 && !mobileMenuOpen.value
 )
+// Once the page has scrolled a little, condense the solid bar and add elevation.
+const isScrolled = computed(() => scrollY.value > 8)
 
 function onScroll() {
   scrollY.value = window.scrollY
@@ -399,3 +419,40 @@ onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll)
 })
 </script>
+
+<style scoped>
+/* Editorial nav item: text with a center-out underline that grows on hover and
+   stays drawn for the active section. Colour follows the text (currentColor),
+   so it works in both the solid and transparent (over-hero) header states. */
+.nav-link {
+  position: relative;
+  padding: 0.5rem 0.15rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  transition: color 0.2s ease;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0.15rem;
+  right: 0.15rem;
+  bottom: 0.15rem;
+  height: 1.5px;
+  border-radius: 9999px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-link:hover::after,
+.nav-link-active::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-link::after {
+    transition: none;
+  }
+}
+</style>

@@ -1,33 +1,34 @@
 <template>
   <div>
-    <section class="bg-gradient-to-br from-gray-50 to-white py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-3xl mx-auto text-center">
-        <span class="inline-block text-xs font-semibold tracking-widest uppercase text-primary-600 mb-3">
-          Custom Artwork
-        </span>
-        <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 leading-tight">
-          Commission a piece
-        </h1>
-        <p class="mt-4 text-base text-gray-500 max-w-xl mx-auto">
+    <!-- Hero -->
+    <section class="relative isolate flex min-h-[48vh] overflow-hidden text-white">
+      <div class="hero-media-gradient absolute inset-0" aria-hidden="true" />
+      <div class="hero-media-grain absolute inset-0" aria-hidden="true" />
+      <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" aria-hidden="true" />
+
+      <div class="relative z-10 mx-auto flex w-full max-w-3xl flex-col justify-end px-4 pb-14 pt-28 sm:px-6 lg:px-8">
+        <p class="hero-stagger mb-3 text-sm font-medium text-white/70" style="animation-delay: 0.15s">Custom artwork</p>
+        <h1 class="hero-stagger display-1 font-bold leading-tight text-balance drop-shadow-sm" style="animation-delay: 0.3s">Commission a piece</h1>
+        <p class="hero-stagger mt-5 max-w-xl text-lg text-white/85" style="animation-delay: 0.45s">
           Tell us about the artwork you have in mind. We'll respond within 48 hours with availability and pricing.
         </p>
       </div>
     </section>
 
-    <section class="py-12 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-3xl mx-auto">
+    <section class="section-accent py-16 lg:py-20">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           v-if="submitted"
-          class="bg-white rounded-2xl border border-green-100 shadow-sm p-8 text-center"
+          class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center"
         >
-          <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-green-50 flex items-center justify-center">
-            <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-emerald-50 flex items-center justify-center">
+            <svg class="w-7 h-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
             </svg>
           </div>
           <h2 class="text-xl font-bold text-gray-900">Request submitted</h2>
-          <p class="mt-2 text-sm text-gray-500">
-            Thanks {{ submittedName }}. We've received your commission brief and will be in touch at <span class="font-medium text-gray-700">{{ submittedEmail }}</span> within 48 hours.
+          <p class="mt-2 text-sm text-gray-600 max-w-md mx-auto">
+            Thanks {{ submittedName }}. We've received your commission brief and will be in touch at <span class="font-medium text-gray-900">{{ submittedEmail }}</span> within 48 hours.
           </p>
           <button
             type="button"
@@ -166,7 +167,8 @@
             <button
               type="submit"
               :disabled="submitting"
-              class="inline-flex items-center px-6 py-2.5 rounded-lg text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-50 transition-colors"
+              class="inline-flex items-center px-6 py-2.5 rounded-lg text-sm font-semibold bg-primary-600 hover:bg-primary-700 disabled:opacity-50 transition-colors"
+              :style="{ color: 'var(--on-primary, #fff)' }"
             >
               <span v-if="submitting">Sending…</span>
               <span v-else>Send commission request</span>
@@ -281,3 +283,17 @@ function resetForm(): void {
   error.value = null
 }
 </script>
+
+<style scoped>
+.hero-stagger {
+  opacity: 0;
+  animation: hero-fade-up 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes hero-fade-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-stagger { animation: none; opacity: 1; transform: none; }
+}
+</style>
