@@ -9,46 +9,58 @@
 
   <!-- Fixed-height shell so ONLY main content scrolls -->
   <div class="h-screen bg-gray-50 flex overflow-hidden">
-    <!-- Mobile overlay -->
-    <div
-      v-if="sidebarOpen"
-      class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-40 lg:hidden"
-      @click="sidebarOpen = false"
-    />
+    <!-- Mobile scrim -->
+    <Transition
+      enter-active-class="transition-opacity duration-200 ease-out"
+      leave-active-class="transition-opacity duration-150 ease-in"
+      enter-from-class="opacity-0"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="sidebarOpen"
+        class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-40 lg:hidden"
+        aria-hidden="true"
+        @click="sidebarOpen = false"
+      />
+    </Transition>
 
     <!-- Floating open tab (only when sidebar is closed) -->
     <button
       v-if="!sidebarOpen"
-      class="fixed left-0 top-1/2 -translate-y-1/2 z-50 bg-white border border-gray-200 shadow-md rounded-r-xl py-5 px-1.5 hover:bg-gray-50 transition-colors"
+      class="admin-tab admin-focus tap-target fixed left-0 top-1/2 -translate-y-1/2 z-50 flex items-center
+             bg-white border border-gray-200 shadow-sm rounded-r-xl py-5 px-1.5 text-gray-500
+             hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 hover:translate-x-0.5 transition-colors"
       @click="toggleSidebar"
       aria-label="Open sidebar"
       title="Open sidebar"
     >
-      <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
       </svg>
     </button>
 
     <!-- Sidebar -->
     <aside
-      class="z-50 border-r border-gray-100 transition-all duration-200 ease-in-out
-             fixed lg:sticky top-0 h-screen overflow-hidden bg-white flex flex-col"
+      class="admin-sidebar ease-quint z-50 border-r border-gray-200/70
+             fixed lg:sticky top-0 h-screen overflow-hidden flex flex-col"
       :class="[
+        mounted ? 'transition-[transform,width,opacity] duration-200' : '',
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
         sidebarOpen ? 'w-64 opacity-100 pointer-events-auto' : 'w-64 lg:w-0 lg:opacity-0 lg:pointer-events-none'
       ]"
     >
       <!-- Sidebar header -->
-      <div class="h-16 px-4 flex items-center justify-between border-b border-gray-100 shrink-0">
-        <NuxtLink to="/admin" class="flex items-center gap-2.5" @click="closeSidebarOnMobile">
+      <div class="h-16 px-4 flex items-center justify-between border-b border-gray-200/70 shrink-0">
+        <NuxtLink to="/admin" class="admin-focus flex items-center gap-2.5 rounded-lg" @click="closeSidebarOnMobile">
           <img src="~/assets/css/svg/databasy.svg" alt="Databasy" class="h-8 w-auto shrink-0" />
-          <div>
-            <p class="text-sm font-bold text-gray-900 leading-tight">Admin Panel</p>
-            <p class="text-xs text-gray-400 leading-tight">Store Manager</p>
+          <div class="leading-tight">
+            <p class="text-sm font-semibold text-gray-900">Admin Panel</p>
+            <p class="text-xs text-gray-500">Store Manager</p>
           </div>
         </NuxtLink>
         <button
-          class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+          class="admin-focus tap-target w-8 h-8 flex items-center justify-center rounded-lg text-gray-500
+                 hover:text-gray-700 hover:bg-gray-100 active:scale-95 transition"
           @click="toggleSidebar"
           aria-label="Collapse sidebar"
         >
@@ -59,24 +71,24 @@
       </div>
 
       <!-- Sidebar scroll area -->
-      <div class="sidebar-scroll flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-6">
+      <div class="sidebar-scroll flex-1 overflow-y-auto px-3 py-5 flex flex-col gap-7">
         <!-- Day-to-day navigation -->
-        <div data-guide="sidebar-nav" class="flex flex-col gap-6">
-          <nav
+        <nav data-guide="sidebar-nav" aria-label="Main" class="flex flex-col gap-6">
+          <div
             v-for="group in mainGroups"
             :key="group.heading"
-            class="space-y-0.5"
+            class="space-y-1"
           >
-            <p class="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ group.heading }}</p>
+            <p class="px-3 mb-1.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">{{ group.heading }}</p>
             <template v-for="item in group.items" :key="item.to">
               <NuxtLink
                 v-if="!item.show || item.show()"
                 :to="item.to"
-                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
+                class="admin-nav-link admin-focus group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
                 :class="linkClass(item.to)"
                 @click="closeSidebarOnMobile"
               >
-                <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-4 h-4 shrink-0 transition-colors" :class="iconClass(item)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     v-for="(d, i) in item.paths"
                     :key="i"
@@ -86,30 +98,30 @@
                     :d="d"
                   />
                 </svg>
-                <span class="font-medium">{{ item.label }}</span>
+                <span class="min-w-0 truncate">{{ item.label }}</span>
               </NuxtLink>
             </template>
-          </nav>
-        </div>
+          </div>
+        </nav>
 
         <!-- Settings & access -->
-        <div data-guide="sidebar-settings" class="flex flex-col gap-6">
-          <nav
+        <nav data-guide="sidebar-settings" aria-label="Settings and access" class="flex flex-col gap-6">
+          <div
             v-for="group in settingsGroups"
             :key="group.heading"
             v-show="group.items.some(item => !item.show || item.show())"
-            class="space-y-0.5"
+            class="space-y-1"
           >
-            <p class="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ group.heading }}</p>
+            <p class="px-3 mb-1.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">{{ group.heading }}</p>
             <template v-for="item in group.items" :key="item.to">
               <NuxtLink
                 v-if="!item.show || item.show()"
                 :to="item.to"
-                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-                :class="item.accent === 'purple' ? 'text-purple-700 hover:bg-purple-50' : linkClass(item.to)"
+                class="admin-nav-link admin-focus group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
+                :class="item.accent === 'purple' ? 'text-purple-700 hover:bg-purple-50 font-medium' : linkClass(item.to)"
                 @click="closeSidebarOnMobile"
               >
-                <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-4 h-4 shrink-0 transition-colors" :class="iconClass(item)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     v-for="(d, i) in item.paths"
                     :key="i"
@@ -119,11 +131,11 @@
                     :d="d"
                   />
                 </svg>
-                <span class="font-medium">{{ item.label }}</span>
+                <span class="min-w-0 truncate">{{ item.label }}</span>
               </NuxtLink>
             </template>
-          </nav>
-        </div>
+          </div>
+        </nav>
 
         <!-- Spacer -->
         <div class="flex-1"></div>
@@ -132,32 +144,35 @@
         <div class="space-y-1 pb-2">
           <a
             :href="storeUrl"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+            class="admin-nav-link admin-focus flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                   text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
             @click="closeSidebarOnMobile"
             target="_blank"
             rel="noopener"
           >
-            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-4 h-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
-            <span class="font-medium">View Store</span>
+            <span>View Store</span>
           </a>
 
           <!-- Account row -->
-          <div class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-gray-50">
-            <div class="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
-              <span class="text-xs font-bold text-primary-600">
+          <div class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white ring-1 ring-gray-100">
+            <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
+              <span class="text-xs font-bold text-primary-700">
                 {{ (authStore.user?.name || 'A').charAt(0).toUpperCase() }}
               </span>
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-xs font-semibold text-gray-900 truncate">{{ authStore.user?.name || 'Admin' }}</p>
-              <p class="text-xs text-gray-400 truncate">{{ authStore.user?.email }}</p>
+              <p class="text-xs text-gray-500 truncate">{{ authStore.user?.email }}</p>
             </div>
             <button
               @click="handleLogout"
-              class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
-              title="Logout"
+              class="admin-focus tap-target w-8 h-8 flex items-center justify-center rounded-lg text-gray-500
+                     hover:text-red-600 hover:bg-red-50 active:scale-95 transition shrink-0"
+              aria-label="Log out"
+              title="Log out"
             >
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -171,13 +186,14 @@
     <!-- Main column -->
     <div class="flex-1 min-w-0 flex flex-col">
       <!-- Sticky header -->
-      <header class="bg-white border-b border-gray-100 sticky top-0 z-30">
+      <header class="bg-white border-b border-gray-200/70 sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-          <h1 class="text-lg font-bold text-gray-900 truncate">{{ pageTitle }}</h1>
-          <div class="flex items-center gap-3 shrink-0">
+          <h1 class="text-base font-semibold text-gray-900 truncate">{{ pageTitle }}</h1>
+          <div class="flex items-center gap-2 shrink-0">
             <button
               @click="guideRef?.startGuide()"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-primary-600 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors"
+              class="admin-focus inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-primary-700
+                     bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors"
               title="Replay the admin guide"
             >
               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -187,7 +203,8 @@
             </button>
             <a
               :href="storeUrl"
-              class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-800 transition-colors"
+              class="admin-focus hidden sm:inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-medium
+                     text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
               target="_blank"
               rel="noopener"
             >
@@ -324,12 +341,12 @@ const settingsGroups: NavGroup[] = [
   },
 ]
 
-// default is CLOSED
-const sidebarOpen = ref(
-  typeof window !== 'undefined'
-    ? localStorage.getItem('sidebarOpen') !== 'false'
-    : true
-)
+// Default is OPEN. Initialise to a stable value for SSR + first client render so
+// hydration matches; the persisted preference is read in onMounted (client only).
+const sidebarOpen = ref(true)
+// Slide transitions are enabled only after first paint, so the shell arrives
+// settled instead of animating on load (product UIs don't choreograph arrival).
+const mounted = ref(false)
 
 const toggleSidebar = () => {
   sidebarOpen.value = !sidebarOpen.value
@@ -348,6 +365,21 @@ const closeSidebarOnMobile = () => {
     sidebarOpen.value = false
   }
 }
+
+// Escape closes the drawer on mobile, matching the scrim tap.
+const onKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && sidebarOpen.value && window.innerWidth < 1024) {
+    sidebarOpen.value = false
+  }
+}
+
+onMounted(() => {
+  if (localStorage.getItem('sidebarOpen') === 'false') sidebarOpen.value = false
+  window.addEventListener('keydown', onKeydown)
+  requestAnimationFrame(() => { mounted.value = true })
+})
+
+onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 
 const handleLogout = async () => {
   await authStore.logout()
@@ -368,10 +400,16 @@ const pageTitle = computed(() => {
   return match?.title ?? match?.label ?? 'Admin'
 })
 
-const linkClass = (path: string) => {
-  const active = 'bg-primary-50 ring-1 ring-primary-200 text-primary-800'
-  const inactive = 'bg-white hover:bg-gray-100 text-gray-700'
-  return isActivePath(path) ? active : inactive
+// Active is signalled by fill + weight + colour (never a side-stripe); hover
+// stays neutral grey so colour consistently means "this is where you are".
+const linkClass = (path: string) =>
+  isActivePath(path)
+    ? 'bg-primary-50 text-primary-700 font-semibold'
+    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
+
+const iconClass = (item: NavItem) => {
+  if (item.accent === 'purple') return 'text-purple-500'
+  return isActivePath(item.to) ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600'
 }
 </script>
 
@@ -384,5 +422,52 @@ const linkClass = (path: string) => {
 .sidebar-scroll::-webkit-scrollbar {
   width: 0px;
   height: 0px;
+}
+
+/* Ease-out-quint — matches the curve used across the storefront (main.css). */
+.ease-quint {
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* A ~4% wash of the (themeable) brand hue distinguishes the sidebar surface
+   from the white header and grey-50 content without adding loudness. */
+.admin-sidebar {
+  background-color: color-mix(in srgb, var(--color-primary) 4%, #ffffff);
+}
+
+/* Branded keyboard focus. Uses outline (not box-shadow) so it isn't clipped by
+   the sidebar's overflow-hidden / scroll containers. */
+.admin-focus:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-primary) 65%, transparent);
+  outline-offset: 1px;
+}
+
+/* Expand small icon buttons to a 44px hit area without changing their visual
+   size (WCAG 2.5.5 / touch ergonomics). */
+.tap-target {
+  position: relative;
+}
+.tap-target::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
+/* Ensure nav rows meet the 44px touch minimum on coarse pointers. */
+@media (pointer: coarse) {
+  .admin-nav-link {
+    min-height: 44px;
+  }
+}
+
+/* Respect reduced-motion: the sidebar snaps instead of sliding, and the
+   floating tab's invitation nudge is removed. */
+@media (prefers-reduced-motion: reduce) {
+  .ease-quint {
+    transition: none !important;
+  }
+  .admin-tab:hover {
+    transform: translateY(-50%) !important;
+  }
 }
 </style>
