@@ -372,16 +372,30 @@ function buildPathToCategory(tree: Category[], targetId: number): Category[] | n
 
 const route = useRoute()
 
+// Sync the selected category path from the `?category_id=` query. Returns true
+// when the resulting selection differs from the current one.
+function applyCategoryFromQuery(): boolean {
+  const queryCategoryId = Number(route.query.category_id)
+  const path = (Number.isFinite(queryCategoryId) && queryCategoryId > 0)
+    ? (buildPathToCategory(categories.value, queryCategoryId) ?? [])
+    : []
+  const nextId = path.length ? path[path.length - 1]!.id : null
+  if (nextId === activeCategoryId.value) return false
+  selectedPath.value = path
+  return true
+}
+
 onMounted(async () => {
   await fetchCategories()
-
-  const queryCategoryId = Number(route.query.category_id)
-  if (Number.isFinite(queryCategoryId) && queryCategoryId > 0) {
-    const path = buildPathToCategory(categories.value, queryCategoryId)
-    if (path) selectedPath.value = path
-  }
-
+  applyCategoryFromQuery()
   fetchProducts()
+})
+
+// Selecting a category in the header dropdown navigates to `/shop?category_id=…`.
+// Since the path stays `/shop`, the page component is reused (no remount), so we
+// react to the query change here to re-filter instead of relying on onMounted.
+watch(() => route.query.category_id, () => {
+  if (applyCategoryFromQuery()) fetchProducts()
 })
 
 useStaticPageSeo('shop')
