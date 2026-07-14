@@ -1,31 +1,29 @@
 <template>
   <div class="max-w-4xl mx-auto">
     <!-- Page Header -->
-    <div class="mb-6 flex items-start justify-between gap-4">
-      <div>
-        <div class="flex items-center gap-2 text-sm text-gray-400 mb-2">
+    <AdminPageHeader title="Service Categories" subtitle="Group services into topics with color-styled tiles">
+      <template #breadcrumb>
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
           <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
           <span>/</span>
           <span class="text-gray-600 font-medium">Service Categories</span>
         </div>
-        <h1 class="text-2xl font-bold text-gray-900">Service Categories</h1>
-        <p class="text-gray-500 text-sm mt-1">Group services into topics with color-styled tiles</p>
-      </div>
-      <button
-        data-guide="add-service-category-btn"
-        type="button"
-        @click="startAdd"
-        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shrink-0"
-      >
-        <Icon name="heroicons:plus" class="w-4 h-4" />
-        New Category
-      </button>
-    </div>
+      </template>
+      <template #actions>
+        <button
+          data-guide="add-service-category-btn"
+          type="button"
+          @click="startAdd"
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shrink-0"
+        >
+          <Icon name="heroicons:plus" class="w-4 h-4" />
+          New Category
+        </button>
+      </template>
+    </AdminPageHeader>
 
     <!-- Loading -->
-    <div v-if="loading" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 animate-pulse space-y-3">
-      <div v-for="i in 4" :key="i" class="h-16 bg-gray-100 rounded-xl"></div>
-    </div>
+    <AdminSpinner v-if="loading" label="Loading service categories…" />
 
     <!-- Error -->
     <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center max-w-sm mx-auto">
@@ -34,17 +32,25 @@
     </div>
 
     <!-- Empty state -->
-    <div v-else-if="!categories.length" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
-      <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-        <Icon name="heroicons:squares-2x2" class="w-7 h-7 text-gray-300" />
-      </div>
-      <p class="font-semibold text-gray-700 mb-1">No service categories yet</p>
-      <p class="text-sm text-gray-400 mb-6">Create your first category to organize services</p>
-      <button @click="startAdd" class="btn-primary">New Category</button>
-    </div>
+    <AdminCard v-else-if="!categories.length">
+      <AdminEmptyState
+        title="No service categories yet"
+        description="Create your first category to organize services"
+        :icon="'M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z'"
+      >
+        <template #action>
+          <button
+            @click="startAdd"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
+          >
+            New Category
+          </button>
+        </template>
+      </AdminEmptyState>
+    </AdminCard>
 
     <!-- List -->
-    <div v-else data-guide="service-category-list" class="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-100">
+    <div v-else data-guide="service-category-list" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm divide-y divide-gray-100">
       <div
         v-for="cat in categories"
         :key="cat.id"
@@ -60,8 +66,8 @@
 
         <div class="flex-1 min-w-0">
           <p class="text-sm font-semibold text-gray-900 truncate">{{ cat.name }}</p>
-          <p class="text-xs text-gray-400 font-mono">{{ cat.slug }}</p>
-          <p class="text-xs text-gray-400 mt-0.5">
+          <p class="text-xs text-gray-500 font-mono">{{ cat.slug }}</p>
+          <p class="text-xs text-gray-500 mt-0.5">
             {{ cat.services_count ?? 0 }} published {{ (cat.services_count ?? 0) === 1 ? 'service' : 'services' }}
           </p>
         </div>
@@ -176,7 +182,7 @@
               </button>
             </div>
           </div>
-          <p class="text-[11px] text-gray-400 mt-1">Blends over the gradient when set. JPG, PNG, WebP — max 5 MB.</p>
+          <p class="text-[11px] text-gray-500 mt-1">Blends over the gradient when set. JPG, PNG, WebP — max 5 MB.</p>
         </div>
 
         <!-- Color overlay (only meaningful when an image is present) -->
@@ -193,7 +199,7 @@
             step="5"
             class="w-full accent-primary-600"
           />
-          <div class="flex items-center justify-between text-[11px] text-gray-400 mt-0.5">
+          <div class="flex items-center justify-between text-[11px] text-gray-500 mt-0.5">
             <span>Image only</span>
             <span>Strong color</span>
           </div>

@@ -1,34 +1,34 @@
 <template>
-  <div class="space-y-6">
-    <header class="flex items-center justify-between gap-4 flex-wrap">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900">Commissions</h1>
-        <p class="text-sm text-gray-500 mt-0.5">Custom artwork requests from your storefront.</p>
-      </div>
-      <div data-guide="commission-filters" class="flex items-center gap-2">
-        <select
-          v-model="filterStatus"
-          class="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
-          @change="load"
-        >
-          <option value="">All statuses</option>
-          <option v-for="s in STATUSES" :key="s" :value="s">{{ statusLabel(s) }}</option>
-        </select>
-      </div>
-    </header>
+  <div>
+    <AdminPageHeader title="Commissions" subtitle="Custom artwork requests from your storefront.">
+      <template #actions>
+        <div data-guide="commission-filters" class="flex items-center gap-2">
+          <select
+            v-model="filterStatus"
+            class="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none"
+            @change="load"
+          >
+            <option value="">All statuses</option>
+            <option v-for="s in STATUSES" :key="s" :value="s">{{ statusLabel(s) }}</option>
+          </select>
+        </div>
+      </template>
+    </AdminPageHeader>
 
     <div data-guide="commission-table">
-      <div v-if="loading" class="bg-white rounded-2xl border border-gray-100 p-8 text-center text-sm text-gray-500">
-        Loading commissions…
-      </div>
+      <AdminSpinner v-if="loading" label="Loading commissions…" />
 
-      <div v-else-if="commissions.length === 0" class="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-        <p class="text-sm text-gray-500">No commission requests yet.</p>
-      </div>
+      <AdminCard v-else-if="commissions.length === 0">
+        <AdminEmptyState
+          title="No commission requests yet"
+          description="Custom artwork requests from your storefront will appear here."
+          :icon="'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'"
+        />
+      </AdminCard>
 
-      <div v-else class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <AdminCard v-else class="overflow-hidden">
         <table class="w-full">
-        <thead class="bg-gray-50 border-b border-gray-100">
+        <thead class="bg-gray-50 border-b border-gray-200/70">
           <tr>
             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
@@ -46,7 +46,7 @@
             </td>
             <td class="px-6 py-4 text-sm text-gray-700 max-w-xs">
               <p class="font-medium truncate">{{ c.title }}</p>
-              <p class="text-xs text-gray-400 line-clamp-1">{{ c.description }}</p>
+              <p class="text-xs text-gray-500 line-clamp-1">{{ c.description }}</p>
             </td>
             <td class="px-6 py-4 text-sm text-gray-600">{{ c.budget_range || '—' }}</td>
             <td class="px-6 py-4">
@@ -65,14 +65,14 @@
             <td class="px-6 py-4 text-right">
               <button
                 type="button"
-                class="text-xs font-semibold text-primary-600 hover:text-primary-700"
+                class="text-xs font-semibold text-primary-600 hover:text-primary-700 transition-colors"
                 @click="openDetail(c)"
               >View</button>
             </td>
           </tr>
         </tbody>
         </table>
-      </div>
+      </AdminCard>
     </div>
 
     <!-- Detail modal -->
@@ -90,7 +90,7 @@
         @click.self="selected = null"
       >
         <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-          <div class="p-6 border-b border-gray-100 flex items-center justify-between gap-4">
+          <div class="p-6 border-b border-gray-200/70 flex items-center justify-between gap-4">
             <div>
               <h2 class="text-lg font-bold text-gray-900">{{ selected.title }}</h2>
               <p class="text-xs text-gray-500 mt-0.5">From {{ selected.customer_name }} · {{ new Date(selected.created_at).toLocaleString() }}</p>
@@ -133,7 +133,7 @@
             <div v-if="selected.reference_image_url">
               <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Reference image</p>
               <a :href="selected.reference_image_url" target="_blank" rel="noopener">
-                <img :src="selected.reference_image_url" class="rounded-lg border border-gray-100 max-h-72 object-contain" />
+                <img :src="selected.reference_image_url" class="rounded-lg border border-gray-200/70 max-h-72 object-contain" />
               </a>
             </div>
 
@@ -147,22 +147,22 @@
               ></textarea>
             </div>
           </div>
-          <div class="p-4 border-t border-gray-100 flex items-center justify-between gap-2">
+          <div class="p-4 border-t border-gray-200/70 flex items-center justify-between gap-2">
             <button
               type="button"
-              class="text-sm text-red-600 hover:text-red-700 font-medium"
+              class="text-sm text-red-600 hover:text-red-700 font-medium transition-colors"
               @click="onDelete"
             >Delete</button>
             <div class="flex items-center gap-2">
               <button
                 type="button"
-                class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200"
+                class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
                 @click="selected = null"
               >Close</button>
               <button
                 type="button"
                 :disabled="saving"
-                class="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-50"
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 transition-colors disabled:opacity-50"
                 @click="saveNotes"
               >{{ saving ? 'Saving…' : 'Save notes' }}</button>
             </div>

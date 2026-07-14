@@ -1,15 +1,15 @@
 <template>
   <div>
     <!-- Page Header -->
-    <div class="mb-6">
-      <div class="flex items-center gap-2 text-sm text-gray-400 mb-2">
-        <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
-        <span>/</span>
-        <span class="text-gray-600 font-medium">Settings</span>
-      </div>
-      <h1 class="text-2xl font-bold text-gray-900">Site Settings</h1>
-      <p class="text-gray-500 text-sm mt-1">Manage your store's appearance and content</p>
-    </div>
+    <AdminPageHeader title="Site Settings" subtitle="Manage your store's appearance and content">
+      <template #breadcrumb>
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
+          <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
+          <span>/</span>
+          <span class="text-gray-600 font-medium">Settings</span>
+        </div>
+      </template>
+    </AdminPageHeader>
 
     <!-- Tab Navigation -->
     <nav class="flex gap-1 mb-6 bg-gray-100 rounded-xl p-1 overflow-x-auto">
@@ -31,10 +31,7 @@
     </nav>
 
     <!-- Loading -->
-    <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
-      <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
-      <p class="text-sm text-gray-500">Loading settings…</p>
-    </div>
+    <AdminSpinner v-if="loading" label="Loading settings…" />
 
     <!-- Error -->
     <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">

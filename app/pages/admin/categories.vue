@@ -1,15 +1,10 @@
 <template>
   <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Page Header -->
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900">Categories</h1>
-      <p class="text-sm text-gray-500 mt-1">Manage product categories and subcategories at any depth</p>
-    </div>
+    <AdminPageHeader title="Categories" subtitle="Manage product categories and subcategories at any depth" />
 
-    <!-- Loading skeleton -->
-    <div v-if="loading" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 animate-pulse space-y-3">
-      <div v-for="i in 5" :key="i" class="h-10 bg-gray-100 rounded-xl" :style="{ marginLeft: `${(i % 3) * 24}px` }"></div>
-    </div>
+    <!-- Loading -->
+    <AdminSpinner v-if="loading" label="Loading categories…" />
 
     <!-- Error -->
     <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center max-w-sm mx-auto">
@@ -18,9 +13,9 @@
     </div>
 
     <!-- Main content -->
-    <div v-else class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div v-else class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
       <!-- Header -->
-      <div class="px-6 py-4 border-b border-gray-100">
+      <div class="px-6 py-4 border-b border-gray-200/70">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
@@ -30,7 +25,7 @@
             </div>
             <div>
               <p class="text-sm font-semibold text-gray-900">Category Tree</p>
-              <p class="text-xs text-gray-400">{{ totalCount }} total</p>
+              <p class="text-xs text-gray-500">{{ totalCount }} total</p>
             </div>
           </div>
           <div class="flex items-center gap-2">
@@ -79,21 +74,21 @@
               :disabled="saving"
             />
           </div>
-          <button type="submit" class="px-3 py-1.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors whitespace-nowrap disabled:opacity-50" :disabled="!newName.trim() || saving || addingParentId !== null">
+          <button type="submit" class="px-3 py-1.5 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors whitespace-nowrap disabled:opacity-50" :disabled="!newName.trim() || saving || addingParentId !== null">
             Add
           </button>
         </form>
 
         <!-- Search results info -->
-        <p v-if="searchQuery && !filteredCategories.length" class="text-sm text-gray-400 text-center py-4">
+        <p v-if="searchQuery && !filteredCategories.length" class="text-sm text-gray-500 text-center py-4">
           No categories matching "{{ searchQuery }}"
         </p>
-        <p v-else-if="searchQuery" class="text-xs text-gray-400">
+        <p v-else-if="searchQuery" class="text-xs text-gray-500">
           Showing results for "{{ searchQuery }}"
         </p>
 
         <!-- Divider -->
-        <div v-if="filteredCategories.length" class="border-t border-gray-100"></div>
+        <div v-if="filteredCategories.length" class="border-t border-gray-200/70"></div>
 
         <!-- Tree -->
         <div v-if="filteredCategories.length" class="mt-1">
@@ -129,7 +124,7 @@
           />
         </div>
 
-        <p v-else-if="!searchQuery" class="text-sm text-gray-400 text-center py-6">No categories yet. Add one above.</p>
+        <p v-else-if="!searchQuery" class="text-sm text-gray-500 text-center py-6">No categories yet. Add one above.</p>
       </div>
     </div>
 

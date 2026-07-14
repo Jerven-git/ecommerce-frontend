@@ -1,27 +1,27 @@
 <template>
   <div>
     <!-- Page Header -->
-    <div class="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-      <div>
-        <div class="flex items-center gap-2 text-sm text-gray-400 mb-2">
+    <AdminPageHeader title="Discounts" subtitle="Create and manage promotional discount codes">
+      <template #breadcrumb>
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
           <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
           <span>/</span>
           <span class="text-gray-600 font-medium">Discounts</span>
         </div>
-        <h1 class="text-2xl font-bold text-gray-900">Discounts</h1>
-        <p class="text-gray-500 text-sm mt-1">Create and manage promotional discount codes</p>
-      </div>
-      <button
-        data-guide="add-discount-btn"
-        @click="openAddModal"
-        class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors shrink-0"
-      >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        Add Discount
-      </button>
-    </div>
+      </template>
+      <template #actions>
+        <button
+          data-guide="add-discount-btn"
+          @click="openAddModal"
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shrink-0"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Add Discount
+        </button>
+      </template>
+    </AdminPageHeader>
 
     <!-- Filters -->
     <div data-guide="discount-filters" class="mb-6 flex flex-col sm:flex-row gap-3">
@@ -52,10 +52,7 @@
     </div>
 
     <!-- Loading -->
-    <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
-      <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
-      <p class="text-sm text-gray-500">Loading discounts…</p>
-    </div>
+    <AdminSpinner v-if="loading" label="Loading discounts…" />
 
     <!-- Error -->
     <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">
@@ -70,21 +67,22 @@
     </div>
 
     <!-- Empty state -->
-    <div v-else-if="discounts.length === 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
-      <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-        <svg class="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-        </svg>
-      </div>
-      <p class="font-semibold text-gray-700 mb-1">No discounts yet</p>
-      <p class="text-sm text-gray-400 mb-6">Create your first discount code to start offering promotions</p>
-      <button @click="openAddModal" class="btn-primary">Add Discount</button>
-    </div>
+    <AdminCard v-else-if="discounts.length === 0">
+      <AdminEmptyState
+        title="No discounts yet"
+        description="Create your first discount code to start offering promotions"
+        icon="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+      >
+        <template #action>
+          <button @click="openAddModal" class="btn-primary">Add Discount</button>
+        </template>
+      </AdminEmptyState>
+    </AdminCard>
 
     <!-- Discounts table -->
-    <div v-else class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div v-else class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
       <!-- Table header -->
-      <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+      <div class="px-6 py-4 border-b border-gray-200/70 flex items-center gap-3">
         <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center shrink-0">
           <svg class="w-4 h-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
@@ -92,7 +90,7 @@
         </div>
         <div>
           <p class="text-sm font-semibold text-gray-900">Discount Codes</p>
-          <p class="text-xs text-gray-400">{{ totalItems }} code{{ totalItems !== 1 ? 's' : '' }}</p>
+          <p class="text-xs text-gray-500">{{ totalItems }} code{{ totalItems !== 1 ? 's' : '' }}</p>
         </div>
       </div>
 
@@ -100,13 +98,13 @@
         <table class="min-w-full">
           <thead>
             <tr class="border-b border-gray-100">
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Code</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Type</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Value</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Valid Until</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Uses</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
-              <th class="px-6 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Code</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Value</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Valid Until</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Uses</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-50">
@@ -118,7 +116,7 @@
               <!-- Code + description -->
               <td class="px-6 py-4">
                 <p class="text-sm font-semibold text-gray-900 font-mono tracking-wide">{{ discount.code }}</p>
-                <p v-if="discount.description" class="text-xs text-gray-400 mt-0.5">{{ discount.description }}</p>
+                <p v-if="discount.description" class="text-xs text-gray-500 mt-0.5">{{ discount.description }}</p>
               </td>
 
               <!-- Type -->
@@ -146,8 +144,8 @@
               <!-- Uses -->
               <td class="px-6 py-4 whitespace-nowrap">
                 <span class="text-sm text-gray-700">{{ discount.used_count || 0 }}</span>
-                <span v-if="discount.max_uses" class="text-sm text-gray-400"> / {{ discount.max_uses }}</span>
-                <span v-else class="text-xs text-gray-400 ml-1">uses</span>
+                <span v-if="discount.max_uses" class="text-sm text-gray-500"> / {{ discount.max_uses }}</span>
+                <span v-else class="text-xs text-gray-500 ml-1">uses</span>
               </td>
 
               <!-- Status -->
@@ -247,7 +245,7 @@
           </div>
           <div class="min-w-0">
             <h2 class="text-sm font-semibold text-gray-900 truncate">{{ editingDiscount ? 'Edit Discount' : 'New Discount' }}</h2>
-            <p class="text-xs text-gray-400 truncate">{{ editingDiscount ? `Editing ${editingDiscount.code}` : 'Create a new promotional code' }}</p>
+            <p class="text-xs text-gray-500 truncate">{{ editingDiscount ? `Editing ${editingDiscount.code}` : 'Create a new promotional code' }}</p>
           </div>
         </div>
       </template>
@@ -342,7 +340,7 @@
                 <div class="flex items-center justify-between py-3 px-4 bg-gray-50 rounded-xl">
                   <div>
                     <p class="text-sm font-medium text-gray-900">Active</p>
-                    <p class="text-xs text-gray-400 mt-0.5">Customers can apply this discount at checkout</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Customers can apply this discount at checkout</p>
                   </div>
                   <button
                     type="button"
@@ -375,7 +373,7 @@
             type="submit"
             form="discount-form"
             :disabled="submitting"
-            class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
+            class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white text-sm font-semibold rounded-lg transition-colors"
           >
             <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />

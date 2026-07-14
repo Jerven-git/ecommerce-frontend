@@ -1,15 +1,15 @@
 <template>
   <div>
     <!-- Page Header -->
-    <div class="mb-8">
-      <div class="flex items-center gap-2 text-sm text-gray-400 mb-2">
-        <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
-        <span>/</span>
-        <span class="text-gray-600 font-medium">Orders</span>
-      </div>
-      <h1 class="text-2xl font-bold text-gray-900">Orders</h1>
-      <p class="text-gray-500 text-sm mt-1">View and manage customer orders</p>
-    </div>
+    <AdminPageHeader title="Orders" subtitle="View and manage customer orders">
+      <template #breadcrumb>
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
+          <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
+          <span>/</span>
+          <span class="text-gray-600 font-medium">Orders</span>
+        </div>
+      </template>
+    </AdminPageHeader>
 
     <!-- Filters -->
     <div data-guide="order-filters" class="mb-6 flex flex-col sm:flex-row gap-3">
@@ -47,10 +47,7 @@
     <!-- Order content area -->
     <div data-guide="order-list">
     <!-- Loading -->
-    <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
-      <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
-      <p class="text-sm text-gray-500">Loading orders…</p>
-    </div>
+    <AdminSpinner v-if="loading" label="Loading orders…" />
 
     <!-- Error -->
     <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">
@@ -65,33 +62,29 @@
     </div>
 
     <!-- Empty state -->
-    <div v-else-if="orders.length === 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
-      <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-        <svg class="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      </div>
-      <p class="font-semibold text-gray-700 mb-1">No orders yet</p>
-      <p class="text-sm text-gray-400">Orders will appear here once customers start purchasing</p>
-    </div>
+    <AdminCard v-else-if="orders.length === 0">
+      <AdminEmptyState
+        title="No orders yet"
+        description="Orders will appear here once customers start purchasing"
+        icon="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+      />
+    </AdminCard>
 
     <!-- No results for filters -->
-    <div v-else-if="filteredOrders.length === 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
-      <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-        <svg class="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      </div>
-      <p class="font-semibold text-gray-700 mb-1">No matching orders</p>
-      <p class="text-sm text-gray-400">Try adjusting your search or filter</p>
-    </div>
+    <AdminCard v-else-if="filteredOrders.length === 0">
+      <AdminEmptyState
+        title="No matching orders"
+        description="Try adjusting your search or filter"
+        icon="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      />
+    </AdminCard>
 
     <!-- Orders list -->
     <div v-else class="space-y-4">
       <div
         v-for="order in filteredOrders"
         :key="order.id"
-        class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+        class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden"
       >
         <!-- Card header -->
         <div class="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -115,7 +108,7 @@
                 Order #{{ order.id }}
                 <span v-if="isBackorderStatus(order.status)" class="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-orange-100 text-orange-700 border border-orange-200">Backorder</span>
               </p>
-              <p class="text-xs text-gray-400">{{ formatDate(order.created_at) }}</p>
+              <p class="text-xs text-gray-500">{{ formatDate(order.created_at) }}</p>
             </div>
           </div>
 
@@ -204,7 +197,7 @@
         <!-- Customer + Shipping grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-100">
           <div class="px-6 py-4">
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Customer</p>
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2.5">Customer</p>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-900">{{ order.customer_name }}</p>
               <p class="text-sm text-gray-500">{{ order.customer_email }}</p>
@@ -213,7 +206,7 @@
           </div>
 
           <div class="px-6 py-4">
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Ship To</p>
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2.5">Ship To</p>
             <p class="text-sm text-gray-600 leading-relaxed">{{ order.shipping_address }}</p>
           </div>
         </div>
@@ -222,7 +215,7 @@
         <div class="px-6 py-4 border-t border-gray-100">
           <!-- No shipment yet — show Ship button -->
           <div v-if="!order.shipment" class="flex items-center justify-between">
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Tracking</p>
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tracking</p>
             <button
               v-if="order.status !== 'cancelled' && order.status !== 'backorder_cancelled' && order.status !== 'backorder_expired'"
               @click="promptShipOrder(order.id, order.customer_name)"
@@ -231,21 +224,21 @@
             >
               {{ shippingOrderId === order.id ? 'Creating…' : 'Ship Order' }}
             </button>
-            <span v-else class="text-xs text-gray-400 italic">N/A</span>
+            <span v-else class="text-xs text-gray-500 italic">N/A</span>
           </div>
 
           <!-- Has shipment — show tracking info + barcode -->
           <div v-else>
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Tracking</p>
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Tracking</p>
             <div class="bg-gray-50 rounded-xl p-4 space-y-3">
               <!-- Tracking number + carrier -->
               <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div>
-                  <p class="text-xs text-gray-400 mb-0.5">Tracking Number</p>
+                  <p class="text-xs text-gray-500 mb-0.5">Tracking Number</p>
                   <p class="text-sm font-mono font-semibold text-gray-900">{{ order.shipment.tracking_number }}</p>
                 </div>
                 <div v-if="order.shipment.carrier" class="text-right">
-                  <p class="text-xs text-gray-400 mb-0.5">Carrier</p>
+                  <p class="text-xs text-gray-500 mb-0.5">Carrier</p>
                   <p class="text-sm font-medium text-gray-700">{{ order.shipment.carrier }}</p>
                 </div>
               </div>
@@ -262,7 +255,7 @@
               <!-- Shipment status selector -->
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-xs text-gray-400 mb-0.5">Shipped</p>
+                  <p class="text-xs text-gray-500 mb-0.5">Shipped</p>
                   <p class="text-xs text-gray-500">{{ formatDate(order.shipment.shipped_at) }}</p>
                 </div>
                 <div class="relative">
@@ -296,7 +289,7 @@
 
         <!-- Order items -->
         <div class="px-6 py-4 border-t border-gray-100">
-          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Items</p>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Items</p>
 
           <div v-if="order.items && order.items.length > 0" class="space-y-2">
             <div
@@ -305,7 +298,7 @@
               class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg"
             >
               <div class="flex items-center gap-2 min-w-0">
-                <span class="text-xs font-semibold text-gray-400 bg-gray-200 rounded px-1.5 py-0.5 shrink-0">
+                <span class="text-xs font-semibold text-gray-500 bg-gray-200 rounded px-1.5 py-0.5 shrink-0">
                   ×{{ item.quantity }}
                 </span>
                 <span class="text-sm text-gray-700 truncate">{{ item.product_name }}</span>
@@ -316,21 +309,21 @@
             </div>
           </div>
 
-          <p v-else class="text-sm text-gray-400 italic">No items recorded</p>
+          <p v-else class="text-sm text-gray-500 italic">No items recorded</p>
         </div>
 
         <!-- Card footer: breakdown -->
         <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 space-y-1.5">
           <div class="flex items-center justify-between">
-            <span class="text-xs text-gray-400">Subtotal</span>
+            <span class="text-xs text-gray-500">Subtotal</span>
             <span class="text-sm text-gray-600">{{ formatIn(parseFloat(String(order.subtotal)), order.currency) }}</span>
           </div>
           <div v-if="parseFloat(String(order.tax_amount)) > 0" class="flex items-center justify-between">
-            <span class="text-xs text-gray-400">Tax</span>
+            <span class="text-xs text-gray-500">Tax</span>
             <span class="text-sm text-gray-600">{{ formatIn(parseFloat(String(order.tax_amount)), order.currency) }}</span>
           </div>
           <div v-if="parseFloat(String(order.shipping_amount)) > 0" class="flex items-center justify-between">
-            <span class="text-xs text-gray-400">Shipping</span>
+            <span class="text-xs text-gray-500">Shipping</span>
             <span class="text-sm text-gray-600">{{ formatIn(parseFloat(String(order.shipping_amount)), order.currency) }}</span>
           </div>
           <div v-if="parseFloat(String(order.discount_amount)) > 0" class="flex items-center justify-between">
@@ -338,7 +331,7 @@
             <span class="text-sm text-green-600">-{{ formatIn(parseFloat(String(order.discount_amount)), order.currency) }}</span>
           </div>
           <div class="flex items-center justify-between pt-1.5 border-t border-gray-200">
-            <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Total</span>
+            <span class="text-xs text-gray-500 font-medium uppercase tracking-wider">Total</span>
             <span class="text-lg font-bold text-gray-900">{{ formatIn(parseFloat(String(order.total_amount)), order.currency) }}</span>
           </div>
         </div>
@@ -359,7 +352,7 @@
           Previous
         </button>
         <template v-for="page in visiblePages" :key="page">
-          <span v-if="page === '...'" class="px-2 text-gray-400 text-sm">...</span>
+          <span v-if="page === '...'" class="px-2 text-gray-500 text-sm">...</span>
           <button
             v-else
             @click="goToPage(page as number)"
