@@ -2,58 +2,64 @@
   <div class="min-h-screen flex flex-col bg-gray-50">
 
     <!-- Hero -->
-    <section class="relative overflow-hidden">
-      <!-- Background -->
-      <div class="absolute inset-0" :style="fallbackHeroStyle">
-        <img
-          v-if="heroImage"
-          :src="heroImage"
-          :alt="coverAltText || heroHeading"
-          class="w-full h-full object-cover transition-opacity duration-500"
-          :class="heroLoaded ? 'opacity-100' : 'opacity-0'"
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-          @load="heroLoaded = true"
-          @error="heroLoaded = true"
-        />
-        <div
-          v-if="heroImage"
-          class="absolute inset-0"
-          :style="{
-            backgroundColor: overlayColor,
-            opacity: overlayOpacity / 100,
-          }"
-        />
-      </div>
+    <section class="relative isolate flex min-h-[52vh] overflow-hidden">
+      <!-- Media / rich theme gradient fallback -->
+      <img
+        v-if="heroImage"
+        :src="heroImage"
+        :alt="coverAltText || heroHeading"
+        class="absolute inset-0 h-full w-full object-cover transition-opacity duration-500"
+        :class="heroLoaded ? 'opacity-100' : 'opacity-0'"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        @load="heroLoaded = true"
+        @error="heroLoaded = true"
+      />
+      <template v-else>
+        <div class="hero-media-gradient absolute inset-0" aria-hidden="true" />
+        <div class="hero-media-grain absolute inset-0" aria-hidden="true" />
+      </template>
 
-      <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 text-center">
-        <p
-          class="hero-stagger text-xs font-semibold uppercase tracking-[0.2em] mb-3 text-white/80"
-          style="animation-delay: 0.1s"
-        >
-          {{ heroLabel }}
-        </p>
-        <h1
-          class="hero-stagger text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight max-w-3xl mx-auto text-white"
-          style="animation-delay: 0.25s"
-        >
-          {{ heroHeading }}
-        </h1>
-        <p
-          v-if="heroSubtitle"
-          class="hero-stagger text-sm sm:text-base mt-4 max-w-2xl mx-auto text-white/80"
-          style="animation-delay: 0.4s"
-        >
-          {{ heroSubtitle }}
-        </p>
+      <!-- Admin overlay (over image only) -->
+      <div
+        v-if="heroImage"
+        class="absolute inset-0"
+        :style="{ backgroundColor: overlayColor, opacity: overlayOpacity / 100 }"
+      />
+      <!-- Legibility gradient for the lower-left copy -->
+      <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" aria-hidden="true" />
+
+      <div class="relative z-10 mx-auto flex w-full max-w-6xl flex-col justify-end px-4 pb-14 pt-28 sm:px-6 lg:px-8">
+        <div class="max-w-2xl">
+          <p
+            v-if="heroLabel"
+            class="hero-stagger mb-3 text-sm font-medium text-white/70"
+            style="animation-delay: 0.1s"
+          >
+            {{ heroLabel }}
+          </p>
+          <h1
+            class="hero-stagger display-1 font-bold leading-tight text-white text-balance drop-shadow-sm"
+            style="animation-delay: 0.25s"
+          >
+            {{ heroHeading }}
+          </h1>
+          <p
+            v-if="heroSubtitle"
+            class="hero-stagger mt-5 max-w-xl text-lg text-white/85"
+            style="animation-delay: 0.4s"
+          >
+            {{ heroSubtitle }}
+          </p>
+        </div>
       </div>
     </section>
 
     <!-- Read by category -->
     <section v-if="categories.length" class="bg-white border-b border-gray-100">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <p class="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mb-4">Read by category</p>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h2 class="display-2 font-bold text-gray-900 mb-6">Browse by category</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div
             v-for="(cat, idx) in categories"
@@ -74,8 +80,10 @@
     <!-- Featured -->
     <section v-if="featuredPosts.length && !selectedCategory && !searchQuery" class="bg-white border-b border-gray-100">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <p class="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mb-5">Featured blogs</p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="flex items-end justify-between gap-4 border-b border-gray-200 pb-5 mb-8">
+          <h2 class="display-2 font-bold text-gray-900">Featured</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
           <PostCard v-for="post in featuredPosts" :key="post.id" :post="post" />
         </div>
       </div>
@@ -84,15 +92,10 @@
     <!-- Recent posts -->
     <section class="flex-1">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-          <div>
-            <p class="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mb-1">
-              {{ selectedCategory ? currentCategoryName : 'Recent posts' }}
-            </p>
-            <h2 class="text-xl sm:text-2xl font-bold text-gray-900">
-              {{ selectedCategory ? `Posts in ${currentCategoryName}` : 'Latest from the blog' }}
-            </h2>
-          </div>
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+          <h2 class="display-2 font-bold text-gray-900">
+            {{ selectedCategory ? `Posts in ${currentCategoryName}` : 'Latest from the blog' }}
+          </h2>
 
           <!-- Search -->
           <div class="flex items-center rounded-xl border border-gray-200 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500/20 focus-within:border-primary-400 transition-all bg-white w-full sm:w-72">
@@ -102,7 +105,7 @@
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="Search posts..."
+              placeholder="Search posts…"
               class="flex-1 py-2.5 pr-3.5 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none"
             />
           </div>
@@ -131,18 +134,19 @@
         </div>
 
         <!-- Error -->
-        <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center max-w-sm mx-auto">
-          <p class="text-sm font-medium text-red-600 mb-4">{{ error }}</p>
-          <button @click="loadPosts" class="btn-primary">Retry</button>
+        <div v-else-if="error" class="flex flex-col items-center py-20 text-center">
+          <svg class="h-10 w-10 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="mt-4 max-w-xs font-medium text-red-600">{{ error }}</p>
+          <button @click="loadPosts" class="btn-primary mt-6">Retry</button>
         </div>
 
         <!-- Empty -->
-        <div v-else-if="!posts.length" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center max-w-md mx-auto">
-          <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
-            <Icon name="heroicons:document-text" class="w-7 h-7 text-gray-300" />
-          </div>
-          <p class="text-sm font-semibold text-gray-900 mb-1">No posts yet</p>
-          <p class="text-sm text-gray-400">Check back soon — new posts are on the way.</p>
+        <div v-else-if="!posts.length" class="flex flex-col items-center py-20 text-center">
+          <Icon name="heroicons:document-text" class="h-11 w-11 text-gray-300" />
+          <p class="mt-4 text-lg font-semibold text-gray-900">No posts yet</p>
+          <p class="mt-1 max-w-xs text-gray-500">Check back soon — new posts are on the way.</p>
         </div>
 
         <!-- Grid -->
@@ -161,15 +165,20 @@
               :ref="el => observeCard(el as Element | null)"
               class="card-stagger sm:col-span-2 lg:col-span-3"
             >
-              <div class="rounded-2xl bg-gradient-to-r from-primary-500 to-secondary-500 text-white p-8 sm:p-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 shadow-sm">
-                <div class="max-w-xl">
-                  <h3 class="text-xl sm:text-2xl font-bold mb-1.5">{{ cta.heading }}</h3>
-                  <p v-if="cta.subtitle" class="text-sm text-white/90">{{ cta.subtitle }}</p>
+              <div class="relative overflow-hidden rounded-2xl bg-secondary-900 text-white p-8 sm:p-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+                <div
+                  class="pointer-events-none absolute inset-0"
+                  aria-hidden="true"
+                  :style="{ background: 'radial-gradient(80% 140% at 15% -10%, color-mix(in srgb, var(--color-primary) 40%, transparent), transparent 60%)' }"
+                />
+                <div class="relative max-w-xl">
+                  <h3 class="text-2xl font-bold mb-1.5">{{ cta.heading }}</h3>
+                  <p v-if="cta.subtitle" class="text-white/70">{{ cta.subtitle }}</p>
                 </div>
                 <NuxtLink
                   v-if="cta.button_link"
                   :to="cta.button_link"
-                  class="shrink-0 inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-white text-gray-900 text-sm font-semibold hover:bg-gray-100 transition-colors"
+                  class="relative shrink-0 inline-flex items-center justify-center px-6 py-3 rounded-xl bg-white text-gray-900 text-sm font-semibold hover:bg-gray-100 transition-colors"
                 >
                   {{ cta.button_label || 'Learn more' }}
                 </NuxtLink>
@@ -193,7 +202,8 @@
             :key="i"
             type="button"
             class="min-w-[36px] px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
-            :class="page === currentPage ? 'bg-primary-600 text-white' : 'text-gray-600 hover:text-gray-900 hover:bg-white'"
+            :class="page === currentPage ? 'bg-primary-600' : 'text-gray-600 hover:text-gray-900 hover:bg-white'"
+            :style="page === currentPage ? { color: 'var(--on-primary, #fff)' } : {}"
             :disabled="typeof page !== 'number'"
             @click="typeof page === 'number' && goToPage(page)"
           >
@@ -276,12 +286,6 @@ const heroSubtitle = computed(() => siteConfig.value?.blog_page?.header?.subtitl
 const heroImage = computed(() => siteConfig.value?.blog_image_url || null)
 const overlayColor = computed(() => siteConfig.value?.blog_overlay_color || '#000000')
 const overlayOpacity = computed(() => siteConfig.value?.blog_overlay_opacity ?? 40)
-
-const fallbackHeroStyle = computed(() => ({
-  backgroundImage: `linear-gradient(135deg, ${siteConfig.value?.theme?.primary_color || '#6898ED'}, ${
-    siteConfig.value?.theme?.secondary_color || '#4B5979'
-  })`,
-}))
 const cta = computed(() => siteConfig.value?.blog_page?.cta || null)
 
 const currentCategoryName = computed(() => {

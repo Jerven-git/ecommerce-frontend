@@ -1,7 +1,16 @@
 <template>
   <div>
-    <!-- Hero Section -->
-    <section class="relative text-white py-28 overflow-hidden" :style="heroStyle" :aria-label="coverAltText || undefined">
+    <!-- ─────────────────────────  HERO  ───────────────────────── -->
+    <section
+      class="relative isolate flex min-h-[52vh] overflow-hidden text-white"
+      :style="heroStyle"
+      :aria-label="coverAltText || undefined"
+    >
+      <template v-if="!siteConfig?.contact_image_url">
+        <div class="hero-media-gradient absolute inset-0" aria-hidden="true" />
+        <div class="hero-media-grain absolute inset-0" aria-hidden="true" />
+      </template>
+
       <Transition name="fade">
         <div v-if="imageLoading" class="absolute bottom-0 left-0 right-0 h-0.5 overflow-hidden z-20">
           <div class="slide-bar h-full" />
@@ -10,7 +19,7 @@
 
       <Transition name="fade">
         <div
-          v-if="imageLoaded"
+          v-if="imageLoaded && siteConfig?.contact_image_url"
           class="absolute inset-0"
           :style="{
             backgroundColor: siteConfig?.contact_overlay_color || '#000000',
@@ -19,128 +28,103 @@
         />
       </Transition>
 
-      <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <span class="hero-stagger inline-block bg-white/15 backdrop-blur-sm text-xs font-semibold px-4 py-1.5 rounded-full mb-5 tracking-widest uppercase" style="animation-delay: 0.15s">
-          We're here to help
-        </span>
-        <h1 class="hero-stagger text-5xl font-bold mb-4 leading-tight drop-shadow-md" style="animation-delay: 0.35s">Contact Us</h1>
-        <p class="hero-stagger text-lg text-white/80 drop-shadow max-w-lg mx-auto" style="animation-delay: 0.55s">Have a question or need support? We'd love to hear from you and will get back to you promptly.</p>
+      <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" aria-hidden="true" />
+
+      <div class="relative z-10 mx-auto flex w-full max-w-6xl flex-col justify-end px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+        <div class="max-w-2xl">
+          <p class="hero-stagger mb-3 text-sm font-medium text-white/70" style="animation-delay: 0.15s">We're here to help</p>
+          <h1 class="hero-stagger display-1 font-bold leading-tight text-balance drop-shadow-sm" style="animation-delay: 0.3s">Contact us</h1>
+          <p class="hero-stagger mt-5 max-w-lg text-lg text-white/85" style="animation-delay: 0.45s">Have a question or need support? We'd love to hear from you — and we reply promptly.</p>
+        </div>
       </div>
     </section>
 
-    <!-- Main Contact Section -->
-    <section class="section-accent py-16">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+    <!-- ─────────────────  INFO + FORM  ───────────────── -->
+    <section class="bg-white py-24 lg:py-28">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div class="grid items-start gap-12 lg:gap-16 md:grid-cols-2">
 
-          <!-- Contact Info card -->
-          <div :ref="addRevealRef" class="reveal bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" style="transition-delay: 0.1s">
-            <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <div>
-                <p class="text-sm font-semibold text-gray-900">{{ contactPage.info_title }}</p>
-                <p class="text-xs text-gray-400">{{ contactPage.info_subtitle }}</p>
+          <!-- Info -->
+          <div :ref="addRevealRef" class="reveal">
+            <h2 class="display-2 font-bold text-gray-900">{{ contactPage.info_title }}</h2>
+            <p class="mt-5 max-w-md text-lg leading-relaxed text-gray-600">{{ contactPage.info_description }}</p>
+
+            <div class="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary-50 px-3.5 py-2 text-xs font-semibold text-primary-700">
+              <span class="h-1.5 w-1.5 rounded-full bg-primary-500 animate-pulse"></span>
+              {{ contactPage.info_badge }}
+            </div>
+
+            <!-- Skeleton -->
+            <div v-if="loading" class="mt-8 space-y-3">
+              <div v-for="i in 2" :key="i" class="flex items-center gap-3 animate-pulse">
+                <div class="h-9 w-9 rounded-lg bg-gray-100 shrink-0"></div>
+                <div class="h-3.5 w-40 rounded bg-gray-100"></div>
               </div>
             </div>
 
-            <div class="px-6 py-5">
-              <p class="text-sm text-gray-500 leading-relaxed mb-5">{{ contactPage.info_description }}</p>
-
-              <div class="inline-flex items-center gap-2 bg-primary-50 text-primary-700 text-xs font-semibold px-3.5 py-2 rounded-lg mb-6">
-                <span class="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse"></span>
-                {{ contactPage.info_badge }}
-              </div>
-
-              <!-- Skeleton -->
-              <div v-if="loading" class="space-y-3">
-                <div v-for="i in 3" :key="i" class="flex items-center gap-3 animate-pulse">
-                  <div class="w-10 h-10 rounded-xl bg-gray-100 shrink-0"></div>
-                  <div class="space-y-1.5 flex-1">
-                    <div class="h-3.5 bg-gray-100 rounded-lg w-20"></div>
-                    <div class="h-3 bg-gray-100 rounded-lg w-40"></div>
+            <div v-else class="mt-8 space-y-6">
+              <template v-if="contactEntries.length">
+                <div v-for="(entry, i) in contactEntries" :key="i">
+                  <p v-if="entry.label" class="mb-2.5 text-sm font-medium text-gray-500">{{ entry.label }}</p>
+                  <div class="space-y-2.5">
+                    <a v-if="entry.email" :href="`mailto:${entry.email}`" class="group flex items-center gap-3">
+                      <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 transition-colors group-hover:bg-primary-100">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      </span>
+                      <span class="text-gray-700 transition-colors group-hover:text-primary-600">{{ entry.email }}</span>
+                    </a>
+                    <a v-if="entry.phone" :href="`tel:${entry.phone}`" class="group flex items-center gap-3">
+                      <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 transition-colors group-hover:bg-primary-100">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                      </span>
+                      <span class="text-gray-700 transition-colors group-hover:text-primary-600">{{ entry.phone }}</span>
+                    </a>
                   </div>
                 </div>
-              </div>
+              </template>
 
-              <div v-else class="space-y-2">
-                <template v-if="contactEntries.length">
-                  <div v-for="(entry, i) in contactEntries" :key="i" class="p-3 rounded-xl hover:bg-gray-50 transition-colors group">
-                    <p v-if="entry.label" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{{ entry.label }}</p>
-                    <div class="space-y-1.5">
-                      <div v-if="entry.email" class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0 group-hover:bg-primary-100 transition-colors">
-                          <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                          </svg>
-                        </div>
-                        <a :href="`mailto:${entry.email}`" class="text-sm text-gray-700 hover:text-primary-600 transition-colors">{{ entry.email }}</a>
-                      </div>
-                      <div v-if="entry.phone" class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition-colors">
-                          <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                          </svg>
-                        </div>
-                        <a :href="`tel:${entry.phone}`" class="text-sm text-gray-700 hover:text-emerald-600 transition-colors">{{ entry.phone }}</a>
-                      </div>
-                    </div>
-                  </div>
-                </template>
-
-                <div v-else class="text-sm text-gray-400 text-center py-4">
-                  Contact information not configured yet.
-                </div>
-              </div>
+              <p v-else class="text-gray-500">Contact information not configured yet.</p>
             </div>
           </div>
 
-          <!-- Contact Form card -->
-          <div :ref="addRevealRef" class="reveal bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" style="transition-delay: 0.25s">
-            <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
-              </div>
-              <div>
-                <p class="text-sm font-semibold text-gray-900">Send a Message</p>
-                <p class="text-xs text-gray-400">We'll reply within 24 hours</p>
-              </div>
-            </div>
+          <!-- Form -->
+          <div :ref="addRevealRef" class="reveal" style="transition-delay: 0.1s">
+            <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
+              <h3 class="text-lg font-semibold text-gray-900">Send a message</h3>
+              <p class="mt-1 text-sm text-gray-500">We'll reply within 24 hours.</p>
 
-            <div class="px-6 py-6">
               <Transition name="fade" mode="out-in">
                 <!-- Success State -->
-                <div v-if="success" key="success" class="flex flex-col items-center justify-center py-10 text-center">
-                  <div class="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center mb-4 animate-bounce-once">
-                    <svg class="w-7 h-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div v-if="success" key="success" class="flex flex-col items-center justify-center py-12 text-center">
+                  <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 animate-bounce-once">
+                    <svg class="h-7 w-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <p class="text-sm font-bold text-gray-900 mb-1">Message Sent!</p>
-                  <p class="text-sm text-gray-400 max-w-xs">Thank you! We've received your message and will get back to you within 24 hours.</p>
+                  <p class="mb-1 text-base font-bold text-gray-900">Message sent!</p>
+                  <p class="max-w-xs text-sm text-gray-500">Thank you — we've received your message and will get back to you within 24 hours.</p>
                 </div>
 
                 <!-- Form -->
-                <form v-else key="form" @submit.prevent="handleSubmit" class="space-y-4">
+                <form v-else key="form" @submit.prevent="handleSubmit" class="mt-6 space-y-4">
                   <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Your Name <span class="text-red-500">*</span></label>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">Your name <span class="text-red-500">*</span></label>
                     <input v-model="form.name" type="text" placeholder="John Doe" :class="['input-field', formAttempted && fieldErrors.name ? '!border-red-300' : '']" />
                     <p v-if="formAttempted && fieldErrors.name" class="mt-1 text-xs text-red-600">{{ fieldErrors.name }}</p>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Email Address <span class="text-red-500">*</span></label>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">Email address <span class="text-red-500">*</span></label>
                     <input v-model="form.email" type="email" placeholder="you@email.com" :class="['input-field', formAttempted && fieldErrors.email ? '!border-red-300' : '']" />
                     <p v-if="formAttempted && fieldErrors.email" class="mt-1 text-xs text-red-600">{{ fieldErrors.email }}</p>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Subject <span class="text-red-500">*</span></label>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">Subject <span class="text-red-500">*</span></label>
                     <select v-model="form.subject" :class="['input-field', formAttempted && fieldErrors.subject ? '!border-red-300' : '']">
                       <option value="" disabled>Select a topic</option>
                       <option value="order">Order Issue</option>
@@ -153,8 +137,8 @@
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Message <span class="text-red-500">*</span></label>
-                    <textarea v-model="form.message" rows="4" placeholder="Tell us how we can help..." :class="['input-field resize-none', formAttempted && fieldErrors.message ? '!border-red-300' : '']"></textarea>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">Message <span class="text-red-500">*</span></label>
+                    <textarea v-model="form.message" rows="4" placeholder="Tell us how we can help…" :class="['input-field resize-none', formAttempted && fieldErrors.message ? '!border-red-300' : '']"></textarea>
                     <p v-if="formAttempted && fieldErrors.message" class="mt-1 text-xs text-red-600">{{ fieldErrors.message }}</p>
                   </div>
 
@@ -166,8 +150,8 @@
                     leave-from-class="opacity-100"
                     leave-to-class="opacity-0"
                   >
-                    <div v-if="submitError" class="flex items-start gap-2.5 p-3 bg-red-50 border border-red-100 rounded-xl">
-                      <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div v-if="submitError" class="flex items-start gap-2.5 rounded-xl border border-red-100 bg-red-50 p-3">
+                      <svg class="mt-0.5 h-4 w-4 shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <p class="text-sm text-red-600">{{ submitError }}</p>
@@ -176,17 +160,17 @@
 
                   <button
                     type="submit"
-                    class="btn-primary w-full flex items-center justify-center gap-2"
+                    class="btn-primary flex w-full items-center justify-center gap-2"
                     :disabled="submitting"
                   >
-                    <svg v-if="submitting" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <svg v-if="submitting" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                     </svg>
-                    {{ submitting ? 'Sending...' : 'Send Message' }}
+                    {{ submitting ? 'Sending…' : 'Send message' }}
                   </button>
 
-                  <p class="text-center text-gray-400 text-xs">We'll never share your information with anyone.</p>
+                  <p class="text-center text-xs text-gray-400">We'll never share your information with anyone.</p>
                 </form>
               </Transition>
             </div>
@@ -196,50 +180,54 @@
       </div>
     </section>
 
-    <!-- Support Promise Strip -->
-    <section class="text-white py-14" :style="{ backgroundColor: 'var(--color-secondary)' }">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+    <!-- ────────────────  SUPPORT PROMISES  ──────────────── -->
+    <section class="relative overflow-hidden bg-secondary-900 py-16 text-white">
+      <div
+        class="pointer-events-none absolute inset-0"
+        aria-hidden="true"
+        :style="{ background: 'radial-gradient(70% 130% at 50% -10%, color-mix(in srgb, var(--color-primary) 38%, transparent), transparent 62%)' }"
+      />
+      <div class="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div class="grid gap-y-10 md:grid-cols-3 md:gap-y-0">
           <div
             v-for="(promise, i) in promises"
             :key="i"
             :ref="addRevealRef"
-            class="reveal group flex flex-col items-center px-6"
-            :class="i === 1 && promises.length === 3 ? 'border-y md:border-y-0 md:border-x border-white/10 py-8 md:py-0' : ''"
-            :style="{ transitionDelay: `${0.1 + i * 0.15}s` }"
+            class="reveal text-center md:px-8"
+            :class="i > 0 ? 'md:border-l md:border-white/10' : ''"
+            :style="{ transitionDelay: `${0.1 + i * 0.12}s` }"
           >
-            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 group-hover:bg-primary-500 transition-colors duration-300">
-              <Icon :name="promise.icon || 'heroicons:check-circle'" class="w-6 h-6 text-primary-400 group-hover:text-white transition-colors duration-300" />
+            <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10">
+              <Icon :name="promise.icon || 'heroicons:check-circle'" class="h-6 w-6" :style="{ color: 'var(--color-primary-300)' }" />
             </div>
-            <h3 class="text-sm font-semibold mb-1">{{ promise.title }}</h3>
-            <p class="text-white text-sm">{{ promise.description }}</p>
+            <h3 class="text-base font-semibold">{{ promise.title }}</h3>
+            <p class="mt-1 text-sm text-white/70">{{ promise.description }}</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- FAQ Section -->
-    <section class="section-accent border-t border-gray-100 py-16">
-      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div ref="faqHeadingRef" class="reveal text-center mb-10">
-          <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">{{ faqLabel }}</p>
-          <h2 class="text-3xl font-bold text-gray-900 mb-2">{{ faqHeading }}</h2>
-          <p class="text-sm text-gray-500">{{ faqSubtitle }}</p>
+    <!-- ──────────────────────  FAQ  ────────────────────── -->
+    <section class="section-accent border-t border-gray-100 py-20 lg:py-24">
+      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <div ref="faqHeadingRef" class="reveal mb-10">
+          <h2 class="display-2 font-bold text-gray-900">{{ faqHeading }}</h2>
+          <p class="mt-3 text-gray-600">{{ faqSubtitle }}</p>
         </div>
 
-        <div class="space-y-2">
+        <div class="border-y border-gray-200">
           <div
             v-for="(faq, i) in faqs"
             :key="i"
-            class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+            :class="i > 0 ? 'border-t border-gray-200' : ''"
           >
             <button
-              class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors duration-200"
+              class="flex w-full items-center justify-between gap-4 py-5 text-left"
               @click="toggleFaq(i)"
             >
-              <span class="text-sm font-semibold text-gray-900">{{ faq.question }}</span>
+              <span class="text-base font-semibold text-gray-900">{{ faq.question }}</span>
               <svg
-                class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-300 ml-4"
+                class="h-4 w-4 shrink-0 text-gray-400 transition-transform duration-300"
                 :class="{ 'rotate-180': openFaq === i }"
                 fill="none" viewBox="0 0 24 24" stroke="currentColor"
               >
@@ -248,8 +236,8 @@
             </button>
 
             <Transition name="accordion">
-              <div v-if="openFaq === i" class="px-6 pb-5 border-t border-gray-50">
-                <p class="text-sm text-gray-500 leading-relaxed pt-3">{{ faq.answer }}</p>
+              <div v-if="openFaq === i" class="pb-5">
+                <p class="leading-relaxed text-gray-600">{{ faq.answer }}</p>
               </div>
             </Transition>
           </div>
@@ -355,7 +343,6 @@ const defaultFaqs = [
 ]
 
 const faqs = computed(() => contactPage.value.faqs?.length ? contactPage.value.faqs : defaultFaqs)
-const faqLabel = computed(() => contactPage.value.faq_label || 'FAQ')
 const faqHeading = computed(() => contactPage.value.faq_heading || 'Common Questions')
 const faqSubtitle = computed(() => contactPage.value.faq_subtitle || "Can't find what you need? Use the form above to reach us directly.")
 
@@ -364,7 +351,7 @@ const heroStyle = computed(() => {
 
   if (imageUrl) {
     return {
-      backgroundImage: imageLoaded.value ? `url(${imageUrl})` : 'none',
+      backgroundImage: imageLoaded.value ? `url("${imageUrl}")` : 'none',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
@@ -372,11 +359,8 @@ const heroStyle = computed(() => {
     }
   }
 
-  return {
-    backgroundImage: `linear-gradient(135deg, ${siteConfig.value?.theme?.primary_color || '#6898ED'}, ${
-      siteConfig.value?.theme?.secondary_color || '#4B5979'
-    })`,
-  }
+  // No image — the layered `.hero-media-gradient` element paints the background.
+  return {}
 })
 
 const preloadImage = (url: string) => {
@@ -520,5 +504,10 @@ const coverAltText = computed(() => siteConfig.value?.pages_seo?.contact?.cover_
 }
 .animate-bounce-once {
   animation: bounce-once 0.6s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-stagger { animation: none; opacity: 1; transform: none; }
+  .animate-bounce-once { animation: none; }
 }
 </style>

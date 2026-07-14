@@ -94,3 +94,25 @@ export function generatePalette(baseHex: string): Record<string, string> {
 
   return palette
 }
+
+/**
+ * Pick the text colour (near-white or near-black) that reads best on top of a
+ * given solid background, using the WCAG relative-luminance contrast formula.
+ * Used to keep themed buttons/bands legible whatever a store's brand colour is
+ * (e.g. white-on-gold fails; this returns near-black for a light gold instead).
+ */
+export function readableOn(hex: string): string {
+  const h = hex.replace('#', '').trim()
+  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h
+  if (full.length !== 6) return '#ffffff'
+
+  const toLinear = (c: number) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4))
+  const r = toLinear(parseInt(full.slice(0, 2), 16) / 255)
+  const g = toLinear(parseInt(full.slice(2, 4), 16) / 255)
+  const b = toLinear(parseInt(full.slice(4, 6), 16) / 255)
+  const L = 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+  const contrastWhite = 1.05 / (L + 0.05)
+  const contrastBlack = (L + 0.05) / 0.05
+  return contrastWhite >= contrastBlack ? '#ffffff' : '#141414'
+}

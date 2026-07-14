@@ -35,8 +35,10 @@
             class="absolute inset-0 bg-black/45"
           />
         </div>
+        <!-- Legibility gradient -->
+        <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" aria-hidden="true" />
 
-        <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 text-center text-white">
+        <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center text-white">
           <NuxtLink
             to="/blog"
             class="inline-flex items-center gap-1.5 text-xs font-medium text-white/80 hover:text-white mb-4 transition-colors"
@@ -45,11 +47,11 @@
             All posts
           </NuxtLink>
 
-          <p v-if="post.category" class="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/80 mb-3">
+          <p v-if="post.category" class="text-sm font-medium text-white/70 mb-3">
             {{ post.category.name }}
           </p>
 
-          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight max-w-3xl mx-auto">
+          <h1 class="display-1 font-bold leading-tight max-w-3xl mx-auto text-balance">
             {{ post.title }}
           </h1>
 
@@ -73,9 +75,9 @@
 
       <!-- Related posts -->
       <section v-if="related.length" class="bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-          <p class="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mb-4">Related posts</p>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <h2 class="display-2 font-bold text-gray-900 mb-8">Related posts</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
             <PostCard v-for="r in related" :key="r.id" :post="r" />
           </div>
         </div>
