@@ -109,18 +109,17 @@
       <p v-if="saveError" class="text-sm text-red-600">{{ saveError }}</p>
 
       <div class="flex items-center justify-between pt-2">
-        <button type="submit" :disabled="saving" class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 disabled:opacity-50">
-          {{ saving ? 'Saving…' : (isNew ? 'Create admin' : 'Save') }}
-        </button>
-        <button
+        <AdminButton type="submit" variant="primary" :loading="saving">
+          {{ isNew ? 'Create admin' : 'Save' }}
+        </AdminButton>
+        <AdminButton
           v-if="!isNew"
-          type="button"
-          :disabled="deleting"
-          class="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl disabled:opacity-50"
+          variant="danger"
+          :loading="deleting"
           @click="del"
         >
-          {{ deleting ? 'Deleting…' : 'Delete admin' }}
-        </button>
+          Delete admin
+        </AdminButton>
       </div>
     </form>
   </div>
@@ -130,6 +129,7 @@
 const route = useRoute()
 const router = useRouter()
 const api = useSuperAdminApi()
+const { toastSuccess, toastError } = useAdminToast()
 
 const isNew = computed(() => route.params.id === 'new')
 const id = computed(() => Number(route.params.id))
@@ -212,6 +212,9 @@ const save = async () => {
         }
       }
       const result = await api.createAdmin(payload as never)
+      // Toasts are a module-level singleton and survive the SPA navigation, so
+      // the confirmation shows on the admin's edit page we land on next.
+      toastSuccess('Admin created')
       router.push(`/super-admin/admins/${result.data.id}`)
     } else {
       const payload: Record<string, unknown> = {
@@ -228,9 +231,12 @@ const save = async () => {
         payload.password_confirmation = form.value.password_confirmation
       }
       await api.updateAdmin(id.value, payload as never)
+      toastSuccess('Admin saved')
     }
   } catch (err: any) {
-    saveError.value = err?.data?.message || 'Failed to save'
+    const msg = err?.data?.message || 'Failed to save'
+    saveError.value = msg
+    toastError(msg)
   } finally {
     saving.value = false
   }
@@ -241,9 +247,12 @@ const del = async () => {
   deleting.value = true
   try {
     await api.deleteAdmin(id.value)
+    toastSuccess('Admin deleted')
     router.push('/super-admin/admins')
   } catch (err: any) {
-    saveError.value = err?.data?.message || 'Failed to delete'
+    const msg = err?.data?.message || 'Failed to delete'
+    saveError.value = msg
+    toastError(msg)
   } finally {
     deleting.value = false
   }

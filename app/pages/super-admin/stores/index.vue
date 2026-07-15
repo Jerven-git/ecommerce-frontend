@@ -5,12 +5,14 @@
         <h1 class="text-2xl font-bold text-gray-900">Stores</h1>
         <p class="text-sm text-gray-500 mt-1">Each store is owned by exactly one admin (strict 1:1).</p>
       </div>
-      <NuxtLink
-        to="/super-admin/admins/new"
-        class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors"
-      >
+      <AdminButton to="/super-admin/admins/new" variant="primary" class="shrink-0">
+        <template #icon>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14" />
+          </svg>
+        </template>
         New admin + store
-      </NuxtLink>
+      </AdminButton>
     </header>
 
     <div class="bg-purple-50 border border-purple-100 rounded-xl px-4 py-3 text-sm text-purple-800">
@@ -62,7 +64,16 @@
             </td>
             <td class="px-6 py-4 text-gray-500">{{ s.users_count }}</td>
             <td class="px-6 py-4 text-right">
-              <NuxtLink :to="`/super-admin/stores/${s.id}`" class="text-purple-700 hover:underline text-sm">Edit</NuxtLink>
+              <NuxtLink
+                :to="`/super-admin/stores/${s.id}`"
+                class="inline-flex p-1.5 rounded-lg text-gray-400 transition-colors hover:text-purple-700 hover:bg-purple-50"
+                title="Edit"
+                aria-label="Edit store"
+              >
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </NuxtLink>
             </td>
           </tr>
         </tbody>

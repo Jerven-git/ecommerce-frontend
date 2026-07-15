@@ -140,6 +140,47 @@
         @apply bg-white rounded-lg shadow-md p-6;
     }
 
+    /* Skeleton placeholder with a travelling sheen — the calm admin loading
+       state (used instead of mid-content spinners). */
+    .skeleton {
+        position: relative;
+        overflow: hidden;
+        background-color: #eaecf0;
+        border-radius: 0.5rem;
+    }
+    .skeleton::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+        animation: skeleton-sheen 1.4s ease-in-out infinite;
+    }
+    @keyframes skeleton-sheen {
+        100% { transform: translateX(100%); }
+    }
+
+    /* Short, staggered entrance for admin cards/rows. Drive the stagger with an
+       inline `--i` index; keep the total under ~0.5s so a task never waits on it. */
+    .admin-rise {
+        opacity: 0;
+        animation: admin-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        animation-delay: calc(var(--i, 0) * 60ms);
+    }
+    @keyframes admin-rise {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .skeleton::after { animation: none; }
+        .admin-rise {
+            animation: none;
+            opacity: 1;
+            transform: none;
+        }
+    }
+
     /* Scroll reveal — hidden by default, revealed via IntersectionObserver */
     .reveal {
         opacity: 0;

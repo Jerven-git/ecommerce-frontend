@@ -2,6 +2,7 @@
 .output
 .data
 .nuxt
+.nuxt.root-owned.bak
 .nitro
 .cache
 dist
