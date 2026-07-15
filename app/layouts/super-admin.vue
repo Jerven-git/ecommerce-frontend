@@ -1,36 +1,49 @@
 <template>
   <div class="min-h-screen bg-gray-50 flex">
-    <aside class="w-64 bg-white border-r border-gray-100 flex flex-col">
-      <div class="h-16 px-6 flex items-center border-b border-gray-100">
-        <NuxtLink to="/super-admin" class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-            <svg class="w-5 h-5 text-purple-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <aside class="w-64 shrink-0 bg-white border-r border-gray-200/70 flex flex-col">
+      <!-- Brand -->
+      <div class="h-16 px-5 flex items-center border-b border-gray-200/70">
+        <NuxtLink to="/super-admin" class="flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1">
+          <div class="w-9 h-9 rounded-xl bg-purple-600 flex items-center justify-center shadow-sm shadow-purple-600/30">
+            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17 9 21l3-2 3 2-.75-4M3 4h18l-2 13H5L3 4Z" />
             </svg>
           </div>
-          <div>
-            <p class="text-sm font-bold text-gray-900 leading-tight">Super Admin</p>
-            <p class="text-xs text-gray-400 leading-tight">Platform operator</p>
+          <div class="leading-tight">
+            <p class="text-sm font-semibold text-gray-900">Super Admin</p>
+            <p class="text-xs text-gray-500">Platform operator</p>
           </div>
         </NuxtLink>
       </div>
 
-      <nav class="flex-1 p-4 space-y-1">
+      <!-- Nav -->
+      <nav class="flex-1 px-3 py-4 space-y-1">
         <NuxtLink
           v-for="item in navItems"
           :key="item.path"
           :to="item.path"
-          class="flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors"
-          :class="isActive(item.path) ? 'bg-purple-50 text-purple-700 font-medium' : 'text-gray-600 hover:bg-gray-50'"
+          class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1"
+          :class="isActive(item.path)
+            ? 'bg-purple-50 text-purple-700 font-semibold'
+            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'"
         >
-          <span v-html="item.icon" class="w-5 h-5 inline-flex" />
+          <span
+            class="w-5 h-5 inline-flex shrink-0 [&_svg]:w-5 [&_svg]:h-5 transition-colors"
+            :class="isActive(item.path) ? 'text-purple-600' : 'text-gray-400 group-hover:text-gray-600'"
+            v-html="item.icon"
+          />
           <span>{{ item.label }}</span>
         </NuxtLink>
       </nav>
 
-      <div class="p-4 border-t border-gray-100 space-y-2">
+      <!-- Footer -->
+      <div class="px-3 py-4 border-t border-gray-200/70 space-y-1">
+        <div class="px-3 py-1.5 flex items-center gap-2 text-xs text-gray-500">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          Operational
+        </div>
         <button
-          class="block w-full text-left px-3 py-2 text-xs text-gray-500 hover:text-red-600 hover:bg-gray-50 rounded-lg transition-colors"
+          class="block w-full text-left px-3 py-2 text-xs text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1"
           @click="handleLogout"
         >
           Log out
@@ -44,6 +57,9 @@
         <slot />
       </div>
     </main>
+
+    <!-- One toast host for every super-admin page. -->
+    <AdminToast />
   </div>
 </template>
 

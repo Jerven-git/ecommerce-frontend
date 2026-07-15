@@ -70,14 +70,15 @@
         </template>
 
         <div v-if="store.domain" class="mt-3 flex items-center gap-3">
-          <button
-            type="button"
-            :disabled="verifying || domainDirty"
-            class="px-3 py-1.5 text-xs font-medium text-purple-700 border border-purple-200 rounded-lg hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          <AdminButton
+            variant="outline"
+            size="sm"
+            :loading="verifying"
+            :disabled="domainDirty"
             @click="verifyDomain"
           >
-            {{ verifying ? 'Verifying…' : (store.domain_verified ? 'Re-check DNS' : 'Verify domain') }}
-          </button>
+            {{ store.domain_verified ? 'Re-check DNS' : 'Verify domain' }}
+          </AdminButton>
           <p v-if="domainDirty" class="text-xs text-gray-400">Save your change before verifying.</p>
           <p v-else-if="verifyError" class="text-xs text-red-600">{{ verifyError }}</p>
           <p v-else-if="verifyMessage" class="text-xs text-green-700">{{ verifyMessage }}</p>
@@ -95,18 +96,16 @@
       <p v-if="saveError" class="text-sm text-red-600">{{ saveError }}</p>
 
       <div class="flex items-center justify-between pt-2">
-        <button type="submit" :disabled="saving" class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 disabled:opacity-50">
-          {{ saving ? 'Saving…' : 'Save' }}
-        </button>
-        <button
+        <AdminButton type="submit" variant="primary" :loading="saving">Save</AdminButton>
+        <AdminButton
           v-if="!store.is_default"
-          type="button"
-          :disabled="deleting || store.users_count > 0"
-          class="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          variant="danger"
+          :loading="deleting"
+          :disabled="store.users_count > 0"
           @click="del"
         >
-          {{ store.users_count > 0 ? `Has ${store.users_count} admin${store.users_count === 1 ? '' : 's'}` : (deleting ? 'Deleting…' : 'Delete store') }}
-        </button>
+          {{ store.users_count > 0 ? `Has ${store.users_count} admin${store.users_count === 1 ? '' : 's'}` : 'Delete store' }}
+        </AdminButton>
       </div>
     </form>
 
@@ -116,12 +115,14 @@
           <h2 class="text-lg font-bold text-gray-900">Admins</h2>
           <p class="text-sm text-gray-500 mt-0.5">Admins who manage this store. A store can have several.</p>
         </div>
-        <NuxtLink
-          :to="`/super-admin/admins/new?store_id=${store.id}`"
-          class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors shrink-0"
-        >
+        <AdminButton :to="`/super-admin/admins/new?store_id=${store.id}`" variant="primary" class="shrink-0">
+          <template #icon>
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14" />
+            </svg>
+          </template>
           Add admin
-        </NuxtLink>
+        </AdminButton>
       </div>
 
       <p v-if="storeAdmins.length === 0" class="text-sm text-gray-400">No admins assigned to this store yet.</p>
@@ -138,7 +139,16 @@
             >
               {{ a.status }}
             </span>
-            <NuxtLink :to="`/super-admin/admins/${a.id}`" class="text-purple-700 hover:underline text-sm">Edit</NuxtLink>
+            <NuxtLink
+              :to="`/super-admin/admins/${a.id}`"
+              class="inline-flex p-1.5 rounded-lg text-gray-400 transition-colors hover:text-purple-700 hover:bg-purple-50"
+              title="Edit"
+              aria-label="Edit admin"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </NuxtLink>
           </div>
         </li>
       </ul>
@@ -150,6 +160,7 @@
 const route = useRoute()
 const router = useRouter()
 const api = useSuperAdminApi()
+const { toastSuccess, toastError } = useAdminToast()
 
 const id = Number(route.params.id)
 const store = ref<Store | null>(null)
@@ -273,8 +284,10 @@ const save = async () => {
     const result = await api.updateStore(id, payload)
     store.value = result.data
     form.value.domain = result.data.domain ?? ''
+    toastSuccess('Store saved')
   } catch (err: any) {
     saveError.value = err?.data?.errors?.domain?.[0] || err?.data?.message || 'Failed to save'
+    toastError('Couldn’t save the store')
   } finally {
     saving.value = false
   }
@@ -285,9 +298,10 @@ const del = async () => {
   deleting.value = true
   try {
     await api.deleteStore(id)
+    toastSuccess('Store deleted')
     router.push('/super-admin/stores')
   } catch (err: any) {
-    saveError.value = err?.data?.message || 'Failed to delete'
+    toastError(err?.data?.message || 'Couldn’t delete the store')
   } finally {
     deleting.value = false
   }

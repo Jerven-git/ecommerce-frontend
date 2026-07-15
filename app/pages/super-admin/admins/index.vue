@@ -5,12 +5,14 @@
         <h1 class="text-2xl font-bold text-gray-900">Admin users</h1>
         <p class="text-sm text-gray-500 mt-1">Manage who can access the admin panel and which store they belong to.</p>
       </div>
-      <NuxtLink
-        to="/super-admin/admins/new"
-        class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors"
-      >
+      <AdminButton to="/super-admin/admins/new" variant="primary" class="shrink-0">
+        <template #icon>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14" />
+          </svg>
+        </template>
         New admin
-      </NuxtLink>
+      </AdminButton>
     </header>
 
     <section class="bg-white border border-gray-100 rounded-2xl overflow-hidden">
@@ -53,17 +55,30 @@
               </span>
             </td>
             <td class="px-6 py-4 text-right">
-              <div class="flex items-center gap-3 justify-end">
+              <div class="flex items-center gap-1 justify-end">
                 <button
                   v-if="!a.is_super_admin && a.status === 'active'"
                   type="button"
-                  class="text-xs text-amber-700 hover:underline"
+                  class="p-1.5 rounded-lg text-gray-400 transition-colors hover:text-amber-700 hover:bg-amber-50 disabled:opacity-50 disabled:pointer-events-none"
                   :disabled="impersonation.loading"
+                  title="Impersonate"
+                  aria-label="Impersonate"
                   @click="startImpersonation(a.id)"
                 >
-                  Impersonate
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" />
+                  </svg>
                 </button>
-                <NuxtLink :to="`/super-admin/admins/${a.id}`" class="text-purple-700 hover:underline text-sm">Edit</NuxtLink>
+                <NuxtLink
+                  :to="`/super-admin/admins/${a.id}`"
+                  class="p-1.5 rounded-lg text-gray-400 transition-colors hover:text-purple-700 hover:bg-purple-50"
+                  title="Edit"
+                  aria-label="Edit admin"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </NuxtLink>
               </div>
             </td>
           </tr>
