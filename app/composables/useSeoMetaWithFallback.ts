@@ -31,12 +31,39 @@ function firstNonEmpty(...values: Array<string | null | undefined>): string | un
   return undefined
 }
 
+function withSiteName(title: string | undefined, siteName: string | undefined): string | undefined {
+  if (!title) return siteName
+  if (!siteName || title.toLocaleLowerCase().includes(siteName.toLocaleLowerCase())) return title
+  return `${title} | ${siteName}`
+}
+
+function configuredTitle(
+  configured: string | null | undefined,
+  fallback: string | null | undefined,
+  siteDefault: string | null | undefined,
+  siteName: string | null | undefined,
+): string | undefined {
+  const explicit = firstNonEmpty(configured)
+  if (explicit) return explicit
+
+  const fallbackTitle = firstNonEmpty(fallback)
+  if (fallbackTitle) return withSiteName(fallbackTitle, firstNonEmpty(siteName))
+
+  return firstNonEmpty(siteDefault, siteName)
+}
+
 /**
  * Build the canonical URL for the current request: `<canonical_base_url><path>`
  * with a trailing-slash on the base stripped. Returns undefined when the base
  * URL isn't configured — better to omit the tag than emit a bad one.
  */
-function buildCanonical(cfg: Partial<SiteConfig>, path: string): string | undefined {
+function buildCanonical(
+  cfg: Partial<SiteConfig>,
+  path: string,
+  requestHostname: string,
+): string | undefined {
+  if (isLocalSeoHost(requestHostname)) return undefined
+
   const base = cfg.canonical_base_url?.trim()
   if (!base) return undefined
   const trimmed = base.replace(/\/$/, '')
@@ -47,12 +74,19 @@ function buildCanonical(cfg: Partial<SiteConfig>, path: string): string | undefi
 export function useEntitySeo(entity: MaybeRefOrGetter<EntityLike | null | undefined>) {
   const { siteConfig } = useSiteConfig()
   const route = useRoute()
+  const runtimeConfig = useRuntimeConfig()
+  const requestHostname = useRequestURL().hostname
 
   const seo = computed(() => {
     const e = toValue(entity) ?? ({} as EntityLike)
     const cfg = siteConfig.value ?? ({} as Partial<SiteConfig>)
 
-    const title = firstNonEmpty(e.seo_title, e.title, e.name, cfg.default_seo_title, cfg.site_name)
+    const title = configuredTitle(
+      e.seo_title,
+      firstNonEmpty(e.title, e.name),
+      cfg.default_seo_title,
+      cfg.site_name,
+    )
     const description = firstNonEmpty(
       e.seo_description,
       e.excerpt,
@@ -65,8 +99,9 @@ export function useEntitySeo(entity: MaybeRefOrGetter<EntityLike | null | undefi
       e.image_url,
       cfg.default_og_image_url,
     )
-    const robots = e.noindex ? 'noindex,nofollow' : undefined
-    const canonical = buildCanonical(cfg, route.path)
+    const indexingDisabled = !isSeoIndexingEnabled(runtimeConfig.public.seoIndexingEnabled)
+    const robots = indexingDisabled || e.noindex ? 'noindex,nofollow,noarchive' : undefined
+    const canonical = buildCanonical(cfg, route.path, requestHostname)
     const siteName = firstNonEmpty(cfg.site_name)
 
     return { title, description, ogImage, robots, canonical, siteName }
@@ -98,20 +133,36 @@ export function useEntitySeo(entity: MaybeRefOrGetter<EntityLike | null | undefi
 export function useStaticPageSeo(slug: string, fallback?: { title?: string; description?: string }) {
   const { siteConfig } = useSiteConfig()
   const route = useRoute()
+  const runtimeConfig = useRuntimeConfig()
+  const requestHostname = useRequestURL().hostname
 
   const seo = computed(() => {
     const cfg = siteConfig.value ?? ({} as Partial<SiteConfig>)
     const page: SeoFields = (cfg.pages_seo?.[slug] ?? {}) as SeoFields
 
-    const title = firstNonEmpty(page.seo_title, fallback?.title, cfg.default_seo_title, cfg.site_name)
+    const defaultPageTitles: Record<string, string> = {
+      about: 'About',
+      blog: 'Blog',
+      contact: 'Contact',
+      home: '',
+      services: 'Services',
+      shop: 'Shop',
+    }
+    const title = configuredTitle(
+      page.seo_title,
+      fallback?.title ?? defaultPageTitles[slug],
+      cfg.default_seo_title,
+      cfg.site_name,
+    )
     const description = firstNonEmpty(
       page.seo_description,
       fallback?.description,
       cfg.default_seo_description,
     )
     const ogImage = firstNonEmpty(page.og_image_url, cfg.default_og_image_url)
-    const robots = page.noindex ? 'noindex,nofollow' : undefined
-    const canonical = buildCanonical(cfg, route.path)
+    const indexingDisabled = !isSeoIndexingEnabled(runtimeConfig.public.seoIndexingEnabled)
+    const robots = indexingDisabled || page.noindex ? 'noindex,nofollow,noarchive' : undefined
+    const canonical = buildCanonical(cfg, route.path, requestHostname)
     const siteName = firstNonEmpty(cfg.site_name)
 
     return { title, description, ogImage, robots, canonical, siteName }

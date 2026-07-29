@@ -60,6 +60,19 @@
 }
 
 @layer components {
+    /* Shared public-storefront language used by the TAN contact redesign. */
+    .storefront-page {
+        @apply min-h-screen bg-gray-50/70 text-gray-900;
+    }
+
+    .storefront-kicker {
+        @apply mb-2 text-sm font-semibold text-primary-700;
+    }
+
+    .storefront-field-label {
+        @apply mb-1.5 block text-sm font-medium text-gray-700;
+    }
+
     /* Themed section: accent background + optional texture overlay */
     .section-accent {
         background-color: var(--color-accent);

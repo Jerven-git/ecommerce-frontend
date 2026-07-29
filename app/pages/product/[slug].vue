@@ -372,10 +372,37 @@ const route = useRoute()
 const { $apiFetch } = useNuxtApp()
 const cartStore = useCartStore()
 const { format } = useCurrency()
+const { siteConfig } = useSiteConfig()
+const requestUrl = useRequestURL()
 
-const product = ref<ProductDetail | null>(null)
-const loading = ref(true)
-const error = ref<string | null>(null)
+const slug = computed(() => String(route.params.slug || ''))
+const {
+  data: productResponse,
+  status: productStatus,
+  error: productRequestError,
+} = await useAsyncData(
+  `product-${slug.value}`,
+  () => $apiFetch<{ data: ProductDetail }>(`/products/${slug.value}`, { method: 'GET' }),
+  { watch: [slug] },
+)
+
+const product = computed(() => productResponse.value?.data ?? null)
+const loading = computed(() => productStatus.value === 'pending')
+const error = computed(() => {
+  if (!productRequestError.value) return null
+  return (productRequestError.value.data as any)?.message || 'We could not load this product.'
+})
+
+const productErrorStatus = productRequestError.value?.statusCode
+  ?? (productRequestError.value as any)?.status
+
+if (productErrorStatus === 404 || (!loading.value && !product.value && !productRequestError.value)) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Product not found',
+  })
+}
+
 const quantity = ref(1)
 const showLightbox = ref(false)
 const activeIndex = ref(0)
@@ -575,26 +602,56 @@ const fetchRelated = async () => {
   }
 }
 
-const fetchProduct = async () => {
-  loading.value = true
-  error.value = null
-  try {
-    const response = await $apiFetch<{ data: ProductDetail }>(`/products/${route.params.slug}`, { method: 'GET' })
-    if (response?.data) {
-      product.value = response.data
-      fetchRelated()
-    }
-  } catch (err: any) {
-    console.error('Error fetching product:', err)
-    error.value = err?.data?.message || 'Product not found.'
-  } finally {
-    loading.value = false
-  }
-}
-
-onMounted(fetchProduct)
+onMounted(fetchRelated)
 
 useEntitySeo(() => product.value)
+
+const productJsonLd = computed(() => {
+  const value = product.value
+  if (!value) return null
+
+  const config = siteConfig.value ?? {}
+  const baseUrl = seoBaseUrl(config, requestUrl)
+  const activeVariants = (value.variants ?? []).filter(variant => variant.is_active)
+  const stock = activeVariants.length
+    ? activeVariants.reduce((total, variant) => total + variant.stock, 0)
+    : value.stock
+  const availability = stock > 0
+    ? 'https://schema.org/InStock'
+    : value.can_backorder
+      ? 'https://schema.org/BackOrder'
+      : 'https://schema.org/OutOfStock'
+  const images = allImages.value.map(image => image.url)
+  const sku = activeVariants.find(variant => variant.sku)?.sku
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    '@id': `${seoUrl(baseUrl, route.path)}#product`,
+    name: value.name,
+    description: value.seo_description || value.description,
+    url: seoUrl(baseUrl, route.path),
+    ...(images.length ? { image: images } : {}),
+    ...(sku ? { sku } : {}),
+    offers: {
+      '@type': 'Offer',
+      url: seoUrl(baseUrl, route.path),
+      price: fromPrice.value.toFixed(2),
+      priceCurrency: config.currency_code || 'USD',
+      availability,
+      itemCondition: 'https://schema.org/NewCondition',
+    },
+  }
+})
+
+useJsonLd('product', productJsonLd)
+useJsonLd('product-breadcrumbs', () => product.value
+  ? breadcrumbJsonLd(seoBaseUrl(siteConfig.value ?? {}, requestUrl), [
+      { name: 'Home', path: '/' },
+      { name: 'Shop', path: '/shop' },
+      { name: product.value.name, path: route.path },
+    ])
+  : null)
 </script>
 
 <style scoped>

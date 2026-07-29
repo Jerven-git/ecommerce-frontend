@@ -23,10 +23,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
   // custom store domain (`nazareck.com`) is never the bare base domain, so
   // those skip this and resolve their storefront via the backend below.
   const baseDomain = String(useRuntimeConfig().public.storefrontBaseDomain || '').toLowerCase()
-  if (import.meta.client && baseDomain) {
-    const host = window.location.hostname.toLowerCase()
+  const requestUrl = useRequestURL()
+  const host = requestUrl.hostname.toLowerCase()
+  if (baseDomain) {
     if (host === baseDomain || host === `www.${baseDomain}`) {
-      return navigateTo('/admin/login')
+      return navigateTo('/admin/login', { redirectCode: 302 })
     }
   }
 
@@ -46,10 +47,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
   // environments not fronted by that config. Compare hostnames, not hosts, so a
   // dev port never causes a redirect loop.
   const canonicalHost = siteConfig.value?.canonical_host
-  if (import.meta.client && canonicalHost && window.location.hostname.toLowerCase() !== canonicalHost) {
-    const { protocol, port } = window.location
-    const portSuffix = port ? `:${port}` : ''
-    window.location.replace(`${protocol}//${canonicalHost}${portSuffix}${to.fullPath}`)
-    return
+  if (canonicalHost && host !== canonicalHost && !isLocalSeoHost(host)) {
+    return navigateTo(`${requestUrl.protocol}//${canonicalHost}${to.fullPath}`, {
+      external: true,
+      redirectCode: 301,
+    })
   }
 })

@@ -132,11 +132,34 @@ import type { Service, ServiceDetail } from '~/types/service'
 import { renderMarkdown } from '~/utils/markdown'
 
 const route = useRoute()
+const { $apiFetch } = useNuxtApp()
+const { siteConfig } = useSiteConfig()
+const requestUrl = useRequestURL()
 const slug = computed(() => route.params.slug as string)
 
-const service = ref<ServiceDetail | null>(null)
-const related = ref<Service[]>([])
-const loading = ref(true)
+const {
+  data: serviceResponse,
+  status: serviceStatus,
+  error: serviceRequestError,
+} = await useAsyncData(
+  `service-${slug.value}`,
+  () => $apiFetch<{ data: ServiceDetail; related: Service[] }>(`/services/${slug.value}`),
+  { watch: [slug] },
+)
+
+const service = computed(() => serviceResponse.value?.data ?? null)
+const related = computed(() => serviceResponse.value?.related ?? [])
+const loading = computed(() => serviceStatus.value === 'pending')
+
+const serviceErrorStatus = serviceRequestError.value?.statusCode
+  ?? (serviceRequestError.value as any)?.status
+
+if (serviceErrorStatus === 404 || (!loading.value && !service.value && !serviceRequestError.value)) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Service not found',
+  })
+}
 
 const renderedBody = computed(() => renderMarkdown(service.value?.body))
 
@@ -146,18 +169,39 @@ const fallbackGradient = computed(() => {
   return { background: `linear-gradient(135deg, ${from}, ${to})` }
 })
 
-async function load() {
-  loading.value = true
-  const res = await fetchServiceBySlug(slug.value)
-  service.value = res?.data ?? null
-  related.value = res?.related ?? []
-  loading.value = false
-}
-
-onMounted(load)
-watch(slug, load)
-
 useEntitySeo(() => service.value)
+
+useJsonLd('service', () => {
+  const value = service.value
+  if (!value) return null
+
+  const config = siteConfig.value ?? {}
+  const baseUrl = seoBaseUrl(config, requestUrl)
+  const url = seoUrl(baseUrl, route.path)
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    '@id': `${url}#service`,
+    name: value.title,
+    description: value.seo_description || value.description,
+    url,
+    ...(value.cover_image_url ? { image: value.cover_image_url } : {}),
+    provider: {
+      '@type': 'Organization',
+      '@id': `${baseUrl}/#organization`,
+      name: config.site_name,
+    },
+  }
+})
+
+useJsonLd('service-breadcrumbs', () => service.value
+  ? breadcrumbJsonLd(seoBaseUrl(siteConfig.value ?? {}, requestUrl), [
+      { name: 'Home', path: '/' },
+      { name: 'Services', path: '/services' },
+      { name: service.value.title, path: route.path },
+    ])
+  : null)
 </script>
 
 <style scoped>

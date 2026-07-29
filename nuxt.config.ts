@@ -2,7 +2,46 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-15',
   devtools: { enabled: true },
-  ssr: false,
+  ssr: true,
+
+  routeRules: {
+    '/admin/**': {
+      ssr: false,
+      headers: { 'x-robots-tag': 'noindex, nofollow, noarchive' },
+    },
+    '/super-admin/**': {
+      ssr: false,
+      headers: { 'x-robots-tag': 'noindex, nofollow, noarchive' },
+    },
+    '/cart': {
+      ssr: false,
+      headers: { 'x-robots-tag': 'noindex, nofollow, noarchive' },
+    },
+    '/checkout': {
+      ssr: false,
+      headers: { 'x-robots-tag': 'noindex, nofollow, noarchive' },
+    },
+    '/favorites': {
+      ssr: false,
+      headers: { 'x-robots-tag': 'noindex, nofollow, noarchive' },
+    },
+    '/tracking': {
+      ssr: false,
+      headers: { 'x-robots-tag': 'noindex, nofollow, noarchive' },
+    },
+    '/order-success': {
+      ssr: false,
+      headers: { 'x-robots-tag': 'noindex, nofollow, noarchive' },
+    },
+    '/payment/**': {
+      ssr: false,
+      headers: { 'x-robots-tag': 'noindex, nofollow, noarchive' },
+    },
+    '/backorder/pay/**': {
+      ssr: false,
+      headers: { 'x-robots-tag': 'noindex, nofollow, noarchive' },
+    },
+  },
   
   modules: ['@nuxtjs/tailwindcss', '@nuxt/icon', '@nuxt/content', '@pinia/nuxt', '@nuxt/fonts'],
 
@@ -50,14 +89,13 @@ export default defineNuxtConfig({
   
   app: {
     head: {
-      titleTemplate: 'Shop System United',
+      title: 'Shop System United',
       htmlAttrs: {
         lang: 'en',
       },
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'Meta description' },
       ],
       link: [],
     },
@@ -88,11 +126,18 @@ export default defineNuxtConfig({
   },
   
   runtimeConfig: {
+    // Used only by Nitro during SSR. In Docker this points to nginx on the
+    // internal network; a local non-Docker dev server falls back to the public
+    // API origin.
+    apiBase: process.env.NUXT_API_BASE || process.env.NUXT_PUBLIC_API_BASE || '',
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE,
       apiPath: process.env.NUXT_PUBLIC_API_PATH,
       baseURL: process.env.NUXT_PUBLIC_BASE_URL || '',
       storefrontBaseDomain: process.env.NUXT_PUBLIC_STOREFRONT_BASE_DOMAIN || 'localhost',
+      seoIndexingEnabled: process.env.NUXT_PUBLIC_SEO_INDEXING_ENABLED
+        ? process.env.NUXT_PUBLIC_SEO_INDEXING_ENABLED === 'true'
+        : process.env.NODE_ENV === 'production',
       recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
       reverbAppKey: process.env.NUXT_PUBLIC_REVERB_APP_KEY || '',
       reverbHost: process.env.NUXT_PUBLIC_REVERB_HOST || 'localhost',
