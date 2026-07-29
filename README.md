@@ -4,7 +4,7 @@ Storefront and admin dashboard for Shop System United, built with Nuxt 4, Vue 3,
 
 ## Tech Stack
 
-- **Framework:** Nuxt 4 (Vue 3, SPA mode)
+- **Framework:** Nuxt 4 (Vue 3, SSR for public storefront routes)
 - **State Management:** Pinia (with client-side persistence)
 - **Styling:** Tailwind CSS (with dynamic theme colors via CSS variables)
 - **Icons:** @nuxt/icon
@@ -164,6 +164,8 @@ See the root [README.md](../README.md) for full setup instructions.
 | `NUXT_PUBLIC_API_PATH`          | API path prefix (e.g. `/api`)   |
 | `NUXT_PUBLIC_BASE_URL`          | Public site URL                 |
 | `NUXT_PUBLIC_RECAPTCHA_SITE_KEY`| Google reCAPTCHA site key       |
+| `NUXT_API_BASE`                 | Server-only API origin used by Nitro SSR |
+| `NUXT_PUBLIC_SEO_INDEXING_ENABLED` | Enables indexing in production; keep `false` on localhost |
 
 ## Theming
 

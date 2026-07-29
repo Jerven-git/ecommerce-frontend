@@ -1,5 +1,8 @@
 export default defineNuxtPlugin(() => {
     const config = useRuntimeConfig()
+    const incomingHeaders = import.meta.server
+        ? useRequestHeaders(['host', 'cookie', 'x-forwarded-host', 'x-forwarded-proto'])
+        : {}
 
     const getCookie = (name: string) => {
         if (!process.client) return null
@@ -10,7 +13,7 @@ export default defineNuxtPlugin(() => {
     }
 
     const apiFetch = $fetch.create({
-        baseURL: `${config.public.apiBase}${config.public.apiPath}`,
+        baseURL: `${import.meta.server ? config.apiBase : (config.public.apiBase || '')}${config.public.apiPath}`,
         credentials: "include",
 
         // ✅ don't hardcode Content-Type here (it breaks FormData)
@@ -22,28 +25,37 @@ export default defineNuxtPlugin(() => {
         // determine if this request is sending FormData
         const isFormData = options.body instanceof FormData
 
-        const headers: Record<string, string> = {
-        Accept: "application/json",
-        }
+        const headers = new Headers(options.headers)
+        headers.set("Accept", "application/json")
 
         // ✅ only set JSON content-type when NOT FormData
         if (!isFormData) {
-        headers["Content-Type"] = "application/json"
+        headers.set("Content-Type", "application/json")
         }
 
         // Get XSRF token from cookie for CSRF protection (Sanctum)
         if (process.client) {
-        const xsrfToken = getCookie("XSRF-TOKEN")
+            const xsrfToken = getCookie("XSRF-TOKEN")
             if (xsrfToken) {
-                headers["X-XSRF-TOKEN"] = decodeURIComponent(xsrfToken)
+                headers.set("X-XSRF-TOKEN", decodeURIComponent(xsrfToken))
             }
         }
 
-        // merge any headers caller might pass in
-        options.headers = {
-        ...(options.headers as any),
-        ...headers,
-        } as any
+        // During SSR the API request travels over the internal Docker host, but
+        // tenancy must still resolve from the visitor's original hostname.
+        if (import.meta.server) {
+            const forwardedHost = incomingHeaders['x-forwarded-host'] || incomingHeaders.host
+            const forwardedProto = incomingHeaders['x-forwarded-proto']
+
+            if (forwardedHost) {
+                headers.set('host', forwardedHost)
+                headers.set('x-forwarded-host', forwardedHost)
+            }
+            if (forwardedProto) headers.set('x-forwarded-proto', forwardedProto)
+            if (incomingHeaders.cookie) headers.set('cookie', incomingHeaders.cookie)
+        }
+
+        options.headers = headers
     },
 
     onResponseError({ response }) {

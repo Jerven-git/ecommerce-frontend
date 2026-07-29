@@ -93,11 +93,34 @@ import { renderMarkdown } from '~/utils/markdown'
 import { formatPostDate } from '~/utils/formatPostDate'
 
 const route = useRoute()
+const { $apiFetch } = useNuxtApp()
+const { siteConfig } = useSiteConfig()
+const requestUrl = useRequestURL()
 const slug = computed(() => route.params.slug as string)
 
-const post = ref<PostDetail | null>(null)
-const related = ref<Post[]>([])
-const loading = ref(true)
+const {
+  data: postResponse,
+  status: postStatus,
+  error: postRequestError,
+} = await useAsyncData(
+  `post-${slug.value}`,
+  () => $apiFetch<{ data: PostDetail; related: Post[] }>(`/posts/${slug.value}`),
+  { watch: [slug] },
+)
+
+const post = computed(() => postResponse.value?.data ?? null)
+const related = computed(() => postResponse.value?.related ?? [])
+const loading = computed(() => postStatus.value === 'pending')
+
+const postErrorStatus = postRequestError.value?.statusCode
+  ?? (postRequestError.value as any)?.status
+
+if (postErrorStatus === 404 || (!loading.value && !post.value && !postRequestError.value)) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Post not found',
+  })
+}
 
 const renderedBody = computed(() => renderMarkdown(post.value?.body))
 
@@ -107,18 +130,46 @@ const fallbackGradient = computed(() => {
   return { background: `linear-gradient(135deg, ${from}, ${to})` }
 })
 
-async function load() {
-  loading.value = true
-  const res = await fetchPostBySlug(slug.value)
-  post.value = res?.data ?? null
-  related.value = res?.related ?? []
-  loading.value = false
-}
-
-onMounted(load)
-watch(slug, load)
-
 useEntitySeo(() => post.value)
+
+useJsonLd('article', () => {
+  const value = post.value
+  if (!value) return null
+
+  const config = siteConfig.value ?? {}
+  const baseUrl = seoBaseUrl(config, requestUrl)
+  const url = seoUrl(baseUrl, route.path)
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    '@id': `${url}#article`,
+    headline: value.title,
+    description: value.seo_description || value.excerpt,
+    url,
+    mainEntityOfPage: url,
+    ...(value.cover_image_url ? { image: [value.cover_image_url] } : {}),
+    ...(value.published_at ? { datePublished: value.published_at } : {}),
+    ...(value.updated_at ? { dateModified: value.updated_at } : {}),
+    ...(value.author_name
+      ? { author: { '@type': 'Person', name: value.author_name } }
+      : {}),
+    publisher: {
+      '@type': 'Organization',
+      '@id': `${baseUrl}/#organization`,
+      name: config.site_name,
+      ...(config.logo_url ? { logo: { '@type': 'ImageObject', url: config.logo_url } } : {}),
+    },
+  }
+})
+
+useJsonLd('article-breadcrumbs', () => post.value
+  ? breadcrumbJsonLd(seoBaseUrl(siteConfig.value ?? {}, requestUrl), [
+      { name: 'Home', path: '/' },
+      { name: 'Blog', path: '/blog' },
+      { name: post.value.title, path: route.path },
+    ])
+  : null)
 </script>
 
 <style scoped>
