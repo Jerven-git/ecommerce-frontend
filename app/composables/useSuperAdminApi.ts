@@ -75,6 +75,28 @@ export interface Paginated<T> {
   total: number
 }
 
+export interface StoreOption {
+  id: number
+  name: string
+  slug: string
+}
+
+export interface SuperAdminOverview {
+  stores: {
+    total: number
+    active: number
+    inactive: number
+    verified_domains: number
+  }
+  users: { total: number }
+  admins: {
+    total: number
+    active: number
+    super: number
+  }
+  newest_stores: Store[]
+}
+
 interface StoreInput {
   name: string
   slug?: string
@@ -99,9 +121,16 @@ export const useSuperAdminApi = () => {
   const { $apiFetch } = useNuxtApp()
 
   return {
+    overview: () => $apiFetch<{ data: SuperAdminOverview }>('/super-admin/overview'),
+
     // Stores
-    listStores: () => $apiFetch<{ data: Store[] }>('/super-admin/stores'),
+    listStores: (params: Record<string, string | number | undefined> = {}) =>
+      $apiFetch<Paginated<Store>>('/super-admin/stores', { params }),
+    listStoreOptions: (params: { search?: string; selected_id?: number } = {}) =>
+      $apiFetch<{ data: StoreOption[] }>('/super-admin/store-options', { params }),
     showStore: (id: number) => $apiFetch<{ data: Store }>(`/super-admin/stores/${id}`),
+    listStoreAdmins: (id: number) =>
+      $apiFetch<{ data: AdminUser[] }>(`/super-admin/stores/${id}/admins`),
     createStore: (body: StoreInput) =>
       $apiFetch<{ data: Store }>('/super-admin/stores', { method: 'POST', body }),
     updateStore: (id: number, body: Partial<StoreInput>) =>
@@ -122,7 +151,9 @@ export const useSuperAdminApi = () => {
       $apiFetch<DomainVerification>(`/super-admin/stores/${id}/domain/verify`, { method: 'POST' }),
 
     // Admin users
-    listAdmins: () => $apiFetch<{ data: AdminUser[] }>('/super-admin/users'),
+    listAdmins: (params: Record<string, string | number | undefined> = {}) =>
+      $apiFetch<Paginated<AdminUser>>('/super-admin/users', { params }),
+    showAdmin: (id: number) => $apiFetch<{ data: AdminUser }>(`/super-admin/users/${id}`),
     createAdmin: (body: AdminUserInput) =>
       $apiFetch<{ data: AdminUser }>('/super-admin/users', { method: 'POST', body }),
     updateAdmin: (id: number, body: Partial<AdminUserInput>) =>

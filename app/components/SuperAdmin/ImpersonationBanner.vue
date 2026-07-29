@@ -1,9 +1,9 @@
 <template>
   <div
     v-if="active"
-    class="bg-amber-50 border-b border-amber-200 px-6 py-3 flex items-center justify-between gap-4 text-sm"
+    class="flex flex-col gap-3 border-b border-admin-warning bg-admin-warning-soft px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6"
   >
-    <div class="flex items-center gap-3 text-amber-900">
+    <div class="flex items-center gap-3 text-admin-warning">
       <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
       </svg>
@@ -16,7 +16,7 @@
     </div>
     <button
       type="button"
-      class="px-3 py-1.5 text-xs font-medium text-amber-900 bg-white border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
+      class="inline-flex min-h-11 items-center justify-center rounded-lg border border-admin-warning bg-admin-surface px-3 py-2 text-xs font-medium text-admin-warning hover:bg-admin-warning-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-warning"
       :disabled="impersonation.loading"
       @click="leave"
     >

@@ -1,101 +1,93 @@
 <template>
   <div class="space-y-6 max-w-2xl">
-    <div class="flex items-center gap-2 text-sm text-gray-400">
-      <NuxtLink to="/super-admin/admins" class="hover:text-gray-600">Admins</NuxtLink>
-      <span>/</span>
-      <span class="text-gray-600 font-medium">{{ isNew ? 'New admin' : (admin?.email ?? 'Loading…') }}</span>
-    </div>
+    <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm text-admin-muted">
+      <NuxtLink to="/super-admin/admins" class="inline-flex min-h-11 items-center hover:text-admin-text">Admins</NuxtLink>
+      <span aria-hidden="true">/</span>
+      <span class="font-medium text-admin-text">{{ isNew ? 'New admin' : (admin?.email ?? 'Loading…') }}</span>
+    </nav>
 
-    <h1 class="text-2xl font-bold text-gray-900">{{ isNew ? 'Create admin' : 'Edit admin' }}</h1>
-    <p v-if="isNew" class="text-sm text-gray-500">
+    <h1 class="text-2xl font-bold text-admin-text">{{ isNew ? 'Create admin' : 'Edit admin' }}</h1>
+    <p v-if="isNew" class="text-sm text-admin-muted">
       An admin belongs to a store — assign them to an existing one or provision a new store. Super admins do not get a store.
     </p>
 
-    <div v-if="loading && !isNew" class="text-sm text-gray-400">Loading…</div>
+    <div v-if="loading && !isNew" class="text-sm text-admin-muted" role="status" aria-live="polite">Loading admin…</div>
+    <SuperAdminErrorState v-else-if="loadError" :message="loadError" @retry="loadAdmin" />
 
-    <form v-else class="bg-white border border-gray-100 rounded-2xl p-6 space-y-4" @submit.prevent="save">
+    <form v-else class="space-y-4 rounded-2xl border border-admin-border bg-admin-surface p-4 sm:p-6" :aria-describedby="saveError ? 'admin-save-error' : undefined" @submit.prevent="save">
       <div class="grid gap-4 md:grid-cols-2">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Name</label>
-          <input v-model="form.name" type="text" required class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400" />
+          <label for="admin-name" class="mb-1.5 block text-sm font-medium text-admin-text">Name</label>
+          <input id="admin-name" v-model="form.name" type="text" required maxlength="255" class="admin-input" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-          <input v-model="form.email" type="email" required class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400" />
+          <label for="admin-email" class="mb-1.5 block text-sm font-medium text-admin-text">Email</label>
+          <input id="admin-email" v-model="form.email" type="email" required maxlength="255" autocomplete="email" class="admin-input" />
         </div>
       </div>
 
       <div v-if="isNew">
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Role</label>
-        <select v-model="form.role" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400">
+        <label for="admin-role" class="mb-1.5 block text-sm font-medium text-admin-text">Role</label>
+        <select id="admin-role" v-model="form.role" class="admin-input">
           <option value="admin">Admin (manages a single store)</option>
           <option value="super_admin">Super admin (platform operator, no store)</option>
         </select>
       </div>
       <div v-else>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Role</label>
-        <div class="px-3 py-2 text-sm border border-gray-100 rounded-xl bg-gray-50 text-gray-600">
+        <p class="mb-1.5 block text-sm font-medium text-admin-text">Role</p>
+        <div class="rounded-xl border border-admin-border bg-admin-soft px-3 py-2 text-sm text-admin-muted">
           {{ form.role === 'super_admin' ? 'Super admin' : 'Admin' }}
         </div>
-        <p class="text-xs text-gray-400 mt-1">Role is fixed at creation. To change it, delete this account and create a new one.</p>
+        <p class="mt-1 text-xs text-admin-muted">Role is fixed at creation. To change it, delete this account and create a new one.</p>
       </div>
 
-      <div v-if="isNew && form.role === 'admin'" class="space-y-4 bg-purple-50/40 border border-purple-100 rounded-xl p-4">
+      <fieldset v-if="isNew && form.role === 'admin'" class="space-y-4 rounded-xl border border-admin-accent bg-admin-accent-soft p-4">
+        <legend class="text-xs font-semibold uppercase tracking-wide text-admin-accent-strong">Store assignment</legend>
         <div>
-          <p class="text-xs font-semibold text-purple-800 uppercase tracking-wide">Store</p>
-          <p class="text-xs text-purple-700/70 mt-0.5">Assign this admin to an existing store, or provision a new one.</p>
+          <p class="mt-0.5 text-xs text-admin-accent-strong">Assign this admin to an existing store, or provision a new one.</p>
         </div>
         <div class="flex flex-wrap gap-4 text-sm">
-          <label class="inline-flex items-center gap-2">
+          <label class="inline-flex min-h-11 items-center gap-2">
             <input v-model="storeMode" type="radio" value="existing" /> Existing store
           </label>
-          <label class="inline-flex items-center gap-2">
+          <label class="inline-flex min-h-11 items-center gap-2">
             <input v-model="storeMode" type="radio" value="new" /> New store
           </label>
         </div>
-        <div v-if="storeMode === 'existing'">
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Store</label>
-          <select v-model.number="form.store_id" required class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400">
-            <option :value="null" disabled>Select a store…</option>
-            <option v-for="s in stores" :key="s.id" :value="s.id">{{ s.name }} ({{ s.slug }})</option>
-          </select>
-        </div>
+        <SuperAdminStorePicker v-if="storeMode === 'existing'" id="admin-store" v-model="form.store_id" required />
         <div v-else class="grid gap-4 md:grid-cols-2">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Store name</label>
-            <input v-model="form.store_name" type="text" required class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400" />
+            <label for="new-store-name" class="mb-1.5 block text-sm font-medium text-admin-text">Store name</label>
+            <input id="new-store-name" v-model="form.store_name" type="text" required maxlength="255" class="admin-input" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">Store slug (optional)</label>
-            <input v-model="form.store_slug" type="text" pattern="[a-z0-9-]+" placeholder="auto-generated" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white font-mono focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400" />
+            <label for="new-store-slug" class="mb-1.5 block text-sm font-medium text-admin-text">Store slug (optional)</label>
+            <input id="new-store-slug" v-model="form.store_slug" type="text" maxlength="255" pattern="[a-z0-9-]+" placeholder="auto-generated" class="admin-input font-mono" />
           </div>
         </div>
-      </div>
+      </fieldset>
 
       <div v-if="!isNew && form.role === 'admin'">
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Store</label>
-        <select v-model.number="form.store_id" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400">
-          <option v-for="s in stores" :key="s.id" :value="s.id">{{ s.name }} ({{ s.slug }})</option>
-        </select>
-        <p class="text-xs text-gray-400 mt-1">
+        <SuperAdminStorePicker id="admin-store" v-model="form.store_id" required />
+        <p class="mt-1 text-xs text-admin-muted">
           Reassigning moves this admin to another store. A store keeps working as long as it has at least one admin.
-          <NuxtLink v-if="admin?.store" :to="`/super-admin/stores/${admin.store.id}`" class="text-purple-700 hover:underline">Edit current store →</NuxtLink>
+          <NuxtLink v-if="admin?.store" :to="`/super-admin/stores/${admin.store.id}`" class="inline-flex min-h-11 items-center text-admin-accent-strong hover:underline">Edit current store →</NuxtLink>
         </p>
       </div>
 
       <div class="grid gap-4 md:grid-cols-2">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ isNew ? 'Password' : 'New password' }}</label>
-          <input v-model="form.password" type="password" :required="isNew" minlength="8" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400" />
+          <label for="admin-password" class="mb-1.5 block text-sm font-medium text-admin-text">{{ isNew ? 'Password' : 'New password' }}</label>
+          <input id="admin-password" v-model="form.password" type="password" :required="isNew" minlength="8" autocomplete="new-password" class="admin-input" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Confirm password</label>
-          <input v-model="form.password_confirmation" type="password" :required="!!form.password" minlength="8" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400" />
+          <label for="admin-password-confirmation" class="mb-1.5 block text-sm font-medium text-admin-text">Confirm password</label>
+          <input id="admin-password-confirmation" v-model="form.password_confirmation" type="password" :required="!!form.password" minlength="8" autocomplete="new-password" class="admin-input" />
         </div>
       </div>
 
       <div v-if="!isNew">
-        <label class="inline-flex items-center gap-2 text-sm">
+        <label class="inline-flex min-h-11 items-center gap-2 text-sm">
           <input
             type="checkbox"
             :checked="form.status === 'disabled'"
@@ -103,12 +95,12 @@
           />
           <span>Account disabled</span>
         </label>
-        <p class="text-xs text-gray-400 mt-1">Disabled users can't log in and existing sessions are rejected.</p>
+        <p class="mt-1 text-xs text-admin-muted">Disabled users can't log in and existing sessions are rejected.</p>
       </div>
 
-      <p v-if="saveError" class="text-sm text-red-600">{{ saveError }}</p>
+      <p v-if="saveError" id="admin-save-error" class="text-sm text-admin-danger" role="alert" tabindex="-1">{{ saveError }}</p>
 
-      <div class="flex items-center justify-between pt-2">
+      <div class="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center sm:justify-between">
         <AdminButton type="submit" variant="primary" :loading="saving">
           {{ isNew ? 'Create admin' : 'Save' }}
         </AdminButton>
@@ -135,9 +127,9 @@ const isNew = computed(() => route.params.id === 'new')
 const id = computed(() => Number(route.params.id))
 
 const admin = ref<AdminUser | null>(null)
-const stores = ref<Store[]>([])
 const storeMode = ref<'existing' | 'new'>('existing')
 const loading = ref(!isNew.value)
+const loadError = ref<string | null>(null)
 const saving = ref(false)
 const deleting = ref(false)
 const saveError = ref<string | null>(null)
@@ -154,42 +146,34 @@ const form = ref({
   status: 'active' as 'active' | 'disabled',
 })
 
-onMounted(async () => {
-  // Stores are needed both to pick an existing store on create and to reassign
-  // on edit. Default to "new store" only when none exist yet.
-  try {
-    const storesResult = await api.listStores()
-    stores.value = storesResult.data
-  } catch {
-    stores.value = []
-  }
-
+const loadAdmin = async () => {
+  loadError.value = null
   if (isNew.value) {
     const preselect = Number(route.query.store_id)
-    if (preselect && stores.value.some((s) => s.id === preselect)) {
+    if (preselect) {
       storeMode.value = 'existing'
       form.value.store_id = preselect
-    } else if (stores.value.length === 0) {
-      storeMode.value = 'new'
     }
     return
   }
 
+  loading.value = true
   try {
-    const adminsResult = await api.listAdmins()
-    const found = adminsResult.data.find((a) => a.id === id.value) ?? null
+    const found = (await api.showAdmin(id.value)).data
     admin.value = found
-    if (found) {
-      form.value.name = found.name
-      form.value.email = found.email
-      form.value.role = found.role
-      form.value.status = found.status
-      form.value.store_id = found.store?.id ?? null
-    }
+    form.value.name = found.name
+    form.value.email = found.email
+    form.value.role = found.role
+    form.value.status = found.status
+    form.value.store_id = found.store?.id ?? null
+  } catch (err: any) {
+    loadError.value = err?.data?.message || 'This admin could not be loaded.'
   } finally {
     loading.value = false
   }
-})
+}
+
+onMounted(loadAdmin)
 
 const save = async () => {
   saving.value = true
@@ -237,6 +221,8 @@ const save = async () => {
     const msg = err?.data?.message || 'Failed to save'
     saveError.value = msg
     toastError(msg)
+    await nextTick()
+    document.getElementById('admin-save-error')?.focus()
   } finally {
     saving.value = false
   }

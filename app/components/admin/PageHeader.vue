@@ -2,8 +2,8 @@
   <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
     <div class="min-w-0">
       <slot name="breadcrumb" />
-      <h1 class="text-2xl font-semibold tracking-tight text-gray-900 truncate">{{ title }}</h1>
-      <p v-if="subtitle" class="mt-1 text-sm text-gray-500">{{ subtitle }}</p>
+      <h1 class="truncate text-2xl font-semibold tracking-tight text-admin-text">{{ title }}</h1>
+      <p v-if="subtitle" class="mt-1 max-w-3xl text-sm text-admin-muted">{{ subtitle }}</p>
     </div>
     <div v-if="$slots.actions" class="flex items-center gap-2 shrink-0">
       <slot name="actions" />

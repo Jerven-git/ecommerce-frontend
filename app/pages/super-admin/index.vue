@@ -10,11 +10,11 @@
       <div
         v-for="(m, i) in metrics"
         :key="m.label"
-        class="admin-rise bg-white rounded-2xl border border-gray-200/70 shadow-sm p-5"
+        class="admin-rise rounded-2xl border border-admin-border bg-admin-surface p-5 shadow-sm"
         :style="{ '--i': i }"
       >
         <div class="flex items-center justify-between mb-3">
-          <p class="text-[11px] font-semibold uppercase tracking-wider text-gray-500">{{ m.label }}</p>
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-admin-muted">{{ m.label }}</p>
           <span
             class="w-8 h-8 rounded-lg flex items-center justify-center [&_svg]:w-4 [&_svg]:h-4"
             :class="chipClass(m.tone)"
@@ -23,22 +23,26 @@
         </div>
         <div class="h-8 flex items-end">
           <span v-if="statsLoading" class="skeleton block h-7 w-16"></span>
-          <p v-else class="stat-value text-2xl font-bold tabular-nums text-gray-900">{{ m.value }}</p>
+          <p v-else class="stat-value text-2xl font-bold tabular-nums text-admin-text">{{ m.value }}</p>
         </div>
-        <p class="mt-1 text-xs text-gray-500 truncate">
+        <p class="mt-1 truncate text-xs text-admin-muted">
           <span v-if="statsLoading" class="skeleton inline-block h-3 w-24 align-middle"></span>
           <span v-else>{{ m.sub }}</span>
         </p>
       </div>
     </div>
+    <p v-if="statsError" role="alert" class="rounded-xl bg-admin-danger-soft px-4 py-3 text-sm text-admin-danger">
+      {{ statsError }}
+      <button type="button" class="ml-2 min-h-11 font-semibold underline" @click="loadOverview">Try again</button>
+    </p>
 
     <!-- Organized body: activity (2/3) + newest stores (1/3) -->
     <div class="grid gap-6 lg:grid-cols-3 items-start">
       <!-- Recent activity -->
       <AdminCard class="admin-rise lg:col-span-2 overflow-hidden" :style="{ '--i': 4 }">
-        <div class="px-5 py-4 border-b border-gray-200/70 flex items-center justify-between gap-3">
-          <h2 class="text-sm font-semibold text-gray-900">Recent activity</h2>
-          <NuxtLink to="/super-admin/activity" class="text-xs font-medium text-purple-600 hover:text-purple-700 transition-colors shrink-0">View all →</NuxtLink>
+        <div class="flex items-center justify-between gap-3 border-b border-admin-border px-5 py-4">
+          <h2 class="text-sm font-semibold text-admin-text">Recent activity</h2>
+          <NuxtLink to="/super-admin/activity" class="min-h-11 shrink-0 content-center text-xs font-medium text-admin-accent hover:text-admin-accent-strong">View all →</NuxtLink>
         </div>
 
         <ul v-if="loading" class="divide-y divide-gray-100" aria-hidden="true">
@@ -50,12 +54,12 @@
             </div>
           </li>
         </ul>
-        <div v-else-if="error" class="px-5 py-10 text-center text-sm text-red-600">{{ error }}</div>
-        <ul v-else-if="recent.length > 0" class="divide-y divide-gray-100">
+        <SuperAdminErrorState v-else-if="activityError" :message="activityError" @retry="loadActivity" />
+        <ul v-else-if="recent.length > 0" class="divide-y divide-admin-border">
           <li
             v-for="entry in recent"
             :key="entry.id"
-            class="flex items-start gap-3 px-5 py-3 hover:bg-gray-50/70 transition-colors"
+            class="flex items-start gap-3 px-5 py-3 transition-colors hover:bg-admin-soft"
           >
             <span
               class="mt-0.5 shrink-0 px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide"
@@ -64,8 +68,8 @@
               {{ entry.log_name ?? 'event' }}
             </span>
             <div class="min-w-0 flex-1">
-              <p class="text-sm text-gray-800 truncate">{{ entry.description }}</p>
-              <p class="mt-0.5 text-xs text-gray-500 truncate">
+              <p class="truncate text-sm text-admin-text">{{ entry.description }}</p>
+              <p class="mt-0.5 truncate text-xs text-admin-muted">
                 {{ entry.causer?.email ?? 'system' }} · {{ timeLabel(entry.created_at) }}<span v-if="entry.store"> · {{ entry.store.name }}</span>
               </p>
             </div>
@@ -81,9 +85,9 @@
 
       <!-- Newest stores -->
       <AdminCard class="admin-rise overflow-hidden" :style="{ '--i': 5 }">
-        <div class="px-5 py-4 border-b border-gray-200/70 flex items-center justify-between gap-3">
-          <h2 class="text-sm font-semibold text-gray-900">Newest stores</h2>
-          <NuxtLink to="/super-admin/stores" class="text-xs font-medium text-purple-600 hover:text-purple-700 transition-colors shrink-0">All →</NuxtLink>
+        <div class="flex items-center justify-between gap-3 border-b border-admin-border px-5 py-4">
+          <h2 class="text-sm font-semibold text-admin-text">Newest stores</h2>
+          <NuxtLink to="/super-admin/stores" class="min-h-11 shrink-0 content-center text-xs font-medium text-admin-accent hover:text-admin-accent-strong">All →</NuxtLink>
         </div>
 
         <ul v-if="statsLoading" class="divide-y divide-gray-100" aria-hidden="true">
@@ -95,21 +99,21 @@
             <span class="skeleton h-5 w-16 rounded-full shrink-0"></span>
           </li>
         </ul>
-        <ul v-else-if="newestStores.length > 0" class="divide-y divide-gray-100">
+        <ul v-else-if="newestStores.length > 0" class="divide-y divide-admin-border">
           <li v-for="store in newestStores" :key="store.id">
             <NuxtLink
               :to="`/super-admin/stores/${store.id}`"
-              class="flex items-center justify-between gap-3 px-5 py-3 hover:bg-gray-50/70 transition-colors"
+              class="flex min-h-14 items-center justify-between gap-3 px-5 py-3 transition-colors hover:bg-admin-soft"
             >
               <div class="min-w-0">
-                <p class="text-sm font-medium text-gray-900 truncate">{{ store.name }}</p>
-                <p class="text-xs text-gray-500 truncate">{{ store.domain || `${store.slug}.store` }}</p>
+                <p class="truncate text-sm font-medium text-admin-text">{{ store.name }}</p>
+                <p class="truncate text-xs text-admin-muted">{{ store.domain || `${store.slug}.store` }}</p>
               </div>
               <span
                 class="shrink-0 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium"
-                :class="store.status === 'active' ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'"
+                :class="store.status === 'active' ? 'bg-admin-success-soft text-admin-success' : 'bg-admin-soft text-admin-muted'"
               >
-                <span class="w-1.5 h-1.5 rounded-full" :class="store.status === 'active' ? 'bg-emerald-500' : 'bg-gray-400'"></span>
+                <span class="h-1.5 w-1.5 rounded-full" :class="store.status === 'active' ? 'bg-admin-success' : 'bg-admin-muted'"></span>
                 {{ store.status }}
               </span>
             </NuxtLink>
@@ -122,17 +126,17 @@
 </template>
 
 <script setup lang="ts">
-import type { Store, AdminUser, ActivityEntry } from '~/composables/useSuperAdminApi'
+import type { ActivityEntry, SuperAdminOverview } from '~/composables/useSuperAdminApi'
 
 const api = useSuperAdminApi()
 
 const recent = ref<ActivityEntry[]>([])
-const stores = ref<Store[]>([])
-const admins = ref<AdminUser[]>([])
+const overview = ref<SuperAdminOverview | null>(null)
 
 const loading = ref(true)
 const statsLoading = ref(true)
-const error = ref<string | null>(null)
+const activityError = ref<string | null>(null)
+const statsError = ref<string | null>(null)
 
 const icons = {
   store: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l2-3h14l2 3M3 7v13h18V7M3 7h18"/></svg>',
@@ -145,36 +149,27 @@ const icons = {
 const fmt = (n: number) => n.toLocaleString()
 
 const metrics = computed(() => {
-  const active = stores.value.filter(s => s.status === 'active').length
-  const inactive = stores.value.length - active
-  const domains = stores.value.filter(s => s.domain && s.domain_verified).length
-  const users = stores.value.reduce((n, s) => n + (s.users_count || 0), 0)
-  const adminsActive = admins.value.filter(a => a.status === 'active').length
-  const supers = admins.value.filter(a => a.is_super_admin).length
+  const data = overview.value
   return [
-    { label: 'Stores', value: fmt(stores.value.length), sub: `${active} active · ${inactive} inactive`, icon: icons.store, tone: 'brand' },
-    { label: 'Live domains', value: fmt(domains), sub: 'verified custom', icon: icons.globe, tone: 'positive' },
-    { label: 'Users', value: fmt(users), sub: 'across all stores', icon: icons.users, tone: 'info' },
-    { label: 'Admins', value: fmt(admins.value.length), sub: `${adminsActive} active · ${supers} super`, icon: icons.shield, tone: 'attention' },
+    { label: 'Stores', value: fmt(data?.stores.total ?? 0), sub: `${data?.stores.active ?? 0} active · ${data?.stores.inactive ?? 0} inactive`, icon: icons.store, tone: 'brand' },
+    { label: 'Live domains', value: fmt(data?.stores.verified_domains ?? 0), sub: 'verified custom', icon: icons.globe, tone: 'positive' },
+    { label: 'Users', value: fmt(data?.users.total ?? 0), sub: 'across all stores', icon: icons.users, tone: 'info' },
+    { label: 'Admins', value: fmt(data?.admins.total ?? 0), sub: `${data?.admins.active ?? 0} active · ${data?.admins.super ?? 0} super`, icon: icons.shield, tone: 'attention' },
   ]
 })
 
 // Metric-specific tint so the row reads as four distinct facts, not four clones.
 const chipClass = (tone: string) => ({
-  brand: 'bg-purple-50 text-purple-600',
-  positive: 'bg-emerald-50 text-emerald-600',
-  info: 'bg-sky-50 text-sky-600',
-  attention: 'bg-amber-50 text-amber-600',
-}[tone] ?? 'bg-gray-100 text-gray-500')
+  brand: 'bg-admin-accent-soft text-admin-accent',
+  positive: 'bg-admin-success-soft text-admin-success',
+  info: 'bg-admin-info-soft text-admin-info',
+  attention: 'bg-admin-warning-soft text-admin-warning',
+}[tone] ?? 'bg-admin-soft text-admin-muted')
 
 // Vary skeleton line widths so the placeholder reads as content, not a bar chart.
 const skeletonWidth = (n: number) => ['82%', '64%', '73%', '58%', '69%'][(n - 1) % 5]
 
-const newestStores = computed(() =>
-  [...stores.value]
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 5),
-)
+const newestStores = computed(() => overview.value?.newest_stores ?? [])
 
 const timeLabel = (iso: string) =>
   new Date(iso).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -182,27 +177,37 @@ const timeLabel = (iso: string) =>
 // Light event chips, coloured by intent.
 const eventChip = (name: string | null) => {
   const n = (name ?? '').toLowerCase()
-  if (/(delete|remove|deactivate|disable)/.test(n)) return 'bg-rose-50 text-rose-700'
-  if (/(create|store|register)/.test(n)) return 'bg-emerald-50 text-emerald-700'
-  if (/(login|auth|impersonat|session)/.test(n)) return 'bg-sky-50 text-sky-700'
-  return 'bg-purple-50 text-purple-700'
+  if (/(delete|remove|deactivate|disable)/.test(n)) return 'bg-admin-danger-soft text-admin-danger'
+  if (/(create|store|register)/.test(n)) return 'bg-admin-success-soft text-admin-success'
+  if (/(login|auth|impersonat|session)/.test(n)) return 'bg-admin-info-soft text-admin-info'
+  return 'bg-admin-accent-soft text-admin-accent'
 }
 
-onMounted(async () => {
-  const [activity, storeList, adminList] = await Promise.allSettled([
-    api.listActivity({ per_page: 10 }),
-    api.listStores(),
-    api.listAdmins(),
-  ])
+const loadActivity = async () => {
+  loading.value = true
+  activityError.value = null
+  try {
+    recent.value = (await api.listActivity({ per_page: 10 })).data
+  } catch (err: any) {
+    activityError.value = err?.data?.message || 'Recent activity could not be loaded.'
+  } finally {
+    loading.value = false
+  }
+}
 
-  if (activity.status === 'fulfilled') recent.value = activity.value.data
-  else error.value = (activity.reason as any)?.data?.message || 'Failed to load activity'
-  loading.value = false
+const loadOverview = async () => {
+  statsLoading.value = true
+  statsError.value = null
+  try {
+    overview.value = (await api.overview()).data
+  } catch (err: any) {
+    statsError.value = err?.data?.message || 'Platform totals could not be loaded.'
+  } finally {
+    statsLoading.value = false
+  }
+}
 
-  if (storeList.status === 'fulfilled') stores.value = storeList.value.data
-  if (adminList.status === 'fulfilled') admins.value = adminList.value.data
-  statsLoading.value = false
-})
+onMounted(() => Promise.allSettled([loadActivity(), loadOverview()]))
 </script>
 
 <style scoped>

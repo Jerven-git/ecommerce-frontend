@@ -1,17 +1,51 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex">
-    <aside class="w-64 shrink-0 bg-white border-r border-gray-200/70 flex flex-col">
+  <div
+    class="admin-shell super-admin-shell min-h-screen bg-admin-canvas text-admin-text md:flex"
+    :class="themeClass"
+  >
+    <header class="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-admin-border bg-admin-surface px-4 md:hidden">
+      <NuxtLink to="/super-admin" class="flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
+        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-admin-accent text-admin-on-accent shadow-sm" aria-hidden="true">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17 9 21l3-2 3 2-.75-4M3 4h18l-2 13H5L3 4Z" />
+          </svg>
+        </span>
+        <span class="text-sm font-semibold">Super Admin</span>
+      </NuxtLink>
+      <div class="flex items-center gap-1">
+        <AdminThemeToggle />
+        <button
+          type="button"
+          class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent"
+          :aria-expanded="navOpen"
+          aria-controls="super-admin-navigation"
+          :aria-label="navOpen ? 'Close navigation' : 'Open navigation'"
+          @click="navOpen = !navOpen"
+        >
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path v-if="navOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <aside
+      id="super-admin-navigation"
+      class="shrink-0 border-b border-admin-border bg-admin-surface md:flex md:min-h-screen md:w-64 md:flex-col md:border-b-0 md:border-r"
+      :class="navOpen ? 'flex flex-col' : 'hidden'"
+    >
       <!-- Brand -->
-      <div class="h-16 px-5 flex items-center border-b border-gray-200/70">
-        <NuxtLink to="/super-admin" class="flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1">
-          <div class="w-9 h-9 rounded-xl bg-purple-600 flex items-center justify-center shadow-sm shadow-purple-600/30">
-            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="hidden h-16 items-center border-b border-admin-border px-5 md:flex">
+        <NuxtLink to="/super-admin" class="flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent focus-visible:ring-offset-1">
+          <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-admin-accent shadow-sm">
+            <svg class="h-5 w-5 text-admin-on-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17 9 21l3-2 3 2-.75-4M3 4h18l-2 13H5L3 4Z" />
             </svg>
           </div>
           <div class="leading-tight">
-            <p class="text-sm font-semibold text-gray-900">Super Admin</p>
-            <p class="text-xs text-gray-500">Platform operator</p>
+            <p class="text-sm font-semibold text-admin-text">Super Admin</p>
+            <p class="text-xs text-admin-muted">Platform operator</p>
           </div>
         </NuxtLink>
       </div>
@@ -22,14 +56,16 @@
           v-for="item in navItems"
           :key="item.path"
           :to="item.path"
-          class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1"
+          class="group flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent focus-visible:ring-offset-1"
           :class="isActive(item.path)
-            ? 'bg-purple-50 text-purple-700 font-semibold'
-            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'"
+            ? 'bg-admin-accent-soft text-admin-accent-strong font-semibold'
+            : 'text-admin-muted hover:bg-admin-soft hover:text-admin-text font-medium'"
+          :aria-current="isActive(item.path) ? 'page' : undefined"
         >
           <span
             class="w-5 h-5 inline-flex shrink-0 [&_svg]:w-5 [&_svg]:h-5 transition-colors"
-            :class="isActive(item.path) ? 'text-purple-600' : 'text-gray-400 group-hover:text-gray-600'"
+            :class="isActive(item.path) ? 'text-admin-accent' : 'text-admin-muted group-hover:text-admin-text'"
+            aria-hidden="true"
             v-html="item.icon"
           />
           <span>{{ item.label }}</span>
@@ -37,13 +73,14 @@
       </nav>
 
       <!-- Footer -->
-      <div class="px-3 py-4 border-t border-gray-200/70 space-y-1">
-        <div class="px-3 py-1.5 flex items-center gap-2 text-xs text-gray-500">
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+      <div class="space-y-1 border-t border-admin-border px-3 py-4">
+        <div class="flex items-center gap-2 px-3 py-1.5 text-xs text-admin-muted">
+          <span class="h-2 w-2 rounded-full bg-admin-success"></span>
           Operational
         </div>
+        <AdminThemeToggle show-label block />
         <button
-          class="block w-full text-left px-3 py-2 text-xs text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1"
+          class="block min-h-11 w-full rounded-lg px-3 py-2 text-left text-xs text-admin-muted transition-colors hover:bg-admin-danger-soft hover:text-admin-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent focus-visible:ring-offset-1"
           @click="handleLogout"
         >
           Log out
@@ -51,9 +88,9 @@
       </div>
     </aside>
 
-    <main class="flex-1 flex flex-col min-w-0">
+    <main class="flex min-w-0 flex-1 flex-col">
       <SuperAdminImpersonationBanner />
-      <div class="flex-1 overflow-y-auto p-6 md:p-8">
+      <div class="flex-1 p-4 sm:p-6 md:p-8">
         <slot />
       </div>
     </main>
@@ -67,6 +104,8 @@
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const navOpen = ref(false)
+const { themeClass } = useAdminAppearance({ syncBody: true })
 
 const navItems = [
   { path: '/super-admin', label: 'Dashboard', icon: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>' },
@@ -86,4 +125,8 @@ const handleLogout = async () => {
   await authStore.logout()
   router.push('/admin/login')
 }
+
+watch(() => route.path, () => {
+  navOpen.value = false
+})
 </script>

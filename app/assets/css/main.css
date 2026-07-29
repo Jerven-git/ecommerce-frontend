@@ -47,6 +47,59 @@
     /* Fonts */
     --font-heading: 'Inter', sans-serif;
     --font-body: 'Inter', sans-serif;
+
+    /* Shared admin surfaces. These are deliberately independent from each
+       tenant's storefront palette: operators need one stable control room. */
+    --admin-canvas: #f8fafc;
+    --admin-surface: #ffffff;
+    --admin-surface-soft: #f1f5f9;
+    --admin-text: #111827;
+    --admin-text-muted: #4b5563;
+    --admin-border: #dbe2ea;
+    --admin-accent: #7c3aed;
+    --admin-on-accent: #ffffff;
+    --admin-accent-strong: #6d28d9;
+    --admin-accent-soft: #f3e8ff;
+    --admin-success: #047857;
+    --admin-success-soft: #ecfdf5;
+    --admin-warning: #b45309;
+    --admin-warning-soft: #fffbeb;
+    --admin-danger: #b91c1c;
+    --admin-danger-soft: #fef2f2;
+    --admin-info: #0369a1;
+    --admin-info-soft: #f0f9ff;
+  }
+
+  .admin-active {
+    color-scheme: light;
+    background-color: var(--admin-canvas);
+    color: var(--admin-text);
+  }
+
+  .admin-theme-light {
+    color-scheme: light;
+  }
+
+  .admin-theme-dark {
+    color-scheme: dark;
+    --admin-canvas: #0f1117;
+    --admin-surface: #171a23;
+    --admin-surface-soft: #202531;
+    --admin-text: #f8fafc;
+    --admin-text-muted: #cbd5e1;
+    --admin-border: #343b4a;
+    --admin-accent: #a78bfa;
+    --admin-on-accent: #1e1635;
+    --admin-accent-strong: #c4b5fd;
+    --admin-accent-soft: #2e2250;
+    --admin-success: #6ee7b7;
+    --admin-success-soft: #123c32;
+    --admin-warning: #fcd34d;
+    --admin-warning-soft: #493313;
+    --admin-danger: #fca5a5;
+    --admin-danger-soft: #4c1d24;
+    --admin-info: #7dd3fc;
+    --admin-info-soft: #123549;
   }
 
   body {
@@ -57,6 +110,101 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
   }
+}
+
+/* Central compatibility bridge for the existing store-admin screens. New admin
+   UI should use the semantic admin tokens directly; this scoped layer keeps the
+   legacy Tailwind neutral utilities coherent in dark mode without page edits. */
+.admin-theme-dark .bg-white {
+    background-color: var(--admin-surface);
+}
+.admin-theme-dark .bg-white\/80,
+.admin-theme-dark .bg-white\/85,
+.admin-theme-dark .bg-white\/90,
+.admin-theme-dark .bg-white\/95 {
+    background-color: color-mix(in srgb, var(--admin-surface) 90%, transparent);
+}
+.admin-theme-dark .bg-gray-50,
+.admin-theme-dark .bg-gray-50\/50,
+.admin-theme-dark .bg-gray-50\/60,
+.admin-theme-dark .bg-gray-50\/80,
+.admin-theme-dark .bg-slate-50,
+.admin-theme-dark .bg-stone-50,
+.admin-theme-dark .bg-stone-50\/70,
+.admin-theme-dark .bg-gray-50\/70,
+.admin-theme-dark .bg-gray-100,
+.admin-theme-dark .bg-stone-100 {
+    background-color: var(--admin-surface-soft);
+}
+.admin-theme-dark .bg-gray-200,
+.admin-theme-dark .bg-stone-300 {
+    background-color: color-mix(in srgb, var(--admin-surface-soft) 78%, var(--admin-text));
+}
+.admin-theme-dark .text-gray-900,
+.admin-theme-dark .text-gray-800,
+.admin-theme-dark .text-gray-700,
+.admin-theme-dark .text-stone-900,
+.admin-theme-dark .text-stone-800 {
+    color: var(--admin-text);
+}
+.admin-theme-dark .text-gray-600,
+.admin-theme-dark .text-gray-500,
+.admin-theme-dark .text-gray-400,
+.admin-theme-dark .text-gray-300,
+.admin-theme-dark .text-slate-600,
+.admin-theme-dark .text-stone-600,
+.admin-theme-dark .text-stone-500,
+.admin-theme-dark .text-stone-400,
+.admin-theme-dark .text-stone-300,
+.admin-theme-dark .text-stone-200 {
+    color: var(--admin-text-muted);
+}
+.admin-theme-dark .border-gray-100,
+.admin-theme-dark .border-gray-200,
+.admin-theme-dark .border-gray-200\/70,
+.admin-theme-dark .border-gray-300,
+.admin-theme-dark .border-stone-200,
+.admin-theme-dark .border-stone-300 {
+    border-color: var(--admin-border);
+}
+.admin-theme-dark .ring-gray-100,
+.admin-theme-dark .ring-gray-200 {
+    --tw-ring-color: var(--admin-border);
+}
+.admin-theme-dark .divide-gray-50 > :not([hidden]) ~ :not([hidden]),
+.admin-theme-dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+.admin-theme-dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+.admin-theme-dark .divide-stone-100 > :not([hidden]) ~ :not([hidden]) {
+    border-color: var(--admin-border);
+}
+.admin-theme-dark .hover\:bg-gray-50:hover,
+.admin-theme-dark .hover\:bg-gray-100:hover,
+.admin-theme-dark .hover\:bg-stone-50:hover,
+.admin-theme-dark .hover\:bg-stone-100:hover,
+.admin-theme-dark .hover\:bg-white:hover,
+.admin-theme-dark .focus\:bg-white:focus {
+    background-color: var(--admin-surface-soft);
+}
+.admin-theme-dark .hover\:text-gray-900:hover,
+.admin-theme-dark .hover\:text-gray-800:hover,
+.admin-theme-dark .hover\:text-gray-700:hover,
+.admin-theme-dark .hover\:text-gray-600:hover,
+.admin-theme-dark .hover\:text-stone-900:hover,
+.admin-theme-dark .hover\:text-stone-800:hover,
+.admin-theme-dark .hover\:text-stone-600:hover {
+    color: var(--admin-text);
+}
+.admin-theme-dark input:not([type='checkbox']):not([type='radio']):not([type='range']),
+.admin-theme-dark select,
+.admin-theme-dark textarea {
+    background-color: var(--admin-surface);
+    border-color: var(--admin-border);
+    color: var(--admin-text);
+}
+.admin-theme-dark input::placeholder,
+.admin-theme-dark textarea::placeholder {
+    color: var(--admin-text-muted);
+    opacity: 1;
 }
 
 @layer components {
@@ -147,6 +295,10 @@
 
     .input-field {
         @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    }
+
+    .admin-input {
+        @apply min-h-11 w-full rounded-xl border border-admin-border bg-admin-surface px-3 py-2 text-sm text-admin-text placeholder:text-admin-muted focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-admin-accent disabled:bg-admin-soft disabled:text-admin-muted;
     }
 
     .card {
