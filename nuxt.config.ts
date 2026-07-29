@@ -1,6 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-15',
+  // Keep generated Nuxt artifacts in the project-owned directory. Nuxt 4's
+  // node_modules cache default can be owned by the container user, which makes
+  // local production builds fail before compilation begins.
+  buildDir: '.nuxt',
   devtools: { enabled: true },
   ssr: true,
 

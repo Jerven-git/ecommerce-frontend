@@ -2,7 +2,7 @@
   <component
     :is="tag"
     v-bind="boundAttrs"
-    class="admin-btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
+    class="admin-btn min-h-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
     :class="[variantClass, sizeClass, { 'w-full': block, 'admin-btn--busy': loading }]"
     :aria-busy="loading || undefined"
   >
@@ -53,15 +53,15 @@ const boundAttrs = computed(() =>
 )
 
 const variantClass = computed(() => ({
-  primary: 'text-white bg-purple-600 hover:bg-purple-700 shadow-sm shadow-purple-600/20 focus-visible:ring-purple-500',
-  outline: 'text-purple-700 bg-white border border-purple-200 hover:bg-purple-50 hover:border-purple-300 focus-visible:ring-purple-500',
-  danger: 'text-red-600 hover:bg-red-50 focus-visible:ring-red-400',
-  ghost: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-gray-400',
-  secondary: 'text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 focus-visible:ring-gray-400',
+  primary: 'text-admin-on-accent bg-admin-accent hover:bg-admin-accent-strong shadow-sm focus-visible:ring-admin-accent',
+  outline: 'text-admin-accent-strong bg-admin-surface border border-admin-accent hover:bg-admin-accent-soft focus-visible:ring-admin-accent',
+  danger: 'text-admin-danger hover:bg-admin-danger-soft focus-visible:ring-admin-danger',
+  ghost: 'text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:ring-admin-muted',
+  secondary: 'text-admin-text bg-admin-surface border border-admin-border hover:bg-admin-soft focus-visible:ring-admin-muted',
 }[props.variant]))
 
 const sizeClass = computed(() => ({
-  sm: 'px-3 py-1.5 text-xs rounded-lg',
+  sm: 'px-3 py-2 text-xs rounded-lg',
   md: 'px-4 py-2 text-sm rounded-xl',
 }[props.size]))
 </script>

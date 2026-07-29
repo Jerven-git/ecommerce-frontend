@@ -8,7 +8,10 @@
   <SuperAdminImpersonationBanner />
 
   <!-- Fixed-height shell so ONLY main content scrolls -->
-  <div class="h-screen bg-gray-50 flex overflow-hidden">
+  <div
+    class="admin-shell h-screen flex overflow-hidden bg-admin-canvas text-admin-text"
+    :class="themeClass"
+  >
     <!-- Mobile scrim -->
     <Transition
       enter-active-class="transition-opacity duration-200 ease-out"
@@ -142,6 +145,8 @@
 
         <!-- View Store + Account (bottom) -->
         <div class="space-y-1 pb-2">
+          <AdminThemeToggle show-label block />
+
           <a
             :href="storeUrl"
             class="admin-nav-link admin-focus flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
@@ -190,6 +195,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           <h1 class="text-base font-semibold text-gray-900 truncate">{{ pageTitle }}</h1>
           <div class="flex items-center gap-2 shrink-0">
+            <AdminThemeToggle />
             <button
               @click="guideRef?.startGuide()"
               class="admin-focus inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-primary-700
@@ -233,6 +239,7 @@ const route = useRoute()
 const { isEnabled } = useModules()
 const guideRef = ref<{ startGuide: () => void } | null>(null)
 const runtimeConfig = useRuntimeConfig()
+const { themeClass } = useAdminAppearance({ syncBody: true })
 
 /**
  * Absolute URL to the admin's own storefront. Prefers the store's custom domain
@@ -432,7 +439,7 @@ const iconClass = (item: NavItem) => {
 /* A ~4% wash of the (themeable) brand hue distinguishes the sidebar surface
    from the white header and grey-50 content without adding loudness. */
 .admin-sidebar {
-  background-color: color-mix(in srgb, var(--color-primary) 4%, #ffffff);
+  background-color: color-mix(in srgb, var(--color-primary) 4%, var(--admin-surface));
 }
 
 /* Branded keyboard focus. Uses outline (not box-shadow) so it isn't clipped by

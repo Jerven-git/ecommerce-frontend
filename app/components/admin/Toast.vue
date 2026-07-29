@@ -18,7 +18,7 @@
           v-for="t in toasts"
           :key="t.id"
           :role="t.variant === 'error' ? 'alert' : 'status'"
-          class="pointer-events-auto rounded-xl border border-gray-200/70 bg-white shadow-lg shadow-gray-900/[0.06] px-4 py-3 flex items-start gap-3"
+          class="pointer-events-auto flex items-start gap-3 rounded-xl border border-admin-border bg-admin-surface px-4 py-3 shadow-lg"
         >
           <span
             class="mt-0.5 w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
@@ -30,11 +30,11 @@
           </span>
 
           <div class="min-w-0 flex-1">
-            <p class="text-sm font-medium text-gray-900 break-words">{{ t.message }}</p>
+            <p class="break-words text-sm font-medium text-admin-text">{{ t.message }}</p>
             <button
               v-if="t.action"
               type="button"
-              class="mt-1 text-xs font-semibold text-purple-600 hover:text-purple-700 transition-colors focus-visible:outline-none focus-visible:underline"
+              class="mt-1 min-h-11 text-xs font-semibold text-admin-accent hover:text-admin-accent-strong focus-visible:outline-none focus-visible:underline"
               @click="runAction(t)"
             >
               {{ t.action.label }}
@@ -43,7 +43,7 @@
 
           <button
             type="button"
-            class="shrink-0 -mr-1 -mt-0.5 p-1 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+            class="-mr-1 -mt-1 inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent"
             aria-label="Dismiss notification"
             @click="dismiss(t.id)"
           >
@@ -63,9 +63,9 @@ import type { AdminToast } from '~/composables/useAdminToast'
 const { toasts, dismiss } = useAdminToast()
 
 const chip: Record<AdminToast['variant'], string> = {
-  success: 'bg-emerald-50 text-emerald-600',
-  error: 'bg-rose-50 text-rose-600',
-  info: 'bg-purple-50 text-purple-600',
+  success: 'bg-admin-success-soft text-admin-success',
+  error: 'bg-admin-danger-soft text-admin-danger',
+  info: 'bg-admin-accent-soft text-admin-accent',
 }
 
 const glyph: Record<AdminToast['variant'], string> = {

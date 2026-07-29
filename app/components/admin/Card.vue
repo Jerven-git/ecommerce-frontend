@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-2xl border border-gray-200/70 shadow-sm" :class="padded ? 'p-5 sm:p-6' : ''">
+  <div class="rounded-2xl border border-admin-border bg-admin-surface shadow-sm" :class="padded ? 'p-5 sm:p-6' : ''">
     <slot />
   </div>
 </template>
