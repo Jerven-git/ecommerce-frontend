@@ -137,6 +137,7 @@ export default defineNuxtConfig({
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE,
       apiPath: process.env.NUXT_PUBLIC_API_PATH,
+      staticGeneration: process.env.NUXT_PUBLIC_STATIC_GENERATION === 'true',
       baseURL: process.env.NUXT_PUBLIC_BASE_URL || '',
       storefrontBaseDomain: process.env.NUXT_PUBLIC_STOREFRONT_BASE_DOMAIN || 'localhost',
       seoIndexingEnabled: process.env.NUXT_PUBLIC_SEO_INDEXING_ENABLED

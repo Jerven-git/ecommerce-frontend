@@ -202,14 +202,19 @@ import type { Service, ServiceCategory } from '~/types/service'
 const { siteConfig, fetchSiteConfig } = useSiteConfig()
 const { addRevealRef } = useScrollRevealAll()
 const { $apiFetch } = useNuxtApp()
+const runtimeConfig = useRuntimeConfig()
 
 await fetchSiteConfig()
 
-// Fetch all published services + categories in parallel. Pull a high
-// per_page so the page renders the full grouped layout in one shot;
-// the service catalogue is small enough that pagination here would be
-// noise. If it grows past ~100 we can revisit.
-const { data: servicesRes } = await useAsyncData('services-public', async () => {
+// During static generation, fetch the tenant catalogue in the browser.
+// Prerendering it would either require Docker's internal `nginx` hostname or
+// bake one store's data into every storefront domain. Normal SSR builds still
+// fetch on the server. Pull a high per_page so the grouped layout stays on one
+// page; if the catalogue grows past ~100 we can revisit pagination.
+const {
+  data: servicesRes,
+  status: servicesStatus,
+} = await useAsyncData('services-public', async () => {
   const [servicesPage, categoriesRes] = await Promise.all([
     $apiFetch<{ data: Service[]; current_page?: number }>('/services', {
       query: { per_page: 100, sort: 'default' },
@@ -220,9 +225,9 @@ const { data: servicesRes } = await useAsyncData('services-public', async () => 
     services: servicesPage?.data ?? [],
     categories: categoriesRes?.data ?? [],
   }
-})
+}, { server: !runtimeConfig.public.staticGeneration })
 
-const loadingServices = computed(() => !servicesRes.value)
+const loadingServices = computed(() => servicesStatus.value === 'idle' || servicesStatus.value === 'pending')
 
 const services = computed(() => servicesRes.value?.services ?? [])
 const categories = computed(() => servicesRes.value?.categories ?? [])

@@ -5,7 +5,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
-    "generate": "nuxt generate",
+    "generate": "NUXT_PUBLIC_STATIC_GENERATION=true nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
