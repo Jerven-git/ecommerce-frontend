@@ -187,6 +187,8 @@ const heroStyle = computed(() => {
 })
 
 const preloadImage = (url: string) => {
+  if (!import.meta.client) return
+
   imageLoading.value = true
   imageLoaded.value = false
 

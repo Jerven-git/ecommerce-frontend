@@ -1,6 +1,6 @@
 <template>
   <nav
-    v-if="totalItems > 0"
+    v-if="totalItems > 0 && totalPages > 1"
     class="admin-pagination"
     :aria-label="`${itemLabel} pagination`"
   >

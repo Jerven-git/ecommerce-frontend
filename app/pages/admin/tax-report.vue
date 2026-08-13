@@ -12,25 +12,37 @@
     </AdminPageHeader>
 
     <!-- Filters -->
-    <section data-guide="tax-report" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden mb-6">
+    <section data-guide="tax-report" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm mb-6">
       <div class="px-6 py-4 flex flex-wrap items-end gap-4">
         <div>
           <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">From</label>
-          <input v-model="filters.date_from" type="date" class="input-field w-44" />
+          <AdminDatePicker
+            v-model="filters.date_from"
+            aria-label="Report start date"
+            placeholder="Start date"
+            :max="filters.date_to"
+            class="w-52"
+          />
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">To</label>
-          <input v-model="filters.date_to" type="date" class="input-field w-44" />
+          <AdminDatePicker
+            v-model="filters.date_to"
+            aria-label="Report end date"
+            placeholder="End date"
+            :min="filters.date_from"
+            class="w-52"
+          />
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Status</label>
-          <select v-model="filters.status" class="input-field w-44">
-            <option value="">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="shipped">Shipped</option>
-            <option value="delivered">Delivered</option>
-          </select>
+          <AdminFilterSelect
+            v-model="filters.status"
+            :options="statusFilterOptions"
+            aria-label="Filter tax report by order status"
+            list-label="Tax report order status filters"
+            class="w-52"
+          />
         </div>
         <button
           @click="loadReport"
@@ -130,6 +142,14 @@ const filters = ref({
   date_to: '',
   status: '',
 })
+
+const statusFilterOptions = [
+  { value: '', label: 'All statuses', icon: 'heroicons:funnel' },
+  { value: 'pending', label: 'Pending', icon: 'heroicons:clock' },
+  { value: 'processing', label: 'Processing', icon: 'heroicons:arrow-path' },
+  { value: 'shipped', label: 'Shipped', icon: 'heroicons:truck' },
+  { value: 'delivered', label: 'Delivered', icon: 'heroicons:check-circle' },
+]
 
 interface ReportRow {
   country: string | null

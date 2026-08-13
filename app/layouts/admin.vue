@@ -40,7 +40,7 @@
       title="Open navigation"
     >
       <span class="sr-only">Open navigation</span>
-      <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+      <svg class="admin-open-nav__icon h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m6 5 7 7-7 7m5-14 7 7-7 7" />
       </svg>
     </button>
@@ -477,6 +477,26 @@ const iconClass = (item: NavItem) => {
   background: transparent;
 }
 
+.admin-open-nav:hover .admin-open-nav__icon,
+.admin-open-nav:focus-visible .admin-open-nav__icon {
+  animation: admin-nav-nudge 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes admin-nav-nudge {
+  0% {
+    transform: translateX(0);
+  }
+  45% {
+    transform: translateX(0.3rem);
+  }
+  72% {
+    transform: translateX(0.1rem);
+  }
+  100% {
+    transform: translateX(0.2rem);
+  }
+}
+
 /* Respect reduced motion: the sidebar snaps instead of sliding. */
 @media (prefers-reduced-motion: reduce) {
   .ease-quint {
@@ -484,6 +504,10 @@ const iconClass = (item: NavItem) => {
   }
   .admin-open-nav {
     transform: translateY(-50%);
+  }
+  .admin-open-nav:hover .admin-open-nav__icon,
+  .admin-open-nav:focus-visible .admin-open-nav__icon {
+    animation: none;
   }
 }
 </style>

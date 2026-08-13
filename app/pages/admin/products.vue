@@ -82,7 +82,7 @@
       @edit="handleEdit"
       @delete="products.deleteProduct"
     >
-      <template #footer>
+      <template v-if="products.totalPages.value > 1" #footer>
         <AdminPagination
           :current-page="products.currentPage.value"
           :total-pages="products.totalPages.value"

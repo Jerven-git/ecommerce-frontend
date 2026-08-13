@@ -36,22 +36,21 @@
           />
         </div>
 
-        <select
+        <AdminFilterSelect
           v-model="statusFilter"
-          class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white"
-        >
-          <option value="all">All statuses</option>
-          <option value="published">Published</option>
-          <option value="draft">Drafts</option>
-        </select>
+          :options="statusFilterOptions"
+          aria-label="Filter posts by status"
+          list-label="Blog post status filters"
+          class="sm:w-44"
+        />
 
-        <select
+        <AdminFilterSelect
           v-model="categoryFilter"
-          class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white"
-        >
-          <option value="">All categories</option>
-          <option v-for="cat in categories" :key="cat.id" :value="String(cat.id)">{{ cat.name }}</option>
-        </select>
+          :options="categoryFilterOptions"
+          aria-label="Filter posts by category"
+          list-label="Blog post category filters"
+          class="sm:w-52"
+        />
       </div>
     </div>
 
@@ -166,7 +165,7 @@
           </tbody>
         </table>
       </div>
-      <div class="flex justify-end border-t border-gray-100 px-4 py-2">
+      <div v-if="totalPages > 1" class="flex justify-end border-t border-gray-100 px-4 py-2">
         <AdminPagination
           :current-page="currentPage"
           :total-pages="totalPages"
@@ -207,8 +206,23 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 
 const searchQuery = ref('')
-const statusFilter = ref<'all' | 'published' | 'draft'>('all')
+const statusFilter = ref('all')
 const categoryFilter = ref('')
+
+const statusFilterOptions = [
+  { value: 'all', label: 'All statuses', icon: 'heroicons:funnel' },
+  { value: 'published', label: 'Published', icon: 'heroicons:check-circle' },
+  { value: 'draft', label: 'Drafts', icon: 'heroicons:pencil-square' },
+]
+
+const categoryFilterOptions = computed(() => [
+  { value: '', label: 'All categories', icon: 'heroicons:squares-2x2' },
+  ...categories.value.map(category => ({
+    value: String(category.id),
+    label: category.name,
+    icon: 'heroicons:folder',
+  })),
+])
 
 const currentPage = ref(1)
 const totalPages = ref(1)
