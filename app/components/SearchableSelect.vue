@@ -6,8 +6,14 @@
       type="text"
       :placeholder="placeholder"
       :required="required"
-      class="input-field pr-9"
+      :disabled="disabled"
+      class="input-field pr-9 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
       autocomplete="off"
+      role="combobox"
+      aria-autocomplete="list"
+      :aria-expanded="isOpen"
+      :aria-controls="listboxId"
+      :aria-activedescendant="activeOptionId"
       @focus="onFocus"
       @blur="onBlur"
       @keydown="onKeydown"
@@ -22,11 +28,16 @@
     <!-- Dropdown -->
     <ul
       v-if="isOpen && filtered.length > 0"
+      :id="listboxId"
+      role="listbox"
       class="absolute z-50 mt-1 w-full max-h-60 overflow-auto bg-white border border-gray-200 rounded-xl shadow-lg py-1"
     >
       <li
         v-for="(item, index) in filtered"
         :key="item"
+        :id="`${listboxId}-option-${index}`"
+        role="option"
+        :aria-selected="item === modelValue"
         class="px-4 py-2 text-sm cursor-pointer transition-colors"
         :class="index === highlightedIndex ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50'"
         @mousedown.prevent="select(item)"
@@ -58,11 +69,13 @@ const props = withDefaults(defineProps<{
   required?: boolean
   allowFreeText?: boolean
   minSearchLength?: number
+  disabled?: boolean
 }>(), {
   placeholder: 'Select...',
   required: false,
   allowFreeText: false,
-  minSearchLength: 0
+  minSearchLength: 0,
+  disabled: false,
 })
 
 const emit = defineEmits<{
@@ -74,6 +87,7 @@ const wrapperRef = ref<HTMLElement | null>(null)
 const isOpen = ref(false)
 const search = ref('')
 const highlightedIndex = ref(0)
+const listboxId = useId()
 
 // Sync search text with modelValue when not open
 watch(() => props.modelValue, (val) => {
@@ -91,7 +105,14 @@ const filtered = computed(() => {
   return props.options.filter(item => item.toLowerCase().includes(q))
 })
 
+const activeOptionId = computed(() => {
+  return isOpen.value && filtered.value[highlightedIndex.value]
+    ? `${listboxId}-option-${highlightedIndex.value}`
+    : undefined
+})
+
 function onFocus() {
+  if (props.disabled) return
   isOpen.value = true
   search.value = ''
   highlightedIndex.value = 0

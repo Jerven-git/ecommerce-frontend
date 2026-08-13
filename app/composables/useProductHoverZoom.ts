@@ -6,6 +6,8 @@ interface ImageFitParams {
   offsetY: number
 }
 
+const LENS_SIZE = 400
+
 function computeObjectFitParams(
   contW: number, contH: number,
   natW: number, natH: number,
@@ -26,7 +28,7 @@ function computeObjectFitParams(
 export function useProductHoverZoom() {
   const containerRef = ref<HTMLElement | null>(null)
   const imageUrl = ref('')
-  const zoomFactor = ref(1.5)
+  const zoomFactor = ref(2.5)
 
   const fitMode = ref<'cover' | 'contain'>('cover')
   const isDesktop = ref(false)
@@ -38,6 +40,8 @@ export function useProductHoverZoom() {
 
   const naturalW = ref(0)
   const naturalH = ref(0)
+  const containerW = ref(0)
+  const containerH = ref(0)
 
   let viewportW = 0
   let viewportH = 0
@@ -76,6 +80,8 @@ export function useProductHoverZoom() {
     clientY.value = e.clientY
 
     const rect = containerRef.value.getBoundingClientRect()
+    containerW.value = rect.width
+    containerH.value = rect.height
     const cx = Math.max(0, Math.min(e.clientX - rect.left, rect.width))
     const cy = Math.max(0, Math.min(e.clientY - rect.top, rect.height))
 
@@ -87,7 +93,7 @@ export function useProductHoverZoom() {
     if (!show.value) return { left: '-9999px', top: '-9999px' }
 
     const gap = 16
-    const lensW = 400
+    const lensW = LENS_SIZE
 
     let left = clientX.value + gap
     let top = clientY.value - lensW / 2
@@ -106,22 +112,52 @@ export function useProductHoverZoom() {
   })
 
   const bgSize = computed(() => {
-    if (!naturalW.value || !naturalH.value) return ''
-    return `${naturalW.value * zoomFactor.value}px ${naturalH.value * zoomFactor.value}px`
+    if (!naturalW.value || !naturalH.value || !containerW.value || !containerH.value) return ''
+
+    const params = computeObjectFitParams(
+      containerW.value,
+      containerH.value,
+      naturalW.value,
+      naturalH.value,
+      fitMode.value,
+    )
+    const scale = Math.max(
+      params.scale * zoomFactor.value,
+      LENS_SIZE / naturalW.value,
+      LENS_SIZE / naturalH.value,
+    )
+
+    return `${naturalW.value * scale}px ${naturalH.value * scale}px`
   })
 
   const bgPosition = computed(() => {
     if (!show.value || !naturalW.value || !naturalH.value || !containerRef.value) return '0 0'
 
-    const rect = containerRef.value.getBoundingClientRect()
-    const params = computeObjectFitParams(rect.width, rect.height, naturalW.value, naturalH.value, fitMode.value)
+    if (!containerW.value || !containerH.value) return '0 0'
 
-    const ox = (cursorX.value - params.offsetX) / params.scale
-    const oy = (cursorY.value - params.offsetY) / params.scale
-    const Z = zoomFactor.value
+    const params = computeObjectFitParams(
+      containerW.value,
+      containerH.value,
+      naturalW.value,
+      naturalH.value,
+      fitMode.value,
+    )
 
-    const half = 200
-    return `${half - ox * Z}px ${half - oy * Z}px`
+    const ox = Math.max(0, Math.min((cursorX.value - params.offsetX) / params.scale, naturalW.value))
+    const oy = Math.max(0, Math.min((cursorY.value - params.offsetY) / params.scale, naturalH.value))
+    const scale = Math.max(
+      params.scale * zoomFactor.value,
+      LENS_SIZE / naturalW.value,
+      LENS_SIZE / naturalH.value,
+    )
+    const backgroundW = naturalW.value * scale
+    const backgroundH = naturalH.value * scale
+
+    const half = LENS_SIZE / 2
+    const x = Math.min(0, Math.max(LENS_SIZE - backgroundW, half - ox * scale))
+    const y = Math.min(0, Math.max(LENS_SIZE - backgroundH, half - oy * scale))
+
+    return `${x}px ${y}px`
   })
 
   function checkDesktop() {

@@ -1,5 +1,5 @@
 <template>
-  <div data-guide="settings-save" class="fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-t border-gray-200 shadow-lg">
+  <div data-guide="settings-save" class="admin-settings-save-footer fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-t border-gray-200 shadow-lg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
       <!-- Dirty status -->
       <p v-if="dirty" class="flex items-center gap-2 text-xs font-medium text-amber-600">
@@ -46,3 +46,23 @@ const emit = defineEmits<{
   discard: []
 }>()
 </script>
+
+<style scoped>
+.admin-settings-save-footer {
+  transition: left 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The mobile sidebar is an overlay. On desktop it participates in the shell,
+   so the fixed action footer follows the same content edge. */
+@media (min-width: 1024px) {
+  .admin-settings-save-footer {
+    left: var(--admin-sidebar-offset, 0rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-settings-save-footer {
+    transition: none;
+  }
+}
+</style>

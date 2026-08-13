@@ -1,13 +1,25 @@
 <template>
   <div ref="wrapperRef" class="relative">
+    <Icon
+      v-if="selectedCountry"
+      :name="`circle-flags:${selectedCountry.code.toLowerCase()}`"
+      class="pointer-events-none absolute left-3 top-1/2 z-10 h-5 w-5 -translate-y-1/2"
+      aria-hidden="true"
+    />
     <input
       ref="inputRef"
       v-model="search"
       type="text"
       :placeholder="placeholder"
       :required="required"
-      class="input-field"
-      autocomplete="off"
+      class="input-field pr-9"
+      :class="selectedCountry ? 'pl-11' : ''"
+      autocomplete="country-name"
+      role="combobox"
+      aria-autocomplete="list"
+      :aria-expanded="isOpen"
+      :aria-controls="listboxId"
+      :aria-activedescendant="activeOptionId"
       @focus="onFocus"
       @blur="onBlur"
       @keydown="onKeydown"
@@ -23,18 +35,26 @@
     <Teleport to="body">
       <ul
         v-if="isOpen && filtered.length > 0"
+        :id="listboxId"
+        role="listbox"
+        aria-label="Countries"
         class="fixed z-[9999] max-h-60 overflow-auto bg-white border border-gray-200 rounded-xl shadow-lg py-1"
         :style="dropdownStyle"
       >
         <li
           v-for="(country, index) in filtered"
           :key="country.code"
-          class="px-4 py-2 text-sm cursor-pointer transition-colors"
+          :id="`${listboxId}-option-${country.code}`"
+          role="option"
+          :aria-selected="country.name === modelValue"
+          class="flex min-w-0 items-center gap-3 px-4 py-2 text-sm cursor-pointer transition-colors"
           :class="index === highlightedIndex ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50'"
           @mousedown.prevent="select(country)"
           @mouseenter="highlightedIndex = index"
         >
-          {{ country.name }}
+          <Icon :name="`circle-flags:${country.code.toLowerCase()}`" class="h-5 w-5 shrink-0" aria-hidden="true" />
+          <span class="min-w-0 flex-1 truncate">{{ country.name }}</span>
+          <span class="shrink-0 text-[11px] font-medium uppercase text-gray-400">{{ country.code }}</span>
         </li>
       </ul>
 
@@ -75,6 +95,12 @@ const isOpen = ref(false)
 const search = ref('')
 const highlightedIndex = ref(0)
 const dropdownStyle = ref<Record<string, string>>({})
+const listboxId = useId()
+
+const selectedCountry = computed(() => {
+  const value = props.modelValue.trim().toLowerCase()
+  return countries.find(country => country.name.toLowerCase() === value) || null
+})
 
 // Sync search text with modelValue on mount and when modelValue changes externally
 watch(() => props.modelValue, (val) => {
@@ -84,9 +110,14 @@ watch(() => props.modelValue, (val) => {
 }, { immediate: true })
 
 const filtered = computed(() => {
-  if (!search.value) return []
+  if (!search.value) return countries
   const q = search.value.toLowerCase()
   return countries.filter(c => c.name.toLowerCase().includes(q))
+})
+
+const activeOptionId = computed(() => {
+  const country = filtered.value[highlightedIndex.value]
+  return isOpen.value && country ? `${listboxId}-option-${country.code}` : undefined
 })
 
 function positionDropdown() {
@@ -161,7 +192,7 @@ function onKeydown(e: KeyboardEvent) {
 
 function scrollToHighlighted() {
   nextTick(() => {
-    const list = wrapperRef.value?.querySelector('ul')
+    const list = document.getElementById(listboxId)
     const item = list?.children[highlightedIndex.value] as HTMLElement | undefined
     item?.scrollIntoView({ block: 'nearest' })
   })

@@ -8,7 +8,7 @@
             <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
             <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
             <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Weight / Dims</th>
-            <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+            <th class="w-48 px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
             <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
             <th class="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
@@ -73,9 +73,17 @@
                 {{ parseFloat(String(product.weight || 0)).toFixed(2) }} kg
               </template>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
-                {{ product.category }}
+            <td class="w-48 px-6 py-4">
+              <span
+                v-if="getProductCategoryNames(product).length"
+                class="block max-w-48 cursor-help truncate whitespace-nowrap rounded-full bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-700"
+                :title="getProductCategoryNames(product).join(', ')"
+                :aria-label="`Categories: ${getProductCategoryNames(product).join(', ')}`"
+              >
+                {{ getProductCategoryNames(product).join(', ') }}
+              </span>
+              <span v-else class="text-xs font-medium text-amber-700">
+                Uncategorised
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
@@ -100,7 +108,7 @@
                 </button>
                 <button
                   @click="$emit('delete', product.id)"
-                  class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  class="p-2 text-gray-400 hover:text-red-600 hover:bg-gray-100 rounded-lg transition-colors"
                   title="Delete"
                 >
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -113,11 +121,15 @@
         </tbody>
       </table>
     </div>
+    <div v-if="$slots.footer" class="flex justify-end border-t border-gray-100 px-4 py-2">
+      <slot name="footer" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Product } from '~/composables/useProducts'
+import { getProductCategoryNames } from '~/utils/product'
 
 defineProps<{
   products: Product[]

@@ -30,10 +30,7 @@
     </div>
 
     <!-- Loading existing post -->
-    <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
-      <div class="w-10 h-10 rounded-full border-4 border-primary-100 border-t-primary-600 animate-spin"></div>
-      <p class="text-sm text-gray-500">Loading post…</p>
-    </div>
+    <AdminSpinner v-if="loading" label="Loading post editor…" variant="form" />
 
     <form v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6" @submit.prevent="save">
       <!-- Main column -->

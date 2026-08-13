@@ -3,7 +3,7 @@
     <AdminPageHeader title="Dashboard" subtitle="Overview of your store's performance" />
 
     <!-- Loading -->
-    <AdminSpinner v-if="loading" label="Loading dashboard…" />
+    <AdminSpinner v-if="loading" label="Loading dashboard…" variant="dashboard" />
 
     <div v-else class="space-y-6">
       <!-- Stats — one hero metric (revenue) anchors a restrained supporting set. -->

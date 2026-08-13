@@ -24,7 +24,10 @@
               </svg>
             </div>
             <div>
-              <p class="text-sm font-semibold text-gray-900">Category Tree</p>
+              <div class="flex items-center gap-1.5">
+                <p class="text-sm font-semibold text-gray-900">Category Tree</p>
+                <HelpTip :text="categoryTreeHelpText" />
+              </div>
               <p class="text-xs text-gray-500">{{ totalCount }} total</p>
             </div>
           </div>
@@ -100,6 +103,8 @@
             :is-last="index === filteredCategories.length - 1"
             :editing-id="editingId"
             :edit-name="editName"
+            :edit-parent-id="editParentId"
+            :parent-options="editParentOptions"
             :expanded-ids="expandedIds"
             :adding-parent-id="addingParentId"
             :adding-name="addingName"
@@ -107,12 +112,14 @@
             :search-query="searchQuery"
             :dragging-id="draggingId"
             :dragging-parent-id="draggingParentId"
+            :dragging-blocked-ids="draggingBlockedIds"
             @toggle="toggleExpand"
             @start-edit="startEdit"
             @save-edit="saveEdit"
             @cancel-edit="cancelEdit"
             @edit-cover="openCover"
             @update:edit-name="editName = $event"
+            @update:edit-parent-id="editParentId = $event"
             @confirm-delete="confirmDelete"
             @start-add="startAddChild"
             @save-add="saveAddChild"
@@ -125,6 +132,19 @@
         </div>
 
         <p v-else-if="!searchQuery" class="text-sm text-gray-500 text-center py-6">No categories yet. Add one above.</p>
+
+        <div
+          v-if="draggingId !== null && draggingParentId !== null"
+          class="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-dashed px-4 py-2 text-xs font-semibold transition-colors"
+          :class="rootDropActive ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-gray-300 bg-gray-50 text-gray-500'"
+          @dragenter.prevent="rootDropActive = true"
+          @dragover.prevent="rootDropActive = true"
+          @dragleave="rootDropActive = false"
+          @drop.prevent="handleRootDrop"
+        >
+          <Icon name="heroicons:arrow-up-tray" class="h-4 w-4" aria-hidden="true" />
+          Drop here to make it a main category
+        </div>
       </div>
     </div>
 
@@ -167,7 +187,24 @@ interface CategoriesResponse {
   data: Category[]
 }
 
+interface CategoryOption {
+  id: number
+  label: string
+  path: string
+  depth: number
+}
+
 const { $apiFetch } = useNuxtApp()
+const { showToast } = useAdminToast()
+
+const categoryTreeHelpText = `Move a category together with all of its subcategories:
+
+• Drag it onto the middle of another category to place it underneath.
+• Use the top or bottom edge to reorder categories at the same level.
+• Or select Edit, choose a different parent category, then save.
+• To make it a main category again, choose “Main shop title” while editing or use the drop area below the tree.
+
+Products remain assigned to their categories, and Shop filtering follows the updated category tree.`
 
 const categories = ref<Category[]>([])
 const loading = ref(true)
@@ -184,6 +221,7 @@ const addingName = ref('')
 // Inline editing
 const editingId = ref<number | null>(null)
 const editName = ref('')
+const editParentId = ref<number | null>(null)
 
 // Delete
 const deleteTarget = ref<Category | null>(null)
@@ -204,6 +242,8 @@ const searchQuery = ref('')
 // Drag and drop
 const draggingId = ref<number | null>(null)
 const draggingParentId = ref<number | null | undefined>(undefined)
+const draggingBlockedIds = ref<Set<number>>(new Set())
+const rootDropActive = ref(false)
 
 function filterTree(cats: Category[], query: string): Category[] {
   if (!query) return cats
@@ -237,6 +277,29 @@ const totalCount = computed(() => {
     return cats.reduce((sum, c) => sum + 1 + count(c.children || []), 0)
   }
   return count(categories.value)
+})
+
+function flattenCategoryOptions(cats: Category[], depth = 0, ancestors: string[] = []): CategoryOption[] {
+  return cats.flatMap(cat => {
+    const pathParts = [...ancestors, cat.name]
+
+    return [
+      { id: cat.id, label: cat.name, path: pathParts.join(' / '), depth },
+      ...flattenCategoryOptions(cat.children || [], depth + 1, pathParts),
+    ]
+  })
+}
+
+const editParentOptions = computed<CategoryOption[]>(() => {
+  if (editingId.value === null) return flattenCategoryOptions(categories.value)
+
+  const editing = findCategory(categories.value, editingId.value)
+  const excluded = new Set([
+    editingId.value,
+    ...collectIds(editing?.children || []),
+  ])
+
+  return flattenCategoryOptions(categories.value).filter(option => !excluded.has(option.id))
 })
 
 function collectIds(cats: Category[]): number[] {
@@ -324,11 +387,13 @@ function cancelAddChild() {
 function startEdit(cat: Category) {
   editingId.value = cat.id
   editName.value = cat.name
+  editParentId.value = cat.parent_id
 }
 
 function cancelEdit() {
   editingId.value = null
   editName.value = ''
+  editParentId.value = null
 }
 
 async function saveEdit(cat: Category) {
@@ -337,7 +402,10 @@ async function saveEdit(cat: Category) {
   try {
     await $apiFetch(`/categories/${cat.id}`, {
       method: 'PATCH',
-      body: { name: editName.value.trim() },
+      body: {
+        name: editName.value.trim(),
+        parent_id: editParentId.value,
+      },
     })
     cancelEdit()
     await fetchCategories()
@@ -368,17 +436,25 @@ async function executeDelete() {
 
 // --- Drag and drop handlers ---
 
-function handleDragStart(catId: number, parentId: number | null) {
+function handleDragStart(catId: number, parentId: number | null, blockedIds: number[]) {
   draggingId.value = catId
   draggingParentId.value = parentId
+  draggingBlockedIds.value = new Set(blockedIds)
 }
 
 function handleDragEnd() {
   draggingId.value = null
   draggingParentId.value = undefined
+  draggingBlockedIds.value = new Set()
+  rootDropActive.value = false
 }
 
-function handleDragDrop(draggedId: number, targetId: number, parentId: number | null, pos: 'before' | 'after') {
+async function handleDragDrop(draggedId: number, targetId: number, parentId: number | null, pos: 'before' | 'inside' | 'after') {
+  if (pos === 'inside') {
+    await moveCategory(draggedId, targetId)
+    return
+  }
+
   const list = parentId === null
     ? categories.value
     : findCategory(categories.value, parentId)?.children
@@ -406,7 +482,66 @@ function handleDragDrop(draggedId: number, targetId: number, parentId: number | 
   }
 
   handleDragEnd()
-  saveReorder(arr.map(c => c.id))
+  await saveReorder(arr.map(c => c.id))
+}
+
+async function handleRootDrop(event: DragEvent) {
+  const draggedId = Number(event.dataTransfer?.getData('text/plain') || draggingId.value)
+  rootDropActive.value = false
+  if (!draggedId) return
+
+  const dragged = findCategory(categories.value, draggedId)
+  if (!dragged || dragged.parent_id === null) {
+    handleDragEnd()
+    return
+  }
+
+  await moveCategory(draggedId, null)
+}
+
+async function moveCategory(draggedId: number, parentId: number | null) {
+  const dragged = findCategory(categories.value, draggedId)
+  const target = parentId === null ? null : findCategory(categories.value, parentId)
+  if (!dragged || (parentId !== null && !target)) {
+    handleDragEnd()
+    return
+  }
+
+  if (parentId !== null && collectIds(dragged.children || []).includes(parentId)) {
+    showToast('A category cannot be moved inside one of its own subcategories.', 'error')
+    handleDragEnd()
+    return
+  }
+
+  const sortOrder = parentId === null
+    ? categories.value.length
+    : (target?.children?.length ?? 0)
+
+  handleDragEnd()
+  saving.value = true
+  try {
+    await $apiFetch(`/categories/${draggedId}`, {
+      method: 'PATCH',
+      body: { parent_id: parentId, sort_order: sortOrder },
+    })
+
+    if (parentId !== null) {
+      expandedIds.value = new Set([...expandedIds.value, parentId])
+    }
+
+    showToast(
+      parentId === null
+        ? `“${dragged.name}” is now a main category.`
+        : `“${dragged.name}” and its subcategories moved under “${target!.name}”.`,
+      'success',
+    )
+    await fetchCategories()
+  } catch (err: any) {
+    showToast(err?.data?.message || 'Failed to move category.', 'error')
+    await fetchCategories()
+  } finally {
+    saving.value = false
+  }
 }
 
 function findCategory(cats: Category[], id: number): Category | null {

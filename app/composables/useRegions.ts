@@ -1,6 +1,9 @@
 import { State, City } from 'country-state-city'
 import isoCountries from 'i18n-iso-countries'
+import enLocale from 'i18n-iso-countries/langs/en.json'
 import ph from 'philippines'
+
+isoCountries.registerLocale(enLocale)
 
 /**
  * Returns state/province names for a given country name,
@@ -39,7 +42,7 @@ export function useRegions() {
 
   function getCities(countryName: string, stateName: string): string[] {
     const countryCode = getCountryCode(countryName)
-    if (!countryCode || !stateName) return []
+    if (!countryCode) return []
 
     // Philippines: use dedicated package
     if (countryCode === 'PH') {
@@ -54,6 +57,12 @@ export function useRegions() {
     }
 
     // Other countries: use country-state-city
+    if (!stateName) {
+      return [...new Set(
+        City.getCitiesOfCountry(countryCode)?.map(c => c.name) || []
+      )].sort((a, b) => a.localeCompare(b))
+    }
+
     const state = State.getStatesOfCountry(countryCode)
       .find(s => s.name.toLowerCase() === stateName.toLowerCase())
     if (!state) return []

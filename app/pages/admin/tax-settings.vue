@@ -12,7 +12,7 @@
     </AdminPageHeader>
 
     <!-- Loading -->
-    <AdminSpinner v-if="loading" label="Loading tax settings…" />
+    <AdminSpinner v-if="loading" label="Loading tax settings…" variant="form" />
 
     <div v-else class="space-y-6">
       <!-- Tax Configuration -->

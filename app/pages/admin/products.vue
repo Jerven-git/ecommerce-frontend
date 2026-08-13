@@ -28,9 +28,12 @@
       data-guide="product-filters"
       :search-query="products.searchQuery.value"
       :selected-status="products.selectedStatus.value"
+      :selected-category-id="products.selectedCategoryId.value"
+      :category-options="categoryFilterOptions"
       :status-filters="products.statusFilters"
       @update:search-query="products.searchQuery.value = $event"
       @update:selected-status="products.selectedStatus.value = $event"
+      @update:selected-category-id="products.selectedCategoryId.value = $event"
     />
 
     <!-- Loading -->
@@ -78,18 +81,18 @@
       :products="products.products.value"
       @edit="handleEdit"
       @delete="products.deleteProduct"
-    />
-
-    <!-- Pagination -->
-    <AdminProductsProductPagination
-      v-if="!products.loading.value && !products.error.value && products.totalPages.value > 1"
-      :current-page="products.currentPage.value"
-      :total-pages="products.totalPages.value"
-      :total-items="products.totalItems.value"
-      :per-page="products.perPage"
-      :visible-pages="products.visiblePages.value"
-      @go-to-page="products.goToPage"
-    />
+    >
+      <template #footer>
+        <AdminPagination
+          :current-page="products.currentPage.value"
+          :total-pages="products.totalPages.value"
+          :total-items="products.totalItems.value"
+          :per-page="products.perPage"
+          item-label="products"
+          @go-to-page="products.goToPage"
+        />
+      </template>
+    </AdminProductsProductTable>
 
     <!-- Delete Confirmation Modal -->
     <ConfirmDeleteModal
@@ -151,6 +154,28 @@ definePageMeta({
 const products = useProducts()
 const productForm = useProductForm()
 const categories = useProductCategories()
+
+interface CategoryFilterOption {
+  id: number
+  label: string
+  path: string
+  depth: number
+}
+
+const categoryFilterOptions = computed<CategoryFilterOption[]>(() => {
+  function flatten(items: typeof categories.allCategories.value, depth = 0, ancestors: string[] = []): CategoryFilterOption[] {
+    return items.flatMap((category) => {
+      const pathParts = [...ancestors, category.name]
+
+      return [
+        { id: category.id, label: category.name, path: pathParts.join(' / '), depth },
+        ...flatten(category.children || [], depth + 1, pathParts),
+      ]
+    })
+  }
+
+  return flatten(categories.allCategories.value)
+})
 
 
 const handleEdit = async (product: Product) => {

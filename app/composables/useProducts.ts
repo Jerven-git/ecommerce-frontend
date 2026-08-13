@@ -44,6 +44,7 @@ export function useProducts() {
   const error = ref<string | null>(null)
   const searchQuery = ref('')
   const selectedStatus = ref('all')
+  const selectedCategoryId = ref<number | null>(null)
   const currentPage = ref(1)
   const totalPages = ref(1)
   const totalItems = ref(0)
@@ -91,6 +92,7 @@ export function useProducts() {
 
       const q = searchQuery.value.trim()
       if (q) query.search = q
+      if (selectedCategoryId.value !== null) query.category_id = selectedCategoryId.value
 
       const response = await $apiFetch<PaginatedResponse>('/products', {
         method: 'GET',
@@ -144,6 +146,13 @@ export function useProducts() {
     loadProducts()
   })
 
+  // Parent categories include their descendants through the ProductController
+  // category filter contract.
+  watch(selectedCategoryId, () => {
+    currentPage.value = 1
+    loadProducts()
+  })
+
   // Debounced re-fetch when search query changes
   let searchTimer: ReturnType<typeof setTimeout>
   watch(searchQuery, () => {
@@ -160,6 +169,7 @@ export function useProducts() {
     error,
     searchQuery,
     selectedStatus,
+    selectedCategoryId,
     currentPage,
     totalPages,
     totalItems,

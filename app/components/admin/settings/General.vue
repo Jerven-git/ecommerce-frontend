@@ -8,127 +8,147 @@
       </div>
       <div>
         <h2 class="text-sm font-semibold text-gray-900">General</h2>
-        <p class="text-xs text-gray-400">Store name, logo, and site icon</p>
+        <p class="text-xs text-gray-500">Store identity and shared interface icons</p>
       </div>
     </div>
 
-    <div class="p-6 space-y-5">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Store Name</label>
-        <input :value="modelValue.site_name" @input="emit('update:modelValue', { ...modelValue, site_name: ($event.target as HTMLInputElement).value })" type="text" class="input-field" placeholder="My Awesome Store" />
-      </div>
-
-      <div class="flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50/60 px-4 py-3">
-        <svg class="w-4 h-4 shrink-0 mt-0.5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <p class="text-xs text-blue-900/80 leading-relaxed">
-          <span class="font-semibold">Tip:</span> For the cleanest look, upload <span class="font-semibold">transparent PNG</span> files — or use an image whose background matches your site's header/footer colour so no seams are visible.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Logo</label>
-          <AdminMediaUploader
-            :url="modelValue.logo_url"
-            :uploading="mediaUploading.logo"
-            label="Logo"
-            hint="PNG, JPG, SVG — max 2 MB"
-            input-id="logoInput"
-            preview-class="h-16 w-auto rounded-lg object-contain"
-            @select="(f: File) => emit('media-select', f, 'logo')"
-            @remove="emit('media-remove', 'logo')"
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Site Icon</label>
-          <AdminMediaUploader
-            :url="modelValue.favicon_url"
-            :uploading="mediaUploading.favicon"
-            label="Icon"
-            hint="Square preferred — max 2 MB"
-            input-id="faviconInput"
-            preview-class="h-16 w-16 rounded-lg object-contain"
-            @select="(f: File) => emit('media-select', f, 'favicon')"
-            @remove="emit('media-remove', 'favicon')"
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Cart Icon</label>
-          <AdminMediaUploader
-            :url="modelValue.cart_icon_url"
-            :uploading="mediaUploading.cart_icon"
-            label="Cart Icon"
-            hint="PNG, SVG — max 2 MB · 24×24 px recommended"
-            input-id="cartIconInput"
-            preview-class="h-16 w-16 rounded-lg object-contain"
-            @select="(f: File) => emit('media-select', f, 'cart_icon')"
-            @remove="emit('media-remove', 'cart_icon')"
-          />
-        </div>
-      </div>
-
-      <!-- Header logo size -->
-      <div class="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
-        <div class="flex items-center justify-between mb-2">
-          <label for="logoSizeRange" class="text-sm font-medium text-gray-700">Header logo size</label>
-          <span class="text-xs font-mono text-gray-500 tabular-nums">{{ modelValue.logo_size }}px</span>
-        </div>
-        <input
-          id="logoSizeRange"
-          type="range"
-          min="20"
-          max="64"
-          step="1"
-          :value="modelValue.logo_size"
-          @input="emit('update:modelValue', { ...modelValue, logo_size: Number(($event.target as HTMLInputElement).value) })"
-          class="w-full accent-primary-600 cursor-pointer"
-        />
-        <p class="text-[11px] text-gray-400 mt-1">
-          Height of the logo in the header bar — the width scales automatically so the logo keeps its proportions and stays crisp at any size.
-        </p>
-        <div v-if="modelValue.logo_url" class="mt-3 flex items-center gap-3 overflow-hidden rounded-lg border border-gray-200 bg-white px-3 py-2">
-          <span class="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-gray-400">Preview</span>
-          <img
-            :src="modelValue.logo_url"
-            :style="{ height: modelValue.logo_size + 'px' }"
-            class="w-auto max-w-full object-contain"
-            alt="Header logo preview"
-          />
-        </div>
-      </div>
-
-      <!-- Header layout toggle -->
-      <div class="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
-        <label class="flex items-start gap-3 cursor-pointer">
+    <div class="space-y-7 p-5 sm:p-6">
+      <div class="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)] lg:items-end">
+        <div class="min-w-0">
+          <label for="general-store-name" class="mb-1.5 block text-sm font-medium text-gray-700">Store Name</label>
           <input
-            :checked="modelValue.hero_full_bleed"
-            @change="emit('update:modelValue', { ...modelValue, hero_full_bleed: ($event.target as HTMLInputElement).checked })"
-            type="checkbox"
-            class="mt-0.5 w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+            id="general-store-name"
+            :value="modelValue.site_name"
+            type="text"
+            class="input-field"
+            placeholder="My Awesome Store"
+            @input="emit('update:modelValue', { ...modelValue, site_name: ($event.target as HTMLInputElement).value })"
           />
-          <div class="flex-1">
-            <p class="text-sm font-medium text-gray-800">Cover images flow under header</p>
-            <p class="text-xs text-gray-500 mt-0.5">When on, the cover image extends behind a transparent header for a full-bleed look — on the homepage hero and the About, Contact, Blog, and Services banners. When off, the header sits as its own band above the cover.</p>
+          <p class="mt-1.5 text-xs leading-5 text-gray-500">Used throughout the storefront and browser metadata.</p>
+        </div>
+
+        <div class="flex min-w-0 items-start gap-3 rounded-xl bg-blue-50 px-4 py-3 text-blue-900">
+          <Icon name="heroicons:information-circle" class="mt-0.5 h-4 w-4 shrink-0 text-blue-600" aria-hidden="true" />
+          <p class="min-w-0 text-xs leading-5">
+            <span class="font-semibold">Image tip:</span> Use transparent PNG files, or match the image background to your header and footer colour to avoid visible seams.
+          </p>
+        </div>
+      </div>
+
+      <div class="space-y-4 border-t border-gray-100 pt-6">
+        <div>
+          <h3 class="text-sm font-semibold text-gray-900">Brand images</h3>
+          <p class="mt-1 text-xs leading-5 text-gray-500">Upload each asset for the place it appears. Existing images remain unchanged until removed or replaced.</p>
+        </div>
+
+        <div class="grid min-w-0 gap-x-5 gap-y-6 sm:grid-cols-2 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)]">
+          <div class="min-w-0 space-y-2.5 sm:col-span-2 xl:col-span-1">
+            <div>
+              <p class="text-sm font-medium text-gray-800">Logo</p>
+              <p class="mt-0.5 text-xs leading-5 text-gray-500">Primary brand mark used in the storefront header and footer.</p>
+            </div>
+            <AdminMediaUploader
+              :url="modelValue.logo_url"
+              :uploading="mediaUploading.logo"
+              label="Logo"
+              hint="PNG, JPG, SVG — max 2 MB"
+              input-id="logoInput"
+              preview-class="h-16 w-auto rounded-lg object-contain"
+              @select="(f: File) => emit('media-select', f, 'logo')"
+              @remove="emit('media-remove', 'logo')"
+            />
           </div>
-        </label>
-        <Transition
-          enter-active-class="transition duration-200 ease-out"
-          enter-from-class="opacity-0 -translate-y-1"
-          enter-to-class="opacity-100 translate-y-0"
-        >
-          <div v-if="modelValue.hero_full_bleed" class="mt-3 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
-            <svg class="w-4 h-4 shrink-0 mt-0.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <p class="text-xs text-amber-800 leading-relaxed">
-              Applies to the homepage hero and the About, Contact, Blog, and Services cover banners. Use darker images, or increase each page's overlay opacity, so the header navigation stays readable on top.
+
+          <div class="min-w-0 space-y-2.5">
+            <div>
+              <p class="text-sm font-medium text-gray-800">Site Icon</p>
+              <p class="mt-0.5 text-xs leading-5 text-gray-500">Square icon used in browser tabs and bookmarks.</p>
+            </div>
+            <AdminMediaUploader
+              :url="modelValue.favicon_url"
+              :uploading="mediaUploading.favicon"
+              label="Icon"
+              hint="Square preferred — max 2 MB"
+              input-id="faviconInput"
+              preview-class="h-16 w-16 rounded-lg object-contain"
+              @select="(f: File) => emit('media-select', f, 'favicon')"
+              @remove="emit('media-remove', 'favicon')"
+            />
+          </div>
+
+          <div class="min-w-0 space-y-2.5">
+            <div>
+              <p class="text-sm font-medium text-gray-800">Cart Icon</p>
+              <p class="mt-0.5 text-xs leading-5 text-gray-500">Optional custom icon for the storefront cart action.</p>
+            </div>
+            <AdminMediaUploader
+              :url="modelValue.cart_icon_url"
+              :uploading="mediaUploading.cart_icon"
+              label="Cart Icon"
+              hint="PNG, SVG — max 2 MB · 24×24 px recommended"
+              input-id="cartIconInput"
+              preview-class="h-16 w-16 rounded-lg object-contain"
+              @select="(f: File) => emit('media-select', f, 'cart_icon')"
+              @remove="emit('media-remove', 'cart_icon')"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-4 border-t border-gray-100 pt-6">
+        <div>
+          <h3 class="text-sm font-semibold text-gray-900">Header presentation</h3>
+          <p class="mt-1 text-xs leading-5 text-gray-500">Control how your brand and cover imagery appear in the storefront header.</p>
+        </div>
+
+        <div class="grid min-w-0 gap-4 lg:grid-cols-2">
+          <div class="min-w-0 rounded-xl bg-gray-50 p-4">
+            <div class="mb-3 flex min-w-0 items-center justify-between gap-3">
+              <label for="logoSizeRange" class="min-w-0 text-sm font-medium text-gray-800">Header logo size</label>
+              <span class="shrink-0 rounded-md bg-white px-2 py-1 text-xs font-semibold tabular-nums text-gray-600">{{ modelValue.logo_size }}px</span>
+            </div>
+            <input
+              id="logoSizeRange"
+              type="range"
+              min="20"
+              max="64"
+              step="1"
+              :value="modelValue.logo_size"
+              class="w-full cursor-pointer accent-primary-600"
+              @input="emit('update:modelValue', { ...modelValue, logo_size: Number(($event.target as HTMLInputElement).value) })"
+            />
+            <p class="mt-2 text-xs leading-5 text-gray-500">The width scales automatically to preserve the logo proportions.</p>
+            <div v-if="modelValue.logo_url" class="mt-3 flex h-20 min-w-0 items-center justify-center overflow-hidden rounded-lg bg-white p-3">
+              <img
+                :src="modelValue.logo_url"
+                :style="{ height: modelValue.logo_size + 'px' }"
+                class="max-h-full max-w-full object-contain"
+                alt="Header logo preview"
+              />
+            </div>
+          </div>
+
+          <div class="min-w-0 rounded-xl bg-gray-50 p-4">
+            <label class="flex min-w-0 cursor-pointer items-start gap-3">
+              <input
+                :checked="modelValue.hero_full_bleed"
+                type="checkbox"
+                class="peer sr-only"
+                @change="emit('update:modelValue', { ...modelValue, hero_full_bleed: ($event.target as HTMLInputElement).checked })"
+              />
+              <span class="relative mt-0.5 h-6 w-10 shrink-0 rounded-full bg-gray-300 transition-colors peer-checked:bg-primary-600 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary-500">
+                <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-4" />
+              </span>
+              <span class="min-w-0">
+                <span class="block text-sm font-medium text-gray-800">Cover images flow under header</span>
+                <span class="mt-1 block text-xs leading-5 text-gray-500">Extends homepage and page-cover imagery behind a transparent header.</span>
+              </span>
+            </label>
+            <p v-if="modelValue.hero_full_bleed" class="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">
+              Use darker images or increase each page overlay so navigation remains readable.
             </p>
           </div>
-        </Transition>
+        </div>
       </div>
     </div>
   </section>

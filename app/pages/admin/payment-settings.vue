@@ -12,7 +12,7 @@
     </AdminPageHeader>
 
     <!-- Loading -->
-    <AdminSpinner v-if="loading" label="Loading payment settings…" />
+    <AdminSpinner v-if="loading" label="Loading payment settings…" variant="form" />
 
     <div v-else class="space-y-6">
       <!-- Load error -->

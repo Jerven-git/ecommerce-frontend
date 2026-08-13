@@ -12,7 +12,7 @@
     </AdminPageHeader>
 
     <!-- Loading -->
-    <AdminSpinner v-if="loading" label="Loading shipping settings…" />
+    <AdminSpinner v-if="loading" label="Loading shipping settings…" variant="form" />
 
     <div v-else class="space-y-5 pb-24">
 
@@ -304,14 +304,33 @@
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1.5">Country</label>
               <CountrySelect v-model="form.store_country" placeholder="Select country" />
+              <p class="mt-1.5 text-xs text-gray-400">Choose the country where orders are dispatched.</p>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1.5">State / Province</label>
-              <SearchableSelect v-model="form.store_state" :options="stateOptions" placeholder="Select state / province" />
+              <SearchableSelect
+                v-model="form.store_state"
+                :options="stateOptions"
+                :placeholder="statePlaceholder"
+                :disabled="!form.store_country"
+                :allow-free-text="!!form.store_country && stateOptions.length === 0"
+              />
+              <p class="mt-1.5 text-xs text-gray-400">
+                {{ !form.store_country ? 'Select a country first.' : stateOptions.length ? `${stateOptions.length} regions available in the location dataset.` : 'No region list is available; enter the region name.' }}
+              </p>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1.5">City</label>
-              <SearchableSelect v-model="form.store_city" :options="cityOptions" placeholder="Select city" allow-free-text />
+              <SearchableSelect
+                v-model="form.store_city"
+                :options="cityOptions"
+                :placeholder="cityPlaceholder"
+                :disabled="!form.store_country || (stateOptions.length > 0 && !form.store_state)"
+                :allow-free-text="cityAllowsFreeText"
+              />
+              <p class="mt-1.5 text-xs text-gray-400">
+                {{ cityHint }}
+              </p>
             </div>
           </div>
         </div>
@@ -437,6 +456,23 @@ const applyPreset = () => {
 // Dynamic state/city options based on selected country/state
 const stateOptions = computed(() => getStates(form.value.store_country))
 const cityOptions = computed(() => getCities(form.value.store_country, form.value.store_state))
+const statePlaceholder = computed(() => form.value.store_country ? 'Search state / province' : 'Select country first')
+const cityPlaceholder = computed(() => {
+  if (!form.value.store_country) return 'Select country first'
+  if (stateOptions.value.length > 0 && !form.value.store_state) return 'Select state / province first'
+  return cityOptions.value.length > 0 ? 'Search city' : 'Enter city'
+})
+const cityAllowsFreeText = computed(() => {
+  const parentSelected = !!form.value.store_country
+    && (stateOptions.value.length === 0 || !!form.value.store_state)
+  return parentSelected && cityOptions.value.length === 0
+})
+const cityHint = computed(() => {
+  if (!form.value.store_country) return 'Select a country first.'
+  if (stateOptions.value.length > 0 && !form.value.store_state) return 'Select a state or province first.'
+  if (cityOptions.value.length > 0) return `${cityOptions.value.length} cities available in the location dataset.`
+  return 'No city list is available; enter the city name.'
+})
 
 // Clear dependent fields when parent changes
 watch(() => form.value.store_country, () => {

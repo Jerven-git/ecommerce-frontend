@@ -40,7 +40,7 @@ const props = withDefaults(defineProps<{
   fitMode?: 'cover' | 'contain'
 }>(), {
   imageUrl: '',
-  zoomFactor: 0.5,
+  zoomFactor: 2.5,
   enabled: false,
   fitMode: 'cover',
 })

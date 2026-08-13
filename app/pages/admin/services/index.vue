@@ -56,9 +56,7 @@
     </div>
 
     <!-- Loading -->
-    <div v-if="loading" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 animate-pulse space-y-3">
-      <div v-for="i in 5" :key="i" class="h-16 bg-gray-100 rounded-xl"></div>
-    </div>
+    <AdminSpinner v-if="loading" label="Loading services…" variant="list" />
 
     <!-- Error -->
     <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">
@@ -168,38 +166,17 @@
           </tbody>
         </table>
       </div>
+      <div class="flex justify-end border-t border-gray-100 px-4 py-2">
+        <AdminPagination
+          :current-page="currentPage"
+          :total-pages="totalPages"
+          :total-items="totalItems"
+          :per-page="perPage"
+          item-label="services"
+          @go-to-page="goToPage"
+        />
+      </div>
     </div>
-
-    <!-- Pagination -->
-    <nav v-if="!loading && !error && totalPages > 1" class="flex items-center justify-center gap-1.5 mt-6">
-      <button
-        type="button"
-        class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-        :disabled="currentPage === 1"
-        @click="goToPage(currentPage - 1)"
-      >
-        Prev
-      </button>
-      <button
-        v-for="(page, i) in visiblePages"
-        :key="i"
-        type="button"
-        class="min-w-[36px] px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
-        :class="page === currentPage ? 'bg-primary-600 text-white' : 'text-gray-600 hover:text-gray-900 hover:bg-white'"
-        :disabled="typeof page !== 'number'"
-        @click="typeof page === 'number' && goToPage(page)"
-      >
-        {{ page }}
-      </button>
-      <button
-        type="button"
-        class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-        :disabled="currentPage === totalPages"
-        @click="goToPage(currentPage + 1)"
-      >
-        Next
-      </button>
-    </nav>
 
     <!-- Delete confirm -->
     <ConfirmDeleteModal
@@ -235,22 +212,11 @@ const categoryFilter = ref('')
 
 const currentPage = ref(1)
 const totalPages = ref(1)
+const totalItems = ref(0)
 const perPage = 15
 
 const deleteTarget = ref<Service | null>(null)
 const deleting = ref(false)
-
-const visiblePages = computed(() => {
-  const total = totalPages.value
-  const current = currentPage.value
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
-  const pages: (number | string)[] = [1]
-  if (current > 3) pages.push('...')
-  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) pages.push(i)
-  if (current < total - 2) pages.push('...')
-  pages.push(total)
-  return pages
-})
 
 async function load() {
   loading.value = true
@@ -269,7 +235,9 @@ async function load() {
 
     const res = await $apiFetch<PaginatedServices>('/admin/services', { query })
     services.value = res.data ?? []
+    currentPage.value = res.current_page ?? 1
     totalPages.value = res.last_page ?? 1
+    totalItems.value = res.total ?? 0
   } catch (err: any) {
     error.value = err?.data?.message || 'Failed to load services'
   } finally {

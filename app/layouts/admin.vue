@@ -11,6 +11,7 @@
   <div
     class="admin-shell h-screen flex overflow-hidden bg-admin-canvas text-admin-text"
     :class="themeClass"
+    :style="{ '--admin-sidebar-offset': sidebarOpen ? '16rem' : '0rem' }"
   >
     <!-- Mobile scrim -->
     <Transition
@@ -27,23 +28,26 @@
       />
     </Transition>
 
-    <!-- Floating open tab (only when sidebar is closed) -->
+    <!-- Navigation invitation (only when sidebar is closed) -->
     <button
       v-if="!sidebarOpen"
-      class="admin-tab admin-focus tap-target fixed left-0 top-1/2 -translate-y-1/2 z-50 flex items-center
-             bg-white border border-gray-200 shadow-sm rounded-r-xl py-5 px-1.5 text-gray-500
-             hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 hover:translate-x-0.5 transition-colors"
+      class="admin-open-nav admin-focus fixed left-0 top-1/2 z-50 flex h-16 w-11 -translate-y-1/2 items-center justify-center
+             bg-transparent text-gray-700 transition-colors hover:text-primary-700"
       @click="toggleSidebar"
-      aria-label="Open sidebar"
-      title="Open sidebar"
+      aria-controls="admin-navigation"
+      aria-expanded="false"
+      aria-label="Open navigation"
+      title="Open navigation"
     >
-      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      <span class="sr-only">Open navigation</span>
+      <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m6 5 7 7-7 7m5-14 7 7-7 7" />
       </svg>
     </button>
 
     <!-- Sidebar -->
     <aside
+      id="admin-navigation"
       class="admin-sidebar ease-quint z-50 border-r border-gray-200/70
              fixed lg:sticky top-0 h-screen overflow-hidden flex flex-col"
       :class="[
@@ -386,7 +390,9 @@ onMounted(() => {
   requestAnimationFrame(() => { mounted.value = true })
 })
 
-onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onKeydown)
+})
 
 const handleLogout = async () => {
   await authStore.logout()
@@ -467,14 +473,17 @@ const iconClass = (item: NavItem) => {
   }
 }
 
-/* Respect reduced-motion: the sidebar snaps instead of sliding, and the
-   floating tab's invitation nudge is removed. */
+.admin-open-nav {
+  background: transparent;
+}
+
+/* Respect reduced motion: the sidebar snaps instead of sliding. */
 @media (prefers-reduced-motion: reduce) {
   .ease-quint {
     transition: none !important;
   }
-  .admin-tab:hover {
-    transform: translateY(-50%) !important;
+  .admin-open-nav {
+    transform: translateY(-50%);
   }
 }
 </style>

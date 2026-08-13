@@ -31,7 +31,7 @@
     </nav>
 
     <!-- Loading -->
-    <AdminSpinner v-if="loading" label="Loading settings…" />
+    <AdminSpinner v-if="loading" label="Loading settings…" variant="form" />
 
     <!-- Error -->
     <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">
@@ -578,9 +578,46 @@ const form = ref({
 // --- Unsaved-changes tracking ---
 // Snapshot of the form as last loaded/saved. `isDirty` compares the live form
 // against it so we can disable Save when nothing changed and guard navigation.
-// Media selections flow through the form (object URLs), so they count as dirty too.
+// Media selections flow through the form (object URLs), so they count as dirty.
+// Server-owned processing fields are excluded because background refreshes
+// must not look like unsaved administrator changes.
 const savedSnapshot = ref('')
-const isDirty = computed(() => savedSnapshot.value !== '' && JSON.stringify(form.value) !== savedSnapshot.value)
+
+function settingsSnapshot(value: typeof form.value): string {
+  const snapshot = JSON.parse(JSON.stringify(value))
+
+  snapshot.homepage_showcase = {
+    enabled: snapshot.homepage_showcase.enabled,
+    label: snapshot.homepage_showcase.label,
+    heading: snapshot.homepage_showcase.heading,
+    subtitle: snapshot.homepage_showcase.subtitle,
+    tiles: snapshot.homepage_showcase.tiles,
+  }
+
+  snapshot.homepage_watch_shop = {
+    enabled: snapshot.homepage_watch_shop.enabled,
+    label: snapshot.homepage_watch_shop.label,
+    heading: snapshot.homepage_watch_shop.heading,
+    subtitle: snapshot.homepage_watch_shop.subtitle,
+    cards: snapshot.homepage_watch_shop.cards.map((card: any) => ({
+      id: card.id,
+      media_id: card.media_id,
+      product_id: card.product?.id ?? null,
+    })),
+  }
+
+  snapshot.homepage_best_sellers = {
+    enabled: snapshot.homepage_best_sellers.enabled,
+    label: snapshot.homepage_best_sellers.label,
+    heading: snapshot.homepage_best_sellers.heading,
+    subtitle: snapshot.homepage_best_sellers.subtitle,
+    fallback_product_ids: snapshot.homepage_best_sellers.fallback_product_ids ?? [],
+  }
+
+  return JSON.stringify(snapshot)
+}
+
+const isDirty = computed(() => savedSnapshot.value !== '' && settingsSnapshot(form.value) !== savedSnapshot.value)
 
 // Map collection -> form field
 const urlFields: Record<MediaCollection, keyof typeof form.value> = {
@@ -1036,9 +1073,11 @@ async function loadSettings() {
         contact: form.value.contact_image_url,
       }
 
-      // Baseline for unsaved-changes detection — must be the last thing set
-      // after the form is fully populated.
-      savedSnapshot.value = JSON.stringify(form.value)
+      // Child controls normalize a few values in their watchers. Wait for
+      // those updates before capturing the baseline so a successful save
+      // cannot immediately become dirty again.
+      await nextTick()
+      savedSnapshot.value = settingsSnapshot(form.value)
     }
   } catch (err: any) {
     console.error("Error loading settings:", err)
@@ -1215,10 +1254,11 @@ async function saveSettings() {
     // Notify other open tabs to re-fetch and apply the new theme
     broadcastConfigUpdate()
 
-    // A save always persists the whole config, not just the active tab —
-    // so the message says so rather than implying a single tab was saved.
-    showToast('All settings saved', 'success')
     await loadSettings()
+    savedSnapshot.value = settingsSnapshot(form.value)
+
+    // A save always persists the whole config, not just the active tab.
+    showToast('All settings saved', 'success')
   } catch (err: any) {
     console.error("Save failed:", err?.data || err)
     showToast(err?.data?.message || 'Failed to save settings', 'error')
