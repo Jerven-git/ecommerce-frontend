@@ -65,6 +65,10 @@
         :saved-theme="savedTheme"
         :saved-hero="savedHero"
         :saved-covers="savedCovers"
+        :media-uploading="media.uploading"
+        :media-progress="media.uploadProgress"
+        @media-select="onMediaSelect"
+        @media-remove="onMediaRemove"
         @preset-applied="onPresetApplied"
       />
 
@@ -186,12 +190,13 @@ watch(activeTab, (tab) => {
 
 // --- Media upload composable ---
 const media = useMediaUpload({
-  collections: ['logo', 'favicon', 'cart_icon', 'footer_logo', 'hero', 'about', 'contact', 'blog', 'services', 'showcase_video', 'homepage_statement', 'story_image_a', 'story_image_b'],
+  collections: ['logo', 'favicon', 'cart_icon', 'footer_logo', 'loader_logo', 'hero', 'about', 'contact', 'blog', 'services', 'showcase_video', 'homepage_statement', 'story_image_a', 'story_image_b'],
   limits: {
     logo:      { maxMB: 2,  label: 'Logo' },
     favicon:   { maxMB: 2,  label: 'Site icon' },
     cart_icon: { maxMB: 2,  label: 'Cart icon' },
     footer_logo: { maxMB: 2, label: 'Footer logo' },
+    loader_logo: { maxMB: 2, label: 'Loading logo' },
     hero:    { maxMB: 10, label: 'Hero media', accept: ['image/', 'video/'] },
     about:   { maxMB: 10, label: 'About image' },
     contact: { maxMB: 10, label: 'Contact image' },
@@ -239,7 +244,7 @@ const discardConfirmOpen = ref(false)
 
 const tabConfirmMessages: Record<TabId, string> = {
   general: 'Apply your general settings changes to the site?',
-  appearance: 'Apply the new theme to your site?',
+  appearance: 'Apply the new appearance to your site?',
   pages: 'Save these page content changes?',
   popup: 'Save these popup settings?',
   modules: 'Apply these module visibility changes? Disabled pages will redirect to the homepage.',
@@ -368,6 +373,8 @@ const form = ref({
   favicon_url: "",
   cart_icon_url: "",
   footer_logo_url: "",
+  loader_logo_url: "",
+  loader_animation: 'bounce' as import('~/composables/useSiteConfig').LoaderLogoAnimation,
   logo_size: 36,
   footer_logo_size: 128,
   hero_title: "",
@@ -625,6 +632,7 @@ const urlFields: Record<MediaCollection, keyof typeof form.value> = {
   favicon: 'favicon_url',
   cart_icon: 'cart_icon_url',
   footer_logo: 'footer_logo_url',
+  loader_logo: 'loader_logo_url',
   hero: 'hero_image_url',
   about: 'about_image_url',
   contact: 'contact_image_url',
@@ -767,6 +775,10 @@ async function loadSettings() {
         favicon_url: response.data.favicon_url || "",
         cart_icon_url: response.data.cart_icon_url || "",
         footer_logo_url: response.data.footer_logo_url || "",
+        loader_logo_url: response.data.loader_logo_url || "",
+        loader_animation: ['bounce', 'rotate', 'slide'].includes(response.data.loader_animation)
+          ? response.data.loader_animation
+          : 'bounce',
         logo_size: response.data.logo_size ?? 36,
         footer_logo_size: response.data.footer_logo_size ?? 128,
         hero_title: response.data.hero_title || "",
@@ -1210,6 +1222,7 @@ async function saveSettings() {
         logo_alt_text: form.value.logo_alt_text || null,
         logo_size: form.value.logo_size,
         footer_logo_size: form.value.footer_logo_size,
+        loader_animation: form.value.loader_animation,
         currency_code: form.value.currency_code || 'USD',
         header_cta: {
           enabled: !!form.value.header_cta.enabled,
@@ -1248,8 +1261,7 @@ async function saveSettings() {
 
     // Refresh shared siteConfig so the theme updates live
     const { fetchSiteConfig, broadcastConfigUpdate } = useSiteConfig()
-    useState<boolean>('siteConfigFetched').value = false
-    await fetchSiteConfig()
+    await fetchSiteConfig(true)
 
     // Notify other open tabs to re-fetch and apply the new theme
     broadcastConfigUpdate()
@@ -1261,7 +1273,7 @@ async function saveSettings() {
     showToast('All settings saved', 'success')
   } catch (err: any) {
     console.error("Save failed:", err?.data || err)
-    showToast(err?.data?.message || 'Failed to save settings', 'error')
+    showToast(err?.data?.message || err?.message || 'Failed to save settings', 'error')
   } finally {
     saving.value = false
   }

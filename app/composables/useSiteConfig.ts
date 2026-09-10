@@ -285,6 +285,8 @@ export interface SiteConfig {
   favicon_url: string | null
   cart_icon_url: string | null
   footer_logo_url: string | null
+  loader_logo_url: string | null
+  loader_animation: LoaderLogoAnimation
   logo_size: number | null
   footer_logo_size: number | null
   hero_title: string | null
@@ -348,6 +350,8 @@ export interface SiteConfig {
   currency_code: string
   updated_at: string
 }
+
+export type LoaderLogoAnimation = 'bounce' | 'rotate' | 'slide'
 
 export interface HeaderCta {
   enabled: boolean
@@ -439,7 +443,20 @@ export function useSiteConfig() {
   const fetched = useState<boolean>('siteConfigFetched', () => false)
 
   async function fetchSiteConfig(force = false) {
-    if ((!force && fetched.value) || pending.value) return
+    if (pending.value && !force) return
+
+    while (pending.value) {
+      await new Promise<void>((resolve) => {
+        const stop = watch(pending, (isPending) => {
+          if (!isPending) {
+            stop()
+            resolve()
+          }
+        }, { flush: 'sync' })
+      })
+    }
+
+    if (!force && fetched.value) return
     pending.value = true
     try {
       const { $apiFetch } = useNuxtApp()
@@ -461,6 +478,7 @@ export function useSiteConfig() {
     } catch {
       // Use defaults on failure
       siteConfig.value = DEFAULT_CONFIG as SiteConfig
+      fetched.value = false
     } finally {
       pending.value = false
     }

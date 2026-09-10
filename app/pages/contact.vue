@@ -259,47 +259,15 @@
           <p class="mt-3 max-w-2xl text-sm leading-6 text-gray-600">{{ faqSubtitle }}</p>
         </div>
 
-        <div class="border-y border-secondary-200/70">
-          <div v-for="(faq, i) in faqs" :key="i" class="border-b border-secondary-200/70 last:border-b-0">
-            <button
-              :id="`faq-trigger-${i}`"
-              class="flex min-h-14 w-full items-center justify-between gap-5 py-5 text-left text-secondary-950 transition-colors hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500"
-              :aria-expanded="openFaq === i"
-              :aria-controls="`faq-panel-${i}`"
-              @click="toggleFaq(i)"
-            >
-              <span class="text-base font-semibold">{{ faq.question }}</span>
-              <svg
-                class="h-5 w-5 shrink-0 text-secondary-500 transition-transform duration-300"
-                :class="{ 'rotate-180': openFaq === i }"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-
-            <Transition name="accordion">
-              <div
-                v-if="openFaq === i"
-                :id="`faq-panel-${i}`"
-                role="region"
-                :aria-labelledby="`faq-trigger-${i}`"
-                class="pb-6"
-              >
-                <p class="max-w-3xl text-sm leading-7 text-gray-600">{{ faq.answer }}</p>
-              </div>
-            </Transition>
-          </div>
-        </div>
+        <MotionAccordion :items="faqs" />
       </div>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
+import MotionAccordion from '~/components/storefront/MotionAccordion.vue'
+
 interface ContactEntry {
   label: string
   email: string
@@ -372,11 +340,6 @@ const contactEntries = computed(() => {
 })
 
 const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`
-
-const openFaq = ref<number | null>(null)
-const toggleFaq = (index: number) => {
-  openFaq.value = openFaq.value === index ? null : index
-}
 
 const defaultFaqs = [
   {
@@ -547,18 +510,14 @@ useStaticPageSeo('contact')
 .fade-enter-active,
 .fade-leave-active,
 .field-reveal-enter-active,
-.field-reveal-leave-active,
-.accordion-enter-active,
-.accordion-leave-active {
+.field-reveal-leave-active {
   transition: opacity 220ms ease-out, transform 220ms ease-out;
 }
 
 .fade-enter-from,
 .fade-leave-to,
 .field-reveal-enter-from,
-.field-reveal-leave-to,
-.accordion-enter-from,
-.accordion-leave-to {
+.field-reveal-leave-to {
   opacity: 0;
   transform: translateY(-4px);
 }
@@ -567,18 +526,14 @@ useStaticPageSeo('contact')
   .fade-enter-active,
   .fade-leave-active,
   .field-reveal-enter-active,
-  .field-reveal-leave-active,
-  .accordion-enter-active,
-  .accordion-leave-active {
+  .field-reveal-leave-active {
     transition-duration: 0ms;
   }
 
   .fade-enter-from,
   .fade-leave-to,
   .field-reveal-enter-from,
-  .field-reveal-leave-to,
-  .accordion-enter-from,
-  .accordion-leave-to {
+  .field-reveal-leave-to {
     transform: none;
   }
 }

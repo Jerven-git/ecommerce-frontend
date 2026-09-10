@@ -39,7 +39,7 @@
         <p id="store-domain-help" class="mb-2 text-xs text-admin-muted">
           Point an A record for this domain at
           <span v-if="expectedIps.length" class="font-mono text-admin-text">{{ expectedIps.join(' or ') }}</span>
-          <span v-else>your server</span>, then verify it. A domain only serves traffic once verified.
+          <span v-else>the public IP configured for SSU</span>, then verify it. A domain only serves traffic once verified.
         </p>
 
         <input
@@ -62,6 +62,9 @@
           <p v-if="!check.valid || !check.available" class="mt-1.5 text-xs text-admin-danger">
             {{ check.reason }}
           </p>
+          <p v-else-if="!domainVerifierConfigured" class="mt-1.5 text-xs text-admin-warning">
+            The domain verifier has no server IP to compare against. Set <span class="font-mono">STOREFRONT_SERVER_IPS</span> on the backend, then check again.
+          </p>
           <p v-else-if="check.dns?.points_at_server" class="mt-1.5 text-xs text-admin-success">
             Available, and DNS already points here. Save, then verify.
           </p>
@@ -80,7 +83,7 @@
             variant="outline"
             size="sm"
             :loading="verifying"
-            :disabled="domainDirty"
+            :disabled="domainDirty || !domainVerifierConfigured"
             @click="verifyDomain"
           >
             {{ store.domain_verified ? 'Re-check DNS' : 'Verify domain' }}
@@ -195,14 +198,18 @@ const canonical = (value: string | null | undefined) => {
 const domainDirty = computed(() => canonical(form.value.domain) !== canonical(store.value?.domain))
 
 const expectedIps = computed(() => check.value?.expected_ips ?? [])
+const domainVerifierConfigured = computed(() => expectedIps.value.length > 0)
 
 const domainInputClass = computed(() => {
   if (!form.value.domain?.trim() || checking.value || !check.value) {
     return 'border-admin-border focus:border-admin-accent'
   }
-  return check.value.valid && check.value.available
+  if (!check.value.valid || !check.value.available) {
+    return 'border-admin-danger focus:border-admin-danger'
+  }
+  return domainVerifierConfigured.value
     ? 'border-admin-success focus:border-admin-success'
-    : 'border-admin-danger focus:border-admin-danger'
+    : 'border-admin-warning focus:border-admin-warning'
 })
 
 const loadStore = async () => {

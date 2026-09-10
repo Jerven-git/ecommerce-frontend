@@ -3,6 +3,7 @@
 .data
 .nuxt
 .nuxt.root-owned.bak
+.nuxt_root_bak
 .nitro
 .cache
 dist
