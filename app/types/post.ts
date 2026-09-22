@@ -58,3 +58,11 @@ export interface PaginatedPosts {
   per_page: number
   total: number
 }
+
+export interface PaginatedPostCategories {
+  data: PostCategory[]
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
+}

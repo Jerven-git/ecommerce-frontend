@@ -1,4 +1,8 @@
 <template>
+  <!-- Guest pages (login, 2FA, password reset) render standalone without the admin shell -->
+  <slot v-if="isGuestPage" />
+
+  <template v-else>
   <!-- Admin Guide -->
   <AdminGuide ref="guideRef" />
 
@@ -235,6 +239,7 @@
       </main>
     </div>
   </div>
+  </template>
 </template>
 
 <script setup lang="ts">
@@ -244,6 +249,13 @@ const { isEnabled } = useModules()
 const guideRef = ref<{ startGuide: () => void } | null>(null)
 const runtimeConfig = useRuntimeConfig()
 const { themeClass } = useAdminAppearance({ syncBody: true })
+
+/**
+ * Auth pages live under /admin/* (so admin.vue's middleware still runs) but
+ * must never render inside the sidebar shell.
+ */
+const guestPaths = ['/admin/login', '/admin/forgot-password', '/admin/reset-password', '/admin/verify-2fa']
+const isGuestPage = computed(() => guestPaths.includes(route.path))
 
 /**
  * Absolute URL to the admin's own storefront. Prefers the store's custom domain

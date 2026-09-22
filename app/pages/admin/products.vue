@@ -151,6 +151,13 @@ definePageMeta({
   middleware: 'auth'
 })
 
+// Lock window scroll on this page — the admin shell's inner main already
+// scrolls the table area, so a browser-level scrollbar only adds dead space.
+useHead({
+  htmlAttrs: { style: 'overflow-y: hidden' },
+  bodyAttrs: { style: 'overflow-y: hidden' },
+})
+
 const products = useProducts()
 const productForm = useProductForm()
 const categories = useProductCategories()

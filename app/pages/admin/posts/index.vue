@@ -1,8 +1,8 @@
 <template>
   <div>
     <!-- Page Header -->
-    <div class="mb-6 flex items-start justify-between gap-4">
-      <div>
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div class="min-w-0">
         <div class="flex items-center gap-2 text-sm text-gray-400 mb-2">
           <NuxtLink to="/admin" class="hover:text-gray-600 transition-colors">Dashboard</NuxtLink>
           <span>/</span>
@@ -14,7 +14,7 @@
       <NuxtLink
         data-guide="add-post-btn"
         to="/admin/posts/new"
-        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shrink-0"
+        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shrink-0 self-start sm:self-auto"
       >
         <Icon name="heroicons:plus" class="w-4 h-4" />
         New Post
@@ -22,7 +22,7 @@
     </div>
 
     <!-- Filters -->
-    <div data-guide="post-filters" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
+    <div data-guide="post-filters" class="mb-6">
       <div class="flex flex-col sm:flex-row gap-3">
         <div class="flex-1 flex items-center rounded-lg border border-gray-200 overflow-hidden focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-500/20 bg-white">
           <span class="pl-3 text-gray-400 shrink-0">
@@ -74,16 +74,16 @@
     </div>
 
     <!-- Table -->
-    <div v-else data-guide="post-table" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div v-else data-guide="post-table" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full">
           <thead>
             <tr class="border-b border-gray-100">
-              <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Post</th>
-              <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Category</th>
-              <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Status</th>
-              <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">Published</th>
-              <th class="px-6 py-3.5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
+              <th class="px-3 sm:px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Post</th>
+              <th class="px-3 sm:px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Category</th>
+              <th class="px-3 sm:px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Status</th>
+              <th class="px-3 sm:px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Published</th>
+              <th class="px-3 sm:px-6 py-3.5 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider sticky right-0 bg-white shadow-[-12px_0_16px_-12px_rgba(0,0,0,0.15)]">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-50">
@@ -92,17 +92,18 @@
               :key="post.id"
               class="hover:bg-gray-50/60 transition-colors"
             >
-              <td class="px-6 py-4">
+              <td class="px-3 sm:px-6 py-4">
                 <div class="flex items-center gap-3 min-w-0">
-                  <div class="w-12 h-12 rounded-lg bg-gray-100 shrink-0 overflow-hidden">
+                  <div class="h-10 w-10 rounded-lg bg-gray-100 shrink-0 overflow-hidden border border-gray-100">
                     <img v-if="post.cover_image_url" :src="post.cover_image_url" :alt="post.title" class="w-full h-full object-cover" loading="lazy" decoding="async" />
                     <div v-else class="w-full h-full flex items-center justify-center">
-                      <Icon name="heroicons:photo" class="w-5 h-5 text-gray-300" />
+                      <Icon name="heroicons:photo" class="w-4 h-4 text-gray-400" />
                     </div>
                   </div>
                   <div class="min-w-0">
                     <p class="text-sm font-semibold text-gray-900 truncate">{{ post.title }}</p>
-                    <p class="text-xs text-gray-400 truncate font-mono">/{{ post.slug }}</p>
+                    <p class="hidden sm:block text-xs text-gray-400 truncate font-mono">/{{ post.slug }}</p>
+                    <p class="sm:hidden text-xs text-gray-500 truncate">{{ post.excerpt }}</p>
                   </div>
                   <Icon
                     v-if="post.is_featured"
@@ -113,18 +114,18 @@
                 </div>
               </td>
 
-              <td class="px-6 py-4 hidden md:table-cell">
+              <td class="px-3 sm:px-6 py-4 hidden md:table-cell w-48">
                 <span
                   v-if="post.category"
-                  class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium text-white"
+                  class="block max-w-48 truncate whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium text-white"
                   :style="{ background: `linear-gradient(135deg, ${post.category.gradient_from}, ${post.category.gradient_to})` }"
                 >
                   {{ post.category.name }}
                 </span>
-                <span v-else class="text-xs text-gray-400">—</span>
+                <span v-else class="text-xs font-medium text-amber-700">Uncategorised</span>
               </td>
 
-              <td class="px-6 py-4 hidden sm:table-cell">
+              <td class="px-3 sm:px-6 py-4 hidden sm:table-cell">
                 <span
                   class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
                   :class="post.is_published ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'"
@@ -134,11 +135,11 @@
                 </span>
               </td>
 
-              <td class="px-6 py-4 hidden lg:table-cell whitespace-nowrap text-sm text-gray-500">
+              <td class="px-3 sm:px-6 py-4 hidden lg:table-cell whitespace-nowrap text-sm text-gray-500">
                 {{ post.published_at ? formatPostDate(post.published_at) : '—' }}
               </td>
 
-              <td class="px-6 py-4 whitespace-nowrap text-right">
+              <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-right sticky right-0 bg-white shadow-[-12px_0_16px_-12px_rgba(0,0,0,0.15)]">
                 <div class="inline-flex items-center gap-1">
                   <NuxtLink
                     :to="`/admin/posts/${post.id}`"
@@ -227,7 +228,7 @@ const categoryFilterOptions = computed(() => [
 const currentPage = ref(1)
 const totalPages = ref(1)
 const totalItems = ref(0)
-const perPage = 15
+const perPage = 10
 
 const deleteTarget = ref<Post | null>(null)
 const deleting = ref(false)

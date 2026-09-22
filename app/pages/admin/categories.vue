@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="max-w-3xl mx-auto px-2 sm:px-6 lg:px-8 py-8">
     <!-- Page Header -->
     <AdminPageHeader title="Categories" subtitle="Manage product categories and subcategories at any depth" />
 
@@ -15,7 +15,7 @@
     <!-- Main content -->
     <div v-else class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
       <!-- Header -->
-      <div class="px-6 py-4 border-b border-gray-200/70">
+      <div class="px-4 sm:px-6 py-4 border-b border-gray-200/70">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
@@ -62,7 +62,7 @@
         </div>
       </div>
 
-      <div data-guide="category-tree" class="p-5 space-y-3">
+      <div data-guide="category-tree" class="p-3 sm:p-5 space-y-3">
         <!-- Add root category -->
         <form data-guide="add-category" @submit.prevent="addCategory(null)" class="flex gap-2 items-center">
           <div class="relative flex-1">

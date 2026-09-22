@@ -13,7 +13,7 @@
 
     <!-- Filters -->
     <section data-guide="tax-report" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm mb-6">
-      <div class="px-6 py-4 flex flex-wrap items-end gap-4">
+      <div class="px-4 sm:px-6 py-4 grid grid-cols-2 sm:flex sm:flex-wrap sm:items-end gap-3 sm:gap-4">
         <div>
           <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">From</label>
           <AdminDatePicker
@@ -21,7 +21,7 @@
             aria-label="Report start date"
             placeholder="Start date"
             :max="filters.date_to"
-            class="w-52"
+            class="w-full sm:w-52"
           />
         </div>
         <div>
@@ -31,23 +31,23 @@
             aria-label="Report end date"
             placeholder="End date"
             :min="filters.date_from"
-            class="w-52"
+            class="w-full sm:w-52"
           />
         </div>
-        <div>
+        <div class="col-span-2">
           <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Status</label>
           <AdminFilterSelect
             v-model="filters.status"
             :options="statusFilterOptions"
             aria-label="Filter tax report by order status"
             list-label="Tax report order status filters"
-            class="w-52"
+            class="w-full sm:w-52"
           />
         </div>
         <button
           @click="loadReport"
           :disabled="loading"
-          class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
+          class="col-span-2 inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors sm:w-auto"
         >
           <svg v-if="loading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -60,8 +60,8 @@
 
     <!-- Report Table -->
     <section class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
-      <div class="px-6 py-4 border-b border-gray-200/70 flex items-center justify-between">
-        <p class="text-sm font-semibold text-gray-900">Tax Summary by Region</p>
+      <div class="px-4 sm:px-6 py-4 border-b border-gray-200/70 flex items-center justify-between gap-3">
+        <p class="text-sm font-semibold text-gray-900 truncate">Tax Summary by Region</p>
         <div class="flex items-center gap-2">
           <button
             @click="exportCsv"
@@ -89,37 +89,37 @@
         <table class="w-full text-sm">
           <thead>
             <tr class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              <th class="text-left px-6 py-3">Region</th>
-              <th class="text-right px-6 py-3">Orders</th>
-              <th class="text-right px-6 py-3">Subtotal (Ex-Tax)</th>
-              <th class="text-right px-6 py-3">Tax Collected</th>
-              <th class="text-right px-6 py-3">Total</th>
-              <th class="text-right px-6 py-3">Rate</th>
+              <th class="text-left px-3 sm:px-6 py-3">Region</th>
+              <th class="text-right px-3 sm:px-6 py-3">Orders</th>
+              <th class="text-right px-3 sm:px-6 py-3">Subtotal (Ex-Tax)</th>
+              <th class="text-right px-3 sm:px-6 py-3">Tax Collected</th>
+              <th class="text-right px-3 sm:px-6 py-3">Total</th>
+              <th class="text-right px-3 sm:px-6 py-3">Rate</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
             <tr v-for="row in report" :key="row.region_label" class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-3.5">
+              <td class="px-3 sm:px-3 sm:px-6 py-3.5">
                 <div>
                   <p class="font-medium text-gray-900">{{ row.region_label }}</p>
                   <p v-if="row.tax_name" class="text-xs text-gray-500">{{ row.tax_name }}</p>
                 </div>
               </td>
-              <td class="px-6 py-3.5 text-right text-gray-700 font-medium">{{ row.order_count }}</td>
-              <td class="px-6 py-3.5 text-right text-gray-700">{{ format(row.subtotal) }}</td>
-              <td class="px-6 py-3.5 text-right text-gray-900 font-semibold">{{ format(row.tax_collected) }}</td>
-              <td class="px-6 py-3.5 text-right text-gray-700">{{ format(row.total) }}</td>
-              <td class="px-6 py-3.5 text-right text-gray-500">{{ row.tax_rate != null ? row.tax_rate + '%' : '-' }}</td>
+              <td class="px-3 sm:px-3 sm:px-6 py-3.5 text-right text-gray-700 font-medium">{{ row.order_count }}</td>
+              <td class="px-3 sm:px-3 sm:px-6 py-3.5 text-right text-gray-700">{{ format(row.subtotal) }}</td>
+              <td class="px-3 sm:px-3 sm:px-6 py-3.5 text-right text-gray-900 font-semibold">{{ format(row.tax_collected) }}</td>
+              <td class="px-3 sm:px-3 sm:px-6 py-3.5 text-right text-gray-700">{{ format(row.total) }}</td>
+              <td class="px-3 sm:px-3 sm:px-6 py-3.5 text-right text-gray-500">{{ row.tax_rate != null ? row.tax_rate + '%' : '-' }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr class="bg-gray-50 font-semibold text-sm">
-              <td class="px-6 py-3.5 text-gray-900">Total</td>
-              <td class="px-6 py-3.5 text-right text-gray-900">{{ totals.orders }}</td>
-              <td class="px-6 py-3.5 text-right text-gray-900">{{ format(totals.subtotal) }}</td>
-              <td class="px-6 py-3.5 text-right text-gray-900">{{ format(totals.taxCollected) }}</td>
-              <td class="px-6 py-3.5 text-right text-gray-900">{{ format(totals.total) }}</td>
-              <td class="px-6 py-3.5"></td>
+              <td class="px-3 sm:px-3 sm:px-6 py-3.5 text-gray-900">Total</td>
+              <td class="px-3 sm:px-3 sm:px-6 py-3.5 text-right text-gray-900">{{ totals.orders }}</td>
+              <td class="px-3 sm:px-3 sm:px-6 py-3.5 text-right text-gray-900">{{ format(totals.subtotal) }}</td>
+              <td class="px-3 sm:px-3 sm:px-6 py-3.5 text-right text-gray-900">{{ format(totals.taxCollected) }}</td>
+              <td class="px-3 sm:px-3 sm:px-6 py-3.5 text-right text-gray-900">{{ format(totals.total) }}</td>
+              <td class="px-3 sm:px-3 sm:px-6 py-3.5"></td>
             </tr>
           </tfoot>
         </table>

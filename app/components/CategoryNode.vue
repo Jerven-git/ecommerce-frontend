@@ -127,13 +127,13 @@
           </template>
 
           <!-- Display mode -->
-          <div v-else class="flex min-w-0 flex-wrap items-center gap-2">
+          <div v-else class="flex min-w-0 flex-nowrap items-center gap-2">
             <span
               v-if="searchQuery && isHighlighted"
-              class="text-sm font-medium text-gray-800 truncate"
+              class="text-sm font-medium text-gray-800 truncate min-w-0"
               v-html="highlightMatch(category.name)"
             ></span>
-            <span v-else class="text-sm font-medium text-gray-800 truncate">{{ category.name }}</span>
+            <span v-else class="text-sm font-medium text-gray-800 truncate min-w-0">{{ category.name }}</span>
             <span v-if="category.children?.length" class="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full shrink-0">{{ category.children.length }}</span>
           </div>
         </div>

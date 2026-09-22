@@ -29,7 +29,7 @@
       <section data-guide="payment-methods" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
         <div class="divide-y divide-gray-100">
           <!-- Stripe -->
-          <div class="px-6 py-5">
+          <div class="px-4 sm:px-6 py-4 sm:py-5">
             <div class="flex items-center justify-between gap-4">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background-color:#635BFF">
@@ -45,7 +45,7 @@
               </button>
             </div>
             <Transition v-bind="expandTransition">
-              <div v-if="form.stripe_enabled" class="mt-4 ml-[52px] space-y-4">
+              <div v-if="form.stripe_enabled" class="mt-4 ml-0 sm:ml-[52px] space-y-4">
                 <div>
                   <label class="payment-label">Publishable key</label>
                   <input v-model="form.stripe_publishable_key" type="text" class="payment-input" placeholder="pk_live_…" autocomplete="off" />
@@ -64,7 +64,7 @@
           </div>
 
           <!-- PayPal -->
-          <div class="px-6 py-5">
+          <div class="px-4 sm:px-6 py-4 sm:py-5">
             <div class="flex items-center justify-between gap-4">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background-color:#003087">
@@ -80,7 +80,7 @@
               </button>
             </div>
             <Transition v-bind="expandTransition">
-              <div v-if="form.paypal_enabled" class="mt-4 ml-[52px] space-y-4">
+              <div v-if="form.paypal_enabled" class="mt-4 ml-0 sm:ml-[52px] space-y-4">
                 <div>
                   <label class="payment-label">Mode</label>
                   <select v-model="form.paypal_mode" class="payment-input">
@@ -106,7 +106,7 @@
           </div>
 
           <!-- Square -->
-          <div class="px-6 py-5">
+          <div class="px-4 sm:px-6 py-4 sm:py-5">
             <div class="flex items-center justify-between gap-4">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center shrink-0">
@@ -122,7 +122,7 @@
               </button>
             </div>
             <Transition v-bind="expandTransition">
-              <div v-if="form.square_enabled" class="mt-4 ml-[52px] space-y-4">
+              <div v-if="form.square_enabled" class="mt-4 ml-0 sm:ml-[52px] space-y-4">
                 <div>
                   <label class="payment-label">Mode</label>
                   <select v-model="form.square_mode" class="payment-input">
@@ -155,7 +155,7 @@
 
       <!-- Security Notice -->
       <div data-guide="payment-security" class="bg-white rounded-2xl border border-amber-100 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 flex items-start gap-3">
+        <div class="px-4 sm:px-6 py-4 flex items-start gap-3">
           <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0 mt-0.5">
             <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />

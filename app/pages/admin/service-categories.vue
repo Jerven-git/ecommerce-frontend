@@ -22,6 +22,33 @@
       </template>
     </AdminPageHeader>
 
+    <!-- Search -->
+    <div class="mb-6">
+      <div class="flex items-center rounded-lg border border-gray-200 overflow-hidden focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-500/20 bg-white">
+        <span class="pl-3 text-gray-400 shrink-0">
+          <Icon name="heroicons:magnifying-glass" class="w-4 h-4" />
+        </span>
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search by name or slug…"
+          class="flex-1 py-2 pr-3 pl-2 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none"
+        />
+        <button
+          v-if="searchQuery"
+          type="button"
+          @click="searchQuery = ''"
+          class="pr-3 text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+          aria-label="Clear search"
+        >
+          <Icon name="heroicons:x-mark" class="w-4 h-4" />
+        </button>
+      </div>
+      <p v-if="searchQuery && !loading" class="text-xs text-gray-500 mt-2">
+        Showing results for "{{ searchQuery }}"
+      </p>
+    </div>
+
     <!-- Loading -->
     <AdminSpinner v-if="loading" label="Loading service categories…" />
 
@@ -32,7 +59,7 @@
     </div>
 
     <!-- Empty state -->
-    <AdminCard v-else-if="!categories.length">
+    <AdminCard v-else-if="!categories.length && !searchQuery">
       <AdminEmptyState
         title="No service categories yet"
         description="Create your first category to organize services"
@@ -49,16 +76,34 @@
       </AdminEmptyState>
     </AdminCard>
 
+    <!-- No search results -->
+    <AdminCard v-else-if="!categories.length">
+      <AdminEmptyState
+        title="No matching categories"
+        :description="`Nothing found for &quot;${searchQuery}&quot;`"
+        :icon="'M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z'"
+      >
+        <template #action>
+          <button
+            @click="searchQuery = ''"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          >
+            Clear search
+          </button>
+        </template>
+      </AdminEmptyState>
+    </AdminCard>
+
     <!-- List -->
     <div v-else data-guide="service-category-list" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm divide-y divide-gray-100">
       <div
         v-for="cat in categories"
         :key="cat.id"
-        class="flex items-center gap-4 p-4 hover:bg-gray-50/50 transition-colors"
+        class="flex items-center gap-3 sm:gap-4 p-4 hover:bg-gray-50/50 transition-colors"
       >
         <!-- Gradient preview -->
         <div
-          class="w-16 h-16 rounded-xl shadow-sm flex items-center justify-center shrink-0"
+          class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl shadow-sm flex items-center justify-center shrink-0"
           :style="{ background: `linear-gradient(135deg, ${cat.gradient_from}, ${cat.gradient_to})` }"
         >
           <span class="text-[10px] font-bold text-white/90 uppercase tracking-wider">{{ cat.name.slice(0, 2) }}</span>
@@ -66,30 +111,40 @@
 
         <div class="flex-1 min-w-0">
           <p class="text-sm font-semibold text-gray-900 truncate">{{ cat.name }}</p>
-          <p class="text-xs text-gray-500 font-mono">{{ cat.slug }}</p>
-          <p class="text-xs text-gray-500 mt-0.5">
+          <p class="text-xs text-gray-500 font-mono truncate">{{ cat.slug }}</p>
+          <p class="text-xs text-gray-500 mt-0.5 truncate">
             {{ cat.services_count ?? 0 }} published {{ (cat.services_count ?? 0) === 1 ? 'service' : 'services' }}
           </p>
         </div>
 
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-1 sm:gap-2 shrink-0">
           <button
             type="button"
             @click="startEdit(cat)"
-            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+            class="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors"
           >
             <Icon name="heroicons:pencil-square" class="w-3.5 h-3.5" />
-            Edit
+            <span class="hidden sm:inline">Edit</span>
           </button>
           <button
             type="button"
             @click="deleteTarget = cat"
-            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-red-500 hover:bg-red-50 transition-colors"
+            class="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium text-red-500 hover:bg-red-50 transition-colors"
           >
             <Icon name="heroicons:trash" class="w-3.5 h-3.5" />
-            Delete
+            <span class="hidden sm:inline">Delete</span>
           </button>
         </div>
+      </div>
+      <div v-if="totalPages > 1" class="flex justify-end border-t border-gray-100 px-4 py-2">
+        <AdminPagination
+          :current-page="currentPage"
+          :total-pages="totalPages"
+          :total-items="totalItems"
+          :per-page="perPage"
+          item-label="categories"
+          @go-to-page="goToPage"
+        />
       </div>
     </div>
 
@@ -265,7 +320,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ServiceCategory } from '~/types/service'
+import type { PaginatedServiceCategories, ServiceCategory } from '~/types/service'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -275,6 +330,12 @@ const { showToast } = useAdminToast()
 const categories = ref<ServiceCategory[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
+
+const searchQuery = ref('')
+const currentPage = ref(1)
+const totalPages = ref(1)
+const totalItems = ref(0)
+const perPage = 10
 
 const showModal = ref(false)
 const editing = ref<ServiceCategory | null>(null)
@@ -302,13 +363,28 @@ async function load() {
   loading.value = true
   error.value = null
   try {
-    const res = await $apiFetch<{ data: ServiceCategory[] }>('/service-categories')
+    const query: Record<string, string | number> = {
+      page: currentPage.value,
+      per_page: perPage,
+    }
+    if (searchQuery.value.trim()) query.search = searchQuery.value.trim()
+
+    const res = await $apiFetch<PaginatedServiceCategories>('/service-categories', { query })
     categories.value = res.data ?? []
+    currentPage.value = res.current_page ?? 1
+    totalPages.value = res.last_page ?? 1
+    totalItems.value = res.total ?? 0
   } catch (err: any) {
     error.value = err?.data?.message || 'Failed to load categories'
   } finally {
     loading.value = false
   }
+}
+
+function goToPage(page: number) {
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+  load()
 }
 
 function resetForm() {
@@ -405,7 +481,10 @@ async function save() {
     }
 
     showToast(editing.value ? 'Category updated' : 'Category created', 'success')
+    const wasEditing = !!editing.value
     closeModal()
+    // New categories sort by name — jump to page 1 so the created row is visible
+    if (!wasEditing) currentPage.value = 1
     await load()
   } catch (err: any) {
     showToast(err?.data?.message || 'Failed to save category', 'error')
@@ -421,6 +500,8 @@ async function executeDelete() {
     await $apiFetch(`/service-categories/${deleteTarget.value.id}`, { method: 'DELETE' })
     showToast('Category deleted', 'success')
     deleteTarget.value = null
+    // Step back if the last item on the page was removed
+    if (categories.value.length <= 1 && currentPage.value > 1) currentPage.value -= 1
     await load()
   } catch (err: any) {
     showToast(err?.data?.message || 'Failed to delete category', 'error')
@@ -428,6 +509,15 @@ async function executeDelete() {
     deleting.value = false
   }
 }
+
+let searchTimer: ReturnType<typeof setTimeout>
+watch(searchQuery, () => {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    currentPage.value = 1
+    load()
+  }, 400)
+})
 
 onMounted(load)
 onBeforeUnmount(() => {

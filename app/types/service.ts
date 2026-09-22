@@ -61,3 +61,11 @@ export interface PaginatedServices {
   per_page: number
   total: number
 }
+
+export interface PaginatedServiceCategories {
+  data: ServiceCategory[]
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
+}

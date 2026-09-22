@@ -194,8 +194,29 @@
           </div>
         </div>
 
+        <!-- Collapsed summary — click to expand full details -->
+        <button
+          type="button"
+          @click="toggleExpanded(order.id)"
+          class="w-full px-6 py-3 flex items-center gap-2 text-left hover:bg-gray-50/60 transition-colors"
+          :aria-expanded="isExpanded(order.id)"
+          :aria-label="isExpanded(order.id) ? `Hide details for order ${order.id}` : `Show details for order ${order.id}`"
+        >
+          <span class="text-sm font-medium text-gray-900 truncate">{{ order.customer_name }}</span>
+          <span class="text-xs text-gray-400 shrink-0">&middot;</span>
+          <span class="text-xs text-gray-500 shrink-0">{{ itemCount(order) }} {{ itemCount(order) === 1 ? 'item' : 'items' }}</span>
+          <span class="ml-auto text-sm font-bold text-gray-900 shrink-0">{{ formatIn(parseFloat(String(order.total_amount)), order.currency) }}</span>
+          <svg
+            class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
+            :class="{ 'rotate-180': isExpanded(order.id) }"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
         <!-- Customer + Shipping grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+        <div v-if="isExpanded(order.id)" class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-100 border-t border-gray-100">
           <div class="px-6 py-4">
             <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2.5">Customer</p>
             <div class="space-y-1">
@@ -212,7 +233,7 @@
         </div>
 
         <!-- Shipment / Tracking -->
-        <div class="px-6 py-4 border-t border-gray-100">
+        <div v-if="isExpanded(order.id)" class="px-6 py-4 border-t border-gray-100">
           <!-- No shipment yet — show Ship button -->
           <div v-if="!order.shipment" class="flex items-center justify-between">
             <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tracking</p>
@@ -288,7 +309,7 @@
         </div>
 
         <!-- Order items -->
-        <div class="px-6 py-4 border-t border-gray-100">
+        <div v-if="isExpanded(order.id)" class="px-6 py-4 border-t border-gray-100">
           <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Items</p>
 
           <div v-if="order.items && order.items.length > 0" class="space-y-2">
@@ -313,7 +334,7 @@
         </div>
 
         <!-- Card footer: breakdown -->
-        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 space-y-1.5">
+        <div v-if="isExpanded(order.id)" class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 space-y-1.5">
           <div class="flex items-center justify-between">
             <span class="text-xs text-gray-500">Subtotal</span>
             <span class="text-sm text-gray-600">{{ formatIn(parseFloat(String(order.subtotal)), order.currency) }}</span>
@@ -485,7 +506,17 @@ const statusCounts = ref<Record<string, number>>({})
 const currentPage = ref(1)
 const totalPages = ref(1)
 const totalItems = ref(0)
-const perPage = 15
+const perPage = 10
+
+// Expanded order details (collapsed by default)
+const expandedOrders = ref<number[]>([])
+const isExpanded = (orderId: number) => expandedOrders.value.includes(orderId)
+const toggleExpanded = (orderId: number) => {
+  expandedOrders.value = isExpanded(orderId)
+    ? expandedOrders.value.filter(id => id !== orderId)
+    : [...expandedOrders.value, orderId]
+}
+const itemCount = (order: Order) => (order.items ?? []).reduce((sum, item) => sum + item.quantity, 0)
 
 const visiblePages = computed(() => {
   const total = totalPages.value

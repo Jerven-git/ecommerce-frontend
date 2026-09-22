@@ -48,7 +48,7 @@ export function useProducts() {
   const currentPage = ref(1)
   const totalPages = ref(1)
   const totalItems = ref(0)
-  const perPage = 15
+  const perPage = 10
 
   const showDeleteModal = ref(false)
   const deletingId = ref<number | null>(null)

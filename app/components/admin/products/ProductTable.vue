@@ -10,7 +10,7 @@
             <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Weight / Dims</th>
             <th class="w-48 px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
             <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+            <th class="px-6 py-3.5 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider sticky right-0 bg-white shadow-[-12px_0_16px_-12px_rgba(0,0,0,0.15)]">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-50">
@@ -95,7 +95,7 @@
                 {{ product.is_active ? 'Active' : 'Inactive' }}
               </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right">
+            <td class="px-6 py-4 whitespace-nowrap text-right sticky right-0 bg-white shadow-[-12px_0_16px_-12px_rgba(0,0,0,0.15)]">
               <div class="inline-flex items-center gap-1">
                 <button
                   @click="$emit('edit', product)"

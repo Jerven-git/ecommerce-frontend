@@ -238,7 +238,7 @@ onMounted(() => {
   })
 
   if (!authStore.twoFactorRequired) {
-    navigateTo('/admin/login')
+    navigateTo(authStore.isAdmin ? '/admin' : '/admin/login')
   }
 })
 
