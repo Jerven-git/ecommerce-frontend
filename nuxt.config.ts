@@ -17,6 +17,14 @@ export default defineNuxtConfig({
       ssr: false,
       headers: { 'x-robots-tag': 'noindex, nofollow, noarchive' },
     },
+    '/register': {
+      ssr: false,
+      headers: { 'x-robots-tag': 'noindex, nofollow, noarchive' },
+    },
+    '/subscribe': {
+      ssr: false,
+      headers: { 'x-robots-tag': 'noindex, nofollow, noarchive' },
+    },
     '/cart': {
       ssr: false,
       headers: { 'x-robots-tag': 'noindex, nofollow, noarchive' },

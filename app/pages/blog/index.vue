@@ -58,9 +58,9 @@
 
     <!-- Read by category -->
     <section v-if="categories.length" class="bg-white border-b border-gray-100">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="max-w-[84rem] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h2 class="display-2 font-bold text-gray-900 mb-6">Browse by category</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div
             v-for="(cat, idx) in categories"
             :key="cat.id"
@@ -79,11 +79,11 @@
 
     <!-- Featured -->
     <section v-if="featuredPosts.length && !selectedCategory && !searchQuery" class="bg-white border-b border-gray-100">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="max-w-[84rem] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="flex items-end justify-between gap-4 border-b border-gray-200 pb-5 mb-8">
           <h2 class="display-2 font-bold text-gray-900">Featured</h2>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10">
           <PostCard v-for="post in featuredPosts" :key="post.id" :post="post" />
         </div>
       </div>
@@ -91,7 +91,7 @@
 
     <!-- Recent posts -->
     <section class="flex-1">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="max-w-[84rem] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
           <h2 class="display-2 font-bold text-gray-900">
             {{ selectedCategory ? `Posts in ${currentCategoryName}` : 'Latest from the blog' }}
@@ -124,7 +124,7 @@
         </div>
 
         <!-- Loading skeleton -->
-        <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-if="loading" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <div v-for="i in 6" :key="i" class="animate-pulse">
             <div class="aspect-[16/9] rounded-2xl bg-gray-200 mb-3" />
             <div class="h-3 bg-gray-200 rounded w-1/3 mb-2" />
@@ -150,7 +150,7 @@
         </div>
 
         <!-- Grid -->
-        <div v-else :key="`grid-${animationKey}`" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-else :key="`grid-${animationKey}`" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <template v-for="(post, idx) in posts" :key="post.id">
             <div
               :ref="el => observeCard(el as Element | null)"

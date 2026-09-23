@@ -9,10 +9,16 @@
  *
  * Admin and super-admin routes are host-agnostic (login must work from any
  * host), so they are never redirected — this also prevents a redirect loop
- * since the login itself lives under /admin.
+ * since the login itself lives under /admin. The public /register and
+ * /subscribe self-onboarding pages are host-agnostic for the same reason.
  */
 export default defineNuxtRouteMiddleware(async (to) => {
-  if (to.path.startsWith('/admin') || to.path.startsWith('/super-admin')) {
+  if (
+    to.path.startsWith('/admin') ||
+    to.path.startsWith('/super-admin') ||
+    to.path === '/register' ||
+    to.path.startsWith('/subscribe')
+  ) {
     return
   }
 

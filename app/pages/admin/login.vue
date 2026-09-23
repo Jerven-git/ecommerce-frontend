@@ -214,6 +214,10 @@
               </svg>
               <span>{{ loading ? 'Signing in...' : 'Sign In' }}</span>
             </button>
+            <p class="mt-4 text-center text-sm text-white/40">
+              No store yet?
+              <NuxtLink to="/register" class="text-white/70 hover:text-primary-600 transition-colors">Create one</NuxtLink>
+            </p>
           </div>
         </form>
       </div>

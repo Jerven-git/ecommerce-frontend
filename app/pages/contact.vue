@@ -180,7 +180,7 @@
                   </p>
                   <button
                     type="submit"
-                    class="btn-primary inline-flex min-h-11 shrink-0 items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
+                    class="btn-primary inline-flex min-h-11 shrink-0 text-white items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
                     :disabled="submitting"
                   >
                     <svg v-if="submitting" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">

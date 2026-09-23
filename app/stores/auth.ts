@@ -57,6 +57,14 @@ interface RegisterData {
   email: string
   password: string
   password_confirmation: string
+  store_name: string
+  store_slug?: string
+}
+
+interface RegisterResponse {
+  message: string
+  data: User
+  redirect: string
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -194,14 +202,13 @@ export const useAuthStore = defineStore('auth', {
           credentials: 'include'
         })
 
-        // Register user
-        const response = await $apiFetch<LoginResponse>('/register', {
+        // Register user. No auto-login — the platform's mandatory 2FA login is
+        // a separate flow, and a brand-new store is subscription-gated until
+        // checkout is completed.
+        const response = await $apiFetch<RegisterResponse>('/register', {
           method: 'POST',
           body: data
         })
-
-        this.user = response.user ?? null
-        this.isAuthenticated = !!response.user
 
         return response
       } catch (error: any) {

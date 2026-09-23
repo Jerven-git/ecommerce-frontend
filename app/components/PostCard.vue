@@ -1,7 +1,7 @@
 <template>
-  <NuxtLink :to="`/blog/${post.slug}`" class="group flex flex-col">
+  <NuxtLink :to="`/blog/${post.slug}`" class="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-900/[0.08] bg-white shadow-sm transition-shadow duration-300 hover:shadow-md">
     <!-- Cover image -->
-    <div class="relative aspect-[16/9] overflow-hidden rounded-xl bg-gray-100">
+    <div class="relative aspect-[16/10] overflow-hidden bg-gray-100">
       <SmoothImage
         v-if="post.cover_image_url"
         :src="post.cover_image_url"
@@ -23,16 +23,16 @@
     </div>
 
     <!-- Body -->
-    <div class="flex flex-1 flex-col pt-4">
-      <p class="mb-2 text-xs text-gray-500">
+    <div class="flex flex-1 flex-col p-4 sm:p-5">
+      <p class="mb-1.5 text-[11px] sm:text-xs text-gray-500">
         <span v-if="post.category">{{ post.category.name }}</span>
         <span v-if="post.category && post.published_at" class="mx-1.5 text-gray-300">·</span>
         <span v-if="post.published_at">{{ formatPostDate(post.published_at) }}</span>
       </p>
-      <h3 class="text-lg font-semibold leading-snug tracking-tight text-gray-900 line-clamp-2 transition-colors group-hover:text-primary-600">
+      <h3 class="text-[15px] sm:text-lg font-semibold leading-snug tracking-tight text-gray-900 line-clamp-2 transition-colors group-hover:text-primary-600">
         {{ post.title }}
       </h3>
-      <p v-if="post.excerpt" class="mt-2 text-sm leading-relaxed text-gray-600 line-clamp-2">
+      <p v-if="post.excerpt" class="mt-1.5 sm:mt-2 text-[13px] sm:text-sm leading-relaxed text-gray-600 line-clamp-2">
         {{ post.excerpt }}
       </p>
     </div>

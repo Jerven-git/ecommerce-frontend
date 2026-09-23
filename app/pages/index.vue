@@ -3,7 +3,7 @@
     <!-- ─────────────────────────  HERO  ───────────────────────── -->
     <section
       class="hero relative isolate flex overflow-hidden"
-      :class="isFullBleed ? 'min-h-screen' : 'min-h-[calc(100vh-4rem)]'"
+      :class="isFullBleed ? 'min-h-[92svh] lg:min-h-screen' : 'min-h-[92svh] lg:min-h-[calc(100vh-4rem)]'"
       :style="heroStyle"
       :aria-label="heroAltText || undefined"
     >
@@ -54,15 +54,15 @@
       <div class="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-transparent" aria-hidden="true" />
 
       <!-- Copy, anchored lower-left -->
-      <div class="relative z-10 mx-auto flex w-full max-w-7xl flex-col justify-end px-6 pb-20 pt-32 lg:px-8 lg:pb-28">
+      <div class="relative z-10 mx-auto flex w-full max-w-7xl flex-col justify-end px-6 pb-16 pt-28 lg:px-8 lg:pb-28">
         <div class="max-w-2xl">
           <h1 class="hero-stagger display-1 font-bold text-white text-balance drop-shadow-sm" style="animation-delay: 0.15s">
             {{ heroTitle }}
           </h1>
-          <p class="hero-stagger mt-6 max-w-xl text-lg leading-relaxed text-white/85 md:text-xl" style="animation-delay: 0.35s">
+          <p class="hero-stagger mt-4 max-w-xl text-base leading-relaxed text-white/85 md:mt-6 md:text-xl" style="animation-delay: 0.35s">
             {{ heroSubtitle }}
           </p>
-          <div class="hero-stagger mt-10 flex flex-wrap items-center gap-4" style="animation-delay: 0.55s">
+          <div class="hero-stagger mt-8 flex flex-wrap items-center gap-3 md:mt-10 md:gap-4" style="animation-delay: 0.55s">
             <NuxtLink to="/shop" class="hero-cta-primary">
               Shop Now
               <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -91,7 +91,7 @@
     </section>
 
     <!-- ────────────────────  FEATURED PRODUCTS  ──────────────────── -->
-    <section id="featured" class="bg-white py-24 lg:py-32">
+    <section id="featured" class="bg-white py-16 lg:py-32">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div ref="featuredHeadingRef" class="reveal flex items-end justify-between gap-6 border-b border-gray-200 pb-6">
           <div>
@@ -107,7 +107,7 @@
         </div>
 
         <!-- Skeleton -->
-        <div v-if="loading" class="mt-12 grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
+        <div v-if="loading" class="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 lg:mt-12 lg:gap-x-6 lg:gap-y-10">
           <div v-for="i in 8" :key="i" class="animate-pulse">
             <div class="aspect-[4/5] rounded-xl bg-gray-100"></div>
             <div class="mx-auto mt-3.5 h-3.5 w-2/3 rounded bg-gray-100"></div>
@@ -133,7 +133,7 @@
         </div>
 
         <!-- Products: row 1 slides from right, row 2 slides from left -->
-        <div v-else class="mt-12 grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
+        <div v-else class="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 lg:mt-12 lg:gap-x-6 lg:gap-y-10 lg:grid-cols-4">
           <div
             v-for="(product, index) in products"
             :key="product.id"
@@ -166,7 +166,7 @@
     <HomepageBestSellers />
 
     <!-- ────────────────────────  HOW IT WORKS  ──────────────────────── -->
-    <section class="section-accent py-24">
+    <section class="section-accent py-16 lg:py-24">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div ref="howItWorksHeadingRef" class="reveal max-w-2xl">
           <p v-if="stepsLabel" class="mb-3 text-sm font-medium" :style="{ color: 'var(--color-primary-700)' }">{{ stepsLabel }}</p>
@@ -174,7 +174,7 @@
           <p class="mt-4 text-lg text-gray-600">{{ stepsSubtitle }}</p>
         </div>
 
-        <ol class="mt-16 grid gap-x-10 gap-y-12 md:grid-cols-3">
+        <ol class="mt-10 grid gap-x-10 gap-y-10 md:mt-16 md:gap-y-12 md:grid-cols-3">
           <li
             v-for="(step, i) in steps"
             :key="i"
@@ -194,7 +194,7 @@
         </ol>
 
         <div :ref="addRevealRef" class="reveal mt-14" style="transition-delay: 0.5s">
-          <NuxtLink to="/shop" class="btn-primary inline-flex items-center gap-2">
+          <NuxtLink to="/shop" class="btn-primary inline-flex text-white items-center gap-2">
             Start Shopping
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -205,7 +205,7 @@
     </section>
 
     <!-- ──────────────────────  FEATURE STRIP  ────────────────────── -->
-    <section class="border-t border-gray-100 bg-white py-16">
+    <section class="border-t border-gray-100 bg-white py-12 lg:py-16">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div class="grid gap-y-10 md:grid-cols-3 md:gap-y-0">
           <div
@@ -225,7 +225,7 @@
     </section>
 
     <!-- ──────────────────────  BY THE NUMBERS  ────────────────────── -->
-    <section class="section-accent py-20">
+    <section class="section-accent py-14 lg:py-20">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div class="grid grid-cols-2 gap-y-10 md:grid-cols-4">
           <div
@@ -236,7 +236,7 @@
             :class="i > 0 ? 'md:border-l md:border-gray-300' : ''"
             :style="{ transitionDelay: `${i * 0.1}s` }"
           >
-            <div class="text-4xl font-bold tabular-nums text-gray-900 md:text-5xl" :style="{ fontFamily: 'var(--font-heading)' }">{{ stat.value }}</div>
+            <div class="text-3xl font-bold tabular-nums text-gray-900 md:text-5xl" :style="{ fontFamily: 'var(--font-heading)' }">{{ stat.value }}</div>
             <div class="mt-2 text-sm text-gray-600">{{ stat.label }}</div>
           </div>
         </div>
@@ -244,7 +244,7 @@
     </section>
 
     <!-- ────────────────────  STATEMENT (editorial)  ──────────────────── -->
-    <section v-if="showStatement" class="border-t border-gray-100 bg-white py-24 lg:py-28">
+    <section v-if="showStatement" class="border-t border-gray-100 bg-white py-16 lg:py-28">
       <div class="mx-auto max-w-6xl px-6 lg:px-8">
         <div class="grid items-center gap-10 lg:gap-16" :class="statement?.image_url ? 'md:grid-cols-2' : 'md:grid-cols-1'">
           <!-- Image -->
@@ -276,7 +276,7 @@
     </section>
 
     <!-- ──────────────────────  NEWSLETTER  ────────────────────── -->
-    <section class="relative overflow-hidden bg-secondary-900 py-24 text-white">
+    <section class="relative overflow-hidden bg-secondary-900 py-16 lg:py-24 text-white">
       <div
         class="pointer-events-none absolute inset-0 opacity-[0.06]"
         style="background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0); background-size: 22px 22px;"
@@ -300,7 +300,7 @@
               />
               <button
                 type="submit"
-                class="btn-primary shrink-0 disabled:opacity-50"
+                class="btn-primary text-white shrink-0 disabled:opacity-50"
                 :disabled="newsletterSubmitting || !newsletterEmail"
               >
                 {{ newsletterSubmitting ? 'Subscribing…' : 'Subscribe' }}

@@ -6,8 +6,8 @@
       isTransparent
         ? 'bg-transparent border-b border-transparent'
         : isScrolled
-          ? 'bg-white/90 backdrop-blur-md border-b border-gray-200/70 shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)]'
-          : 'bg-white/75 backdrop-blur-md border-b border-gray-100'
+          ? 'bg-white/85 backdrop-blur-xl border-b border-gray-900/10 shadow-[0_12px_32px_-24px_rgba(15,23,42,0.45)]'
+          : 'bg-white/70 backdrop-blur-xl border-b border-gray-900/[0.06]'
     ]"
   >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -129,15 +129,16 @@
         </nav>
 
         <!-- Right actions -->
-        <div class="flex items-center gap-1.5 justify-self-end">
+        <div class="flex items-center gap-2 justify-self-end col-start-3 -mr-2 md:mr-0">
 
           <!-- Admin pill (desktop) -->
           <NuxtLink
             v-if="authStore.isAdmin"
             to="/admin"
-            class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-            :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'"
+            class="hidden lg:inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold tracking-tight transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+            :class="isTransparent ? 'border-white/25 text-white/85 hover:text-white hover:bg-white/10' : 'border-primary-600/25 bg-primary-600/[0.06] text-primary-700 hover:bg-primary-600/[0.12]'"
           >
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -145,20 +146,25 @@
             Admin
           </NuxtLink>
 
+          <!-- Shop action cluster -->
+          <div
+            class="flex items-center gap-0.5 rounded-full border p-1 transition-colors"
+            :class="isTransparent ? 'border-white/20 bg-white/10' : 'border-gray-900/10 bg-white/70 shadow-sm'"
+          >
           <!-- Favorites (hidden when the favorites feature is off site-wide) -->
           <NuxtLink
             v-if="favoritesEnabled"
             to="/favorites"
-            class="relative p-2 rounded-lg transition-colors"
+            class="relative p-2 rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
             :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
             aria-label="Favorites"
           >
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
             <span
               v-if="favoritesStore.count > 0"
-              class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none"
+              class="absolute top-0.5 right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none"
             >
               {{ favoritesStore.count }}
             </span>
@@ -168,38 +174,40 @@
           <NuxtLink
             v-if="isEnabled('shop')"
             to="/cart"
-            class="relative p-2 rounded-lg transition-colors"
-            :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+            class="relative p-2 rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+            :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-900 hover:bg-gray-100'"
+            aria-label="Cart"
           >
-            <img v-if="siteConfig?.cart_icon_url" :src="siteConfig.cart_icon_url" alt="Cart" class="w-5 h-5 object-contain" />
-            <svg v-else class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <img v-if="siteConfig?.cart_icon_url" :src="siteConfig.cart_icon_url" alt="Cart" class="w-[18px] h-[18px] object-contain" />
+            <svg v-else class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
             <span
               v-if="cartStore.itemCount > 0"
-              class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-primary-600 text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none"
+              class="absolute top-0.5 right-0.5 min-w-[16px] h-4 bg-primary-600 text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none"
               :style="{ color: 'var(--on-primary, #fff)' }"
             >
               {{ cartStore.itemCount }}
             </span>
           </NuxtLink>
+          </div>
 
           <!-- Header CTA (desktop) -->
           <NuxtLink
             v-if="headerCta?.enabled && headerCta.label && headerCta.link"
             :to="headerCta.link"
-            class="hidden lg:inline-flex items-center px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-colors"
+            class="hidden lg:inline-flex items-center px-4 py-2 rounded-full text-xs font-semibold tracking-tight transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
             :class="isTransparent
               ? 'bg-white text-gray-900 hover:bg-white/90'
-              : 'bg-primary-600 hover:bg-primary-700'"
+              : 'bg-primary-600 hover:bg-primary-700 shadow-[0_8px_20px_-10px_rgba(0,0,0,0.4)]'"
             :style="isTransparent ? {} : { color: 'var(--on-primary, #fff)' }"
           >{{ headerCta.label }}</NuxtLink>
 
           <!-- Mobile hamburger -->
           <button
             @click="mobileMenuOpen = true"
-            class="lg:hidden p-2 -mr-2 rounded-lg transition-colors"
-            :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+            class="lg:hidden p-2 rounded-full border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+            :class="isTransparent ? 'border-white/20 text-white/85 hover:bg-white/10' : 'border-gray-900/10 bg-white/70 text-gray-900 shadow-sm hover:bg-gray-50'"
             aria-label="Open menu"
           >
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -212,10 +220,10 @@
       <!-- Mobile drawer (right side) -->
       <Teleport to="body">
         <Transition
-          enter-active-class="transition duration-200 ease-out"
+          enter-active-class="motion-safe:transition motion-safe:duration-200 motion-safe:ease-out"
           enter-from-class="opacity-0"
           enter-to-class="opacity-100"
-          leave-active-class="transition duration-150 ease-in"
+          leave-active-class="motion-safe:transition motion-safe:duration-150 motion-safe:ease-in"
           leave-from-class="opacity-100"
           leave-to-class="opacity-0"
         >
@@ -227,10 +235,10 @@
           />
         </Transition>
         <Transition
-          enter-active-class="transition duration-250 ease-out"
+          enter-active-class="motion-safe:transition motion-safe:duration-250 motion-safe:ease-out"
           enter-from-class="translate-x-full"
           enter-to-class="translate-x-0"
-          leave-active-class="transition duration-200 ease-in"
+          leave-active-class="motion-safe:transition motion-safe:duration-200 motion-safe:ease-in"
           leave-from-class="translate-x-0"
           leave-to-class="translate-x-full"
         >
@@ -242,13 +250,16 @@
             aria-label="Menu"
           >
             <!-- Drawer header -->
-            <div class="flex items-center justify-between px-5 h-16 border-b border-gray-100 shrink-0">
-              <span class="text-base font-bold tracking-tight text-gray-900 truncate">
-                {{ siteConfig?.site_name || 'Store' }}
-              </span>
+            <div class="flex items-center justify-between pl-5 pr-3 h-16 border-b border-gray-900/[0.08] shrink-0">
+              <div class="min-w-0">
+                <p class="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-400">Menu</p>
+                <p class="text-base font-bold tracking-tight text-gray-900 truncate">
+                  {{ siteConfig?.site_name || 'Store' }}
+                </p>
+              </div>
               <button
                 type="button"
-                class="p-2 -mr-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                class="p-2 rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
                 aria-label="Close menu"
                 @click="closeMobile"
               >
@@ -306,12 +317,22 @@
                   @click="closeMobile"
                 >{{ link.label }}</NuxtLink>
               </template>
-              <NuxtLink
-                v-if="authStore.isAdmin"
-                to="/admin"
-                class="px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-                @click="closeMobile"
-              >Admin</NuxtLink>
+              <div v-if="authStore.isAdmin" class="mt-2 pt-3 border-t border-gray-900/[0.08]">
+                <NuxtLink
+                  to="/admin"
+                  class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-primary-700 bg-primary-600/[0.07] hover:bg-primary-600/[0.12] transition-colors"
+                  @click="closeMobile"
+                >
+                  <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-600/[0.12] shrink-0">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </span>
+                  <span class="min-w-0 flex-1">Admin dashboard</span>
+                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" aria-hidden="true" />
+                </NuxtLink>
+              </div>
             </nav>
           </aside>
         </Transition>

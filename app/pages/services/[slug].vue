@@ -38,7 +38,7 @@
         <!-- Legibility gradient -->
         <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" aria-hidden="true" />
 
-        <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center text-white">
+        <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-left sm:text-center text-white">
           <NuxtLink
             to="/services"
             class="inline-flex items-center gap-1.5 text-xs font-medium text-white/80 hover:text-white mb-4 transition-colors"
@@ -54,13 +54,13 @@
             {{ service.category.name }}
           </p>
 
-          <h1 class="display-1 font-bold leading-tight max-w-3xl mx-auto text-balance">
+          <h1 class="display-1 font-bold leading-tight max-w-3xl sm:mx-auto text-balance">
             {{ service.title }}
           </h1>
 
           <p
             v-if="service.description"
-            class="text-sm sm:text-base text-white/85 mt-5 max-w-2xl mx-auto leading-relaxed"
+            class="text-sm sm:text-base text-white/85 mt-5 max-w-2xl sm:mx-auto leading-relaxed"
           >
             {{ service.description }}
           </p>
@@ -97,7 +97,7 @@
               :to="`/services/${r.slug}`"
               class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
             >
-              <div class="aspect-[16/9] bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+              <div class="aspect-[4/3] sm:aspect-[16/9] bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
                 <img
                   v-if="r.cover_image_url"
                   :src="r.cover_image_url"

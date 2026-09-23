@@ -2,7 +2,7 @@
   <div class="min-h-screen flex flex-col bg-gray-50">
 
     <!-- Hero -->
-    <section class="relative isolate flex min-h-[60vh] overflow-hidden">
+    <section class="relative isolate flex min-h-[54svh] sm:min-h-[60vh] overflow-hidden">
       <!-- Media / rich theme gradient fallback -->
       <img
         v-if="heroImage"
@@ -27,7 +27,7 @@
       <!-- Legibility gradient for the lower-left copy -->
       <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" aria-hidden="true" />
 
-      <div class="relative z-10 mx-auto flex w-full max-w-6xl flex-col justify-end px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+      <div class="relative z-10 mx-auto flex w-full max-w-6xl flex-col justify-end px-4 pb-14 pt-24 sm:px-6 sm:pb-16 sm:pt-28 lg:px-8">
         <div class="max-w-2xl">
           <p
             v-if="heroLabel"
@@ -44,17 +44,17 @@
           </h1>
           <p
             v-if="heroSubtitle"
-            class="hero-stagger mt-5 max-w-lg text-lg text-white/85"
+            class="hero-stagger mt-4 max-w-lg text-base text-white/85 sm:mt-5 sm:text-lg"
             style="animation-delay: 0.4s"
           >
             {{ heroSubtitle }}
           </p>
 
-          <div v-if="primaryCta || secondaryCta" class="hero-stagger mt-8 flex flex-wrap gap-4" style="animation-delay: 0.55s">
-            <NuxtLink v-if="primaryCta" :to="primaryCta.link || '#'" class="svc-cta-primary">
+          <div v-if="primaryCta || secondaryCta" class="hero-stagger mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:gap-4" style="animation-delay: 0.55s">
+            <NuxtLink v-if="primaryCta" :to="primaryCta.link || '#'" class="svc-cta-primary justify-start self-start">
               {{ primaryCta.label }}
             </NuxtLink>
-            <NuxtLink v-if="secondaryCta" :to="secondaryCta.link || '#'" class="svc-cta-ghost">
+            <NuxtLink v-if="secondaryCta" :to="secondaryCta.link || '#'" class="svc-cta-ghost justify-start self-start">
               {{ secondaryCta.label }}
             </NuxtLink>
           </div>
@@ -64,7 +64,7 @@
 
     <!-- Summary strip -->
     <section v-if="summary.length" class="bg-white border-b border-gray-100">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10">
           <div v-for="(item, i) in summary" :key="i" class="border-t border-gray-200 pt-4">
             <p class="text-sm font-semibold text-gray-900 mb-1">{{ item.title }}</p>
@@ -89,17 +89,18 @@
       class="border-b border-gray-100"
       :class="gi % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
     >
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <h2 class="display-2 font-bold text-gray-900 mb-12 max-w-xl">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+        <h2 class="display-2 font-bold text-gray-900 max-w-xl">
           {{ group.category?.name || 'Services' }}
         </h2>
+        <div class="mt-4 mb-8 sm:mb-12 h-[3px] w-12 rounded-full" :style="{ background: 'var(--color-primary-600)' }" aria-hidden="true" />
 
-        <div class="space-y-14 sm:space-y-20">
+        <div class="space-y-12 sm:space-y-20">
           <NuxtLink
             v-for="(service, ii) in group.items"
             :key="service.id"
             :to="`/services/${service.slug}`"
-            class="group grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center"
+            class="group grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center"
             :class="ii % 2 === 1 ? 'md:[&>*:first-child]:order-2' : ''"
           >
             <div
@@ -109,10 +110,10 @@
               <p v-if="service.eyebrow" class="mb-2 text-sm font-medium" :style="{ color: 'var(--color-primary-700)' }">
                 {{ service.eyebrow }}
               </p>
-              <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 leading-tight tracking-tight group-hover:text-primary-600 transition-colors">
+              <h3 class="text-xl sm:text-3xl font-bold text-gray-900 mb-2.5 sm:mb-3 leading-tight tracking-tight group-hover:text-primary-600 transition-colors">
                 {{ service.title }}
               </h3>
-              <p v-if="service.description" class="text-base text-gray-600 leading-relaxed mb-5">
+              <p v-if="service.description" class="text-[15px] sm:text-base text-gray-600 leading-relaxed mb-4 sm:mb-5">
                 {{ service.description }}
               </p>
               <span class="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 border-b border-primary-600/30 group-hover:border-primary-700 transition-colors pb-0.5">
@@ -125,7 +126,7 @@
 
             <div
               :ref="addRevealRef"
-              class="aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200"
+              class="aspect-[16/10] sm:aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200"
               :class="ii % 2 === 1 ? 'reveal-from-left' : 'reveal-from-right'"
             >
               <img
@@ -160,10 +161,10 @@
 
     <!-- Stats -->
     <section v-if="stats.length" class="bg-white border-b border-gray-100">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10">
           <div v-for="(stat, i) in stats" :key="i" class="border-t border-gray-200 pt-4">
-            <p class="text-4xl sm:text-5xl font-bold tabular-nums text-gray-900 mb-1" :style="{ fontFamily: 'var(--font-heading)' }">{{ stat.value }}</p>
+            <p class="text-3xl sm:text-5xl font-bold tabular-nums text-gray-900 mb-1" :style="{ fontFamily: 'var(--font-heading)' }">{{ stat.value }}</p>
             <p class="text-sm text-gray-600 leading-relaxed">{{ stat.label }}</p>
           </div>
         </div>
@@ -172,8 +173,8 @@
 
     <!-- Bottom CTA -->
     <section v-if="bottomCta" class="bg-gray-50">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div class="relative overflow-hidden rounded-3xl bg-secondary-900 text-white p-10 sm:p-14 text-center">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div class="relative overflow-hidden rounded-3xl bg-secondary-900 text-white p-8 sm:p-14 text-center">
           <div
             class="pointer-events-none absolute inset-0"
             aria-hidden="true"

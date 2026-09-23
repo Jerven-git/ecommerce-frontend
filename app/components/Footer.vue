@@ -1,17 +1,17 @@
 <template>
-  <footer class="bg-white border-t border-gray-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div class="grid grid-cols-1 gap-8" :class="gridColsClass">
-        <div>
-          <NuxtLink to="/" class="inline-block mb-4">
+  <footer class="bg-white border-t border-gray-900/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+      <div class="grid grid-cols-2 gap-x-6 gap-y-10" :class="gridColsClass">
+        <div class="col-span-2 md:col-span-1">
+          <NuxtLink to="/" class="inline-block mb-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-500 rounded-lg">
             <img v-if="footerLogoUrl" :src="footerLogoUrl" :alt="siteConfig?.site_name" :style="{ height: footerLogoHeight + 'px' }" class="w-auto object-contain" />
             <span v-else class="text-2xl font-bold tracking-tight" :style="{ color: siteConfig?.theme?.primary_color || '#6898ED' }">
               {{ siteConfig?.site_name || 'Store' }}
             </span>
           </NuxtLink>
-          <p v-if="showTagline && tagline" class="text-sm text-gray-500">{{ tagline }}</p>
+          <p v-if="showTagline && tagline" class="text-sm leading-relaxed text-gray-500 max-w-xs">{{ tagline }}</p>
 
-          <div v-if="showSocial && socialLinks.length" class="flex items-center gap-3 mt-5">
+          <div v-if="showSocial && socialLinks.length" class="flex items-center gap-2 mt-5">
             <a
               v-for="link in socialLinks"
               :key="link.platform + link.url"
@@ -19,7 +19,7 @@
               :aria-label="link.label || link.platform"
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white transition-colors"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-full border border-gray-900/10 text-gray-500 hover:bg-gray-900 hover:border-gray-900 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
             >
               <Icon :name="link.icon" class="w-4 h-4" />
             </a>
@@ -27,19 +27,22 @@
         </div>
 
         <div v-if="showQuickLinks && quickLinks.length">
-          <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Quick Links</h4>
-          <ul class="space-y-2">
+          <h4 class="text-[11px] font-semibold text-gray-400 uppercase tracking-[0.14em] mb-4">Explore</h4>
+          <ul class="space-y-2.5">
             <li v-for="link in quickLinks" :key="link.to">
-              <NuxtLink :to="link.to" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">{{ link.label }}</NuxtLink>
+              <NuxtLink :to="link.to" class="group inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 rounded">
+                <span class="h-px w-0 bg-current transition-all duration-200 group-hover:w-3" aria-hidden="true" />
+                {{ link.label }}
+              </NuxtLink>
             </li>
           </ul>
         </div>
 
         <div v-if="showContact">
-          <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Contact Info</h4>
-          <ul class="space-y-2">
+          <h4 class="text-[11px] font-semibold text-gray-400 uppercase tracking-[0.14em] mb-4">Contact</h4>
+          <ul class="space-y-2.5">
             <template v-if="contactLines.length">
-              <li v-for="(line, i) in contactLines" :key="i" class="text-sm text-gray-500">{{ line }}</li>
+              <li v-for="(line, i) in contactLines" :key="i" class="text-sm text-gray-500 break-words">{{ line }}</li>
             </template>
             <template v-else>
               <li class="text-sm text-gray-500">contact@store.com</li>
@@ -49,8 +52,19 @@
         </div>
       </div>
 
-      <div class="border-t border-gray-100 mt-8 pt-8 text-center">
-        <p class="text-sm text-gray-400">{{ copyrightText }}</p>
+      <div class="border-t border-gray-900/[0.08] mt-10 pt-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+        <p class="text-xs text-gray-400 text-center sm:text-left">{{ copyrightText }}</p>
+        <button
+          type="button"
+          class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-gray-900 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 rounded-lg px-2 py-1"
+          aria-label="Back to top"
+          @click="scrollToTop"
+        >
+          Back to top
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
       </div>
     </div>
   </footer>
@@ -144,7 +158,12 @@ const gridColsClass = computed(() => {
   switch (visibleColumns.value) {
     case 1: return 'md:grid-cols-1'
     case 2: return 'md:grid-cols-2'
-    default: return 'md:grid-cols-3'
+    default: return 'md:grid-cols-[1.25fr_1fr_1fr]'
   }
 })
+
+function scrollToTop() {
+  if (!import.meta.client) return
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
 </script>
