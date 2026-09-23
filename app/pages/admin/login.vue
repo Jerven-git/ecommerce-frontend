@@ -231,6 +231,14 @@ definePageMeta({
 })
 
 const authStore = useAuthStore()
+const route = useRoute()
+
+// Optional ?redirect= destination (fallback to admin dashboard). Only allow
+// same-origin paths to keep it from becoming an open redirect.
+const getRedirect = () => {
+  const candidate = route.query.redirect
+  return typeof candidate === 'string' && candidate.startsWith('/') ? candidate : '/admin'
+}
 
 const form = ref({
   email: '',
@@ -250,11 +258,11 @@ const handleLogin = async () => {
     const response = await authStore.login(form.value.email, form.value.password)
 
     if (response.two_factor_required) {
-      navigateTo('/admin/verify-2fa')
+      navigateTo({ path: '/admin/verify-2fa', query: { redirect: getRedirect() } })
       return
     }
 
-    navigateTo('/admin')
+    navigateTo(getRedirect())
   } catch (err: any) {
     error.value = err?.data?.message || 'Invalid credentials or not authorized as admin'
   } finally {
@@ -265,7 +273,7 @@ const handleLogin = async () => {
 onMounted(async () => {
   await authStore.checkAuth()
   if (authStore.isAdmin) {
-    navigateTo('/admin')
+    navigateTo(getRedirect())
     return
   }
 

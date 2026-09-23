@@ -228,6 +228,13 @@ definePageMeta({
 })
 
 const authStore = useAuthStore()
+const route = useRoute()
+
+// Optional ?redirect= carried over from login. Only same-origin paths.
+const getRedirect = () => {
+  const candidate = route.query.redirect
+  return typeof candidate === 'string' && candidate.startsWith('/') ? candidate : '/admin'
+}
 
 const mounted = ref(false)
 
@@ -238,7 +245,7 @@ onMounted(() => {
   })
 
   if (!authStore.twoFactorRequired) {
-    navigateTo(authStore.isAdmin ? '/admin' : '/admin/login')
+    navigateTo(authStore.isAdmin ? getRedirect() : '/admin/login')
   }
 })
 
@@ -265,7 +272,7 @@ const handleVerify = async () => {
 
   try {
     await authStore.verifyTwoFactor(code.value)
-    navigateTo('/admin')
+    navigateTo(getRedirect())
   } catch (err: any) {
     error.value = err?.data?.message || 'Invalid code. Please try again.'
   } finally {

@@ -2,6 +2,11 @@
   <!-- Guest pages (login, 2FA, password reset) render standalone without the admin shell -->
   <slot v-if="isGuestPage" />
 
+  <!-- Subscription-gated stores: lock screen replaces the shell (UI sugar; the
+       backend 402s are the actual enforcement). Super admins are exempt — their
+       provisions flow must keep working regardless of any store's billing. -->
+  <SubscriptionLock v-else-if="isStoreLocked" />
+
   <template v-else>
   <!-- Admin Guide -->
   <AdminGuide ref="guideRef" />
@@ -256,6 +261,14 @@ const { themeClass } = useAdminAppearance({ syncBody: true })
  */
 const guestPaths = ['/admin/login', '/admin/forgot-password', '/admin/reset-password', '/admin/verify-2fa']
 const isGuestPage = computed(() => guestPaths.includes(route.path))
+
+/**
+ * Gated stores see the subscription lock screen instead of the shell. Matches
+ * the backend's middleware exemptions: super admins are never gated, and the
+ * auth store's cached subscription fields drive the decision (kept in sync by
+ * useSubscription's fetchState). Cancelled-but-within-period stays unlocked.
+ */
+const isStoreLocked = computed(() => !authStore.isSuperAdmin && authStore.isStoreGated)
 
 /**
  * Absolute URL to the admin's own storefront. Prefers the store's custom domain

@@ -1,3 +1,14 @@
+export type SubscriptionStatus = 'unsubscribed' | 'pending' | 'active' | 'cancelled' | 'expired' | 'comped'
+
+export interface SubscriptionPlanInfo {
+  id: number
+  name: string
+  slug: string
+  price_cents: number
+  setup_fee_cents: number
+  interval: 'monthly' | 'quarterly' | 'weekly' | 'yearly'
+}
+
 export interface Store {
   id: number
   name: string
@@ -6,6 +17,11 @@ export interface Store {
   domain_verified_at: string | null
   domain_verified: boolean
   status: 'active' | 'inactive'
+  subscription_status: SubscriptionStatus
+  subscription_plan_id: number | null
+  subscription_plan: SubscriptionPlanInfo | null
+  subscribed_at: string | null
+  subscription_expires_at: string | null
   is_default: boolean
   default_currency_id: number | null
   users_count: number
@@ -141,6 +157,10 @@ export const useSuperAdminApi = () => {
       $apiFetch<{ data: Store }>(`/super-admin/stores/${id}/activate`, { method: 'POST' }),
     deactivateStore: (id: number) =>
       $apiFetch<{ data: Store }>(`/super-admin/stores/${id}/deactivate`, { method: 'POST' }),
+    compStore: (id: number, body: { subscription_plan_id?: number } = {}) =>
+      $apiFetch<{ data: Store }>(`/super-admin/stores/${id}/comp`, { method: 'POST', body }),
+    uncompStore: (id: number) =>
+      $apiFetch<{ data: Store }>(`/super-admin/stores/${id}/uncomp`, { method: 'POST' }),
 
     // Custom domains
     checkDomain: (domain: string, storeId?: number) =>

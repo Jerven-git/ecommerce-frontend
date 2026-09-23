@@ -71,6 +71,21 @@ export default defineNuxtPlugin(() => {
                     authStore.error = (response._data as any)?.message || 'Your account has been disabled.'
                     navigateTo('/admin/login')
                 }
+            } else if (response.status === 402 && (response._data as any)?.code === 'subscription_required') {
+                if (process.client) {
+                    const route = useRoute()
+                    if (route.path === '/subscribe') return
+                    const authStore = useAuthStore()
+                    // Super admins bypass the subscription gate on the backend,
+                    // so never bounce them to /subscribe.
+                    if (authStore.isAuthenticated && !authStore.isSuperAdmin) {
+                        // Refresh authoritative status so the lock screen and
+                        // /subscribe reflect reality.
+                        const { fetchState } = useSubscription()
+                        fetchState(true).catch(() => {})
+                        navigateTo('/subscribe')
+                    }
+                }
             } else if (response.status === 401) {
             console.error("Unauthorized - user may need to login again")
             // Session expired — clear auth state and redirect to login

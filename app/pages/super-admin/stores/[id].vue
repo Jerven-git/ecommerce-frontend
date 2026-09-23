@@ -121,6 +121,75 @@
     </form>
 
     <section v-if="store" class="space-y-4 rounded-2xl border border-admin-border bg-admin-surface p-4 sm:p-6">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold text-admin-text">Subscription</h2>
+          <p class="mt-0.5 text-sm text-admin-muted">Billing status and access for this store.</p>
+        </div>
+        <span
+          class="px-2 py-0.5 text-xs font-medium rounded"
+          :class="subscriptionBadgeClass"
+        >
+          {{ subscriptionLabel }}
+        </span>
+      </div>
+
+      <dl class="grid gap-3 text-sm sm:grid-cols-2">
+        <div>
+          <dt class="text-xs text-admin-muted">Plan</dt>
+          <dd class="mt-0.5 font-medium text-admin-text">{{ store.subscription_plan?.name ?? 'No plan' }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-admin-muted">Renews / expires</dt>
+          <dd class="mt-0.5 font-medium text-admin-text">
+            {{ store.subscription_expires_at ? formatDate(store.subscription_expires_at) : '—' }}
+          </dd>
+        </div>
+        <div>
+          <dt class="text-xs text-admin-muted">Subscribed</dt>
+          <dd class="mt-0.5 font-medium text-admin-text">
+            {{ store.subscribed_at ? formatDate(store.subscribed_at) : '—' }}
+          </dd>
+        </div>
+        <div>
+          <dt class="text-xs text-admin-muted">Price</dt>
+          <dd class="mt-0.5 font-medium text-admin-text">
+            {{ store.subscription_plan ? formatPrice(store.subscription_plan.price_cents) : '—' }}
+          </dd>
+        </div>
+      </dl>
+
+      <div v-if="!store.is_default" class="flex flex-col gap-2 border-t border-admin-border pt-3 sm:flex-row sm:items-center">
+        <template v-if="store.subscription_status === 'comped'">
+          <AdminButton variant="danger" size="sm" :loading="compMutating" @click="uncomp">
+            Revoke comp
+          </AdminButton>
+          <p class="text-sm text-admin-muted">Removing the comp re-locks the store until the owner subscribes.</p>
+        </template>
+        <template v-else>
+          <label class="sr-only" for="comp-plan">Plan to grant</label>
+          <select
+            id="comp-plan"
+            v-model="compPlanId"
+            class="admin-input w-auto text-sm"
+          >
+            <option :value="null">No plan</option>
+            <option v-for="plan in compPlans" :key="plan.id" :value="plan.id">
+              {{ plan.name }} — {{ formatPrice(plan.price_cents) }}/{{ plan.interval }}
+            </option>
+          </select>
+          <AdminButton variant="primary" size="sm" :loading="compMutating" @click="comp">
+            Comp — grant access
+          </AdminButton>
+        </template>
+        <p v-if="compError" class="text-sm text-admin-danger" role="alert">{{ compError }}</p>
+      </div>
+      <p v-else class="border-t border-admin-border pt-3 text-sm text-admin-muted">
+        The default store is always accessible.
+      </p>
+    </section>
+
+    <section v-if="store" class="space-y-4 rounded-2xl border border-admin-border bg-admin-surface p-4 sm:p-6">
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 class="text-lg font-bold text-admin-text">Admins</h2>
@@ -170,6 +239,7 @@
 const route = useRoute()
 const router = useRouter()
 const api = useSuperAdminApi()
+const { plans, fetchPlans } = useSubscription()
 const { toastSuccess, toastError } = useAdminToast()
 
 const id = Number(route.params.id)
@@ -187,6 +257,46 @@ const check = ref<DomainAvailability | null>(null)
 const verifying = ref(false)
 const verifyMessage = ref<string | null>(null)
 const verifyError = ref<string | null>(null)
+
+const compPlanId = ref<number | null>(null)
+const compMutating = ref(false)
+const compError = ref<string | null>(null)
+const compPlans = computed(() => plans.value ?? [])
+
+const subscriptionLabel = computed(() => {
+  switch (store.value?.subscription_status) {
+    case 'active': return 'Active'
+    case 'comped': return 'Comp — free access'
+    case 'cancelled': return 'Cancelled'
+    case 'expired': return 'Expired'
+    case 'pending': return 'Pending'
+    default: return 'Unsubscribed'
+  }
+})
+
+const subscriptionBadgeClass = computed(() => {
+  switch (store.value?.subscription_status) {
+    case 'active':
+    case 'comped':
+      return 'bg-admin-success-soft text-admin-success'
+    case 'cancelled':
+    case 'expired':
+      return 'bg-admin-warning-soft text-admin-warning'
+    default:
+      return 'bg-admin-soft text-admin-muted'
+  }
+})
+
+const formatDate = (iso: string) => new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+}).format(new Date(iso))
+
+const formatPrice = (cents: number) => new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+}).format(cents / 100)
 
 /** Normalise the way the API does, so "WWW.X.com" doesn't read as a pending edit. */
 const canonical = (value: string | null | undefined) => {
@@ -233,7 +343,10 @@ const loadStore = async () => {
   }
 }
 
-onMounted(loadStore)
+onMounted(async () => {
+  if (!plans.value) fetchPlans().catch(() => {})
+  await loadStore()
+})
 
 let checkTimer: ReturnType<typeof setTimeout> | undefined
 let checkSeq = 0
@@ -313,6 +426,37 @@ const save = async () => {
     document.getElementById('store-save-error')?.focus()
   } finally {
     saving.value = false
+  }
+}
+
+const comp = async () => {
+  compMutating.value = true
+  compError.value = null
+  try {
+    const result = await api.compStore(id, compPlanId.value ? { subscription_plan_id: compPlanId.value } : {})
+    store.value = result.data
+    toastSuccess('Store comped — access granted')
+  } catch (err: any) {
+    compError.value = err?.data?.message || 'Couldn’t comp this store'
+    toastError('Couldn’t comp the store')
+  } finally {
+    compMutating.value = false
+  }
+}
+
+const uncomp = async () => {
+  if (!confirm('Revoke this comp? The store will be locked until it subscribes.')) return
+  compMutating.value = true
+  compError.value = null
+  try {
+    const result = await api.uncompStore(id)
+    store.value = result.data
+    toastSuccess('Comp revoked')
+  } catch (err: any) {
+    compError.value = err?.data?.message || 'Couldn’t revoke this comp'
+    toastError('Couldn’t revoke the comp')
+  } finally {
+    compMutating.value = false
   }
 }
 

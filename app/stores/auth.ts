@@ -11,7 +11,7 @@ interface User {
   is_impersonating?: boolean
   impersonator?: { id: number; name: string; email: string; is_super_admin?: boolean } | null
   store_id?: number | null
-  store?: { id: number; name: string; slug: string; domain: string | null; domain_verified?: boolean } | null
+  store?: { id: number; name: string; slug: string; domain: string | null; domain_verified?: boolean; subscription_status?: string; subscription_expires_at?: string | null } | null
   status?: 'active' | 'disabled'
   email_verified_at?: string | null
   created_at?: string
@@ -86,6 +86,29 @@ export const useAuthStore = defineStore('auth', {
     },
     isImpersonating: (state) => {
       return state.user?.is_impersonating === true
+    },
+    /**
+     * Whether the logged-in admin's store is subscription-gated. Mirrors the
+     * backend's Store::hasActiveSubscription(): `active` (until expiry) and
+     * `comped` are unlocked; `cancelled` stays unlocked until the paid period
+     * lapses; everything else (unsubscribed / pending / expired / lapsed
+     * active) is gated.
+     */
+    isStoreGated: (state) => {
+      const status = state.user?.store?.subscription_status
+      const expiresAt = state.user?.store?.subscription_expires_at
+      const expiresInPast = !!expiresAt && new Date(expiresAt).getTime() <= Date.now()
+
+      if (status === 'active' || status === 'comped') {
+        return status === 'active' && expiresInPast
+      }
+
+      if (status === 'cancelled') {
+        return !expiresAt || expiresInPast
+      }
+
+      // Unknown status (super admin without a store, legacy payload) => not gated.
+      return status !== undefined && status !== null
     },
   },
 
