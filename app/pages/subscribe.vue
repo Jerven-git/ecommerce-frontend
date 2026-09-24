@@ -47,6 +47,13 @@
 
       <!-- Authenticated -->
       <template v-else>
+        <div class="flex justify-end mb-4" :class="mounted ? 'animate-stagger-1' : 'opacity-0 translate-y-4'">
+          <NuxtLink to="/admin" class="inline-flex min-h-11 items-center gap-1.5 text-sm text-white/50 hover:text-white/75 transition-colors">
+            <Icon name="mdi:arrow-left" class="w-4 h-4" />
+            Back to dashboard
+          </NuxtLink>
+        </div>
+
         <!-- Unlocked success -->
         <div v-if="unlocked" class="max-w-md mx-auto">
           <div
@@ -189,7 +196,7 @@
 
                 <div class="mt-3 flex items-baseline gap-1">
                   <span class="text-3xl font-bold text-white">{{ formatPrice(plan.price_cents) }}</span>
-                  <span class="text-sm text-white/40">/ {{ intervalLabel(plan.interval) }}</span>
+                  <span class="text-sm text-white/40">/ {{ intervalLang(plan.interval) }}</span>
                 </div>
 
                 <div v-if="plan.setup_fee_cents > 0" class="mt-1 text-xs text-white/40">
@@ -272,7 +279,7 @@ const formatPrice = (cents?: number | null): string => {
   return remainder === 0 ? `$${whole}` : `$${whole}.${String(remainder).padStart(2, '0')}`
 }
 
-const intervalLabel = (interval: string): string => {
+const intervalLang = (interval: string): string => {
   switch (interval) {
     case 'weekly': return 'week'
     case 'quarterly': return '3 months'
@@ -281,13 +288,26 @@ const intervalLabel = (interval: string): string => {
   }
 }
 
+/** Rough months per interval, used only to compare bang-for-buck across plans. */
+const intervalMonths = (interval: string): number => {
+  switch (interval) {
+    case 'weekly': return 0.230769
+    case 'quarterly': return 3
+    case 'yearly': return 12
+    default: return 1
+  }
+}
+
+const monthlyEquivalent = (plan: { price_cents: number; interval: string }) =>
+  plan.price_cents / intervalMonths(plan.interval)
+
+const isCheapest = (plan: { price_cents: number; interval: string }) =>
+  planList.value.length > 1 && monthlyEquivalent(plan) === Math.min(...planList.value.map(monthlyEquivalent))
+
 const formatDate = (value?: string | null): string => {
   if (!value) return '—'
   return new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
 }
-
-const isCheapest = (plan: { price_cents: number }) =>
-  planList.value.length > 1 && plan.price_cents === Math.min(...planList.value.map((p) => p.price_cents))
 
 const loadPlans = async () => {
   plansLoading.value = true
