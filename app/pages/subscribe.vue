@@ -374,16 +374,12 @@ onMounted(async () => {
 
   await authStore.checkAuth()
 
+  // Authenticated admins manage billing inside the admin shell; keep
+  // /subscribe as the public guest aquisition page only.
   if (authStore.isAuthenticated) {
-    await subscription.fetchState(true)
-    if (!subscription.unlocked.value) {
-      await loadPlans()
-      // Came back from Stripe and still locked — poll in the background until
-      // the webhook flips the store active.
-      if (statusParam.value === 'success') {
-        pollForUnlock()
-      }
-    }
+    const targetQuery = route.query.status ? { status: route.query.status as string } : {}
+    await navigateTo({ path: '/admin/subscription', query: targetQuery })
+    return
   }
 
   checkingAuth.value = false

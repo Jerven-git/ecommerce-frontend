@@ -74,16 +74,16 @@ export default defineNuxtPlugin(() => {
             } else if (response.status === 402 && (response._data as any)?.code === 'subscription_required') {
                 if (process.client) {
                     const route = useRoute()
-                    if (route.path === '/subscribe') return
+                    if (route.path === '/subscribe' || route.path === '/admin/subscription') return
                     const authStore = useAuthStore()
                     // Super admins bypass the subscription gate on the backend,
-                    // so never bounce them to /subscribe.
+                    // so never bounce them to the subscription page.
                     if (authStore.isAuthenticated && !authStore.isSuperAdmin) {
                         // Refresh authoritative status so the lock screen and
-                        // /subscribe reflect reality.
+                        // subscription page reflect reality.
                         const { fetchState } = useSubscription()
                         fetchState(true).catch(() => {})
-                        navigateTo('/subscribe')
+                        navigateTo('/admin/subscription')
                     }
                 }
             } else if (response.status === 401) {

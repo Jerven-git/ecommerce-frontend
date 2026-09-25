@@ -17,9 +17,9 @@
       >
 
         <!-- Logo -->
-        <NuxtLink to="/" class="flex items-center shrink-0 justify-self-start">
+        <NuxtLink :to="marketingHome" class="flex items-center shrink-0 justify-self-start">
           <img
-            v-if="siteConfig?.logo_url"
+            v-if="!isApexMarketing && siteConfig?.logo_url"
             :src="siteConfig.logo_url"
             :alt="siteConfig.logo_alt_text || siteConfig.site_name"
             :style="{ height: logoHeight + 'px' }"
@@ -30,12 +30,21 @@
             class="text-xl font-bold tracking-tight transition-colors duration-300"
             :style="{ color: isTransparent ? '#fff' : (siteConfig?.theme?.primary_color || '#6898ED') }"
           >
-            {{ siteConfig?.site_name || 'Store' }}
+            {{ isApexMarketing ? 'SSu' : (siteConfig?.site_name || 'Store') }}
           </span>
         </NuxtLink>
 
-        <!-- Desktop nav (centered) -->
-        <nav class="hidden lg:flex items-center gap-7 justify-self-center">
+        <!-- Desktop nav (centered) — storefront vs marketing -->
+        <nav v-if="isApexMarketing" class="hidden lg:flex items-center gap-7 justify-self-center">
+          <a
+            v-for="link in marketingLinks"
+            :key="link.to"
+            :href="link.to"
+            class="nav-link"
+            :class="isTransparent ? 'text-white/85 hover:text-white' : 'text-gray-700 hover:text-gray-950'"
+          >{{ link.label }}</a>
+        </nav>
+        <nav v-else class="hidden lg:flex items-center gap-7 justify-self-center">
           <template v-for="link in navLinks" :key="link.to">
             <!-- Item with category dropdown (Shop) -->
             <div
@@ -131,6 +140,32 @@
         <!-- Right actions -->
         <div class="flex items-center gap-2 justify-self-end col-start-3 -mr-2 md:mr-0">
 
+          <!-- Apex marketing: Login + Get Started -->
+          <template v-if="isApexMarketing">
+            <NuxtLink
+              v-if="authStore.isAuthenticated"
+              to="/admin"
+              class="hidden lg:inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold tracking-tight transition-colors"
+              :class="isTransparent ? 'border-white/25 text-white/85 hover:text-white hover:bg-white/10' : 'border-gray-900/10 bg-white text-gray-700 hover:bg-gray-50'"
+            >
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+              Dashboard
+            </NuxtLink>
+            <NuxtLink
+              v-else
+              to="/admin/login"
+              class="hidden lg:inline-flex items-center px-3.5 py-2 text-sm font-medium transition-colors"
+              :class="isTransparent ? 'text-white/85 hover:text-white' : 'text-gray-600 hover:text-gray-900'"
+            >Login</NuxtLink>
+            <NuxtLink
+              :to="authStore.isAuthenticated ? '/admin' : '/register'"
+              class="hidden lg:inline-flex items-center px-5 py-2.5 rounded-full text-sm font-semibold shadow-sm transition-colors"
+              :class="isTransparent ? 'bg-white text-gray-900 hover:bg-white/90' : 'bg-[#6898ED] text-white hover:bg-[#5a85cc]'"
+              :style="isTransparent ? {} : { color: 'var(--on-primary, #fff)' }"
+            >{{ authStore.isAuthenticated ? 'Go to dashboard' : 'Get Started' }}</NuxtLink>
+          </template>
+
+          <template v-else>
           <!-- Admin pill (desktop) -->
           <NuxtLink
             v-if="authStore.isAdmin"
@@ -202,6 +237,7 @@
               : 'bg-primary-600 hover:bg-primary-700 shadow-[0_8px_20px_-10px_rgba(0,0,0,0.4)]'"
             :style="isTransparent ? {} : { color: 'var(--on-primary, #fff)' }"
           >{{ headerCta.label }}</NuxtLink>
+          </template>
 
           <!-- Mobile hamburger -->
           <button
@@ -270,7 +306,18 @@
             </div>
 
             <!-- Drawer nav -->
-            <nav class="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-0.5">
+            <nav v-if="isApexMarketing" class="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-0.5">
+              <a v-for="link in marketingLinks" :key="link.to" :href="link.to" class="px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors" @click="closeMobile">{{ link.label }}</a>
+              <div class="mt-4 pt-4 border-t border-gray-900/[0.08] flex flex-col gap-2">
+                <NuxtLink v-if="authStore.isAuthenticated" to="/admin" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-[#6898ED] text-white" @click="closeMobile">Dashboard</NuxtLink>
+                <template v-else>
+                  <NuxtLink to="/admin/login" class="flex items-center justify-center px-4 py-2.5 rounded-xl text-sm font-medium border border-gray-200 hover:bg-gray-50" @click="closeMobile">Login</NuxtLink>
+                  <NuxtLink to="/register" class="flex items-center justify-center px-4 py-2.5 rounded-xl text-sm font-semibold bg-[#6898ED] text-white" @click="closeMobile">Create Account</NuxtLink>
+                </template>
+                <NuxtLink v-if="!authStore.isAuthenticated" to="/admin/subscription" class="text-center px-3 py-2 text-sm text-gray-500 hover:text-gray-700" @click="closeMobile">View Plans</NuxtLink>
+              </div>
+            </nav>
+            <nav v-else class="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-0.5">
               <template v-for="link in navLinks" :key="link.to">
                 <!-- Accordion item with categories (Shop) -->
                 <div v-if="link.categories && link.categories.length">
@@ -355,6 +402,14 @@ const mobileShopOpen = ref(false)
 const favoritesEnabled = computed(() => siteConfig.value?.favorites_enabled ?? false)
 const headerCta = computed(() => siteConfig.value?.header_cta ?? null)
 const logoHeight = computed(() => siteConfig.value?.logo_size || 36)
+
+const isApexMarketing = computed(() => siteConfig.value?.is_storefront_host === false)
+const marketingLinks = [
+  { label: 'Features', to: '#features' },
+  { label: 'How it works', to: '#how-it-works' },
+  { label: 'Pricing', to: '#pricing' },
+] as const
+const marketingHome = computed(() => (authStore.isAuthenticated ? '/admin' : '/'))
 
 // --- Shop dropdown: product categories with their direct subcategories ---
 interface NavCategory {

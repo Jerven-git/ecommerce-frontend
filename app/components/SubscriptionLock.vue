@@ -61,7 +61,7 @@ const handleSubscribe = async () => {
   subscribing.value = true
   try {
     await authStore.checkAuth()
-    navigateTo('/subscribe')
+    navigateTo('/admin/subscription')
   } finally {
     subscribing.value = false
   }

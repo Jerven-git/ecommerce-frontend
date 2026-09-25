@@ -22,19 +22,28 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return
   }
 
-  // Hard guard for the bare apex (e.g. `localhost`, or the production base
-  // domain with no subdomain). Decide purely from the browser host so this
-  // holds even if the `/site-config` fetch fails and falls back to defaults
-  // (which assume a storefront host). A store subdomain (`acme.localhost`) or a
-  // custom store domain (`nazareck.com`) is never the bare base domain, so
-  // those skip this and resolve their storefront via the backend below.
+  // Bare apex (e.g. `localhost`, prod base domain) is the public marketing
+  // site. Only `/`, `/register`, `/subscribe` and `/admin`/`/super-admin`
+  // are valid there — everything else is a store route that doesn't exist
+  // on apex, so bounce those back to `/`. This keeps `/` as the SaaS
+  // front door while still supporting per-store subdomains / custom domains
+  // for real storefronts. The check is purely client-side host-based so it
+  // works even when `/site-config` hasn't loaded yet.
   const baseDomain = String(useRuntimeConfig().public.storefrontBaseDomain || '').toLowerCase()
   const requestUrl = useRequestURL()
   const host = requestUrl.hostname.toLowerCase()
-  if (baseDomain) {
-    if (host === baseDomain || host === `www.${baseDomain}`) {
-      return navigateTo('/admin/login', { redirectCode: 302 })
+  const isApex = !!baseDomain && (host === baseDomain || host === `www.${baseDomain}`)
+  if (isApex) {
+    const allowedApexPrefixes = ['/admin', '/super-admin', '/register', '/subscribe']
+    const isAllowedApex = to.path === '/' || allowedApexPrefixes.some((p) => to.path === p || to.path.startsWith(p + '/'))
+    if (!isAllowedApex) {
+      // Let the marketing page handle its own anchors (/ #features etc) — don't
+      // redirect hash navigations away. Only bounce unknown storefront paths.
+      return navigateTo('/', { redirectCode: 302 })
     }
+    // Apex marketing homepage is valid — don't fall through to the
+    // `is_storefront_host===false` login redirect below.
+    return
   }
 
   const { siteConfig, fetchSiteConfig } = useSiteConfig()

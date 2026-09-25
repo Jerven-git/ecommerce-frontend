@@ -1,5 +1,151 @@
 <template>
   <div>
+    <div v-if="siteConfigPending && !siteConfig" class="min-h-[60vh] flex items-center justify-center">
+      <span class="text-sm text-gray-500">Loading…</span>
+    </div>
+    <!-- ─────────────────────────  APEX MARKETING (bare domain)  ───────────────────────── -->
+    <template v-else-if="isApexMarketing">
+      <!-- Hero -->
+      <section class="relative isolate overflow-hidden bg-white">
+        <div class="absolute inset-0 -z-10">
+          <div class="absolute inset-0 bg-gradient-to-b from-blue-50 via-white to-white" />
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[520px] bg-blue-100/50 rounded-full blur-[120px]" />
+        </div>
+        <div class="mx-auto max-w-7xl px-6 lg:px-8 py-16 lg:py-24">
+          <div class="grid gap-10 lg:grid-cols-2 lg:gap-12 items-center">
+            <div>
+              <div class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" /> For stores that sell — launch in minutes
+              </div>
+              <h1 class="mt-6 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                The store platform for <span class="text-[#6898ED]">SSu</span>
+              </h1>
+              <p class="mt-4 text-lg leading-relaxed text-gray-600">
+                Create your store, pick a plan, and start selling. SSu gives you products, orders, shipping, tax, blog and theme controls — one place to run the whole shop.
+              </p>
+              <div class="mt-8 flex flex-wrap items-center gap-3">
+                <NuxtLink :to="authStore.isAuthenticated ? '/admin' : '/register'" class="inline-flex items-center gap-2 rounded-full bg-[#6898ED] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#5a85cc]">
+                  {{ authStore.isAuthenticated ? 'Go to dashboard' : 'Get Started — Create account' }}
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </NuxtLink>
+                <a href="#pricing" class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">View Plans</a>
+                <NuxtLink v-if="!authStore.isAuthenticated" to="/admin/login" class="text-sm font-medium text-gray-600 hover:text-gray-900">Login →</NuxtLink>
+              </div>
+              <p class="mt-3 text-xs text-gray-500">No credit card to explore. Cancel anytime from billing portal.</p>
+            </div>
+            <!-- Visual -->
+            <div class="relative">
+              <div class="rounded-2xl border border-gray-200 bg-white shadow-xl shadow-gray-200/50 overflow-hidden">
+                <div class="flex items-center gap-1.5 px-4 py-3 border-b border-gray-100">
+                  <span class="h-2.5 w-2.5 rounded-full bg-red-400" /><span class="h-2.5 w-2.5 rounded-full bg-amber-400" /><span class="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                  <span class="ml-3 text-xs font-medium text-gray-400">SSu — Admin</span>
+                </div>
+                <div class="grid grid-cols-3 gap-4 p-5">
+                  <div class="col-span-1 space-y-3">
+                    <div class="h-8 rounded-lg bg-gray-900" />
+                    <div class="space-y-2">
+                      <div class="h-3 rounded bg-gray-100" /><div class="h-3 rounded bg-gray-100 w-5/6" /><div class="h-3 rounded bg-blue-100" />
+                    </div>
+                  </div>
+                  <div class="col-span-2 space-y-3">
+                    <div class="h-20 rounded-xl bg-gradient-to-br from-[#6898ED] to-blue-400" />
+                    <div class="grid grid-cols-2 gap-3">
+                      <div class="h-16 rounded-xl border border-gray-100 bg-gray-50" /><div class="h-16 rounded-xl border border-gray-100 bg-gray-50" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="absolute -bottom-4 -left-4 hidden sm:flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-lg">
+                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">✓</span>
+                <div><p class="text-xs font-semibold text-gray-900">Orders synced</p><p class="text-xs text-gray-500">Shipping + tax handled</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Trusted / What you get -->
+      <section id="features" class="py-16 lg:py-20 border-t border-gray-100 bg-white">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+          <div class="max-w-2xl">
+            <p class="text-sm font-semibold text-blue-700">Everything to sell</p>
+            <h2 class="mt-2 text-3xl font-bold tracking-tight text-gray-900">Store, content and orders — in one place</h2>
+            <p class="mt-3 text-gray-600">Built from the SSu capabilities already in your admin. No mock features.</p>
+          </div>
+          <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div v-for="f in [['Products & Categories','Create products, variants, stock, categories and collections.'],['Services & Booking','Offer services with categories and scheduling.'],['Orders & Backorders','Track orders, backorders, discounts and gift cards.'],['Shipping, Tax & Payments','Configure carriers, tax rules and payment gateways.'],['Blog, Pages & Theme','Manage posts, pages, hero, theme colours and fonts — no code.'],['Custom domain & Roles','Point your domain, verify DNS, manage admin users and permissions.']]" :key="f[0]" class="rounded-2xl border border-gray-200 p-6 bg-white">
+              <h3 class="font-semibold text-gray-900">{{ f[0] }}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-600">{{ f[1] }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- How it works -->
+      <section id="how-it-works" class="py-16 lg:py-20 bg-gray-50 border-y border-gray-100">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+          <div class="max-w-2xl">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900">How it works</h2>
+            <p class="mt-3 text-gray-600">Four steps from zero to live store.</p>
+          </div>
+          <ol class="mt-10 grid gap-6 md:grid-cols-4">
+            <li v-for="(s, i) in [['Create account','Pick your store name and slug — you get an instant subdomain.'],['Choose a plan','Monthly $200 or Yearly $2,000 (2 months free). Unlocks the admin.'],['Set up your store','Add products, theme, domain and shipping in the dashboard.'],['Sell & manage','Orders, discounts, blog and analytics — all in SSu.']]" :key="i" class="rounded-2xl bg-white border border-gray-200 p-6 relative">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-[#6898ED] text-white text-sm font-bold">{{ i + 1 }}</span>
+              <h3 class="mt-4 font-semibold text-gray-900">{{ s[0] }}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-600">{{ s[1] }}</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Pricing -->
+      <section id="pricing" class="py-16 lg:py-24 bg-white">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+          <div class="mx-auto max-w-2xl text-center">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900">Simple pricing</h2>
+            <p class="mt-3 text-gray-600">Two intervals, same features. Change or cancel anytime from the billing portal.</p>
+          </div>
+          <div v-if="marketingPlansLoading" class="mt-10 flex justify-center"><span class="text-sm text-gray-500">Loading plans…</span></div>
+          <div v-else-if="marketingPlans.length" class="mt-10 grid gap-6 sm:grid-cols-2 max-w-4xl mx-auto">
+            <div
+              v-for="plan in marketingPlans"
+              :key="plan.id"
+              class="rounded-2xl border p-6 flex flex-col"
+              :class="plan.slug === 'standard-yearly' ? 'border-blue-200 bg-blue-50/50 shadow-sm' : 'border-gray-200 bg-white'"
+            >
+              <span v-if="plan.slug === 'standard-yearly'" class="self-start rounded-full bg-green-100 border border-green-200 px-2.5 py-0.5 text-xs font-semibold text-green-700">Best value · 2 months free</span>
+              <h3 class="mt-3 text-lg font-semibold text-gray-900">{{ plan.name }}</h3>
+              <div class="mt-2 flex items-baseline gap-1">
+                <span class="text-3xl font-bold text-gray-900">{{ marketingFormatPrice(plan.price_cents) }}</span>
+                <span class="text-sm text-gray-500">/ {{ marketingIntervalLabel(plan.interval) }}</span>
+              </div>
+              <ul class="mt-4 space-y-2 flex-1">
+                <li v-for="feat in plan.features" :key="feat" class="flex gap-2 text-sm text-gray-600"><span class="text-green-600">✓</span>{{ feat }}</li>
+              </ul>
+              <NuxtLink :to="authStore.isAuthenticated ? '/admin/subscription' : '/register'" class="mt-6 inline-flex justify-center rounded-full px-5 py-3 text-sm font-semibold" :class="plan.slug === 'standard-yearly' ? 'bg-[#6898ED] text-white hover:bg-[#5a85cc]' : 'border border-gray-900 text-gray-900 hover:bg-gray-50'">
+                {{ authStore.isAuthenticated ? 'Go to subscription' : 'Get started' }}
+              </NuxtLink>
+            </div>
+          </div>
+          <div v-else class="mt-10 text-center text-sm text-gray-500">Plans are being set up — <NuxtLink to="/register" class="text-[#6898ED] hover:underline">create an account</NuxtLink> and you’ll see them inside.</div>
+          <p class="mt-6 text-center text-xs text-gray-500">Secure checkout by Stripe. Existing stores on this host are grandfathered as comped.</p>
+        </div>
+      </section>
+
+      <!-- Final CTA -->
+      <section class="relative overflow-hidden bg-gray-900 py-16 lg:py-20">
+        <div class="absolute inset-0 bg-gradient-to-br from-[#6898ED]/20 via-transparent to-transparent" />
+        <div class="relative mx-auto max-w-4xl px-6 lg:px-8 text-center">
+          <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Ready to launch your store?</h2>
+          <p class="mt-4 text-gray-300">Create your account, pick a plan, and open the dashboard in minutes.</p>
+          <div class="mt-8 flex flex-wrap justify-center gap-3">
+            <NuxtLink :to="authStore.isAuthenticated ? '/admin' : '/register'" class="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-100">Get Started</NuxtLink>
+            <NuxtLink to="/admin/login" class="inline-flex items-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10">Login</NuxtLink>
+          </div>
+        </div>
+      </section>
+    </template>
+    <template v-else>
     <!-- ─────────────────────────  HERO  ───────────────────────── -->
     <section
       class="hero relative isolate flex overflow-hidden"
@@ -312,6 +458,7 @@
         </div>
       </div>
     </section>
+    </template>
   </div>
 </template>
 
@@ -330,7 +477,33 @@ interface ProductsResponse {
 }
 
 const { $apiFetch } = useNuxtApp()
-const { siteConfig } = useSiteConfig()
+const { siteConfig, pending: siteConfigPending } = useSiteConfig()
+const authStore = useAuthStore()
+const subscription = useSubscription()
+const isApexMarketing = computed(() => siteConfig.value?.is_storefront_host === false)
+const marketingPlans = computed(() => subscription.plans.value ?? [])
+const marketingPlansLoading = ref(false)
+
+const marketingFormatPrice = (cents?: number | null) => {
+  if (cents == null) return '—'
+  const dollars = Math.floor(cents / 100)
+  const rest = cents % 100
+  const whole = dollars.toLocaleString(undefined, { maximumFractionDigits: 0 })
+  return rest === 0 ? `$${whole}` : `$${whole}.${String(rest).padStart(2, '0')}`
+}
+const marketingIntervalLabel = (interval: string) => {
+  switch (interval) {
+    case 'weekly': return 'week'
+    case 'quarterly': return '3 months'
+    case 'yearly': return 'year'
+    default: return 'month'
+  }
+}
+const loadMarketingPlans = async () => {
+  marketingPlansLoading.value = true
+  try { await subscription.fetchPlans(true) } catch {}
+  marketingPlansLoading.value = false
+}
 
 // Scroll reveal
 const { revealRef: featuredHeadingRef } = useScrollReveal()
@@ -500,8 +673,18 @@ watch(() => siteConfig.value?.hero_image_url, (url) => {
   if (url && !isHeroVideo.value) preloadImage(url)
 }, { immediate: true })
 
+watch(isApexMarketing, (apex) => {
+  if (apex) loadMarketingPlans()
+  else if (products.value.length === 0 && !loading.value) fetchData()
+}, { immediate: true })
+
 onMounted(() => {
-  fetchData()
+  if (!isApexMarketing.value) fetchData()
+  else {
+    loadMarketingPlans()
+    // So the CTA can show Dashboard for returning admins
+    if (!authStore.isAuthenticated) authStore.checkAuth().catch(() => {})
+  }
 })
 
 useStaticPageSeo('home')

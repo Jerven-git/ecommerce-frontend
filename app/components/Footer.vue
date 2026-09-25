@@ -1,5 +1,36 @@
 <template>
-  <footer class="bg-white border-t border-gray-900/10">
+  <!-- Apex marketing footer — platform branding, not tenant store -->
+  <footer v-if="isApexMarketing" class="bg-gray-900 text-white border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-12 md:py-16">
+      <div class="grid gap-10 md:grid-cols-3">
+        <div>
+          <NuxtLink to="/" class="inline-block text-xl font-bold tracking-tight text-white">SSu</NuxtLink>
+          <p class="mt-3 text-sm leading-relaxed text-white/60 max-w-xs">The store platform for modern merchants — products, orders, and content in one place.</p>
+        </div>
+        <div>
+          <h4 class="text-[11px] font-semibold text-white/40 uppercase tracking-[0.14em] mb-4">Platform</h4>
+          <ul class="space-y-2.5">
+            <li><a href="#features" class="text-sm text-white/60 hover:text-white transition-colors">Features</a></li>
+            <li><a href="#how-it-works" class="text-sm text-white/60 hover:text-white transition-colors">How it works</a></li>
+            <li><a href="#pricing" class="text-sm text-white/60 hover:text-white transition-colors">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-[11px] font-semibold text-white/40 uppercase tracking-[0.14em] mb-4">Get started</h4>
+          <ul class="space-y-2.5">
+            <li><NuxtLink to="/register" class="text-sm text-white/60 hover:text-white transition-colors">Create Account</NuxtLink></li>
+            <li><NuxtLink to="/admin/login" class="text-sm text-white/60 hover:text-white transition-colors">Login</NuxtLink></li>
+            <li><NuxtLink to="/admin/subscription" class="text-sm text-white/60 hover:text-white transition-colors">View Plans</NuxtLink></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-white/10 mt-10 pt-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+        <p class="text-xs text-white/40">© {{ new Date().getFullYear() }} SSu. All rights reserved.</p>
+        <button type="button" class="inline-flex items-center gap-1.5 text-xs font-semibold text-white/40 hover:text-white transition-colors" @click="scrollToTop">Back to top <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg></button>
+      </div>
+    </div>
+  </footer>
+  <footer v-else class="bg-white border-t border-gray-900/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
       <div class="grid grid-cols-2 gap-x-6 gap-y-10" :class="gridColsClass">
         <div class="col-span-2 md:col-span-1">
@@ -72,6 +103,7 @@
 
 <script setup lang="ts">
 const { siteConfig } = useSiteConfig()
+const isApexMarketing = computed(() => siteConfig.value?.is_storefront_host === false)
 const footerLogoUrl = computed(() => siteConfig.value?.footer_logo_url || siteConfig.value?.logo_url || null)
 const footerLogoHeight = computed(() => siteConfig.value?.footer_logo_size || 128)
 const { isEnabled } = useModules()

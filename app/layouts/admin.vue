@@ -267,8 +267,13 @@ const isGuestPage = computed(() => guestPaths.includes(route.path))
  * the backend's middleware exemptions: super admins are never gated, and the
  * auth store's cached subscription fields drive the decision (kept in sync by
  * useSubscription's fetchState). Cancelled-but-within-period stays unlocked.
+ * The subscription page itself is always reachable so gated users can upgrade.
  */
-const isStoreLocked = computed(() => !authStore.isSuperAdmin && authStore.isStoreGated)
+const isStoreLocked = computed(() => {
+  if (authStore.isSuperAdmin || !authStore.isStoreGated) return false
+  if (route.path === '/admin/subscription') return false
+  return true
+})
 
 /**
  * Absolute URL to the admin's own storefront. Prefers the store's custom domain
@@ -366,6 +371,7 @@ const settingsGroups: NavGroup[] = [
       { to: '/admin/shipping', label: 'Shipping', paths: ['M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z', 'M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0'] },
       { to: '/admin/tax-settings', label: 'Tax', paths: ['M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z'] },
       { to: '/admin/payment-settings', label: 'Payments', paths: ['M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z'] },
+      { to: '/admin/subscription', label: 'Subscription', title: 'Subscription', paths: ['M5 5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2H5z', 'M8 14h8M8 10h8'] },
     ],
   },
   {
