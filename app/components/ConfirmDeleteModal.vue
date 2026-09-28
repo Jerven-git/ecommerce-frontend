@@ -1,5 +1,5 @@
 <template>
-  <BaseModal :open="open" size="sm" hide-close body-class="p-6" @close="$emit('cancel')">
+  <BaseModal :open="open" :aria-label="title" size="sm" hide-close body-class="p-6" @close="$emit('cancel')">
     <!-- Icon -->
     <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
       <svg class="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">

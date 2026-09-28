@@ -1,20 +1,25 @@
 <template>
   <div class="space-y-3">
     <div>
-      <label :for="searchId" class="mb-1.5 block text-sm font-medium text-admin-text">Find store</label>
-      <input
-        :id="searchId"
-        v-model="search"
-        type="search"
-        autocomplete="off"
-        placeholder="Search by name or slug"
-        class="admin-input"
-        :aria-describedby="statusId"
-      />
+      <label :for="searchId" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-admin-muted">Find store</label>
+      <div class="relative">
+        <input
+          :id="searchId"
+          v-model="search"
+          type="search"
+          autocomplete="off"
+          placeholder="Search by name or slug"
+          class="admin-input pl-9"
+          :aria-describedby="statusId"
+        />
+        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-admin-muted">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 110-15 7.5 7.5 0 010 15z" /></svg>
+        </span>
+      </div>
     </div>
 
     <div>
-      <label :for="id" class="mb-1.5 block text-sm font-medium text-admin-text">Store</label>
+      <label :for="id" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-admin-muted">Store</label>
       <select
         :id="id"
         :value="modelValue ?? ''"

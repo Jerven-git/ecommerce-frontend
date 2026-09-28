@@ -2,11 +2,11 @@
   <component
     :is="to ? NuxtLinkComponent : 'div'"
     :to="to || undefined"
-    class="group block bg-white rounded-2xl border border-gray-200/70 shadow-sm transition-colors"
-    :class="[hero ? 'p-6' : 'p-5', to ? 'admin-tile-link hover:border-primary-200' : '']"
+    class="group block rounded-2xl border border-admin-border bg-admin-surface transition-colors"
+    :class="[hero ? 'p-6' : 'p-5', to ? 'admin-tile-link hover:border-admin-accent' : '']"
   >
     <div class="flex items-start justify-between gap-3 mb-4">
-      <p class="text-[11px] font-semibold uppercase tracking-wider text-gray-500">{{ label }}</p>
+      <p class="text-[11px] font-semibold uppercase tracking-[0.04em] text-admin-muted">{{ label }}</p>
       <span
         class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors"
         :class="chipClass"
@@ -23,7 +23,7 @@
         </svg>
       </span>
     </div>
-    <p class="font-bold text-gray-900 truncate" :class="hero ? 'text-3xl' : 'text-2xl'">{{ value }}</p>
+    <p class="truncate font-bold tabular-nums text-admin-text" :class="hero ? 'text-3xl' : 'text-2xl'">{{ value }}</p>
     <p v-if="hint" class="mt-1 text-xs truncate" :class="hintClass">{{ hint }}</p>
   </component>
 </template>
@@ -51,19 +51,19 @@ const NuxtLinkComponent = resolveComponent('NuxtLink')
 const iconPaths = computed(() => (Array.isArray(props.icon) ? props.icon : [props.icon]))
 
 const chipClass = computed(() => ({
-  brand: 'bg-primary-50 text-primary-600 group-hover:bg-primary-100',
-  positive: 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100',
-  attention: 'bg-amber-50 text-amber-600 group-hover:bg-amber-100',
-  neutral: 'bg-gray-100 text-gray-500 group-hover:bg-gray-200',
+  brand: 'bg-admin-accent-soft text-admin-accent-strong',
+  positive: 'bg-admin-success-soft text-admin-success',
+  attention: 'bg-admin-warning-soft text-admin-warning',
+  neutral: 'bg-admin-soft text-admin-muted',
 }[props.tone]))
 
 const hintClass = computed(() => {
-  if (!props.emphasizeHint) return 'text-gray-500'
+  if (!props.emphasizeHint) return 'text-admin-muted'
   return {
-    brand: 'text-primary-600 font-medium',
-    positive: 'text-emerald-600 font-medium',
-    attention: 'text-amber-600 font-medium',
-    neutral: 'text-gray-500',
+    brand: 'text-admin-accent-strong font-medium',
+    positive: 'text-admin-success font-medium',
+    attention: 'text-admin-warning font-medium',
+    neutral: 'text-admin-muted',
   }[props.tone]
 })
 </script>

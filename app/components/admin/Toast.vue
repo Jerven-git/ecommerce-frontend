@@ -94,7 +94,7 @@ const runAction = (t: AdminToast) => {
   border-radius: 0.75rem;
   color: var(--admin-text);
   background: var(--admin-surface);
-  box-shadow: 0 12px 28px -14px rgb(15 23 42 / 38%);
+  box-shadow: var(--admin-shadow-transient);
   pointer-events: auto;
 }
 

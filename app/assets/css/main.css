@@ -68,6 +68,10 @@
     --admin-danger-soft: #fef2f2;
     --admin-info: #0369a1;
     --admin-info-soft: #f0f9ff;
+    --admin-shadow-quiet: 0 1px 2px rgba(15, 23, 42, 0.05);
+    --admin-shadow-transient: 0 10px 15px -3px rgba(15, 23, 42, 0.10);
+    --skeleton-base: #e5e7eb;
+    --skeleton-highlight: rgba(255, 255, 255, 0.65);
   }
 
   .admin-active {
@@ -100,16 +104,66 @@
     --admin-danger-soft: #4c1d24;
     --admin-info: #7dd3fc;
     --admin-info-soft: #123549;
+    --admin-shadow-quiet: 0 1px 2px rgba(0, 0, 0, 0.18);
+    --admin-shadow-transient: 0 14px 34px -16px rgba(0, 0, 0, 0.72);
+    --skeleton-base: #2a303d;
+    --skeleton-highlight: rgba(255, 255, 255, 0.08);
   }
 
   body {
     @apply bg-gray-50 text-gray-900;
     font-family: var(--font-body);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
   }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-primary) 28%, transparent);
+    color: currentColor;
+  }
+
+  :where(a, button) {
+    text-underline-offset: 0.18em;
+  }
+
+  :where(input, textarea, select) {
+    caret-color: var(--color-primary);
+  }
+
+  .admin-active ::selection {
+    background: color-mix(in srgb, var(--admin-accent) 32%, transparent);
+  }
+
+  .admin-active :where(input, textarea, select) {
+    caret-color: var(--admin-accent);
+  }
+}
+
+.admin-active {
+  scrollbar-color: var(--admin-border) var(--admin-canvas);
+}
+
+.admin-active ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.admin-active ::-webkit-scrollbar-track {
+  background: var(--admin-canvas);
+}
+
+.admin-active ::-webkit-scrollbar-thumb {
+  border: 3px solid var(--admin-canvas);
+  border-radius: 9999px;
+  background: var(--admin-border);
+}
+
+.admin-active ::-webkit-scrollbar-thumb:hover {
+  background: var(--admin-text-muted);
 }
 
 /* Central compatibility bridge for the existing store-admin screens. New admin
@@ -310,7 +364,7 @@
     .skeleton {
         position: relative;
         overflow: hidden;
-        background-color: #eaecf0;
+        background-color: var(--skeleton-base);
         border-radius: 0.5rem;
     }
     .skeleton::after {
@@ -318,7 +372,7 @@
         position: absolute;
         inset: 0;
         transform: translateX(-100%);
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+        background: linear-gradient(90deg, transparent, var(--skeleton-highlight), transparent);
         animation: skeleton-sheen 1.4s ease-in-out infinite;
     }
     @keyframes skeleton-sheen {

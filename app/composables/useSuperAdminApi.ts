@@ -103,6 +103,8 @@ export interface SuperAdminOverview {
     active: number
     inactive: number
     verified_domains: number
+    unverified_domains: number
+    no_domain: number
   }
   users: { total: number }
   admins: {

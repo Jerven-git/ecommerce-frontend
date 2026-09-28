@@ -25,14 +25,20 @@
         >
           <div
             v-if="open"
-            class="relative bg-white rounded-2xl shadow-xl border border-gray-100 w-full max-h-[90vh] flex flex-col overflow-hidden"
+            ref="dialogRef"
+            role="dialog"
+            aria-modal="true"
+            :aria-labelledby="title ? titleId : undefined"
+            :aria-label="title ? undefined : ariaLabel"
+            tabindex="-1"
+            class="relative flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-2xl bg-white shadow-xl outline-none focus-visible:ring-2 focus-visible:ring-primary-500 motion-reduce:transition-none"
             :class="sizeClass"
           >
             <!-- Header (slot or default) -->
             <div v-if="$slots.header || title" class="px-5 py-4 border-b border-gray-100 flex items-center justify-between gap-3 shrink-0">
               <slot name="header">
                 <div class="min-w-0">
-                  <h2 class="text-sm font-semibold text-gray-900 truncate">{{ title }}</h2>
+                  <h2 :id="titleId" class="text-sm font-semibold text-gray-900 truncate">{{ title }}</h2>
                   <p v-if="subtitle" class="text-xs text-gray-400 truncate mt-0.5">{{ subtitle }}</p>
                 </div>
               </slot>
@@ -40,7 +46,7 @@
                 v-if="!hideClose"
                 type="button"
                 @click="$emit('close')"
-                class="shrink-0 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                class="shrink-0 inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                 aria-label="Close"
               >
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -77,13 +83,19 @@ const props = withDefaults(defineProps<{
   hideClose?: boolean
   closeOnBackdrop?: boolean
   closeOnEscape?: boolean
+  ariaLabel?: string
 }>(), {
   size: 'md',
   closeOnBackdrop: true,
   closeOnEscape: true,
+  ariaLabel: 'Dialog',
 })
 
 const emit = defineEmits<{ close: [] }>()
+const titleId = useId()
+const dialogRef = ref<HTMLElement | null>(null)
+let previouslyFocused: HTMLElement | null = null
+let previousBodyOverflow = ''
 
 const sizeClass = computed(() => ({
   sm: 'max-w-sm',
@@ -103,12 +115,69 @@ function onBackdropMouseUp() {
 }
 
 function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'Escape' && props.open && props.closeOnEscape) {
+  if (!props.open) return
+
+  if (e.key === 'Escape' && props.closeOnEscape) {
     e.preventDefault()
     emit('close')
+    return
+  }
+
+  if (e.key !== 'Tab' || !dialogRef.value) return
+
+  const focusable = getFocusableElements()
+  if (focusable.length === 0) {
+    e.preventDefault()
+    dialogRef.value.focus()
+    return
+  }
+
+  const first = focusable[0]!
+  const last = focusable[focusable.length - 1]!
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault()
+    last.focus()
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault()
+    first.focus()
   }
 }
 
+function getFocusableElements(): HTMLElement[] {
+  if (!dialogRef.value) return []
+  return Array.from(dialogRef.value.querySelectorAll<HTMLElement>(
+    'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+  )).filter(element => !element.hasAttribute('hidden') && element.getAttribute('aria-hidden') !== 'true')
+}
+
+async function focusDialog() {
+  await nextTick()
+  const autofocusTarget = dialogRef.value?.querySelector<HTMLElement>('[autofocus]')
+  const target = autofocusTarget ?? getFocusableElements()[0] ?? dialogRef.value
+  target?.focus({ preventScroll: true })
+}
+
+function restorePageState() {
+  document.body.style.overflow = previousBodyOverflow
+  if (previouslyFocused?.isConnected) previouslyFocused.focus({ preventScroll: true })
+  previouslyFocused = null
+}
+
+watch(() => props.open, async (isOpen) => {
+  if (!import.meta.client) return
+  if (isOpen) {
+    previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    previousBodyOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    await focusDialog()
+  } else if (previouslyFocused) {
+    restorePageState()
+  }
+}, { immediate: true, flush: 'post' })
+
 onMounted(() => window.addEventListener('keydown', onKeydown))
-onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onKeydown)
+  if (props.open) restorePageState()
+})
 </script>

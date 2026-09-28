@@ -41,7 +41,7 @@
     <button
       v-if="!sidebarOpen"
       class="admin-open-nav admin-focus fixed left-0 top-1/2 z-50 flex h-16 w-11 -translate-y-1/2 items-center justify-center
-             bg-transparent text-gray-700 transition-colors hover:text-primary-700"
+             bg-transparent text-admin-muted transition-colors hover:text-admin-accent-strong"
       @click="toggleSidebar"
       aria-controls="admin-navigation"
       aria-expanded="false"
@@ -57,7 +57,7 @@
     <!-- Sidebar -->
     <aside
       id="admin-navigation"
-      class="admin-sidebar ease-quint z-50 border-r border-gray-200/70
+      class="admin-sidebar ease-quint z-50 border-r border-admin-border
              fixed lg:sticky top-0 h-screen overflow-hidden flex flex-col"
       :class="[
         mounted ? 'transition-[transform,width,opacity] duration-200' : '',
@@ -66,17 +66,17 @@
       ]"
     >
       <!-- Sidebar header -->
-      <div class="h-16 px-4 flex items-center justify-between border-b border-gray-200/70 shrink-0">
+      <div class="h-16 px-4 flex items-center justify-between border-b border-admin-border shrink-0">
         <NuxtLink to="/admin" class="admin-focus flex items-center gap-2.5 rounded-lg" @click="closeSidebarOnMobile">
           <img src="~/assets/css/svg/databasy.svg" alt="Databasy" class="h-8 w-auto shrink-0" />
           <div class="leading-tight">
-            <p class="text-sm font-semibold text-gray-900">Admin Panel</p>
-            <p class="text-xs text-gray-500">Store Manager</p>
+            <p class="text-sm font-semibold text-admin-text">Admin Panel</p>
+            <p class="text-xs text-admin-muted">Store Manager</p>
           </div>
         </NuxtLink>
         <button
-          class="admin-focus tap-target w-8 h-8 flex items-center justify-center rounded-lg text-gray-500
-                 hover:text-gray-700 hover:bg-gray-100 active:scale-95 transition"
+          class="admin-focus tap-target w-8 h-8 flex items-center justify-center rounded-lg text-admin-muted
+                 hover:text-admin-text hover:bg-admin-soft active:scale-95 transition"
           @click="toggleSidebar"
           aria-label="Collapse sidebar"
         >
@@ -95,7 +95,7 @@
             :key="group.heading"
             class="space-y-1"
           >
-            <p class="px-3 mb-1.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">{{ group.heading }}</p>
+            <p class="px-3 mb-1.5 text-[11px] font-semibold text-admin-muted uppercase tracking-[0.04em]">{{ group.heading }}</p>
             <template v-for="item in group.items" :key="item.to">
               <NuxtLink
                 v-if="!item.show || item.show()"
@@ -128,13 +128,13 @@
             v-show="group.items.some(item => !item.show || item.show())"
             class="space-y-1"
           >
-            <p class="px-3 mb-1.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">{{ group.heading }}</p>
+            <p class="px-3 mb-1.5 text-[11px] font-semibold text-admin-muted uppercase tracking-[0.04em]">{{ group.heading }}</p>
             <template v-for="item in group.items" :key="item.to">
               <NuxtLink
                 v-if="!item.show || item.show()"
                 :to="item.to"
                 class="admin-nav-link admin-focus group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-                :class="item.accent === 'purple' ? 'text-purple-700 hover:bg-purple-50 font-medium' : linkClass(item.to)"
+                :class="item.accent === 'purple' ? 'text-admin-accent-strong hover:bg-admin-accent-soft font-medium' : linkClass(item.to)"
                 @click="closeSidebarOnMobile"
               >
                 <svg class="w-4 h-4 shrink-0 transition-colors" :class="iconClass(item)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -163,32 +163,32 @@
           <a
             :href="storeUrl"
             class="admin-nav-link admin-focus flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
-                   text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                   text-admin-muted hover:bg-admin-soft hover:text-admin-text transition-colors"
             @click="closeSidebarOnMobile"
             target="_blank"
             rel="noopener"
           >
-            <svg class="w-4 h-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-4 h-4 shrink-0 text-admin-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
             <span>View Store</span>
           </a>
 
           <!-- Account row -->
-          <div class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white ring-1 ring-gray-100">
-            <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
-              <span class="text-xs font-bold text-primary-700">
+          <div class="flex items-center gap-2.5 rounded-xl border border-admin-border bg-admin-surface px-3 py-2.5">
+            <div class="w-8 h-8 rounded-full bg-admin-accent-soft flex items-center justify-center shrink-0">
+              <span class="text-xs font-bold text-admin-accent-strong">
                 {{ (authStore.user?.name || 'A').charAt(0).toUpperCase() }}
               </span>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-semibold text-gray-900 truncate">{{ authStore.user?.name || 'Admin' }}</p>
-              <p class="text-xs text-gray-500 truncate">{{ authStore.user?.email }}</p>
+              <p class="text-xs font-semibold text-admin-text truncate">{{ authStore.user?.name || 'Admin' }}</p>
+              <p class="text-xs text-admin-muted truncate">{{ authStore.user?.email }}</p>
             </div>
             <button
               @click="handleLogout"
-              class="admin-focus tap-target w-8 h-8 flex items-center justify-center rounded-lg text-gray-500
-                     hover:text-red-600 hover:bg-red-50 active:scale-95 transition shrink-0"
+              class="admin-focus tap-target w-8 h-8 flex items-center justify-center rounded-lg text-admin-muted
+                     hover:text-admin-danger hover:bg-admin-danger-soft active:scale-95 transition shrink-0"
               aria-label="Log out"
               title="Log out"
             >
@@ -204,15 +204,15 @@
     <!-- Main column -->
     <div class="flex-1 min-w-0 flex flex-col">
       <!-- Sticky header -->
-      <header class="bg-white border-b border-gray-200/70 sticky top-0 z-30">
+      <header class="sticky top-0 z-30 border-b border-admin-border bg-admin-surface">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-          <h1 class="text-base font-semibold text-gray-900 truncate">{{ pageTitle }}</h1>
+          <h1 class="text-base font-semibold text-admin-text truncate">{{ pageTitle }}</h1>
           <div class="flex items-center gap-2 shrink-0">
             <AdminThemeToggle />
             <button
               @click="guideRef?.startGuide()"
-              class="admin-focus inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-primary-700
-                     bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors"
+              class="admin-focus inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-admin-accent-soft px-3 py-2 text-xs font-semibold text-admin-accent-strong
+                     transition-colors hover:bg-admin-soft"
               title="Replay the admin guide"
             >
               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -222,8 +222,8 @@
             </button>
             <a
               :href="storeUrl"
-              class="admin-focus hidden sm:inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-medium
-                     text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+              class="admin-focus hidden min-h-11 sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium
+                     text-admin-muted hover:text-admin-text hover:bg-admin-soft transition-colors"
               target="_blank"
               rel="noopener"
             >
@@ -448,12 +448,12 @@ const pageTitle = computed(() => {
 // stays neutral grey so colour consistently means "this is where you are".
 const linkClass = (path: string) =>
   isActivePath(path)
-    ? 'bg-primary-50 text-primary-700 font-semibold'
-    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium'
+    ? 'bg-admin-accent-soft text-admin-accent-strong font-semibold'
+    : 'text-admin-muted hover:bg-admin-soft hover:text-admin-text font-medium'
 
 const iconClass = (item: NavItem) => {
-  if (item.accent === 'purple') return 'text-purple-500'
-  return isActivePath(item.to) ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600'
+  if (item.accent === 'purple') return 'text-admin-accent'
+  return isActivePath(item.to) ? 'text-admin-accent' : 'text-admin-muted group-hover:text-admin-text'
 }
 </script>
 
@@ -473,16 +473,15 @@ const iconClass = (item: NavItem) => {
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* A ~4% wash of the (themeable) brand hue distinguishes the sidebar surface
-   from the white header and grey-50 content without adding loudness. */
+/* The operator rail is intentionally independent from tenant storefront color. */
 .admin-sidebar {
-  background-color: color-mix(in srgb, var(--color-primary) 4%, var(--admin-surface));
+  background-color: color-mix(in srgb, var(--admin-accent) 4%, var(--admin-surface));
 }
 
 /* Branded keyboard focus. Uses outline (not box-shadow) so it isn't clipped by
    the sidebar's overflow-hidden / scroll containers. */
 .admin-focus:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--color-primary) 65%, transparent);
+  outline: 2px solid var(--admin-accent);
   outline-offset: 1px;
 }
 
