@@ -28,9 +28,9 @@
           <span
             v-else
             class="text-xl font-bold tracking-tight transition-colors duration-300"
-            :style="{ color: isTransparent ? '#fff' : (siteConfig?.theme?.primary_color || '#6898ED') }"
+            :style="{ color: headerLogoColor }"
           >
-            {{ isApexMarketing ? 'SSu' : (siteConfig?.site_name || 'Store') }}
+            {{ isApexMarketing ? 'SSU' : (siteConfig?.site_name || 'Store') }}
           </span>
         </NuxtLink>
 
@@ -511,6 +511,12 @@ const scrollY = ref(0)
 const isTransparent = computed(() =>
   isFullBleedPage.value && scrollY.value < 50 && !mobileMenuOpen.value
 )
+const PLATFORM_PRIMARY_COLOR = '#6898ED'
+const headerLogoColor = computed(() => {
+  if (isApexMarketing.value) return PLATFORM_PRIMARY_COLOR
+  if (isTransparent.value) return '#fff'
+  return siteConfig.value?.theme?.primary_color || PLATFORM_PRIMARY_COLOR
+})
 // Once the page has scrolled a little, condense the solid bar and add elevation.
 const isScrolled = computed(() => scrollY.value > 8)
 

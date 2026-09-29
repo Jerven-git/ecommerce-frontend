@@ -1,44 +1,54 @@
 <template>
-  <div>
+  <div :class="{ 'ssu-marketing-home': isApexMarketing }">
     <div v-if="siteConfigPending && !siteConfig" class="min-h-[60vh] flex items-center justify-center">
       <span class="text-sm text-gray-500">Loading…</span>
     </div>
     <!-- ─────────────────────────  APEX MARKETING (bare domain)  ───────────────────────── -->
     <template v-else-if="isApexMarketing">
+      <ClientOnly>
+        <LazyHomeCustomCursor />
+      </ClientOnly>
+
       <!-- Hero -->
-      <section class="relative isolate overflow-hidden bg-white">
-        <div class="absolute inset-0 -z-10">
+      <section class="relative isolate overflow-hidden bg-white" aria-labelledby="ssu-hero-title">
+        <div class="absolute inset-0 -z-20">
           <div class="absolute inset-0 bg-gradient-to-b from-blue-50 via-white to-white" />
           <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[520px] bg-blue-100/50 rounded-full blur-[120px]" />
         </div>
-        <div class="mx-auto max-w-7xl px-6 lg:px-8 py-16 lg:py-24">
+
+        <ClientOnly>
+          <LazyHomeHeroThreeBackground />
+        </ClientOnly>
+        <div class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-white via-white/90 to-white/25 lg:via-white/75" aria-hidden="true" />
+
+        <div class="relative z-10 mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
           <div class="grid gap-10 lg:grid-cols-2 lg:gap-12 items-center">
             <div>
               <div class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" /> For stores that sell — launch in minutes
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Commerce, without the operational clutter
               </div>
-              <h1 class="mt-6 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-                The store platform for <span class="text-[#6898ED]">SSu</span>
+              <h1 id="ssu-hero-title" class="mt-6 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                Your next shop, <span class="text-[#6898ED]">ready for what’s next.</span>
               </h1>
               <p class="mt-4 text-lg leading-relaxed text-gray-600">
-                Create your store, pick a plan, and start selling. SSu gives you products, orders, shipping, tax, blog and theme controls — one place to run the whole shop.
+                Bring products, orders, payments, shipping and content into one clear workspace—from launch day to daily growth.
               </p>
               <div class="mt-8 flex flex-wrap items-center gap-3">
-                <NuxtLink :to="authStore.isAuthenticated ? '/admin' : '/register'" class="inline-flex items-center gap-2 rounded-full bg-[#6898ED] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#5a85cc]">
-                  {{ authStore.isAuthenticated ? 'Go to dashboard' : 'Get Started — Create account' }}
+                <NuxtLink :to="authStore.isAuthenticated ? '/admin' : '/register'" class="inline-flex items-center gap-2 rounded-full bg-[#6898ED] px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#5a85cc] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6898ED]">
+                  {{ authStore.isAuthenticated ? 'Open dashboard' : 'Start with SSU' }}
                   <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                 </NuxtLink>
-                <a href="#pricing" class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">View Plans</a>
+                <a href="#pricing" class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6898ED]">See pricing</a>
                 <NuxtLink v-if="!authStore.isAuthenticated" to="/admin/login" class="text-sm font-medium text-gray-600 hover:text-gray-900">Login →</NuxtLink>
               </div>
-              <p class="mt-3 text-xs text-gray-500">No credit card to explore. Cancel anytime from billing portal.</p>
+              <p class="mt-3 text-xs text-gray-500">Explore first. Choose a plan when you’re ready.</p>
             </div>
             <!-- Visual -->
             <div class="relative">
               <div class="rounded-2xl border border-gray-200 bg-white shadow-xl shadow-gray-200/50 overflow-hidden">
                 <div class="flex items-center gap-1.5 px-4 py-3 border-b border-gray-100">
                   <span class="h-2.5 w-2.5 rounded-full bg-red-400" /><span class="h-2.5 w-2.5 rounded-full bg-amber-400" /><span class="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-                  <span class="ml-3 text-xs font-medium text-gray-400">SSu — Admin</span>
+                  <span class="ml-3 text-xs font-medium text-gray-400">SSU — Admin</span>
                 </div>
                 <div class="grid grid-cols-3 gap-4 p-5">
                   <div class="col-span-1 space-y-3">
@@ -70,7 +80,7 @@
           <div class="max-w-2xl">
             <p class="text-sm font-semibold text-blue-700">Everything to sell</p>
             <h2 class="mt-2 text-3xl font-bold tracking-tight text-gray-900">Store, content and orders — in one place</h2>
-            <p class="mt-3 text-gray-600">Built from the SSu capabilities already in your admin. No mock features.</p>
+            <p class="mt-3 text-gray-600">Built from the SSU capabilities already in your admin. No mock features.</p>
           </div>
           <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <div v-for="f in [['Products & Categories','Create products, variants, stock, categories and collections.'],['Services & Booking','Offer services with categories and scheduling.'],['Orders & Backorders','Track orders, backorders, discounts and gift cards.'],['Shipping, Tax & Payments','Configure carriers, tax rules and payment gateways.'],['Blog, Pages & Theme','Manage posts, pages, hero, theme colours and fonts — no code.'],['Custom domain & Roles','Point your domain, verify DNS, manage admin users and permissions.']]" :key="f[0]" class="rounded-2xl border border-gray-200 p-6 bg-white">
@@ -89,7 +99,7 @@
             <p class="mt-3 text-gray-600">Four steps from zero to live store.</p>
           </div>
           <ol class="mt-10 grid gap-6 md:grid-cols-4">
-            <li v-for="(s, i) in [['Create account','Pick your store name and slug — you get an instant subdomain.'],['Choose a plan','Monthly $200 or Yearly $2,000 (2 months free). Unlocks the admin.'],['Set up your store','Add products, theme, domain and shipping in the dashboard.'],['Sell & manage','Orders, discounts, blog and analytics — all in SSu.']]" :key="i" class="rounded-2xl bg-white border border-gray-200 p-6 relative">
+            <li v-for="(s, i) in [['Create account','Pick your store name and slug — you get an instant subdomain.'],['Choose a plan','Monthly $200 or Yearly $2,000 (2 months free). Unlocks the admin.'],['Set up your store','Add products, theme, domain and shipping in the dashboard.'],['Sell & manage','Orders, discounts, blog and analytics — all in SSU.']]" :key="i" class="rounded-2xl bg-white border border-gray-200 p-6 relative">
               <span class="flex h-8 w-8 items-center justify-center rounded-full bg-[#6898ED] text-white text-sm font-bold">{{ i + 1 }}</span>
               <h3 class="mt-4 font-semibold text-gray-900">{{ s[0] }}</h3>
               <p class="mt-2 text-sm leading-relaxed text-gray-600">{{ s[1] }}</p>

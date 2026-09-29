@@ -48,18 +48,18 @@
     --font-heading: 'Inter', sans-serif;
     --font-body: 'Inter', sans-serif;
 
-    /* Shared admin surfaces. These are deliberately independent from each
-       tenant's storefront palette: operators need one stable control room. */
+    /* Shared admin surfaces. Neutral surfaces stay stable, while interactive
+       accents follow the primary colour configured in Appearance. */
     --admin-canvas: #f8fafc;
     --admin-surface: #ffffff;
     --admin-surface-soft: #f1f5f9;
     --admin-text: #111827;
     --admin-text-muted: #4b5563;
     --admin-border: #dbe2ea;
-    --admin-accent: #7c3aed;
-    --admin-on-accent: #ffffff;
-    --admin-accent-strong: #6d28d9;
-    --admin-accent-soft: #f3e8ff;
+    --admin-accent: var(--color-primary, #6898ED);
+    --admin-on-accent: var(--on-primary, #ffffff);
+    --admin-accent-strong: var(--color-primary-700, #4f7dd4);
+    --admin-accent-soft: var(--color-primary-50, #eef4fd);
     --admin-success: #047857;
     --admin-success-soft: #ecfdf5;
     --admin-warning: #b45309;
@@ -92,10 +92,10 @@
     --admin-text: #f8fafc;
     --admin-text-muted: #cbd5e1;
     --admin-border: #343b4a;
-    --admin-accent: #a78bfa;
-    --admin-on-accent: #1e1635;
-    --admin-accent-strong: #c4b5fd;
-    --admin-accent-soft: #2e2250;
+    --admin-accent: var(--color-primary, #6898ED);
+    --admin-on-accent: var(--on-primary, #ffffff);
+    --admin-accent-strong: var(--color-primary-300, #8eb4f0);
+    --admin-accent-soft: color-mix(in srgb, var(--color-primary, #6898ED) 24%, var(--admin-canvas));
     --admin-success: #6ee7b7;
     --admin-success-soft: #123c32;
     --admin-warning: #fcd34d;

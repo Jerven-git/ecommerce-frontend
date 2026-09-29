@@ -4,7 +4,7 @@
     <div class="max-w-7xl mx-auto px-6 lg:px-8 py-12 md:py-16">
       <div class="grid gap-10 md:grid-cols-3">
         <div>
-          <NuxtLink to="/" class="inline-block text-xl font-bold tracking-tight text-white">SSu</NuxtLink>
+          <NuxtLink to="/" class="inline-block text-xl font-bold tracking-tight text-white">SSU</NuxtLink>
           <p class="mt-3 text-sm leading-relaxed text-white/60 max-w-xs">The store platform for modern merchants — products, orders, and content in one place.</p>
         </div>
         <div>
@@ -25,7 +25,7 @@
         </div>
       </div>
       <div class="border-t border-white/10 mt-10 pt-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-        <p class="text-xs text-white/40">© {{ new Date().getFullYear() }} SSu. All rights reserved.</p>
+        <p class="text-xs text-white/40">© {{ new Date().getFullYear() }} SSU. All rights reserved.</p>
         <button type="button" class="inline-flex items-center gap-1.5 text-xs font-semibold text-white/40 hover:text-white transition-colors" @click="scrollToTop">Back to top <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg></button>
       </div>
     </div>

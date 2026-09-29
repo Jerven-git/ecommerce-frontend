@@ -1,29 +1,39 @@
-export default defineNuxtPlugin(({ $pinia }) => {
-  // Simple cart persistence using localStorage
-  if (process.client) {
-    const CART_KEY = 'cart-storage'
-    
-    // Load cart from localStorage on init
-    const cartStore = useCartStore($pinia as any)
-    const stored = localStorage.getItem(CART_KEY)
-    
-    if (stored) {
-      try {
+const CART_KEY = 'cart-storage'
+
+export default defineNuxtPlugin((nuxtApp) => {
+  // Restore browser-only state after Vue has hydrated the server HTML. Applying
+  // it during plugin setup made the cart badge differ between SSR and hydration.
+  nuxtApp.hook('app:mounted', () => {
+    const cartStore = useCartStore(nuxtApp.$pinia as any)
+
+    try {
+      const stored = localStorage.getItem(CART_KEY)
+      if (stored) {
         const data = JSON.parse(stored)
-        if (data.items) {
-          cartStore.$patch(data)
+        if (Array.isArray(data.items)) {
+          cartStore.$patch({
+            items: data.items,
+            shippingOptions: Array.isArray(data.shippingOptions) ? data.shippingOptions : [],
+          })
+
+          if (cartStore.items.length > 0) {
+            void cartStore.calculateTax()
+          }
         }
-      } catch (e) {
-        console.error('Failed to load cart from storage:', e)
       }
+    } catch (error) {
+      console.error('Failed to load cart from storage:', error)
     }
-    
-    // Save cart to localStorage on changes
-    cartStore.$subscribe((mutation, state) => {
-      localStorage.setItem(CART_KEY, JSON.stringify({
-        items: state.items,
-        shippingOptions: state.shippingOptions
-      }))
+
+    cartStore.$subscribe((_mutation, state) => {
+      try {
+        localStorage.setItem(CART_KEY, JSON.stringify({
+          items: state.items,
+          shippingOptions: state.shippingOptions,
+        }))
+      } catch (error) {
+        console.error('Failed to save cart to storage:', error)
+      }
     })
-  }
+  })
 })

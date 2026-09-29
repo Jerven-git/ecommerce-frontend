@@ -473,7 +473,7 @@ const iconClass = (item: NavItem) => {
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* The operator rail is intentionally independent from tenant storefront color. */
+/* Keep the rail quiet while tinting it with the primary colour from Appearance. */
 .admin-sidebar {
   background-color: color-mix(in srgb, var(--admin-accent) 4%, var(--admin-surface));
 }

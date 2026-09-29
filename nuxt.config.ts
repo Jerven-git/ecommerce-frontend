@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   // node_modules cache default can be owned by the container user, which makes
   // local production builds fail before compilation begins.
   buildDir: '.nuxt',
-  devtools: { enabled: true },
+  devtools: { enabled: process.env.NUXT_DEVTOOLS === 'true' },
   ssr: true,
 
   routeRules: {
@@ -54,10 +54,18 @@ export default defineNuxtConfig({
       headers: { 'x-robots-tag': 'noindex, nofollow, noarchive' },
     },
   },
-  
-  modules: ['@nuxtjs/tailwindcss', '@nuxt/icon', '@nuxt/content', '@pinia/nuxt', '@nuxt/fonts'],
+
+  modules: ['@nuxtjs/tailwindcss', '@nuxt/icon', '@pinia/nuxt', '@nuxt/fonts'],
 
   fonts: {
+    // Tenant-selected fonts are applied through runtime CSS variables, so the
+    // families remain global. Limit every family to the faces the storefront
+    // actually uses instead of generating italic and non-Latin variants too.
+    defaults: {
+      styles: ['normal'],
+      subsets: ['latin'],
+      preload: false,
+    },
     // Font choice is driven by admin settings at runtime (via CSS variables),
     // so the @font-face scanner can't detect which families are used.
     // `global: true` forces each family to be injected on every page regardless.
@@ -65,40 +73,39 @@ export default defineNuxtConfig({
     // are rarely used in body or headings and roughly double the font payload.
     families: [
       // Sans-serif (UI / general)
-      { name: 'Inter',             weights: [400, 600, 700], global: true },
-      { name: 'Poppins',           weights: [400, 600, 700], global: true },
-      { name: 'Roboto',            weights: [400, 700],      global: true },
-      { name: 'Lato',              weights: [400, 700],      global: true },
-      { name: 'Montserrat',        weights: [400, 600, 700], global: true },
-      { name: 'Open Sans',         weights: [400, 600, 700], global: true },
-      { name: 'Nunito',            weights: [400, 600, 700], global: true },
-      { name: 'Work Sans',         weights: [400, 600, 700], global: true },
-      { name: 'DM Sans',           weights: [400, 700],      global: true },
-      { name: 'Raleway',           weights: [400, 600, 700], global: true },
-      { name: 'Fira Sans',         weights: [400, 600, 700], global: true },
+      { name: 'Inter', weights: [400, 600, 700], global: true },
+      { name: 'Poppins', weights: [400, 600, 700], global: true },
+      { name: 'Roboto', weights: [400, 700], global: true },
+      { name: 'Lato', weights: [400, 700], global: true },
+      { name: 'Montserrat', weights: [400, 600, 700], global: true },
+      { name: 'Open Sans', weights: [400, 600, 700], global: true },
+      { name: 'Nunito', weights: [400, 600, 700], global: true },
+      { name: 'Work Sans', weights: [400, 600, 700], global: true },
+      { name: 'DM Sans', weights: [400, 700], global: true },
+      { name: 'Raleway', weights: [400, 600, 700], global: true },
+      { name: 'Fira Sans', weights: [400, 600, 700], global: true },
       // Serif (editorial / premium)
-      { name: 'Playfair Display',  weights: [400, 600, 700], global: true },
-      { name: 'Merriweather',      weights: [400, 700],      global: true },
-      { name: 'Lora',              weights: [400, 600, 700], global: true },
-      { name: 'Crimson Pro',       weights: [400, 600, 700], global: true },
-      { name: 'Libre Baskerville', weights: [400, 700],      global: true },
+      { name: 'Playfair Display', weights: [400, 600, 700], global: true },
+      { name: 'Merriweather', weights: [400, 700], global: true },
+      { name: 'Lora', weights: [400, 600, 700], global: true },
+      { name: 'Crimson Pro', weights: [400, 600, 700], global: true },
+      { name: 'Libre Baskerville', weights: [400, 700], global: true },
       // Display / headings
-      { name: 'Bebas Neue',        weights: [400],           global: true },
-      { name: 'Oswald',            weights: [400, 600, 700], global: true },
-      { name: 'Archivo Black',     weights: [400],           global: true },
-      { name: 'Space Grotesk',     weights: [400, 600, 700], global: true },
+      { name: 'Bebas Neue', weights: [400], global: true },
+      { name: 'Oswald', weights: [400, 600, 700], global: true },
+      { name: 'Archivo Black', weights: [400], global: true },
+      { name: 'Space Grotesk', weights: [400, 600, 700], global: true },
     ],
   },
-  
+
+  // Keep Nuxt's component auto-imports, but only include components used by a
+  // route. Global registration imported the entire component tree on every page.
   components: {
-    global: true,
-    dirs: [
-      '~/components'
-    ]
+    dirs: ['~/components'],
   },
 
   css: ['~/assets/css/main.css'],
-  
+
   app: {
     head: {
       title: 'Shop System United',
@@ -112,15 +119,28 @@ export default defineNuxtConfig({
       link: [],
     },
   },
-  
+
   devServer: {
     host: '0.0.0.0',
     port: 3000,
   },
-  
+
   vue: {},
-  
+
   vite: {
+    optimizeDeps: {
+      include: [
+        'vue3-apexcharts',
+        'country-state-city',
+        'i18n-iso-countries',
+        'philippines',
+        'marked',
+        'isomorphic-dompurify',
+        'motion-v',
+        'laravel-echo',
+        'pusher-js',
+      ],
+    },
     server: {
       hmr: {
         protocol: 'ws',
@@ -130,13 +150,15 @@ export default defineNuxtConfig({
         path: '/__vite_hmr',
       },
       watch: {
-        usePolling: true,
-        interval: 2000,
+        // Native filesystem events are substantially cheaper. Polling remains
+        // available for Docker hosts that do not propagate file events.
+        usePolling: process.env.NUXT_VITE_USE_POLLING === 'true',
+        interval: Number(process.env.NUXT_VITE_POLL_INTERVAL || 1000),
         ignored: ['**/node_modules/**', '**/.nuxt/**', '**/.output/**'],
       },
     },
   },
-  
+
   runtimeConfig: {
     // Used only by Nitro during SSR. In Docker this points to nginx on the
     // internal network; a local non-Docker dev server falls back to the public
@@ -158,8 +180,5 @@ export default defineNuxtConfig({
       reverbScheme: process.env.NUXT_PUBLIC_REVERB_SCHEME || 'http'
     }
   },
-  
-  content: {
-    watch: { enabled: false },
-  },
+
 })

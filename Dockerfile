@@ -7,11 +7,11 @@ LABEL app_environment="development"
 # Set working dir
 WORKDIR /app
 
-# Copy package files first
-COPY package.json ./
+# Copy package files first so dependency layers only rebuild when they change
+COPY package.json bun.lock ./
 
 # Install dependencies
-RUN bun install
+RUN bun install --frozen-lockfile
 
 # Copy the rest of the app
 COPY . .
@@ -19,5 +19,6 @@ COPY . .
 # Expose Nuxt dev port AND HMR port
 EXPOSE 3000 24678
 
-# Install deps into the named volume (if needed) and start dev server
-CMD ["sh", "-c", "bun install --frozen-lockfile 2>/dev/null || bun install && bun run dev --host 0.0.0.0"]
+# Dependencies are baked into the image and copied into the named volume on its
+# first use. Rebuild the image when package files change.
+CMD ["bun", "run", "dev", "--host", "0.0.0.0"]

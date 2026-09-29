@@ -115,6 +115,14 @@
     </div>
 
     <div class="max-w-md w-full relative z-10">
+      <a
+        :href="platformHomeUrl"
+        class="mb-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/15 bg-white/[0.07] px-3.5 py-2 text-sm font-medium text-white/75 backdrop-blur-sm transition-colors hover:bg-white/[0.12] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+      >
+        <Icon name="heroicons:arrow-left" class="h-4 w-4" aria-hidden="true" />
+        Back to SSU home
+      </a>
+
       <!-- Card -->
       <div
         class="bg-white/[0.07] backdrop-blur-xl rounded-2xl shadow-2xl border border-white/[0.12] p-8 sm:p-10"
@@ -232,6 +240,25 @@ definePageMeta({
 
 const authStore = useAuthStore()
 const route = useRoute()
+const runtimeConfig = useRuntimeConfig()
+const requestUrl = useRequestURL()
+
+const platformHomeUrl = computed(() => {
+  const configuredBaseUrl = String(runtimeConfig.public.baseURL || '').trim()
+  if (configuredBaseUrl) {
+    try {
+      return new URL('/', configuredBaseUrl).toString()
+    } catch {
+      // Fall through to the configured platform domain when the URL is invalid.
+    }
+  }
+
+  const baseDomain = String(runtimeConfig.public.storefrontBaseDomain || '').trim()
+  if (!baseDomain) return '/'
+
+  const port = requestUrl.port ? `:${requestUrl.port}` : ''
+  return `${requestUrl.protocol}//${baseDomain}${port}/`
+})
 
 // Optional ?redirect= destination (fallback to admin dashboard). Only allow
 // same-origin paths to keep it from becoming an open redirect.
