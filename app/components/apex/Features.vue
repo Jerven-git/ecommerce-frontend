@@ -16,7 +16,7 @@
           @pointerenter="activateCard(index)"
         >
           <motion.div
-            class="impact-card-inner relative h-full"
+            class="impact-card-inner relative"
             :animate="{ rotateY: isFlipped(index) ? 180 : 0 }"
             :transition="{ duration: prefersReducedMotion ? 0 : 0.42, ease: 'easeOut' }"
           >
@@ -186,7 +186,8 @@ const features = [
 }
 
 .impact-card {
-  height: 26rem;
+  container-type: inline-size;
+  min-height: 26rem;
   perspective: 1100px;
 }
 
@@ -201,13 +202,17 @@ const features = [
 }
 
 .impact-card-inner {
+  display: grid;
+  min-height: inherit;
+  height: 100%;
   transform-style: preserve-3d;
 }
 
 .impact-face {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
+  position: relative;
+  display: flex;
+  grid-area: 1 / 1;
+  min-width: 0;
   border-radius: 1rem;
   background: #f8f8f3;
   backface-visibility: hidden;
@@ -220,7 +225,8 @@ const features = [
 
 .impact-content {
   display: flex;
-  height: 100%;
+  min-width: 0;
+  flex: 1 1 auto;
   flex-direction: column-reverse;
   gap: 0.75rem;
   padding: 0.75rem;
@@ -233,20 +239,34 @@ const features = [
   flex-direction: column;
   justify-content: space-between;
   padding: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.impact-copy > * {
+  min-width: 0;
+}
+
+.impact-action {
+  flex-wrap: wrap;
 }
 
 .impact-visual {
   display: flex;
-  height: 10.5rem;
+  min-width: 0;
+  min-height: 10.5rem;
   flex: 0 0 auto;
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1.5rem;
-  overflow: hidden;
   border-radius: 0.75rem;
   background: var(--feature-accent);
   padding: 1.25rem;
+  overflow-wrap: anywhere;
+}
+
+.impact-visual > * {
+  max-width: 100%;
 }
 
 .impact-visual-back {
@@ -262,38 +282,19 @@ const features = [
 @media (min-width: 1280px) {
   .impact-row {
     display: flex;
-    height: 28rem;
-    gap: 0.5rem;
+    min-height: 28rem;
     align-items: stretch;
+    gap: 0.5rem;
   }
 
   .impact-card {
-    height: 100%;
+    min-height: 28rem;
     flex: 1 1 0;
-    overflow: hidden;
     transition: flex-grow 420ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .impact-card.is-active {
     flex-grow: 3.25;
-  }
-
-  .impact-content {
-    width: 28rem;
-    flex-direction: row;
-    gap: 1.5rem;
-  }
-
-  .impact-copy {
-    width: 7.75rem;
-    flex: 0 0 7.75rem;
-    padding: 1.25rem 0 1.25rem 1.25rem;
-  }
-
-  .impact-visual {
-    width: 15.75rem;
-    height: auto;
-    flex: 0 0 15.75rem;
   }
 
   .impact-card:not(.is-active) .impact-content {
@@ -305,7 +306,6 @@ const features = [
     width: 100%;
     flex: 1 1 auto;
     padding: 1.25rem 1rem;
-    overflow-wrap: anywhere;
   }
 
   .impact-card:not(.is-active) .impact-visual {
@@ -313,9 +313,25 @@ const features = [
   }
 
   .impact-card:not(.is-active) .impact-action {
-    flex-wrap: wrap;
     gap: 0.25rem;
     font-size: 0.6875rem;
+  }
+
+  @container (min-width: 24rem) {
+    .impact-card.is-active .impact-content {
+      flex-direction: row;
+      gap: 1.5rem;
+    }
+
+    .impact-card.is-active .impact-copy {
+      flex: 1 1 40%;
+      padding: 1.25rem 0 1.25rem 1.25rem;
+    }
+
+    .impact-card.is-active .impact-visual {
+      min-width: 0;
+      flex: 1 1 60%;
+    }
   }
 }
 

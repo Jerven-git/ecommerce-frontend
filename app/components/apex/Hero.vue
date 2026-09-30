@@ -57,9 +57,14 @@
           v-for="(slide, index) in slides"
           :key="slide.src"
           :src="slide.src"
+          :srcset="slide.srcset"
+          :sizes="HERO_IMAGE_SIZES"
+          :width="slide.width"
+          :height="slide.height"
           :alt="slide.alt"
           :loading="index === 0 ? 'eager' : 'lazy'"
           :fetchpriority="index === 0 ? 'high' : 'auto'"
+          decoding="async"
           class="hero-slide absolute inset-0 h-full w-full object-cover"
           :class="index === activeSlide ? 'is-active' : ''"
           :aria-hidden="index !== activeSlide"
@@ -144,6 +149,7 @@ defineProps<{
 }>()
 
 const SLIDE_DURATION = 5000
+const HERO_IMAGE_SIZES = '(min-width: 1536px) 42rem, (min-width: 1024px) 44vw, calc(100vw - 3rem)'
 const activeSlide = ref(0)
 const isPlaying = ref(true)
 const progressVersion = ref(0)
@@ -153,25 +159,37 @@ let slideTimer: ReturnType<typeof setInterval> | undefined
 
 const slides = [
   {
-    src: '/images/ArteGallery/mountain-art.webp',
+    src: '/images/ArteGallery/mountain-art-960.webp',
+    srcset: '/images/ArteGallery/mountain-art-640.webp 640w, /images/ArteGallery/mountain-art-960.webp 960w, /images/ArteGallery/mountain-art-1440.webp 1440w, /images/ArteGallery/mountain-art.webp 1920w',
+    width: 1920,
+    height: 1320,
     alt: 'Framed artwork displayed in a bright gallery-inspired interior.',
     category: 'Visual storefront',
     label: 'Arte Gallery',
   },
   {
-    src: '/images/MinimalMono/laptop.webp',
+    src: '/images/MinimalMono/laptop-960.webp',
+    srcset: '/images/MinimalMono/laptop-640.webp 640w, /images/MinimalMono/laptop-960.webp 960w, /images/MinimalMono/laptop-1440.webp 1440w, /images/MinimalMono/laptop.webp 2560w',
+    width: 2560,
+    height: 1707,
     alt: 'Minimal workspace with a laptop and clean product styling.',
     category: 'Focused catalog',
     label: 'Minimal Mono',
   },
   {
-    src: '/images/ForestGreen/food.webp',
+    src: '/images/ForestGreen/food-960.webp',
+    srcset: '/images/ForestGreen/food-640.webp 640w, /images/ForestGreen/food-960.webp 960w, /images/ForestGreen/food-1440.webp 1440w, /images/ForestGreen/food.webp 2560w',
+    width: 2560,
+    height: 1707,
     alt: 'Food presentation styled with rich natural colours.',
     category: 'Product storytelling',
     label: 'Forest Green',
   },
   {
-    src: '/images/WarmSunset/wedding.webp',
+    src: '/images/WarmSunset/wedding-960.webp',
+    srcset: '/images/WarmSunset/wedding-640.webp 640w, /images/WarmSunset/wedding-960.webp 960w, /images/WarmSunset/wedding-1440.webp 1440w, /images/WarmSunset/wedding.webp 2560w',
+    width: 2560,
+    height: 1707,
     alt: 'Warm service-led scene prepared for a celebration.',
     category: 'Services and booking',
     label: 'Warm Sunset',

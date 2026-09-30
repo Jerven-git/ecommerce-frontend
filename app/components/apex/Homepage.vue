@@ -19,27 +19,30 @@
 </template>
 
 <script setup lang="ts">
+import type { SubscriptionPlan } from '~/composables/useSubscription'
+
 const authStore = useAuthStore()
 const subscription = useSubscription()
-const marketingPlans = computed(() => subscription.plans.value ?? [])
-const marketingPlansLoading = ref(true)
-const marketingPlansError = ref<string | null>(null)
 
-async function loadMarketingPlans() {
-  marketingPlansLoading.value = true
-  marketingPlansError.value = null
-  try {
-    await subscription.fetchPlans(true)
-  } catch {
-    marketingPlansError.value = 'We couldn’t load pricing plans. Check your connection and try again.'
-  } finally {
-    marketingPlansLoading.value = false
-  }
-}
+const {
+  data: marketingPlans,
+  pending: marketingPlansLoading,
+  error: marketingPlansRequestError,
+  refresh: loadMarketingPlans,
+} = await useAsyncData<SubscriptionPlan[]>(
+  'apex-marketing-plans',
+  () => subscription.fetchPlans(true),
+  {
+    server: true,
+    default: () => subscription.plans.value ?? [],
+  },
+)
+
+const marketingPlansError = computed(() => marketingPlansRequestError.value
+  ? 'We couldn’t load pricing plans. Check your connection and try again.'
+  : null)
 
 onMounted(() => {
-  loadMarketingPlans()
-
   // Let the CTAs recognise returning admins without blocking the homepage.
   if (!authStore.isAuthenticated) authStore.checkAuth().catch(() => {})
 })
