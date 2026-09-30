@@ -17,7 +17,13 @@
       >
 
         <!-- Logo -->
-        <NuxtLink :to="marketingHome" class="flex items-center shrink-0 justify-self-start">
+        <NuxtLink
+          :to="marketingHome"
+          class="flex items-center shrink-0 justify-self-start rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+          :class="isApexMarketing
+            ? (isTransparent ? 'focus-visible:outline-[var(--apex-focus-on-dark)]' : 'focus-visible:outline-[var(--apex-focus-on-light)]')
+            : 'focus-visible:outline-primary-500'"
+        >
           <img
             v-if="!isApexMarketing && siteConfig?.logo_url"
             :src="siteConfig.logo_url"
@@ -40,8 +46,10 @@
             v-for="link in marketingLinks"
             :key="link.to"
             :href="link.to"
-            class="nav-link"
-            :class="isTransparent ? 'text-white/85 hover:text-white' : 'text-gray-700 hover:text-gray-950'"
+            class="nav-link rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+            :class="isTransparent
+              ? 'text-white/85 hover:text-white focus-visible:outline-[var(--apex-focus-on-dark)]'
+              : 'text-gray-700 hover:text-gray-950 focus-visible:outline-[var(--apex-focus-on-light)]'"
           >{{ link.label }}</a>
         </nav>
         <nav v-else class="hidden lg:flex items-center gap-7 justify-self-center">
@@ -145,8 +153,10 @@
             <NuxtLink
               v-if="authStore.isAuthenticated"
               to="/admin"
-              class="hidden lg:inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold tracking-tight transition-colors"
-              :class="isTransparent ? 'border-white/25 text-white/85 hover:text-white hover:bg-white/10' : 'border-gray-900/10 bg-white text-gray-700 hover:bg-gray-50'"
+              class="hidden lg:inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold tracking-tight transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+              :class="isTransparent
+                ? 'border-white/40 text-white/85 hover:text-white hover:bg-white/10 focus-visible:outline-[var(--apex-focus-on-dark)]'
+                : 'border-gray-900/10 bg-white text-gray-700 hover:bg-gray-50 focus-visible:outline-[var(--apex-focus-on-light)]'"
             >
               <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
               Dashboard
@@ -154,14 +164,17 @@
             <NuxtLink
               v-else
               to="/admin/login"
-              class="hidden lg:inline-flex items-center px-3.5 py-2 text-sm font-medium transition-colors"
-              :class="isTransparent ? 'text-white/85 hover:text-white' : 'text-gray-600 hover:text-gray-900'"
+              class="hidden lg:inline-flex items-center rounded-md px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+              :class="isTransparent
+                ? 'text-white/85 hover:text-white focus-visible:outline-[var(--apex-focus-on-dark)]'
+                : 'text-gray-600 hover:text-gray-900 focus-visible:outline-[var(--apex-focus-on-light)]'"
             >Login</NuxtLink>
             <NuxtLink
               :to="authStore.isAuthenticated ? '/admin' : '/register'"
-              class="hidden lg:inline-flex items-center px-5 py-2.5 rounded-full text-sm font-semibold shadow-sm transition-colors"
-              :class="isTransparent ? 'bg-white text-gray-900 hover:bg-white/90' : 'bg-[#6898ED] text-white hover:bg-[#5a85cc]'"
-              :style="isTransparent ? {} : { color: 'var(--on-primary, #fff)' }"
+              class="hidden lg:inline-flex items-center rounded-full bg-[var(--apex-action)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+              :class="isTransparent
+                ? 'hover:bg-[var(--apex-action-hover)] focus-visible:outline-[var(--apex-focus-on-dark)]'
+                : 'hover:bg-[var(--apex-action-hover)] focus-visible:outline-[var(--apex-focus-on-light)]'"
             >{{ authStore.isAuthenticated ? 'Go to dashboard' : 'Get Started' }}</NuxtLink>
           </template>
 
@@ -241,10 +254,19 @@
 
           <!-- Mobile hamburger -->
           <button
+            ref="mobileMenuTrigger"
+            type="button"
             @click="mobileMenuOpen = true"
-            class="lg:hidden p-2 rounded-full border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-            :class="isTransparent ? 'border-white/20 text-white/85 hover:bg-white/10' : 'border-gray-900/10 bg-white/70 text-gray-900 shadow-sm hover:bg-gray-50'"
+            class="lg:hidden p-2 rounded-full border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            :class="[
+              isTransparent ? 'border-white/20 text-white/85 hover:bg-white/10' : 'border-gray-900/10 bg-white/70 text-gray-900 shadow-sm hover:bg-gray-50',
+              isApexMarketing
+                ? (isTransparent ? 'focus-visible:outline-[var(--apex-focus-on-dark)]' : 'focus-visible:outline-[var(--apex-focus-on-light)]')
+                : 'focus-visible:outline-primary-500',
+            ]"
             aria-label="Open menu"
+            aria-controls="mobile-menu-dialog"
+            :aria-expanded="mobileMenuOpen"
           >
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -280,6 +302,9 @@
         >
           <aside
             v-if="mobileMenuOpen"
+            id="mobile-menu-dialog"
+            ref="mobileMenuDialog"
+            tabindex="-1"
             class="lg:hidden fixed top-0 right-0 z-[61] h-full w-[85vw] max-w-sm bg-white shadow-2xl flex flex-col"
             role="dialog"
             aria-modal="true"
@@ -294,8 +319,10 @@
                 </p>
               </div>
               <button
+                ref="mobileMenuCloseButton"
                 type="button"
-                class="p-2 rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+                class="p-2 rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                :class="isApexMarketing ? 'focus-visible:outline-[var(--apex-focus-on-light)]' : 'focus-visible:outline-primary-500'"
                 aria-label="Close menu"
                 @click="closeMobile"
               >
@@ -307,14 +334,14 @@
 
             <!-- Drawer nav -->
             <nav v-if="isApexMarketing" class="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-0.5">
-              <a v-for="link in marketingLinks" :key="link.to" :href="link.to" class="px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors" @click="closeMobile">{{ link.label }}</a>
+              <a v-for="link in marketingLinks" :key="link.to" :href="link.to" class="rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">{{ link.label }}</a>
               <div class="mt-4 pt-4 border-t border-gray-900/[0.08] flex flex-col gap-2">
-                <NuxtLink v-if="authStore.isAuthenticated" to="/admin" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-[#6898ED] text-white" @click="closeMobile">Dashboard</NuxtLink>
+                <NuxtLink v-if="authStore.isAuthenticated" to="/admin" class="flex items-center justify-center gap-2 rounded-xl bg-[var(--apex-action)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--apex-action-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">Dashboard</NuxtLink>
                 <template v-else>
-                  <NuxtLink to="/admin/login" class="flex items-center justify-center px-4 py-2.5 rounded-xl text-sm font-medium border border-gray-200 hover:bg-gray-50" @click="closeMobile">Login</NuxtLink>
-                  <NuxtLink to="/register" class="flex items-center justify-center px-4 py-2.5 rounded-xl text-sm font-semibold bg-[#6898ED] text-white" @click="closeMobile">Create Account</NuxtLink>
+                  <NuxtLink to="/admin/login" class="flex items-center justify-center rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">Login</NuxtLink>
+                  <NuxtLink to="/register" class="flex items-center justify-center rounded-xl bg-[var(--apex-action)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--apex-action-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">Create Account</NuxtLink>
                 </template>
-                <NuxtLink v-if="!authStore.isAuthenticated" to="/admin/subscription" class="text-center px-3 py-2 text-sm text-gray-500 hover:text-gray-700" @click="closeMobile">View Plans</NuxtLink>
+                <NuxtLink v-if="!authStore.isAuthenticated" to="/admin/subscription" class="rounded-lg px-3 py-2 text-center text-sm font-medium text-[var(--apex-action)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">View Plans</NuxtLink>
               </div>
             </nav>
             <nav v-else class="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-0.5">
@@ -398,6 +425,12 @@ const { siteConfig } = useSiteConfig()
 const { isEnabled } = useModules()
 const mobileMenuOpen = ref(false)
 const mobileShopOpen = ref(false)
+const mobileMenuTrigger = ref<HTMLButtonElement | null>(null)
+const mobileMenuDialog = ref<HTMLElement | null>(null)
+const mobileMenuCloseButton = ref<HTMLButtonElement | null>(null)
+let previouslyFocusedElement: HTMLElement | null = null
+let previousBodyOverflow = ''
+let appRootWasInert = false
 
 const favoritesEnabled = computed(() => siteConfig.value?.favorites_enabled ?? false)
 const headerCta = computed(() => siteConfig.value?.header_cta ?? null)
@@ -497,24 +530,23 @@ function closeMobile() {
   mobileMenuOpen.value = false
 }
 
-// Full-bleed transparent header applies on every page that renders a top
-// cover-image banner — Home (hero) plus About/Contact/Blog/Services — and
-// only when the admin opted into the "image flows under header" setting.
-// Pages without a banner (Shop, Cart, product/checkout) keep the normal
-// solid sticky band so the header never floats over white content.
+// The Apex marketing homepage always places navigation over its dark hero.
+// Storefront pages retain their tenant-configured full-bleed behaviour.
 const BANNER_PATHS = new Set(['/', '/about', '/contact', '/blog', '/services'])
 const isBannerPage = computed(() => BANNER_PATHS.has(route.path))
+const isApexHeroPage = computed(() => isApexMarketing.value && route.path === "/")
 const isFullBleedPage = computed(() =>
-  isBannerPage.value && (siteConfig.value?.hero_full_bleed ?? false)
+  isApexHeroPage.value
+  || (isBannerPage.value && (siteConfig.value?.hero_full_bleed ?? false))
 )
 const scrollY = ref(0)
 const isTransparent = computed(() =>
   isFullBleedPage.value && scrollY.value < 50 && !mobileMenuOpen.value
 )
-const PLATFORM_PRIMARY_COLOR = '#6898ED'
+const PLATFORM_PRIMARY_COLOR = '#3B6EC2'
 const headerLogoColor = computed(() => {
-  if (isApexMarketing.value) return PLATFORM_PRIMARY_COLOR
   if (isTransparent.value) return '#fff'
+  if (isApexMarketing.value) return PLATFORM_PRIMARY_COLOR
   return siteConfig.value?.theme?.primary_color || PLATFORM_PRIMARY_COLOR
 })
 // Once the page has scrolled a little, condense the solid bar and add elevation.
@@ -531,16 +563,61 @@ watch(() => route.fullPath, () => {
   openDropdown.value = null
 })
 
-// Lock body scroll + close on Escape while the drawer is open.
-watch(mobileMenuOpen, (open) => {
+// Keep focus inside the modal drawer, then return it to the opener.
+watch(mobileMenuOpen, async (open) => {
   if (!import.meta.client) return
-  document.body.style.overflow = open ? 'hidden' : ''
+
+  const appRoot = document.querySelector<HTMLElement>('#__nuxt')
+  if (open) {
+    previouslyFocusedElement = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : mobileMenuTrigger.value
+    previousBodyOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    if (appRoot) {
+      appRootWasInert = appRoot.inert
+      appRoot.inert = true
+    }
+    await nextTick()
+    mobileMenuCloseButton.value?.focus()
+    return
+  }
+
+  document.body.style.overflow = previousBodyOverflow
+  if (appRoot && !appRootWasInert) appRoot.inert = false
+  await nextTick()
+  if (previouslyFocusedElement?.isConnected) previouslyFocusedElement.focus()
+  previouslyFocusedElement = null
 })
 
 function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'Escape') closeMobile()
-}
+  if (!mobileMenuOpen.value) return
+  if (e.key === 'Escape') {
+    e.preventDefault()
+    closeMobile()
+    return
+  }
+  if (e.key !== 'Tab' || !mobileMenuDialog.value) return
 
+  const focusable = Array.from(mobileMenuDialog.value.querySelectorAll<HTMLElement>(
+    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+  )).filter(element => !element.hasAttribute('hidden'))
+  const first = focusable[0]
+  const last = focusable.at(-1)
+  if (!first || !last) {
+    e.preventDefault()
+    mobileMenuDialog.value.focus()
+  } else if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault()
+    last.focus()
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault()
+    first.focus()
+  } else if (!mobileMenuDialog.value.contains(document.activeElement)) {
+    e.preventDefault()
+    first.focus()
+  }
+}
 onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
   window.addEventListener('keydown', onKeydown)
@@ -549,7 +626,11 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll)
   window.removeEventListener('keydown', onKeydown)
-  if (import.meta.client) document.body.style.overflow = ''
+  if (import.meta.client) {
+    document.body.style.overflow = previousBodyOverflow
+    const appRoot = document.querySelector<HTMLElement>('#__nuxt')
+    if (appRoot && !appRootWasInert) appRoot.inert = false
+  }
 })
 </script>
 

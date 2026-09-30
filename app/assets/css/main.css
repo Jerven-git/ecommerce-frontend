@@ -35,6 +35,12 @@
     /* Accent / surface */
     --color-accent: #F3F4F6;
 
+    /* Apex marketing roles. Each pair meets WCAG AA in its intended context. */
+    --apex-action: #3b6ec2;
+    --apex-action-hover: #3564b3;
+    --apex-focus-on-light: #285095;
+    --apex-focus-on-dark: #b9d3ff;
+
     /* Legible text on solid primary/secondary fills — overridden per-theme in
        useTheme.ts based on the brand colour's luminance. */
     --on-primary: #ffffff;
