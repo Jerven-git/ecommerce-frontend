@@ -1,88 +1,24 @@
 <template>
-  <section id="features" class="border-t border-gray-100 bg-white py-16 lg:py-20">
-    <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="max-w-2xl">
-        <h2 class="text-3xl font-bold tracking-tight text-gray-900">Everything you need to sell</h2>
-        <p class="mt-3 text-gray-600">Store, content and orders in one place, built from the capabilities already in your SSU admin.</p>
+  <section id="features" class="apex-features" aria-labelledby="apex-features-title">
+    <div class="apex-features__inner">
+      <div class="apex-features__intro">
+        <h2 id="apex-features-title">The work behind every sale, <span>in one place.</span></h2>
+        <p>From what you offer to how you fulfil it, SSU brings the day-to-day parts of your store into one workspace.</p>
       </div>
 
-      <div class="impact-row mt-10" @mouseleave="resetActiveCard">
-        <article
-          v-for="(feature, index) in features"
-          :key="feature.title"
-          class="impact-card relative min-w-0"
-          :class="{ 'is-active': activeCard === index }"
-          :style="{ '--feature-accent': feature.accent }"
-          @pointerenter="activateCard(index)"
-        >
-          <motion.div
-            class="impact-card-inner relative"
-            :animate="{ rotateY: isFlipped(index) ? 180 : 0 }"
-            :transition="{ duration: prefersReducedMotion ? 0 : 0.42, ease: 'easeOut' }"
-          >
-            <div class="impact-face impact-front" :aria-hidden="isFlipped(index)">
-              <div class="impact-content">
-                <div class="impact-copy">
-                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ feature.category }}</span>
-
-                  <div>
-                    <h3 class="text-xl font-semibold tracking-[-0.03em] text-gray-900">{{ feature.title }}</h3>
-                    <p :id="`feature-${index}-summary`" class="mt-3 text-sm leading-relaxed text-gray-600">{{ feature.summary }}</p>
-                    <span class="impact-action mt-5 inline-flex items-center gap-2 text-xs font-semibold text-gray-900">
-                      Click for details
-                      <Icon name="heroicons:arrow-up-right" class="h-4 w-4" aria-hidden="true" />
-                    </span>
-                  </div>
-                </div>
-
-                <div class="impact-visual">
-                  <Icon :name="feature.icon" class="h-16 w-16 text-gray-900" aria-hidden="true" />
-                  <div class="flex flex-wrap gap-1.5">
-                    <span
-                      v-for="tag in feature.tags"
-                      :key="tag"
-                      class="rounded-md bg-white/75 px-2 py-1 text-[0.6875rem] font-semibold text-gray-800"
-                    >
-                      {{ tag }}
-                    </span>
-                  </div>
-                </div>
-              </div>
+      <div class="apex-features__groups">
+        <article v-for="group in groups" :key="group.title" class="apex-features__group">
+          <div class="apex-features__group-intro">
+            <h3>{{ group.title }}</h3>
+            <p>{{ group.description }}</p>
+          </div>
+          <div class="apex-features__items">
+            <div v-for="item in group.items" :key="item.title" class="apex-features__item">
+              <h4>{{ item.title }}</h4>
+              <p>{{ item.description }}</p>
+              <span>{{ item.detail }}</span>
             </div>
-
-            <div class="impact-face impact-back" :aria-hidden="!isFlipped(index)">
-              <div class="impact-content">
-                <div class="impact-copy">
-                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">Inside SSU</span>
-
-                  <div>
-                    <h3 class="text-xl font-semibold tracking-[-0.03em] text-gray-900">{{ feature.title }}</h3>
-                    <p :id="`feature-${index}-details`" class="mt-3 text-sm leading-relaxed text-gray-700">{{ feature.description }}</p>
-                    <span class="impact-action mt-5 inline-flex items-center gap-2 text-xs font-semibold text-gray-900">
-                      Show overview
-                      <Icon name="heroicons:arrow-uturn-left" class="h-4 w-4" aria-hidden="true" />
-                    </span>
-                  </div>
-                </div>
-
-                <div class="impact-visual impact-visual-back">
-                  <Icon :name="feature.icon" class="h-14 w-14 text-gray-900" aria-hidden="true" />
-                  <p class="max-w-44 text-sm font-semibold leading-snug text-gray-900">{{ feature.detail }}</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          <button
-            type="button"
-            class="impact-card-toggle absolute inset-0 z-10 rounded-2xl"
-            :aria-label="`${feature.title}: ${isFlipped(index) ? 'show overview' : 'show details'}`"
-            :aria-describedby="isFlipped(index) ? `feature-${index}-details` : `feature-${index}-summary`"
-            :aria-controls="`feature-${index}-details`"
-            :aria-expanded="isFlipped(index)"
-            @focus="activateCard(index)"
-            @click="toggleCard(index)"
-          />
+          </div>
         </article>
       </div>
     </div>
@@ -90,254 +26,85 @@
 </template>
 
 <script setup lang="ts">
-import { motion, useReducedMotion } from 'motion-v'
-
-const activeCard = ref(0)
-const flippedCard = ref<number | null>(null)
-const prefersReducedMotion = useReducedMotion()
-
-function isFlipped(index: number) {
-  return flippedCard.value === index
-}
-
-function activateCard(index: number) {
-  if (flippedCard.value === null) {
-    activeCard.value = index
-  }
-}
-
-function resetActiveCard() {
-  activeCard.value = flippedCard.value ?? 0
-}
-
-function toggleCard(index: number) {
-  activeCard.value = index
-  flippedCard.value = isFlipped(index) ? null : index
-}
-
-const features = [
+const groups = [
   {
-    title: 'Products & Categories',
-    category: 'Catalog',
-    summary: 'Build a flexible catalog that stays easy to browse and manage.',
-    description: 'Create products, variants, stock, categories and collections from one connected catalog.',
-    detail: 'One catalog for every product, option and collection.',
-    tags: ['Products', 'Variants', 'Collections'],
-    icon: 'heroicons:squares-2x2',
-    accent: '#D8F7A7',
+    title: 'Show what you sell',
+    description: 'Build a storefront around your products, services and own visual identity.',
+    items: [
+      {
+        title: 'Products and categories',
+        description: 'Organise products, options, stock and collections so customers can browse what matters.',
+        detail: 'Catalogue · Variants · Collections',
+      },
+      {
+        title: 'Services and content',
+        description: 'Present services alongside store pages, blog posts and a theme you can adjust from the admin.',
+        detail: 'Services · Pages · Appearance',
+      },
+    ],
   },
   {
-    title: 'Services & Booking',
-    category: 'Scheduling',
-    summary: 'Sell time and expertise alongside your physical products.',
-    description: 'Offer services with their own categories and make scheduling part of your storefront.',
-    detail: 'Turn your services into a bookable storefront offer.',
-    tags: ['Services', 'Categories', 'Booking'],
-    icon: 'heroicons:calendar-days',
-    accent: '#C9D9FF',
+    title: 'Run the sale',
+    description: 'Keep the operational decisions behind each order close to the customer-facing store.',
+    items: [
+      {
+        title: 'Orders and promotions',
+        description: 'Manage purchases and backorders, with discounts and gift cards in the same workspace.',
+        detail: 'Orders · Backorders · Discounts',
+      },
+      {
+        title: 'Checkout settings',
+        description: 'Configure the payment, shipping and tax options that apply to your business.',
+        detail: 'Payments · Shipping · Tax',
+      },
+    ],
   },
   {
-    title: 'Orders & Backorders',
-    category: 'Fulfilment',
-    summary: 'Keep every purchase, promotion and delayed item organised.',
-    description: 'Track orders and backorders while managing discounts and gift cards in the same workflow.',
-    detail: 'A clear path from new order to fulfilled purchase.',
-    tags: ['Orders', 'Backorders', 'Discounts'],
-    icon: 'heroicons:clipboard-document-check',
-    accent: '#E2D8FF',
-  },
-  {
-    title: 'Shipping, Tax & Payments',
-    category: 'Checkout',
-    summary: 'Configure the essentials behind a dependable checkout.',
-    description: 'Set up shipping carriers, tax rules and payment gateways for the way your business sells.',
-    detail: 'Checkout settings that fit the way you operate.',
-    tags: ['Shipping', 'Tax', 'Payments'],
-    icon: 'heroicons:credit-card',
-    accent: '#FFD8C2',
-  },
-  {
-    title: 'Blog, Pages & Theme',
-    category: 'Content',
-    summary: 'Shape your storefront and publish content without touching code.',
-    description: 'Manage posts, pages, hero content, theme colours and fonts directly from your admin.',
-    detail: 'Keep the storefront on-brand without a developer.',
-    tags: ['Blog', 'Pages', 'Theme'],
-    icon: 'heroicons:paint-brush',
-    accent: '#F8E1A6',
-  },
-  {
-    title: 'Custom Domain & Roles',
-    category: 'Administration',
-    summary: 'Use your own domain and give the right access to your team.',
-    description: 'Point and verify your domain, then manage admin users with clear roles and permissions.',
-    detail: 'Own your address and keep team access controlled.',
-    tags: ['Domain', 'Users', 'Permissions'],
-    icon: 'heroicons:globe-alt',
-    accent: '#BDECE3',
+    title: 'Make it yours',
+    description: 'Keep your brand recognizable while controlling how your team works in SSU.',
+    items: [
+      {
+        title: 'Storefront appearance',
+        description: 'Adjust theme colours, fonts and homepage content without editing code.',
+        detail: 'Theme · Homepage · Content',
+      },
+      {
+        title: 'Domain and team access',
+        description: 'A verified custom domain can be configured for your store, while admin roles and permissions control team access.',
+        detail: 'Domain · Users · Roles',
+      },
+    ],
   },
 ]
 </script>
 
 <style scoped>
-.impact-row {
-  display: grid;
-  gap: 0.75rem;
+.apex-features { scroll-margin-top: 5rem; border-top: 1px solid #ececec; background: #fff; color: #1a1a1a; }
+.apex-features__inner { width: min(100%, 82rem); margin: 0 auto; padding: clamp(5rem, 9vw, 8rem) 1.5rem; }
+.apex-features__intro { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(17rem, 0.7fr); align-items: end; gap: 2rem; margin-bottom: 3rem; }
+.apex-features__intro h2 { max-width: 15ch; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: clamp(2.5rem, 4.8vw, 4.5rem); font-weight: 600; line-height: 1.12; letter-spacing: -0.03em; text-wrap: balance; }
+.apex-features__intro h2 span { color: #747474; }
+.apex-features__intro p { max-width: 29rem; margin: 0 0 0.35rem; color: #525252; font-size: 1.05rem; line-height: 1.65; }
+.apex-features__groups { border-top: 1px solid #dedede; }
+.apex-features__group { display: grid; grid-template-columns: minmax(14rem, 0.7fr) minmax(0, 1.3fr); gap: clamp(2rem, 6vw, 6rem); border-bottom: 1px solid #dedede; padding: clamp(2rem, 4vw, 3.5rem) 0; }
+.apex-features__group-intro h3 { max-width: 15ch; margin: 0; font-family: 'Space Grotesk', var(--font-heading); font-size: clamp(1.75rem, 2.7vw, 2.5rem); font-weight: 600; line-height: 1.15; letter-spacing: -0.03em; }
+.apex-features__group-intro p { max-width: 33ch; margin: 1rem 0 0; color: #525252; line-height: 1.6; }
+.apex-features__items { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1.5rem, 3vw, 3rem); }
+.apex-features__item { display: flex; min-width: 0; flex-direction: column; }
+.apex-features__item h4 { margin: 0; font-family: 'Space Grotesk', var(--font-heading); font-size: 1.12rem; font-weight: 600; letter-spacing: -0.02em; }
+.apex-features__item p { margin: 0.75rem 0 1.6rem; color: #525252; font-size: 0.93rem; line-height: 1.65; }
+.apex-features__item span { margin-top: auto; border-top: 1px solid #e5e5e5; padding-top: 0.75rem; color: #626262; font-size: 0.72rem; font-weight: 700; }
+
+@media (max-width: 900px) {
+  .apex-features__intro, .apex-features__group { grid-template-columns: 1fr; }
+  .apex-features__intro { gap: 1rem; }
+  .apex-features__group { gap: 2rem; }
 }
 
-.impact-card {
-  container-type: inline-size;
-  min-height: 26rem;
-  perspective: 1100px;
-}
-
-.impact-card-toggle {
-  cursor: pointer;
-  background: transparent;
-}
-
-.impact-card-toggle:focus-visible {
-  outline: 2px solid var(--apex-focus-on-light);
-  outline-offset: 4px;
-}
-
-.impact-card-inner {
-  display: grid;
-  min-height: inherit;
-  height: 100%;
-  transform-style: preserve-3d;
-}
-
-.impact-face {
-  position: relative;
-  display: flex;
-  grid-area: 1 / 1;
-  min-width: 0;
-  border-radius: 1rem;
-  background: #f8f8f3;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-.impact-back {
-  transform: rotateY(180deg);
-}
-
-.impact-content {
-  display: flex;
-  min-width: 0;
-  flex: 1 1 auto;
-  flex-direction: column-reverse;
-  gap: 0.75rem;
-  padding: 0.75rem;
-}
-
-.impact-copy {
-  display: flex;
-  min-width: 0;
-  flex: 1 1 auto;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 1rem;
-  overflow-wrap: anywhere;
-}
-
-.impact-copy > * {
-  min-width: 0;
-}
-
-.impact-action {
-  flex-wrap: wrap;
-}
-
-.impact-visual {
-  display: flex;
-  min-width: 0;
-  min-height: 10.5rem;
-  flex: 0 0 auto;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1.5rem;
-  border-radius: 0.75rem;
-  background: var(--feature-accent);
-  padding: 1.25rem;
-  overflow-wrap: anywhere;
-}
-
-.impact-visual > * {
-  max-width: 100%;
-}
-
-.impact-visual-back {
-  justify-content: space-between;
-}
-
-@media (min-width: 640px) and (max-width: 1279px) {
-  .impact-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 1280px) {
-  .impact-row {
-    display: flex;
-    min-height: 28rem;
-    align-items: stretch;
-    gap: 0.5rem;
-  }
-
-  .impact-card {
-    min-height: 28rem;
-    flex: 1 1 0;
-    transition: flex-grow 420ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .impact-card.is-active {
-    flex-grow: 3.25;
-  }
-
-  .impact-card:not(.is-active) .impact-content {
-    width: 100%;
-    gap: 0;
-  }
-
-  .impact-card:not(.is-active) .impact-copy {
-    width: 100%;
-    flex: 1 1 auto;
-    padding: 1.25rem 1rem;
-  }
-
-  .impact-card:not(.is-active) .impact-visual {
-    display: none;
-  }
-
-  .impact-card:not(.is-active) .impact-action {
-    gap: 0.25rem;
-    font-size: 0.6875rem;
-  }
-
-  @container (min-width: 24rem) {
-    .impact-card.is-active .impact-content {
-      flex-direction: row;
-      gap: 1.5rem;
-    }
-
-    .impact-card.is-active .impact-copy {
-      flex: 1 1 40%;
-      padding: 1.25rem 0 1.25rem 1.25rem;
-    }
-
-    .impact-card.is-active .impact-visual {
-      min-width: 0;
-      flex: 1 1 60%;
-    }
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .impact-card {
-    transition-duration: 0.01ms;
-  }
+@media (max-width: 639px) {
+  .apex-features__inner { padding: 4.5rem 1.25rem; }
+  .apex-features__intro p { font-size: 0.95rem; }
+  .apex-features__items { grid-template-columns: 1fr; gap: 1.7rem; }
+  .apex-features__item p { margin-bottom: 1rem; }
 }
 </style>

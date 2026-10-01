@@ -30,6 +30,10 @@ import type { LoaderLogoAnimation } from '~/composables/useSiteConfig'
 
 const route = useRoute()
 const router = useRouter()
+const requestUrl = useRequestURL()
+const baseDomain = String(useRuntimeConfig().public.storefrontBaseDomain || '').toLowerCase()
+const host = requestUrl.hostname.toLowerCase()
+const isApexHost = !!baseDomain && (host === baseDomain || host === `www.${baseDomain}`)
 const prefersReducedMotion = useReducedMotion()
 const { siteConfig, pending: siteConfigPending, fetchSiteConfig } = useSiteConfig()
 
@@ -45,7 +49,7 @@ const excludedPrefixes = [
   '/backorder/pay',
 ]
 
-const isStorefrontPath = (path: string) => !excludedPrefixes.some(prefix => path === prefix || path.startsWith(`${prefix}/`))
+const isStorefrontPath = (path: string) => !isApexHost && !excludedPrefixes.some(prefix => path === prefix || path.startsWith(`${prefix}/`))
 
 const active = ref(isStorefrontPath(route.path))
 const loaderRoot = ref<HTMLElement | null>(null)

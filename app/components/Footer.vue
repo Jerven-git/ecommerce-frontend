@@ -1,26 +1,29 @@
 <template>
   <!-- Apex marketing footer — platform branding, not tenant store -->
-  <footer v-if="isApexMarketing" class="bg-gray-900 text-white border-t border-white/10">
+  <footer v-if="isApexMarketing" class="bg-[#1a1a1a] text-white border-t border-white/10">
     <div class="max-w-7xl mx-auto px-6 lg:px-8 py-12 md:py-16">
       <div class="grid gap-10 md:grid-cols-3">
         <div>
           <NuxtLink to="/" class="inline-block text-xl font-bold tracking-tight text-white">SSU</NuxtLink>
-          <p class="mt-3 text-sm leading-relaxed text-white/60 max-w-xs">The store platform for modern merchants — products, orders, and content in one place.</p>
+          <p class="mt-3 text-sm leading-relaxed text-white/70 max-w-xs">A branded storefront and the tools to run it, all in one place.</p>
         </div>
         <div>
           <h4 class="text-[11px] font-semibold text-white/40 uppercase tracking-[0.14em] mb-4">Platform</h4>
           <ul class="space-y-2.5">
-            <li><a href="#features" class="text-sm text-white/60 hover:text-white transition-colors">Features</a></li>
+            <li><a href="#product" class="text-sm text-white/70 hover:text-white transition-colors">Product</a></li>
+            <li><a href="#use-cases" class="text-sm text-white/70 hover:text-white transition-colors">Use cases</a></li>
+            <li><a href="#features" class="text-sm text-white/70 hover:text-white transition-colors">Features</a></li>
             <li><a href="#how-it-works" class="text-sm text-white/60 hover:text-white transition-colors">How it works</a></li>
             <li><a href="#pricing" class="text-sm text-white/60 hover:text-white transition-colors">Pricing</a></li>
+            <li><a href="#faq" class="text-sm text-white/70 hover:text-white transition-colors">FAQ</a></li>
           </ul>
         </div>
         <div>
           <h4 class="text-[11px] font-semibold text-white/40 uppercase tracking-[0.14em] mb-4">Get started</h4>
           <ul class="space-y-2.5">
-            <li><NuxtLink to="/register" class="text-sm text-white/60 hover:text-white transition-colors">Create Account</NuxtLink></li>
-            <li><NuxtLink to="/admin/login" class="text-sm text-white/60 hover:text-white transition-colors">Login</NuxtLink></li>
-            <li><NuxtLink to="/admin/subscription" class="text-sm text-white/60 hover:text-white transition-colors">View Plans</NuxtLink></li>
+            <li><NuxtLink :to="authStore.isAuthenticated ? '/admin' : '/register'" class="text-sm text-white/70 hover:text-white transition-colors">{{ authStore.isAuthenticated ? 'Open dashboard' : 'Create your store' }}</NuxtLink></li>
+            <li v-if="!authStore.isAuthenticated"><NuxtLink to="/admin/login" class="text-sm text-white/70 hover:text-white transition-colors">Log in</NuxtLink></li>
+            <li><a href="#pricing" class="text-sm text-white/70 hover:text-white transition-colors">View plans</a></li>
           </ul>
         </div>
       </div>
@@ -104,6 +107,7 @@
 <script setup lang="ts">
 const { siteConfig } = useSiteConfig()
 const isApexMarketing = computed(() => siteConfig.value?.is_storefront_host === false)
+const authStore = useAuthStore()
 const footerLogoUrl = computed(() => siteConfig.value?.footer_logo_url || siteConfig.value?.logo_url || null)
 const footerLogoHeight = computed(() => siteConfig.value?.footer_logo_size || 128)
 const { isEnabled } = useModules()

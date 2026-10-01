@@ -1,54 +1,18 @@
 <template>
-  <section id="how-it-works" class="border-y border-gray-100 bg-gray-50 py-16 lg:py-20">
-    <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="max-w-2xl">
-        <h2 class="text-3xl font-bold tracking-tight text-gray-900">How it works</h2>
-        <p class="mt-3 text-gray-600">Four steps from zero to live store.</p>
+  <section id="how-it-works" class="apex-steps" aria-labelledby="apex-steps-title">
+    <div class="apex-steps__inner">
+      <div class="apex-steps__intro">
+        <h2 id="apex-steps-title">From account to a store you can run.</h2>
+        <p>Create your store, choose a plan, then shape the storefront and the work behind it. An existing business can add its current catalogue at its own pace.</p>
       </div>
 
-      <ol class="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <li v-for="(step, index) in steps" :key="step.title">
-          <NuxtLink
-            :to="step.link"
-            class="process-card group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--apex-focus-on-light)]"
-            :style="{ '--step-accent': step.accent }"
-          >
-            <div class="process-media relative flex h-36 items-center justify-center overflow-hidden">
-              <Icon :name="step.icon" class="process-icon h-12 w-12 text-gray-900" aria-hidden="true" />
-              <span class="absolute left-3 top-3 rounded-md bg-white px-2 py-1 text-xs font-semibold tabular-nums text-gray-900">
-                {{ String(index + 1).padStart(2, '0') }}
-              </span>
-            </div>
-
-            <div class="flex flex-1 flex-col p-6">
-              <div class="flex items-center gap-2 text-[0.6875rem] font-semibold uppercase tracking-wide text-gray-500">
-                <span class="h-2 w-2 rounded-full bg-[var(--step-accent)]" aria-hidden="true" />
-                {{ step.category }}
-              </div>
-
-              <h3 class="mt-4 text-2xl font-semibold tracking-[-0.03em] text-gray-900">{{ step.title }}</h3>
-              <p class="mt-3 text-sm leading-relaxed text-gray-600">{{ step.description }}</p>
-
-              <div class="mt-5 flex flex-wrap gap-1.5">
-                <span
-                  v-for="tag in step.tags"
-                  :key="tag"
-                  class="rounded-md bg-gray-100 px-2 py-1 text-[0.6875rem] font-medium text-gray-600"
-                >
-                  {{ tag }}
-                </span>
-              </div>
-
-              <div class="mt-auto pt-7">
-                <p class="mb-3 text-xs font-medium text-gray-500">{{ step.detail }}</p>
-                <span class="process-cta relative isolate flex min-h-11 items-center justify-between gap-3 overflow-hidden rounded-xl bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-900">
-                  <span>{{ step.cta }}</span>
-                  <svg class="process-arrow h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M5 12h14m-6-6 6 6-6 6" />
-                  </svg>
-                </span>
-              </div>
-            </div>
+      <ol class="apex-steps__list">
+        <li v-for="(step, index) in steps" :key="step.title" class="apex-steps__step">
+          <span class="apex-steps__number" aria-hidden="true">{{ String(index + 1).padStart(2, '0') }}</span>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.description }}</p>
+          <NuxtLink :to="step.link" class="apex-steps__link">
+            {{ step.action }} <Icon name="heroicons:arrow-up-right" aria-hidden="true" />
           </NuxtLink>
         </li>
       </ol>
@@ -57,169 +21,67 @@
 </template>
 
 <script setup lang="ts">
-import type { SubscriptionPlan } from '~/composables/useSubscription'
-
-const props = defineProps<{
-  plans: SubscriptionPlan[]
-}>()
-
-const monthlyPlan = computed(() => props.plans.find(plan => plan.interval === 'monthly'))
-const yearlyPlan = computed(() => props.plans.find(plan => plan.interval === 'yearly'))
-
-const planTags = computed(() => {
-  const tags = [...new Set(props.plans.map(plan => intervalTag(plan.interval)))]
-  return tags.length ? tags : ['Billing']
-})
-
-const planDescription = computed(() => {
-  const monthly = monthlyPlan.value
-  const yearly = yearlyPlan.value
-  if (monthly && yearly) {
-    const saving = Math.max(0, monthly.price_cents * 12 - yearly.price_cents)
-    const savingCopy = saving > 0 ? ` Save ${formatPrice(saving)} with annual billing.` : ''
-    return `Monthly ${formatPrice(monthly.price_cents)} or yearly ${formatPrice(yearly.price_cents)}.${savingCopy} Unlocks the admin.`
-  }
-
-  const plan = props.plans[0]
-  if (plan) return `${plan.name} is ${formatPrice(plan.price_cents)} per ${intervalLabel(plan.interval)}. Unlocks the admin.`
-  return 'Choose the billing interval that works for you. Current prices appear below.'
-})
+const props = defineProps<{ isAuthenticated: boolean }>()
 
 const steps = computed(() => [
   {
-    title: 'Create account',
-    category: 'Get started',
-    description: 'Pick your store name and slug — you get an instant subdomain.',
-    tags: ['Account', 'Store slug'],
-    detail: 'Your storefront starts here',
-    cta: 'Create account',
-    link: '/register',
-    icon: 'heroicons:user-plus',
-    accent: '#D8F7A7',
+    title: 'Create your account',
+    description: 'Name your store and create the account you will use to manage it.',
+    action: props.isAuthenticated ? 'Open dashboard' : 'Create your store',
+    link: props.isAuthenticated ? '/admin' : '/register',
   },
   {
     title: 'Choose a plan',
-    category: 'Pick your plan',
-    description: planDescription.value,
-    tags: planTags.value,
-    detail: 'Review the current plan details',
-    cta: 'View pricing',
+    description: 'Review the current plans, then complete subscription checkout to activate selling.',
+    action: 'See current plans',
     link: '#pricing',
-    icon: 'heroicons:credit-card',
-    accent: '#C9D9FF',
   },
   {
     title: 'Set up your store',
-    category: 'Make it yours',
-    description: 'Add products, theme, domain and shipping in the dashboard.',
-    tags: ['Products', 'Theme', 'Shipping'],
-    detail: 'Everything in one dashboard',
-    cta: 'See what is included',
+    description: 'Add products or services and configure your appearance, payment and delivery settings.',
+    action: 'Explore the tools',
     link: '#features',
-    icon: 'heroicons:paint-brush',
-    accent: '#E2D8FF',
   },
   {
-    title: 'Sell & manage',
-    category: 'Go live',
-    description: 'Orders, discounts, blog and analytics — all in SSU.',
-    tags: ['Orders', 'Content', 'Analytics'],
-    detail: 'Built for daily operations',
-    cta: 'Start selling',
-    link: '/register',
-    icon: 'heroicons:chart-bar-square',
-    accent: '#FFD8C2',
+    title: 'Manage the day to day',
+    description: 'Keep your catalogue and content current, and manage orders as they come in.',
+    action: 'See the workspace',
+    link: '#product',
   },
 ])
-
-function formatPrice(cents: number) {
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: cents % 100 === 0 ? 0 : 2,
-  }).format(cents / 100)
-}
-
-function intervalTag(interval: SubscriptionPlan['interval']) {
-  return interval.charAt(0).toUpperCase() + interval.slice(1)
-}
-
-function intervalLabel(interval: SubscriptionPlan['interval']) {
-  if (interval === 'quarterly') return 'three months'
-  return interval.replace(/ly$/, '')
-}
 </script>
 
 <style scoped>
-.process-card {
-  transition:
-    transform 350ms cubic-bezier(0.2, 0.75, 0.25, 1),
-    box-shadow 350ms ease;
+.apex-steps { scroll-margin-top: 5rem; background: #f7f7f5; color: #1a1a1a; }
+.apex-steps__inner { width: min(100%, 82rem); margin: 0 auto; padding: clamp(5rem, 9vw, 8rem) 1.5rem; }
+.apex-steps__intro { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(17rem, 0.7fr); align-items: end; gap: 2rem; margin-bottom: 3rem; }
+.apex-steps__intro h2 { max-width: 15ch; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: clamp(2.5rem, 4.8vw, 4.5rem); font-weight: 600; line-height: 1.12; letter-spacing: -0.03em; text-wrap: balance; }
+.apex-steps__intro p { max-width: 31rem; margin: 0 0 0.35rem; color: #525252; font-size: 1.05rem; line-height: 1.65; }
+.apex-steps__list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; border-top: 1px solid #cfcfca; padding: 0; list-style: none; }
+.apex-steps__step { display: flex; min-width: 0; flex-direction: column; padding: 2rem clamp(1rem, 2vw, 2rem) 0; }
+.apex-steps__step:first-child { padding-left: 0; }
+.apex-steps__step + .apex-steps__step { border-left: 1px solid #d9d9d5; }
+.apex-steps__number { color: #626262; font-family: 'Space Grotesk', var(--font-heading); font-size: 0.85rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.apex-steps__step h3 { margin: 2rem 0 0; font-family: 'Space Grotesk', var(--font-heading); font-size: clamp(1.4rem, 2vw, 1.9rem); font-weight: 600; line-height: 1.2; letter-spacing: -0.025em; }
+.apex-steps__step p { margin: 0.8rem 0 1.75rem; color: #525252; font-size: 0.92rem; line-height: 1.6; }
+.apex-steps__link { display: inline-flex; width: fit-content; min-height: 2.75rem; align-items: center; gap: 0.35rem; margin-top: auto; color: #252525; font-size: 0.84rem; font-weight: 700; text-decoration-line: underline; text-decoration-color: #8d8d8d; text-underline-offset: 0.3rem; }
+.apex-steps__link:hover { text-decoration-color: currentColor; }
+.apex-steps__link:focus-visible { border-radius: 0.25rem; outline: 2px solid var(--apex-focus-on-light); outline-offset: 4px; }
+.apex-steps__link :deep(svg) { width: 1rem; height: 1rem; }
+
+@media (max-width: 900px) {
+  .apex-steps__intro { grid-template-columns: 1fr; gap: 1rem; }
+  .apex-steps__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .apex-steps__step { border-bottom: 1px solid #d9d9d5; padding: 2rem; }
+  .apex-steps__step:nth-child(odd) { border-left: 0; padding-left: 0; }
 }
 
-.process-media {
-  background: var(--step-accent);
+@media (max-width: 639px) {
+  .apex-steps__inner { padding: 4.5rem 1.25rem; }
+  .apex-steps__intro p { font-size: 0.95rem; }
+  .apex-steps__list { grid-template-columns: 1fr; }
+  .apex-steps__step, .apex-steps__step:nth-child(odd) { border-left: 0; padding: 1.6rem 0; }
+  .apex-steps__step h3 { margin-top: 0.9rem; }
 }
-
-.process-icon {
-  transition: transform 560ms cubic-bezier(0.2, 0.75, 0.25, 1);
-}
-
-.process-cta::before {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  content: '';
-  background: var(--step-accent);
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 350ms cubic-bezier(0.2, 0.75, 0.25, 1);
-}
-
-.process-arrow {
-  transition: transform 350ms cubic-bezier(0.2, 0.75, 0.25, 1);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .process-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 16px 32px rgb(15 23 42 / 10%), 0 3px 8px rgb(15 23 42 / 4%);
-  }
-
-  .process-card:hover .process-icon {
-    transform: scale(1.08);
-  }
-}
-
-.process-card:hover .process-cta::before,
-.process-card:focus-visible .process-cta::before {
-  transform: scaleX(1);
-}
-
-.process-card:hover .process-arrow,
-.process-card:focus-visible .process-arrow {
-  transform: rotate(-35deg);
-}
-
-.process-card:focus-visible {
-  transform: translateY(-5px);
-  box-shadow: 0 16px 32px rgb(15 23 42 / 10%), 0 3px 8px rgb(15 23 42 / 4%);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .process-card,
-  .process-icon,
-  .process-cta::before,
-  .process-arrow {
-    transition-duration: 0.01ms;
-  }
-
-  .process-card:hover,
-  .process-card:focus-visible,
-  .process-card:hover .process-icon,
-  .process-card:hover .process-arrow,
-  .process-card:focus-visible .process-arrow {
-    transform: none;
-  }
-}
+  .apex-steps__step + .apex-steps__step { border-left: 0; }
 </style>

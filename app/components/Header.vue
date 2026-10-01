@@ -148,7 +148,7 @@
         <!-- Right actions -->
         <div class="flex items-center gap-2 justify-self-end col-start-3 -mr-2 md:mr-0">
 
-          <!-- Apex marketing: Login + Get Started -->
+          <!-- Apex marketing: account actions -->
           <template v-if="isApexMarketing">
             <NuxtLink
               v-if="authStore.isAuthenticated"
@@ -171,11 +171,11 @@
             >Login</NuxtLink>
             <NuxtLink
               :to="authStore.isAuthenticated ? '/admin' : '/register'"
-              class="hidden lg:inline-flex items-center rounded-full bg-[var(--apex-action)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+              class="hidden lg:inline-flex items-center rounded-xl bg-[var(--apex-action)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
               :class="isTransparent
                 ? 'hover:bg-[var(--apex-action-hover)] focus-visible:outline-[var(--apex-focus-on-dark)]'
                 : 'hover:bg-[var(--apex-action-hover)] focus-visible:outline-[var(--apex-focus-on-light)]'"
-            >{{ authStore.isAuthenticated ? 'Go to dashboard' : 'Get Started' }}</NuxtLink>
+            >{{ authStore.isAuthenticated ? 'Open dashboard' : 'Create your store' }}</NuxtLink>
           </template>
 
           <template v-else>
@@ -339,9 +339,9 @@
                 <NuxtLink v-if="authStore.isAuthenticated" to="/admin" class="flex items-center justify-center gap-2 rounded-xl bg-[var(--apex-action)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--apex-action-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">Dashboard</NuxtLink>
                 <template v-else>
                   <NuxtLink to="/admin/login" class="flex items-center justify-center rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">Login</NuxtLink>
-                  <NuxtLink to="/register" class="flex items-center justify-center rounded-xl bg-[var(--apex-action)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--apex-action-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">Create Account</NuxtLink>
+                  <NuxtLink to="/register" class="flex items-center justify-center rounded-xl bg-[var(--apex-action)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--apex-action-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">Create your store</NuxtLink>
                 </template>
-                <NuxtLink v-if="!authStore.isAuthenticated" to="/admin/subscription" class="rounded-lg px-3 py-2 text-center text-sm font-medium text-[var(--apex-action)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">View Plans</NuxtLink>
+                <a v-if="!authStore.isAuthenticated" href="#pricing" class="rounded-lg px-3 py-2 text-center text-sm font-medium text-[var(--apex-action)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">View plans</a>
               </div>
             </nav>
             <nav v-else class="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-0.5">
@@ -438,9 +438,10 @@ const logoHeight = computed(() => siteConfig.value?.logo_size || 36)
 
 const isApexMarketing = computed(() => siteConfig.value?.is_storefront_host === false)
 const marketingLinks = [
-  { label: 'Features', to: '#features' },
-  { label: 'How it works', to: '#how-it-works' },
+  { label: 'Product', to: '#product' },
+  { label: 'Use cases', to: '#use-cases' },
   { label: 'Pricing', to: '#pricing' },
+  { label: 'FAQ', to: '#faq' },
 ] as const
 const marketingHome = computed(() => (authStore.isAuthenticated ? '/admin' : '/'))
 
@@ -530,14 +531,12 @@ function closeMobile() {
   mobileMenuOpen.value = false
 }
 
-// The Apex marketing homepage always places navigation over its dark hero.
-// Storefront pages retain their tenant-configured full-bleed behaviour.
+// Apex marketing uses a light page header. Storefront pages retain their
+// tenant-configured full-bleed behaviour.
 const BANNER_PATHS = new Set(['/', '/about', '/contact', '/blog', '/services'])
 const isBannerPage = computed(() => BANNER_PATHS.has(route.path))
-const isApexHeroPage = computed(() => isApexMarketing.value && route.path === "/")
 const isFullBleedPage = computed(() =>
-  isApexHeroPage.value
-  || (isBannerPage.value && (siteConfig.value?.hero_full_bleed ?? false))
+  !isApexMarketing.value && isBannerPage.value && (siteConfig.value?.hero_full_bleed ?? false)
 )
 const scrollY = ref(0)
 const isTransparent = computed(() =>

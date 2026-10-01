@@ -5,8 +5,10 @@
     </ClientOnly>
 
     <ApexHero :is-authenticated="authStore.isAuthenticated" />
+    <ApexProductShowcase />
+    <ApexUseCases :is-authenticated="authStore.isAuthenticated" />
     <ApexFeatures />
-    <ApexHowItWorks :plans="marketingPlans" />
+    <ApexHowItWorks :is-authenticated="authStore.isAuthenticated" />
     <ApexPricing
       :is-authenticated="authStore.isAuthenticated"
       :loading="marketingPlansLoading"
@@ -14,6 +16,7 @@
       :plans="marketingPlans"
       @retry="loadMarketingPlans"
     />
+    <ApexFaq />
     <ApexFinalCta :is-authenticated="authStore.isAuthenticated" />
   </div>
 </template>

@@ -1,339 +1,265 @@
 <template>
-  <section class="apex-hero relative isolate overflow-hidden bg-[#0B1020] text-white" aria-labelledby="ssu-hero-title">
-    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-      <div class="absolute -left-40 top-1/3 h-96 w-96 rounded-full bg-[#6898ED]/15 blur-[120px]" />
-      <div class="absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-violet-400/10 blur-[100px]" />
-    </div>
-
-    <div class="hero-grid mx-auto grid w-full max-w-[1440px] gap-10 px-6 pb-10 pt-24 lg:grid-cols-[minmax(0,1.08fr)_minmax(28rem,0.92fr)] lg:gap-10 lg:px-8 lg:pb-10 lg:pt-24">
-      <div class="flex max-w-2xl flex-col justify-center py-6 lg:py-10">
-        <h1 id="ssu-hero-title" class="max-w-[10ch] text-[clamp(3.25rem,5.5vw,5.75rem)] font-bold leading-[0.94] tracking-[-0.04em] text-white">
-          Your next shop, <span class="text-[#8BB3F7]">ready for what’s next.</span>
+  <section class="apex-hero" aria-labelledby="ssu-hero-title">
+    <div class="apex-hero__inner">
+      <div class="apex-hero__copy">
+        <h1 id="ssu-hero-title">
+          A storefront that looks like you.
+          <span>One place to run it.</span>
         </h1>
 
-        <p class="mt-7 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
-          Bring products, orders, payments, shipping and content into one clear workspace—from launch day to daily growth.
+        <p class="apex-hero__description">
+          Build a branded storefront, sell products or services, and manage orders and store settings from one dashboard.
         </p>
 
-        <div class="mt-9 flex flex-wrap items-center gap-3">
-          <NuxtLink
-            :to="isAuthenticated ? '/admin' : '/register'"
-            class="inline-flex min-h-12 items-center gap-2 rounded-xl bg-[var(--apex-action)] px-6 py-3 text-sm font-semibold text-white transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-[var(--apex-action-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--apex-focus-on-dark)]"
-          >
-            {{ isAuthenticated ? 'Open dashboard' : 'Start with SSU' }}
-            <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
+        <div class="apex-hero__actions">
+          <NuxtLink :to="isAuthenticated ? '/admin' : '/register'" class="apex-hero__primary">
+            {{ isAuthenticated ? 'Open dashboard' : 'Create your store' }}
+            <Icon name="heroicons:arrow-up-right" class="h-5 w-5" aria-hidden="true" />
           </NuxtLink>
-          <a
-            href="#pricing"
-            class="inline-flex min-h-12 items-center rounded-xl border border-white/40 px-6 py-3 text-sm font-semibold text-white transition-[background-color,border-color] duration-200 hover:border-white/70 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--apex-focus-on-dark)]"
-          >
-            See pricing
+          <a href="#product" class="apex-hero__secondary">
+            Explore SSU
+            <Icon name="heroicons:arrow-down" class="h-4 w-4" aria-hidden="true" />
           </a>
-          <NuxtLink
-            v-if="!isAuthenticated"
-            to="/admin/login"
-            class="rounded-lg px-2 py-3 text-sm font-medium text-slate-300 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--apex-focus-on-dark)]"
-          >
-            Login
-          </NuxtLink>
         </div>
 
-        <div class="mt-10 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/10 pt-6 text-sm text-slate-300" aria-label="Included SSU capabilities">
-          <span v-for="capability in capabilities" :key="capability.label" class="inline-flex items-center gap-2">
-            <Icon :name="capability.icon" class="h-4 w-4 text-[#8BB3F7]" aria-hidden="true" />
-            {{ capability.label }}
-          </span>
-        </div>
+        <p class="apex-hero__audience">
+          Start a new store or set up your existing business on SSU.
+        </p>
       </div>
 
-      <div
-        class="hero-slideshow relative min-h-[20rem] overflow-hidden rounded-2xl bg-slate-800 lg:min-h-0"
-        role="region"
-        aria-roledescription="carousel"
-        aria-label="SSU storefront inspiration"
-      >
-        <p class="sr-only" aria-live="polite" aria-atomic="true">{{ slideAnnouncement }}</p>
-        <img
-          v-for="(slide, index) in slides"
-          :key="slide.src"
-          :src="slide.src"
-          :srcset="slide.srcset"
-          :sizes="HERO_IMAGE_SIZES"
-          :width="slide.width"
-          :height="slide.height"
-          :alt="slide.alt"
-          :loading="index === 0 ? 'eager' : 'lazy'"
-          :fetchpriority="index === 0 ? 'high' : 'auto'"
-          decoding="async"
-          class="hero-slide absolute inset-0 h-full w-full object-cover"
-          :class="index === activeSlide ? 'is-active' : ''"
-          :aria-hidden="index !== activeSlide"
-        >
-
-        <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/20" aria-hidden="true" />
-
-        <div class="absolute left-5 top-5 rounded-lg bg-black/45 px-3 py-2 text-xs font-semibold text-white backdrop-blur-sm sm:left-6 sm:top-6">
-          Storefront inspiration
+      <div class="apex-hero__product" role="group" aria-label="Illustrative SSU workspace and demonstration storefront preview">
+        <div class="apex-hero__product-heading">
+          <span>Storefront + workspace</span>
+          <span class="apex-hero__preview-label">Illustrative preview</span>
         </div>
 
-        <div class="absolute inset-x-0 bottom-0 flex flex-col items-start gap-5 p-5 sm:flex-row sm:items-end sm:justify-between sm:p-6">
-          <div class="min-w-0">
-            <p class="text-xs font-medium uppercase tracking-wide text-white/70">{{ currentSlide.category }}</p>
-            <p class="mt-1 truncate text-xl font-semibold tracking-[-0.02em] text-white sm:text-2xl">{{ currentSlide.label }}</p>
+        <div class="apex-hero__composition">
+          <div class="apex-hero__workspace" aria-hidden="true">
+            <div class="workspace-rail">
+              <div class="workspace-mark">SSU</div>
+              <div class="workspace-rail__item is-selected"><Icon name="heroicons:squares-2x2" class="h-4 w-4" /> <span>Overview</span></div>
+              <div class="workspace-rail__item"><Icon name="heroicons:shopping-bag" class="h-4 w-4" /> <span>Products</span></div>
+              <div class="workspace-rail__item"><Icon name="heroicons:clipboard-document-list" class="h-4 w-4" /> <span>Orders</span></div>
+              <div class="workspace-rail__item"><Icon name="heroicons:paint-brush" class="h-4 w-4" /> <span>Appearance</span></div>
+            </div>
+            <div class="workspace-main">
+              <div class="workspace-topbar">
+                <span>Store overview</span>
+                <span class="workspace-topbar__avatar">AG</span>
+              </div>
+              <div class="workspace-content">
+                <h2>Run your store</h2>
+                <p>Everything you need in one workspace.</p>
+                <div class="workspace-feature-grid">
+                  <div class="workspace-feature"><Icon name="heroicons:tag" class="h-5 w-5" /><span>Catalogue</span></div>
+                  <div class="workspace-feature"><Icon name="heroicons:archive-box" class="h-5 w-5" /><span>Orders</span></div>
+                  <div class="workspace-feature"><Icon name="heroicons:globe-alt" class="h-5 w-5" /><span>Storefront</span></div>
+                </div>
+                <div class="workspace-activity">
+                  <span>Store setup</span>
+                  <span class="workspace-activity__status">Your brand, your storefront</span>
+                </div>
+                <div class="workspace-activity__lines" aria-hidden="true"><span /><span /><span /></div>
+              </div>
+            </div>
           </div>
 
-          <div class="flex shrink-0 items-center gap-2">
-            <button type="button" class="hero-control" aria-label="Previous slide" @click="previousSlide">
-              <Icon name="heroicons:arrow-left" class="h-4 w-4" aria-hidden="true" />
-            </button>
-
-            <button
-              v-if="!prefersReducedMotion"
-              type="button"
-              class="hero-control relative"
-              :aria-label="isPlaying ? 'Pause slideshow' : 'Play slideshow'"
-              @click="togglePlayback"
-            >
-              <svg class="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 44 44" aria-hidden="true">
-                <circle cx="22" cy="22" r="19" fill="none" stroke="rgb(255 255 255 / 0.2)" stroke-width="1.5" />
-                <circle
-                  v-if="isPlaying"
-                  :key="`${activeSlide}-${progressVersion}`"
-                  class="hero-progress"
-                  cx="22"
-                  cy="22"
-                  r="19"
-                  fill="none"
-                  pathLength="100"
-                  stroke="white"
-                  stroke-linecap="round"
-                  stroke-width="1.5"
-                />
-              </svg>
-              <Icon :name="isPlaying ? 'heroicons:pause' : 'heroicons:play'" class="relative h-4 w-4" aria-hidden="true" />
-            </button>
-
-            <button type="button" class="hero-control" aria-label="Next slide" @click="nextSlide">
-              <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
-            </button>
-
-            <span class="ml-1 min-w-12 text-right text-xs font-semibold tabular-nums text-white/80">
-              {{ String(activeSlide + 1).padStart(2, '0') }} / {{ String(slides.length).padStart(2, '0') }}
-            </span>
+          <div class="apex-hero__storefront" aria-hidden="true">
+            <div class="storefront-browser"><span /><span /><span /><p>Demonstration storefront</p></div>
+            <div class="storefront-body">
+              <div class="storefront-nav"><strong>Arte Gallery</strong><span>Shop &nbsp; Story &nbsp; Contact</span></div>
+              <img
+                src="/images/ArteGallery/mountain-art-960.webp"
+                srcset="/images/ArteGallery/mountain-art-640.webp 640w, /images/ArteGallery/mountain-art-960.webp 960w"
+                sizes="(min-width: 1024px) 25rem, (min-width: 640px) 34rem, calc(100vw - 3rem)"
+                width="1920"
+                height="1320"
+                alt=""
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+              >
+              <div class="storefront-caption"><span>Make the store yours</span><Icon name="heroicons:arrow-up-right" class="h-4 w-4" /></div>
+            </div>
           </div>
         </div>
 
-        <div class="absolute bottom-24 left-5 hidden gap-2 sm:left-6 sm:flex" aria-label="Choose a slide">
-          <button
-            v-for="(slide, index) in slides"
-            :key="slide.label"
-            type="button"
-            class="h-11 w-11 rounded-lg p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-dark)]"
-            :aria-label="`Show ${slide.label}`"
-            :aria-current="index === activeSlide ? 'true' : undefined"
-            @click="selectSlide(index)"
-          >
-            <span class="block h-1 w-3 rounded-full transition-colors" :class="index === activeSlide ? 'bg-white' : 'bg-white/35'" />
-          </button>
-        </div>
+        <p class="apex-hero__product-note">A visual preview of the SSU workspace alongside an Arte Gallery demonstration store.</p>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { useReducedMotion } from 'motion-v'
-
 defineProps<{
   isAuthenticated: boolean
 }>()
-
-const SLIDE_DURATION = 5000
-const HERO_IMAGE_SIZES = '(min-width: 1536px) 42rem, (min-width: 1024px) 44vw, calc(100vw - 3rem)'
-const activeSlide = ref(0)
-const isPlaying = ref(true)
-const progressVersion = ref(0)
-const slideAnnouncement = ref('')
-const prefersReducedMotion = useReducedMotion()
-let slideTimer: ReturnType<typeof setInterval> | undefined
-
-const slides = [
-  {
-    src: '/images/ArteGallery/mountain-art-960.webp',
-    srcset: '/images/ArteGallery/mountain-art-640.webp 640w, /images/ArteGallery/mountain-art-960.webp 960w, /images/ArteGallery/mountain-art-1440.webp 1440w, /images/ArteGallery/mountain-art.webp 1920w',
-    width: 1920,
-    height: 1320,
-    alt: 'Framed artwork displayed in a bright gallery-inspired interior.',
-    category: 'Visual storefront',
-    label: 'Arte Gallery',
-  },
-  {
-    src: '/images/MinimalMono/laptop-960.webp',
-    srcset: '/images/MinimalMono/laptop-640.webp 640w, /images/MinimalMono/laptop-960.webp 960w, /images/MinimalMono/laptop-1440.webp 1440w, /images/MinimalMono/laptop.webp 2560w',
-    width: 2560,
-    height: 1707,
-    alt: 'Minimal workspace with a laptop and clean product styling.',
-    category: 'Focused catalog',
-    label: 'Minimal Mono',
-  },
-  {
-    src: '/images/ForestGreen/food-960.webp',
-    srcset: '/images/ForestGreen/food-640.webp 640w, /images/ForestGreen/food-960.webp 960w, /images/ForestGreen/food-1440.webp 1440w, /images/ForestGreen/food.webp 2560w',
-    width: 2560,
-    height: 1707,
-    alt: 'Food presentation styled with rich natural colours.',
-    category: 'Product storytelling',
-    label: 'Forest Green',
-  },
-  {
-    src: '/images/WarmSunset/wedding-960.webp',
-    srcset: '/images/WarmSunset/wedding-640.webp 640w, /images/WarmSunset/wedding-960.webp 960w, /images/WarmSunset/wedding-1440.webp 1440w, /images/WarmSunset/wedding.webp 2560w',
-    width: 2560,
-    height: 1707,
-    alt: 'Warm service-led scene prepared for a celebration.',
-    category: 'Services and booking',
-    label: 'Warm Sunset',
-  },
-]
-
-const capabilities = [
-  { label: 'Products', icon: 'heroicons:squares-2x2' },
-  { label: 'Orders', icon: 'heroicons:clipboard-document-check' },
-  { label: 'Content', icon: 'heroicons:pencil-square' },
-]
-
-const currentSlide = computed(() => slides[activeSlide.value]!)
-
-function stopTimer() {
-  if (slideTimer) clearInterval(slideTimer)
-  slideTimer = undefined
-}
-
-function startTimer() {
-  stopTimer()
-  if (!import.meta.client || !isPlaying.value || prefersReducedMotion.value) return
-  progressVersion.value += 1
-  slideTimer = window.setInterval(() => {
-    activeSlide.value = (activeSlide.value + 1) % slides.length
-  }, SLIDE_DURATION)
-}
-
-async function announceSlide(index: number) {
-  slideAnnouncement.value = ''
-  await nextTick()
-  const slide = slides[index]
-  if (slide) slideAnnouncement.value = `${slide.label}, slide ${index + 1} of ${slides.length}`
-}
-
-function selectSlide(index: number) {
-  activeSlide.value = index
-  announceSlide(index)
-  startTimer()
-}
-
-function previousSlide() {
-  selectSlide((activeSlide.value - 1 + slides.length) % slides.length)
-}
-
-function nextSlide() {
-  selectSlide((activeSlide.value + 1) % slides.length)
-}
-
-function togglePlayback() {
-  isPlaying.value = !isPlaying.value
-  startTimer()
-}
-
-function handleVisibilityChange() {
-  if (document.hidden) stopTimer()
-  else startTimer()
-}
-
-watch(prefersReducedMotion, startTimer)
-
-onMounted(() => {
-  startTimer()
-  document.addEventListener('visibilitychange', handleVisibilityChange)
-})
-
-onBeforeUnmount(() => {
-  stopTimer()
-  document.removeEventListener('visibilitychange', handleVisibilityChange)
-})
 </script>
 
 <style scoped>
 .apex-hero {
-  min-height: 100vh;
-  min-height: 100svh;
+  min-height: calc(100svh - 4rem);
+  background: #fcfcfc;
+  color: #1a1a1a;
 }
 
-.hero-grid {
-  min-height: inherit;
+.apex-hero__inner {
+  display: flex;
+  width: min(100%, 90rem);
+  min-height: calc(100svh - 4rem);
+  flex-direction: column;
+  margin-inline: auto;
+  align-items: center;
+  gap: clamp(2.25rem, 5vh, 3.5rem);
+  padding: clamp(3.5rem, 7vh, 5.5rem) 1.5rem 5rem;
 }
 
-.hero-slideshow {
-  height: max(20rem, 38svh);
+.apex-hero__copy { width: min(100%, 56rem); text-align: center; }
+
+.apex-hero h1 {
+  max-width: 18ch;
+  margin-inline: auto;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(3.1rem, 5.7vw, 5.5rem);
+  font-weight: 600;
+  line-height: 1.03;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
 }
 
-.hero-slide {
-  opacity: 0;
-  transform: scale(1.025);
-  transition:
-    opacity 600ms ease,
-    transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+.apex-hero h1 span {
+  display: block;
+  color: #737373;
+  font-family: 'Space Grotesk', var(--font-heading);
+  font-size: 0.95em;
+  font-weight: 600;
+  letter-spacing: -0.04em;
 }
 
-.hero-slide.is-active {
-  opacity: 1;
-  transform: scale(1);
+.apex-hero__description {
+  max-width: 38rem;
+  margin: 1.35rem auto 0;
+  color: #525252;
+  font-size: clamp(1rem, 1.2vw, 1.125rem);
+  line-height: 1.6;
 }
 
-.hero-control {
+.apex-hero__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1.75rem; }
+
+.apex-hero__primary,
+.apex-hero__secondary {
   display: inline-flex;
-  height: 2.75rem;
-  width: 2.75rem;
+  min-height: 3.25rem;
   align-items: center;
   justify-content: center;
+  gap: 0.7rem;
   border-radius: 0.75rem;
-  background: rgb(0 0 0 / 45%);
-  color: white;
-  backdrop-filter: blur(8px);
-  transition: background-color 180ms ease;
+  padding: 0.8rem 1.2rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
 
-.hero-control:hover {
-  background: rgb(0 0 0 / 70%);
+.apex-hero__primary { background: #1a1a1a; color: #fff; }
+.apex-hero__primary:hover { background: #353535; transform: translateY(-2px); }
+.apex-hero__secondary { border: 1px solid #cecece; background: #fff; color: #1a1a1a; }
+.apex-hero__secondary:hover { border-color: #777; background: #f5f5f5; }
+.apex-hero__primary:focus-visible,
+.apex-hero__secondary:focus-visible { outline: 2px solid var(--apex-focus-on-light); outline-offset: 4px; }
+
+.apex-hero__audience {
+  max-width: 31rem;
+  margin: 1.5rem auto 0;
+  color: #626262;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
-.hero-control:focus-visible {
-  outline: 2px solid var(--apex-focus-on-dark);
-  outline-offset: 2px;
+.apex-hero__product { width: min(100%, 64rem); min-width: 0; scroll-margin-top: 5rem; }
+.apex-hero__product-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.7rem; margin-bottom: 1rem; color: #353535; font-size: 0.8rem; font-weight: 600; }
+.apex-hero__preview-label { color: #626262; font-size: 0.75rem; font-weight: 500; }
+.apex-hero__composition { position: relative; min-height: 34rem; }
+
+.apex-hero__workspace {
+  display: grid;
+  width: 76%;
+  min-height: 28rem;
+  grid-template-columns: 8.2rem minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid #dbe2ea;
+  border-radius: 1rem;
+  background: #f8fafc;
+  box-shadow: 0 2rem 4rem -2rem #0008;
 }
 
-.hero-progress {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  animation: hero-progress 5s linear forwards;
+.workspace-rail { background: #171a23; padding: 1.1rem 0.65rem; }
+.workspace-mark { margin: 0 0.5rem 1.7rem; color: #fff; font-size: 1rem; font-weight: 800; letter-spacing: -0.03em; }
+.workspace-rail__item { display: flex; align-items: center; gap: 0.5rem; border-radius: 0.45rem; padding: 0.65rem 0.5rem; color: #d4d9e2; font-size: 0.7rem; }
+.workspace-rail__item.is-selected { background: #303344; color: #fff; }
+.workspace-main { min-width: 0; color: #111827; }
+.workspace-topbar { display: flex; height: 3.2rem; align-items: center; justify-content: space-between; border-bottom: 1px solid #e2e8f0; background: #fff; padding: 0 1.1rem; font-size: 0.7rem; font-weight: 700; }
+.workspace-topbar__avatar { display: grid; width: 1.6rem; height: 1.6rem; place-items: center; border-radius: 50%; background: #ede9fe; color: #6d28d9; font-size: 0.55rem; }
+.workspace-content { padding: 1.4rem 1.2rem; }
+.workspace-content h2 { margin: 0; color: #111827; font-family: var(--font-body); font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; }
+.workspace-content p { margin: 0.4rem 0 0; color: #64748b; font-size: 0.7rem; }
+.workspace-feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; margin-top: 1.5rem; }
+.workspace-feature { display: flex; min-height: 5.2rem; flex-direction: column; justify-content: space-between; border: 1px solid #e2e8f0; border-radius: 0.6rem; background: #fff; padding: 0.7rem; color: #6d28d9; }
+.workspace-feature span { color: #334155; font-size: 0.67rem; font-weight: 700; }
+.workspace-activity { display: flex; justify-content: space-between; gap: 1rem; margin-top: 1.7rem; color: #334155; font-size: 0.7rem; font-weight: 700; }
+.workspace-activity__status { color: #64748b; font-size: 0.62rem; font-weight: 500; }
+.workspace-activity__lines { display: grid; gap: 0.55rem; margin-top: 0.9rem; }
+.workspace-activity__lines span { height: 0.5rem; border-radius: 1rem; background: #e9eef5; }
+.workspace-activity__lines span:nth-child(2) { width: 75%; }
+.workspace-activity__lines span:nth-child(3) { width: 55%; }
+
+.apex-hero__storefront {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 46%;
+  overflow: hidden;
+  border: 1px solid #dce3ed;
+  border-radius: 0.8rem;
+  background: #fff;
+  box-shadow: 0 2rem 4rem -1.5rem #0009;
 }
 
-@keyframes hero-progress {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
+.storefront-browser { display: flex; height: 1.9rem; align-items: center; gap: 0.22rem; border-bottom: 1px solid #e5e7eb; padding: 0 0.7rem; }
+.storefront-browser > span { width: 0.3rem; height: 0.3rem; border-radius: 50%; background: #d1d5db; }
+.storefront-browser p { margin-left: auto; color: #64748b; font-size: 0.55rem; }
+.storefront-body { padding: 0.55rem; }
+.storefront-nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.3rem 0.25rem 0.7rem; color: #111827; }
+.storefront-nav strong { font-family: 'Space Grotesk', var(--font-heading); font-size: 0.78rem; }
+.storefront-nav span { color: #374151; font-size: 0.53rem; }
+.storefront-body img { display: block; width: 100%; aspect-ratio: 1.52; border-radius: 0.25rem; object-fit: cover; }
+.storefront-caption { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 0.2rem 0.3rem; color: #111827; font-size: 0.67rem; font-weight: 700; }
+.apex-hero__product-note { max-width: 40rem; margin: 1rem auto 0; color: #626262; font-size: 0.75rem; line-height: 1.5; text-align: center; }
 
-@media (min-width: 1024px) {
-  .hero-slideshow {
-    align-self: center;
-    height: clamp(30rem, calc(100svh - 10rem), 38rem);
-  }
+@media (max-width: 639px) {
+  .apex-hero__inner { gap: 2rem; padding: 3rem 1.25rem 3.5rem; }
+  .apex-hero h1 { font-size: clamp(2.55rem, 10vw, 3rem); }
+  .apex-hero__description { margin-top: 1.25rem; }
+  .apex-hero__actions { margin-top: 1.25rem; }
+  .apex-hero__primary,
+  .apex-hero__secondary { min-height: 3rem; padding: 0.7rem 0.9rem; font-size: 0.8rem; }
+  .apex-hero__audience { margin-top: 1.15rem; font-size: 0.8rem; }
+  .apex-hero__composition { min-height: 26rem; }
+  .apex-hero__workspace { width: 100%; min-height: 22rem; grid-template-columns: 4rem minmax(0, 1fr); }
+  .workspace-rail__item { justify-content: center; }
+  .workspace-rail__item span { display: none; }
+  .workspace-mark { margin-inline: 0; text-align: center; font-size: 0.8rem; }
+  .workspace-content { padding: 1rem 0.8rem; }
+  .workspace-feature-grid { gap: 0.3rem; }
+  .workspace-feature { min-height: 4.5rem; padding: 0.45rem; }
+  .workspace-feature span { font-size: 0.55rem; }
+  .apex-hero__storefront { width: 68%; }
+  .storefront-nav span { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-slide {
-    transform: none;
-    transition-duration: 0.01ms;
-  }
+  .apex-hero__primary,
+  .apex-hero__secondary { transition: none; }
+  .apex-hero__primary:hover { transform: none; }
 }
 </style>

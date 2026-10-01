@@ -2,11 +2,11 @@
   <section id="pricing" class="bg-white py-16 lg:py-24">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
       <div class="mx-auto max-w-2xl text-center">
-        <h2 class="text-3xl font-bold tracking-tight text-gray-900">Simple pricing</h2>
-        <p class="mt-3 text-gray-600">Prices and included features come directly from the plans currently available.</p>
+        <h2 class="pricing-title text-gray-900">Choose the plan that fits your store.</h2>
+        <p class="mt-4 text-gray-600">Compare the plans currently available, then choose one after creating your store account.</p>
       </div>
 
-      <div class="pricing-stage mx-auto mt-12 max-w-5xl rounded-2xl bg-[#EEF3FA] px-4 py-10 sm:px-8 sm:py-12 lg:px-14 lg:pb-12 lg:pt-16">
+      <div class="pricing-stage mx-auto mt-12 max-w-5xl rounded-2xl bg-[#f7f7f5] px-4 py-10 sm:px-8 sm:py-12 lg:px-14 lg:pb-12 lg:pt-16">
         <div v-if="loading" class="grid gap-6 sm:grid-cols-2" role="status" aria-live="polite" aria-busy="true">
           <p class="sr-only">Loading pricing plans…</p>
           <div v-for="index in 2" :key="index" class="h-[30rem] rounded-2xl bg-white/70 shadow-[0_20px_50px_-30px_rgba(15,23,42,0.35)] motion-safe:animate-pulse" />
@@ -61,7 +61,7 @@
             <div class="my-7 h-px" :class="isFeatured(plan) ? 'bg-white/[0.12]' : 'bg-gray-100'" aria-hidden="true" />
 
             <p class="text-xs font-semibold uppercase tracking-wide" :class="isFeatured(plan) ? 'text-white/[0.55]' : 'text-gray-500'">
-              Everything included
+              Included in this plan
             </p>
             <ul v-if="plan.features.length" class="mt-4 flex-1 space-y-3">
               <li
@@ -90,7 +90,7 @@
                 ? 'bg-white text-gray-950 hover:bg-blue-50 focus-visible:outline-[var(--apex-focus-on-dark)]'
                 : 'bg-[var(--apex-action)] text-white hover:bg-[var(--apex-action-hover)] focus-visible:outline-[var(--apex-focus-on-light)]'"
             >
-              {{ isAuthenticated ? 'Go to subscription' : 'Get started' }}
+              {{ isAuthenticated ? 'Manage subscription' : 'Create your store' }}
               <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
             </NuxtLink>
 
@@ -101,15 +101,16 @@
         </div>
 
         <div v-else class="py-16 text-center text-sm text-gray-600">
-          Plans are being set up —
-          <NuxtLink to="/register" class="rounded-sm font-semibold text-[var(--apex-action)] underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]">create an account</NuxtLink>
-          and you’ll see them inside.
+          <p>No subscription plans are available right now.</p>
+          <button type="button" class="mt-4 min-h-11 rounded-xl border border-gray-300 bg-white px-5 py-2.5 font-semibold text-gray-900 hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--apex-focus-on-light)]" @click="$emit('retry')">
+            Try again
+          </button>
         </div>
       </div>
 
-      <p class="mt-6 flex items-center justify-center gap-2 text-center text-xs text-gray-500">
+      <p class="mt-6 flex items-center justify-center gap-2 text-center text-xs text-gray-600">
         <Icon name="heroicons:lock-closed" class="h-3.5 w-3.5" aria-hidden="true" />
-        Secure checkout by Stripe. Existing stores on this host are grandfathered as comped.
+        Subscription prices are in USD. Checkout is handled by Stripe; your storefront payment settings are separate.
       </p>
     </div>
   </section>
@@ -173,6 +174,17 @@ function intervalLabel(interval: SubscriptionPlan['interval']) {
 </script>
 
 <style scoped>
+.pricing-title {
+#pricing { scroll-margin-top: 5rem; }
+  margin: 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(2.5rem, 4.8vw, 4.5rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
 .pricing-card {
   box-shadow: 0 24px 55px -32px rgb(15 23 42 / 38%);
   transition:

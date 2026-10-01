@@ -36,8 +36,8 @@
     --color-accent: #F3F4F6;
 
     /* Apex marketing roles. Each pair meets WCAG AA in its intended context. */
-    --apex-action: #3b6ec2;
-    --apex-action-hover: #3564b3;
+    --apex-action: #1a1a1a;
+    --apex-action-hover: #353535;
     --apex-focus-on-light: #285095;
     --apex-focus-on-dark: #b9d3ff;
 

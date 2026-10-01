@@ -1,19 +1,39 @@
 <template>
-  <section class="relative overflow-hidden bg-gray-900 py-16 lg:py-20">
-    <div class="absolute inset-0 bg-gradient-to-br from-[#6898ED]/20 via-transparent to-transparent" />
-    <div class="relative mx-auto max-w-4xl px-6 lg:px-8 text-center">
-      <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Ready to launch your store?</h2>
-      <p class="mt-4 text-gray-300">Create your account, pick a plan, and open the dashboard in minutes.</p>
-      <div class="mt-8 flex flex-wrap justify-center gap-3">
-        <NuxtLink :to="isAuthenticated ? '/admin' : '/register'" class="inline-flex items-center rounded-full bg-[var(--apex-action)] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--apex-action-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--apex-focus-on-dark)]">Get Started</NuxtLink>
-        <NuxtLink to="/admin/login" class="inline-flex items-center rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white transition-colors hover:border-white/70 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--apex-focus-on-dark)]">Login</NuxtLink>
-      </div>
+  <section class="apex-final" aria-labelledby="apex-final-title">
+    <div class="apex-final__inner">
+      <h2 id="apex-final-title">{{ isAuthenticated ? 'Ready to keep building?' : 'Ready to create your store?' }}</h2>
+      <p v-if="isAuthenticated">Your SSU workspace is ready when you are.</p>
+      <p v-else>Create an account, choose a plan to activate selling, and shape a storefront that feels like your business.</p>
+      <NuxtLink :to="isAuthenticated ? '/admin' : '/register'" class="apex-final__action">
+        {{ isAuthenticated ? 'Open dashboard' : 'Create your store' }}
+        <Icon name="heroicons:arrow-up-right" aria-hidden="true" />
+      </NuxtLink>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  isAuthenticated: boolean
-}>()
+defineProps<{ isAuthenticated: boolean }>()
 </script>
+
+<style scoped>
+.apex-final { background: #1a1a1a; color: #fff; }
+.apex-final__inner { width: min(100%, 82rem); margin: 0 auto; padding: clamp(5rem, 9vw, 8rem) 1.5rem; text-align: center; }
+.apex-final h2 { max-width: 17ch; margin: 0 auto; font-family: 'Playfair Display', Georgia, serif; font-size: clamp(2.8rem, 5.5vw, 5.3rem); font-weight: 600; line-height: 1.08; letter-spacing: -0.03em; text-wrap: balance; }
+.apex-final p { max-width: 40rem; margin: 1.35rem auto 2rem; color: #d1d1d1; font-size: 1.05rem; line-height: 1.65; }
+.apex-final__action { display: inline-flex; min-height: 3.4rem; align-items: center; justify-content: center; gap: 0.75rem; border-radius: 0.75rem; background: #fff; padding: 0.8rem 1.3rem; color: #1a1a1a; font-size: 0.9rem; font-weight: 700; text-decoration: none; transition: background-color 180ms ease, transform 180ms ease; }
+.apex-final__action:hover { background: #e9e9e9; transform: translateY(-2px); }
+.apex-final__action:focus-visible { outline: 2px solid var(--apex-focus-on-dark); outline-offset: 4px; }
+.apex-final__action :deep(svg) { width: 1.15rem; height: 1.15rem; }
+
+@media (max-width: 639px) {
+  .apex-final__inner { padding: 4.5rem 1.25rem; }
+  .apex-final p { font-size: 0.95rem; }
+  .apex-final__action { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apex-final__action { transition: none; }
+  .apex-final__action:hover { transform: none; }
+}
+</style>
