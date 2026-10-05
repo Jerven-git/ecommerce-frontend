@@ -15,13 +15,13 @@
                 :key="`${segmentIndex}-${wordIndex}-${word.text}`"
                 class="apex-product__title-word"
                 :class="{ 'apex-product__title-word--muted': segment.muted }"
+                :style="wordStyle(word.letters[0]?.index ?? 0)"
               >
                 <span
                   v-for="letter in word.letters"
                   :key="letter.index"
                   class="apex-product__title-letter"
                   :style="letterStyle(letter.index)"
-                  @animationend="handleLetterAnimationEnd(letter.index)"
                 >{{ letter.character }}</span>
               </span>
             </template>
@@ -105,9 +105,17 @@ const headingSegments = headingCopy.map(segment => ({
 const headingText = headingCopy.map(segment => segment.text).join(' ')
 const headingRef = ref<HTMLElement | null>(null)
 const isHeadingAnimating = ref(false)
-const totalLetters = letterIndex
 let headingIsOnScreen = false
 let headingObserver: IntersectionObserver | undefined
+let headingAnimationTimer: ReturnType<typeof setTimeout> | undefined
+let compactViewport = false
+
+function wordStyle(firstLetterIndex: number) {
+  return {
+    '--word-delay': `${Math.min(firstLetterIndex * 11, 380)}ms`,
+    '--word-mobile-delay': `${Math.min(firstLetterIndex * 7, 220)}ms`,
+  }
+}
 
 function letterStyle(index: number) {
   const direction = index % 4
@@ -127,26 +135,36 @@ function letterStyle(index: number) {
   }
 }
 
-function handleLetterAnimationEnd(index: number) {
-  if (index === totalLetters - 1) isHeadingAnimating.value = false
+function stopHeadingAnimation() {
+  if (headingAnimationTimer) clearTimeout(headingAnimationTimer)
+  headingAnimationTimer = undefined
+  isHeadingAnimating.value = false
+}
+
+function startHeadingAnimation() {
+  stopHeadingAnimation()
+  isHeadingAnimating.value = true
+  headingAnimationTimer = setTimeout(stopHeadingAnimation, compactViewport ? 700 : 1050)
 }
 
 onMounted(() => {
   const heading = headingRef.value
   if (!heading) return
 
+  compactViewport = window.matchMedia('(max-width: 639px)').matches
+
   headingObserver = new IntersectionObserver(([entry]) => {
     if (!entry) return
 
     if (!entry.isIntersecting) {
       headingIsOnScreen = false
-      isHeadingAnimating.value = false
+      stopHeadingAnimation()
       return
     }
 
     if (entry.intersectionRatio >= 0.18 && !headingIsOnScreen) {
       headingIsOnScreen = true
-      isHeadingAnimating.value = true
+      startHeadingAnimation()
     }
   }, { threshold: [0, 0.18] })
 
@@ -155,6 +173,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   headingObserver?.disconnect()
+  stopHeadingAnimation()
 })
 
 const workspaceItems = [
@@ -168,8 +187,8 @@ const workspaceItems = [
 .apex-product {
   scroll-margin-top: 5rem;
   border-top: 1px solid #e8e8e8;
-  background: #fff;
-  color: #1a1a1a;
+  background: var(--apex-surface);
+  color: var(--apex-text);
 }
 
 .apex-product__inner { width: min(100%, 82rem); margin: 0 auto; padding: clamp(5rem, 9vw, 8rem) 1.5rem; }
@@ -178,7 +197,7 @@ const workspaceItems = [
 .apex-product__animated-title { display: block; }
 .apex-product__title-word { display: inline-block; margin-inline-end: 0.22em; white-space: nowrap; }
 .apex-product__title-word:last-child { margin-inline-end: 0; }
-.apex-product__title-word--muted { color: #747474; }
+.apex-product__title-word--muted { color: var(--apex-text-soft); }
 .apex-product__title-letter { display: inline-block; }
 .apex-product__animated-title--entering .apex-product__title-letter {
   animation: apex-product-letter-rewind 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -186,7 +205,7 @@ const workspaceItems = [
   backface-visibility: hidden;
   will-change: transform, opacity;
 }
-.apex-product__intro p { max-width: 39rem; margin: 1.35rem auto 0; color: #525252; font-size: 1.05rem; line-height: 1.65; }
+.apex-product__intro p { max-width: 39rem; margin: 1.35rem auto 0; color: var(--apex-text-muted); font-size: 1.05rem; line-height: 1.65; }
 
 @keyframes apex-product-letter-rewind {
   from { opacity: 0; transform: translate3d(var(--letter-x), var(--letter-y), 0) scale(0.96); }
@@ -208,36 +227,36 @@ const workspaceItems = [
 }
 
 .apex-product__stage { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(20rem, 0.85fr); align-items: stretch; gap: 1.25rem; }
-.apex-product__store, .apex-product__workspace { min-width: 0; overflow: hidden; border: 1px solid #dedede; border-radius: 1rem; background: #fff; }
-.apex-product__browser { display: flex; min-height: 2.6rem; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid #e5e5e5; padding: 0.55rem 1rem; color: #626262; font-size: 0.7rem; }
+.apex-product__store, .apex-product__workspace { min-width: 0; overflow: hidden; border: 1px solid var(--apex-border); border-radius: 1rem; background: var(--apex-surface); }
+.apex-product__browser { display: flex; min-height: 2.6rem; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid #e5e5e5; padding: 0.55rem 1rem; color: var(--apex-text-caption); font-size: 0.7rem; }
 .apex-product__browser-dots { display: flex; gap: 0.3rem; }
 .apex-product__browser-dots i { width: 0.4rem; height: 0.4rem; border-radius: 50%; background: #bdbdbd; }
 .apex-product__store-body { padding: 1rem; }
 .apex-product__store-nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.2rem 0.1rem 1rem; }
 .apex-product__store-nav strong { font-family: 'Space Grotesk', var(--font-heading); font-size: 1rem; }
-.apex-product__store-nav span { color: #525252; font-size: 0.72rem; }
+.apex-product__store-nav span { color: var(--apex-text-muted); font-size: 0.72rem; }
 .apex-product__store-image { position: relative; min-height: 25rem; overflow: hidden; background: #d5ccc2; }
 .apex-product__store-image img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.apex-product__store-overlay { position: absolute; inset: auto 0 0; display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; padding: 3.5rem 1.5rem 1.5rem; background: linear-gradient(to top, #141414c9, transparent); color: #fff; }
+.apex-product__store-overlay { position: absolute; inset: auto 0 0; display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; padding: 3.5rem 1.5rem 1.5rem; background: linear-gradient(to top, #141414c9, transparent); color: var(--apex-on-action); }
 .apex-product__store-overlay > span:first-child { max-width: 14ch; font-family: 'Playfair Display', Georgia, serif; font-size: clamp(1.7rem, 3vw, 2.8rem); line-height: 1.08; }
 .apex-product__store-button { display: inline-flex; align-items: center; gap: 0.3rem; border: 1px solid #ffffffa8; padding: 0.65rem 0.8rem; font-size: 0.7rem; font-weight: 700; white-space: nowrap; }
-.apex-product__store-caption { margin: 1rem 0 0.2rem; color: #525252; font-size: 0.78rem; }
+.apex-product__store-caption { margin: 1rem 0 0.2rem; color: var(--apex-text-muted); font-size: 0.78rem; }
 
 .apex-product__workspace { display: flex; flex-direction: column; background: #f7f8fa; }
-.apex-product__workspace-top { display: flex; min-height: 2.6rem; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid #e2e5e9; padding: 0.55rem 1rem; color: #626262; font-size: 0.7rem; }
+.apex-product__workspace-top { display: flex; min-height: 2.6rem; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid #e2e5e9; padding: 0.55rem 1rem; color: var(--apex-text-caption); font-size: 0.7rem; }
 .apex-product__workspace-mark { color: #222; font-size: 0.85rem; font-weight: 800; letter-spacing: -0.03em; }
 .apex-product__workspace-body { display: flex; flex: 1; flex-direction: column; justify-content: space-between; gap: 2rem; padding: clamp(1.25rem, 3vw, 2rem); }
-.apex-product__workspace-heading > span { color: #626262; font-size: 0.75rem; }
+.apex-product__workspace-heading > span { color: var(--apex-text-caption); font-size: 0.75rem; }
 .apex-product__workspace-heading h3 { max-width: 20ch; margin: 0.65rem 0 0; font-family: 'Space Grotesk', var(--font-heading); font-size: clamp(1.65rem, 2.5vw, 2.4rem); font-weight: 600; line-height: 1.16; letter-spacing: -0.03em; }
-.apex-product__workspace-list { overflow: hidden; border: 1px solid #e0e3e8; border-radius: 0.75rem; background: #fff; }
+.apex-product__workspace-list { overflow: hidden; border: 1px solid #e0e3e8; border-radius: 0.75rem; background: var(--apex-surface); }
 .apex-product__workspace-item { display: flex; align-items: center; gap: 0.85rem; padding: 1.1rem; }
 .apex-product__workspace-item + .apex-product__workspace-item { border-top: 1px solid #e7e9ed; }
-.apex-product__workspace-icon { flex: 0 0 auto; width: 1.3rem; height: 1.3rem; color: #6d28d9; }
+.apex-product__workspace-icon { flex: 0 0 auto; width: 1.3rem; height: 1.3rem; color: var(--apex-preview-accent); }
 .apex-product__workspace-item div { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 0.15rem; }
 .apex-product__workspace-item strong { font-size: 0.84rem; }
 .apex-product__workspace-item div span { color: #5b6470; font-size: 0.72rem; }
 .apex-product__workspace-arrow { width: 0.9rem; height: 0.9rem; color: #7b8491; }
-.apex-product__note { margin: 1rem 0 0; color: #626262; font-size: 0.75rem; text-align: center; }
+.apex-product__note { margin: 1rem 0 0; color: var(--apex-text-caption); font-size: 0.75rem; text-align: center; }
 
 @media (max-width: 900px) {
   .apex-product__stage { grid-template-columns: 1fr; }
@@ -253,5 +272,19 @@ const workspaceItems = [
   .apex-product__store-button { display: none; }
   .apex-product__store-nav span { font-size: 0.64rem; }
   .apex-product__note { text-align: left; }
+}
+
+@media (max-width: 639px) and (prefers-reduced-motion: no-preference) {
+  .apex-product__animated-title--entering .apex-product__title-letter { animation: none; will-change: auto; }
+  .apex-product__animated-title--entering .apex-product__title-word {
+    animation: apex-product-word-rewind 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--word-mobile-delay);
+    will-change: transform, opacity;
+  }
+}
+
+@keyframes apex-product-word-rewind {
+  from { opacity: 0.2; transform: translate3d(0, 0.65rem, 0) scale(0.99); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 </style>

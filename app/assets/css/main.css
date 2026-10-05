@@ -35,11 +35,57 @@
     /* Accent / surface */
     --color-accent: #F3F4F6;
 
-    /* Apex marketing roles. Each pair meets WCAG AA in its intended context. */
-    --apex-action: #1a1a1a;
-    --apex-action-hover: #353535;
+    /* Apex marketing system. These roles preserve the established editorial
+       palette while keeping it independent from tenant storefront themes. */
+    --apex-canvas: #fcfcfc;
+    --apex-surface: #ffffff;
+    --apex-surface-subtle: #f7f7f5;
+    --apex-surface-hover: #f5f5f5;
+    --apex-text: #1a1a1a;
+    --apex-text-strong: #111827;
+    --apex-text-emphasis: #353535;
+    --apex-text-muted: #525252;
+    --apex-text-caption: #626262;
+    --apex-text-display-muted: #737373;
+    --apex-text-soft: #747474;
+    --apex-text-ui-muted: #4b5563;
+    --apex-border: #dedede;
+    --apex-border-soft: #ececec;
+    --apex-border-strong: #cfcfca;
+    --apex-connector: #cecec8;
+    --apex-node: #9d9d98;
+    --apex-action: var(--apex-text);
+    --apex-action-hover: var(--apex-text-emphasis);
+    --apex-on-action: #ffffff;
+    --apex-on-dark-muted: #d1d1d1;
+    --apex-inverse-hover: #e9e9e9;
+    --apex-accent: #3b6ec2;
+    --apex-success: #315c1c;
+    --apex-success-surface: #d8f7a7;
+    --apex-success-ink: #26331b;
+    --apex-danger: #dc2626;
     --apex-focus-on-light: #285095;
     --apex-focus-on-dark: #b9d3ff;
+
+    /* Illustrative workspace/storefront chrome inside the Apex product story. */
+    --apex-preview-canvas: #f8fafc;
+    --apex-preview-surface: #ffffff;
+    --apex-preview-text: #111827;
+    --apex-preview-text-muted: #64748b;
+    --apex-preview-border: #e2e8f0;
+    --apex-preview-accent: #6d28d9;
+    --apex-preview-accent-soft: #ede9fe;
+    --apex-preview-rail: #171a23;
+    --apex-preview-rail-active: #303344;
+
+    /* Pointer states remain separate from content accents: the resting ring is
+       intentionally quieter than the active SSU blue. */
+    --apex-cursor-rest: #315b9f;
+    --apex-cursor-rest-border: rgb(49 91 159 / 62%);
+    --apex-cursor-rest-surface: rgb(104 152 237 / 7%);
+    --apex-cursor-active: #6898ed;
+    --apex-cursor-active-border: rgb(104 152 237 / 82%);
+    --apex-cursor-active-surface: rgb(104 152 237 / 12%);
 
     /* Legible text on solid primary/secondary fills — overridden per-theme in
        useTheme.ts based on the brand colour's luminance. */

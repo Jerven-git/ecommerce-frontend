@@ -1,35 +1,35 @@
 <template>
   <!-- Apex marketing footer — platform branding, not tenant store -->
-  <footer v-if="isApexMarketing" class="bg-[#1a1a1a] text-white border-t border-white/10">
+  <footer v-if="isApexMarketing" class="bg-[var(--apex-action)] text-[var(--apex-on-action)] border-t border-white/10">
     <div class="max-w-7xl mx-auto px-6 lg:px-8 py-12 md:py-16">
       <div class="grid gap-10 md:grid-cols-3">
         <div>
-          <NuxtLink to="/" class="inline-block text-xl font-bold tracking-tight text-white">SSU</NuxtLink>
+          <NuxtLink to="/" class="inline-flex min-h-11 items-center rounded-md text-xl font-bold tracking-tight text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--apex-focus-on-dark)]">SSU</NuxtLink>
           <p class="mt-3 text-sm leading-relaxed text-white/70 max-w-xs">A branded storefront and the tools to run it, all in one place.</p>
         </div>
         <div>
           <h4 class="text-[11px] font-semibold text-white/40 uppercase tracking-[0.14em] mb-4">Platform</h4>
           <ul class="space-y-2.5">
-            <li><a href="#product" class="text-sm text-white/70 hover:text-white transition-colors">Product</a></li>
-            <li><a href="#use-cases" class="text-sm text-white/70 hover:text-white transition-colors">Use cases</a></li>
-            <li><a href="#features" class="text-sm text-white/70 hover:text-white transition-colors">Features</a></li>
-            <li><a href="#how-it-works" class="text-sm text-white/60 hover:text-white transition-colors">How it works</a></li>
-            <li><a href="#pricing" class="text-sm text-white/60 hover:text-white transition-colors">Pricing</a></li>
-            <li><a href="#faq" class="text-sm text-white/70 hover:text-white transition-colors">FAQ</a></li>
+            <li><a href="#product" class="inline-flex min-h-11 items-center rounded-sm text-sm text-white/70 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-dark)]">Product</a></li>
+            <li><a href="#use-cases" class="inline-flex min-h-11 items-center rounded-sm text-sm text-white/70 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-dark)]">Use cases</a></li>
+            <li><a href="#features" class="inline-flex min-h-11 items-center rounded-sm text-sm text-white/70 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-dark)]">Features</a></li>
+            <li><a href="#how-it-works" class="inline-flex min-h-11 items-center rounded-sm text-sm text-white/60 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-dark)]">How it works</a></li>
+            <li><a href="#pricing" class="inline-flex min-h-11 items-center rounded-sm text-sm text-white/60 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-dark)]">Pricing</a></li>
+            <li><a href="#faq" class="inline-flex min-h-11 items-center rounded-sm text-sm text-white/70 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-dark)]">FAQ</a></li>
           </ul>
         </div>
         <div>
           <h4 class="text-[11px] font-semibold text-white/40 uppercase tracking-[0.14em] mb-4">Get started</h4>
           <ul class="space-y-2.5">
-            <li><NuxtLink :to="authStore.isAuthenticated ? '/admin' : '/register'" class="text-sm text-white/70 hover:text-white transition-colors">{{ authStore.isAuthenticated ? 'Open dashboard' : 'Create your store' }}</NuxtLink></li>
-            <li v-if="!authStore.isAuthenticated"><NuxtLink to="/admin/login" class="text-sm text-white/70 hover:text-white transition-colors">Log in</NuxtLink></li>
-            <li><a href="#pricing" class="text-sm text-white/70 hover:text-white transition-colors">View plans</a></li>
+            <li><NuxtLink :to="authStore.isAuthenticated ? '/admin' : '/register'" class="inline-flex min-h-11 items-center rounded-sm text-sm text-white/70 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-dark)]">{{ authStore.isAuthenticated ? 'Open dashboard' : 'Create your store' }}</NuxtLink></li>
+            <li v-if="!authStore.isAuthenticated"><NuxtLink to="/admin/login" class="inline-flex min-h-11 items-center rounded-sm text-sm text-white/70 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-dark)]">Log in</NuxtLink></li>
+            <li><a href="#pricing" class="inline-flex min-h-11 items-center rounded-sm text-sm text-white/70 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-dark)]">View plans</a></li>
           </ul>
         </div>
       </div>
       <div class="border-t border-white/10 mt-10 pt-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
         <p class="text-xs text-white/40">© {{ new Date().getFullYear() }} SSU. All rights reserved.</p>
-        <button type="button" class="inline-flex items-center gap-1.5 text-xs font-semibold text-white/40 hover:text-white transition-colors" @click="scrollToTop">Back to top <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg></button>
+        <button type="button" class="inline-flex min-h-11 items-center gap-1.5 rounded-md text-xs font-semibold text-white/40 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-dark)]" @click="scrollToTop">Back to top <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg></button>
       </div>
     </div>
   </footer>

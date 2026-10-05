@@ -14,13 +14,16 @@
               v-for="word in introWords"
               :key="word.index"
               class="apex-features__description-word"
+              :style="{
+                '--word-delay': `${280 + Math.min(word.index * 38, 720)}ms`,
+                '--word-mobile-delay': `${150 + Math.min(word.index * 20, 280)}ms`,
+              }"
             >
               <span
                 v-for="letter in word.letters"
                 :key="letter.index"
                 class="apex-features__description-letter"
                 :style="introLetterStyle(letter.index)"
-                @animationend="handleIntroLetterEnd(letter.index)"
               >{{ letter.character }}</span>
             </span>
           </span>
@@ -61,12 +64,13 @@ const introWords = introDescription.split(' ').map((word, index) => ({
   index,
   letters: Array.from(word).map(character => ({ character, index: introLetterIndex++ })),
 }))
-const introLetterCount = introLetterIndex
 const introRef = ref<HTMLElement | null>(null)
 const isIntroEntering = ref(false)
 
 let introObserver: IntersectionObserver | undefined
 let introIsOnScreen = false
+let introAnimationTimer: ReturnType<typeof setTimeout> | undefined
+let compactViewport = false
 
 function introLetterStyle(index: number) {
   const entrances = [
@@ -86,33 +90,46 @@ function introLetterStyle(index: number) {
   }
 }
 
-function handleIntroLetterEnd(index: number) {
-  if (index === introLetterCount - 1) isIntroEntering.value = false
+function stopIntroAnimation() {
+  if (introAnimationTimer) clearTimeout(introAnimationTimer)
+  introAnimationTimer = undefined
+  isIntroEntering.value = false
+}
+
+function startIntroAnimation() {
+  stopIntroAnimation()
+  isIntroEntering.value = true
+  introAnimationTimer = setTimeout(stopIntroAnimation, compactViewport ? 900 : 1700)
 }
 
 onMounted(() => {
   const intro = introRef.value
   if (!intro) return
 
+  compactViewport = window.matchMedia('(max-width: 639px)').matches
+
   introObserver = new IntersectionObserver(([entry]) => {
     if (!entry) return
 
     if (!entry.isIntersecting) {
       introIsOnScreen = false
-      isIntroEntering.value = false
+      stopIntroAnimation()
       return
     }
 
     if (entry.intersectionRatio >= 0.22 && !introIsOnScreen) {
       introIsOnScreen = true
-      isIntroEntering.value = true
+      startIntroAnimation()
     }
   }, { threshold: [0, 0.22] })
 
   introObserver.observe(intro)
 })
 
-onBeforeUnmount(() => introObserver?.disconnect())
+onBeforeUnmount(() => {
+  introObserver?.disconnect()
+  stopIntroAnimation()
+})
 
 const groups = [
   {
@@ -167,20 +184,20 @@ const groups = [
 </script>
 
 <style scoped>
-.apex-features { scroll-margin-top: 5rem; border-top: 1px solid #ececec; background: #fff; color: #1a1a1a; }
+.apex-features { scroll-margin-top: 5rem; border-top: 1px solid var(--apex-border-soft); background: var(--apex-surface); color: var(--apex-text); }
 .apex-features__inner { width: min(100%, 82rem); margin: 0 auto; padding: clamp(5rem, 9vw, 8rem) 1.5rem; }
 .apex-features__intro { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(17rem, 0.7fr); align-items: end; gap: 2rem; margin-bottom: 3rem; }
 .apex-features__intro h2 { max-width: 15ch; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: clamp(2.5rem, 4.8vw, 4.5rem); font-weight: 600; line-height: 1.12; letter-spacing: -0.03em; text-wrap: balance; }
-.apex-features__intro h2 span { color: #747474; }
-.apex-features__intro p { max-width: 29rem; margin: 0 0 0.35rem; color: #525252; font-size: 1.05rem; line-height: 1.65; }
+.apex-features__intro h2 span { color: var(--apex-text-soft); }
+.apex-features__intro p { max-width: 29rem; margin: 0 0 0.35rem; color: var(--apex-text-muted); font-size: 1.05rem; line-height: 1.65; }
 .apex-features__description-visual { display: block; }
 .apex-features__description-word { display: inline-block; margin-inline-end: 0.24em; white-space: nowrap; }
 .apex-features__description-word:last-child { margin-inline-end: 0; }
 .apex-features__description-letter { display: inline-block; }
 .apex-features__intro--entering h2 { transform-origin: 50% 100%; animation: apex-features-foam-drop 900ms both; will-change: transform, opacity; }
 .apex-features__intro--entering .apex-features__description-letter { animation: apex-features-letter-arrive 650ms cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: var(--letter-delay); backface-visibility: hidden; will-change: transform, opacity; }
-.apex-features__groups { border-top: 1px solid #dedede; }
-.apex-features__group { display: grid; grid-template-columns: minmax(14rem, 0.7fr) minmax(0, 1.3fr); gap: clamp(2rem, 6vw, 6rem); border-bottom: 1px solid #dedede; padding: clamp(2rem, 4vw, 3.5rem) 0; }
+.apex-features__groups { border-top: 1px solid var(--apex-border); }
+.apex-features__group { display: grid; grid-template-columns: minmax(14rem, 0.7fr) minmax(0, 1.3fr); gap: clamp(2rem, 6vw, 6rem); border-bottom: 1px solid var(--apex-border); padding: clamp(2rem, 4vw, 3.5rem) 0; }
 .apex-features__items { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1.5rem, 3vw, 3rem); }
 .apex-features__item { display: flex; min-width: 0; flex-direction: column; }
 
@@ -218,5 +235,26 @@ const groups = [
   .apex-features__inner { padding: 4.5rem 1.25rem; }
   .apex-features__intro p { font-size: 0.95rem; }
   .apex-features__items { grid-template-columns: 1fr; gap: 1.7rem; }
+}
+
+@media (max-width: 639px) and (prefers-reduced-motion: no-preference) {
+  .apex-features__intro--entering h2 { animation: apex-features-foam-drop-mobile 520ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .apex-features__intro--entering .apex-features__description-letter { animation: none; will-change: auto; }
+  .apex-features__intro--entering .apex-features__description-word {
+    animation: apex-features-word-arrive 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--word-mobile-delay);
+    will-change: transform, opacity;
+  }
+}
+
+@keyframes apex-features-word-arrive {
+  from { opacity: 0.2; transform: translate3d(0, 0.55rem, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes apex-features-foam-drop-mobile {
+  0% { opacity: 0.35; transform: translate3d(0, -1.5rem, 0) scale(0.99); }
+  72% { opacity: 1; transform: translate3d(0, 0.12rem, 0) scale(1.008); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 </style>

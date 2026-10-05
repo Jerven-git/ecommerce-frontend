@@ -278,49 +278,49 @@ function intervalLabel(interval: SubscriptionPlan['interval']) {
 </script>
 
 <style scoped>
-.apex-pricing { scroll-margin-top: 5rem; background: #fff; padding: clamp(4rem, 8vw, 6rem) 0; color: #1a1a1a; }
+.apex-pricing { scroll-margin-top: 5rem; background: var(--apex-surface); padding: clamp(4rem, 8vw, 6rem) 0; color: var(--apex-text); }
 .apex-pricing__inner { width: min(100%, 80rem); margin: 0 auto; padding: 0 1.5rem; }
 .apex-pricing__intro { max-width: 42rem; margin: 0 auto; text-align: center; }
-.pricing-title { margin: 0; color: #111827; font-family: 'Playfair Display', Georgia, serif; font-size: clamp(2.5rem, 4.8vw, 4.5rem); font-weight: 600; line-height: 1.12; letter-spacing: -0.03em; text-wrap: balance; }
-.apex-pricing__intro > p { margin: 1rem 0 0; color: #4b5563; line-height: 1.65; }
+.pricing-title { margin: 0; color: var(--apex-text-strong); font-family: 'Playfair Display', Georgia, serif; font-size: clamp(2.5rem, 4.8vw, 4.5rem); font-weight: 600; line-height: 1.12; letter-spacing: -0.03em; text-wrap: balance; }
+.apex-pricing__intro > p { margin: 1rem 0 0; color: var(--apex-text-ui-muted); line-height: 1.65; }
 .pricing-stage { width: min(100%, 68rem); margin: clamp(3rem, 6vw, 5rem) auto 0; }
 .pricing-loading__switcher { width: 18rem; max-width: 100%; height: 3.25rem; margin: 0 auto 1.5rem; border-radius: 9999px; background: #e5e7eb; }
-.pricing-loading__card { min-height: 28rem; border-block: 1px solid #d6d6d1; background: #f7f7f5; }
+.pricing-loading__card { min-height: 28rem; border-block: 1px solid #d6d6d1; background: var(--apex-surface-subtle); }
 .pricing-switcher { display: flex; width: max-content; max-width: 100%; gap: 0.25rem; margin: 0 auto 2rem; padding: 0.3rem; border: 1px solid #ddddda; border-radius: 9999px; background: #efefec; }
-.pricing-switcher__option { position: relative; display: flex; min-height: 2.75rem; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.6rem 1rem; border: 0; border-radius: 9999px; background: transparent; color: #4b5563; cursor: pointer; font-size: 0.875rem; font-weight: 650; white-space: nowrap; }
-.pricing-switcher__option.is-active { color: #111827; }
+.pricing-switcher__option { position: relative; display: flex; min-height: 2.75rem; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.6rem 1rem; border: 0; border-radius: 9999px; background: transparent; color: var(--apex-text-ui-muted); cursor: pointer; font-size: 0.875rem; font-weight: 650; white-space: nowrap; }
+.pricing-switcher__option.is-active { color: var(--apex-text-strong); }
 .pricing-switcher__option:focus-visible { outline: 2px solid var(--apex-focus-on-light); outline-offset: 3px; }
-.pricing-switcher__selection { position: absolute; inset: 0; border-radius: inherit; background: #fff; box-shadow: 0 5px 16px -8px rgb(15 23 42 / 45%); }
+.pricing-switcher__selection { position: absolute; inset: 0; border-radius: inherit; background: var(--apex-surface); box-shadow: 0 5px 16px -8px rgb(15 23 42 / 45%); }
 .pricing-switcher__label, .pricing-switcher__saving { position: relative; z-index: 1; }
-.pricing-switcher__saving { border-radius: 9999px; background: #d8f7a7; padding: 0.15rem 0.45rem; color: #26331b; font-size: 0.6875rem; font-weight: 750; }
-.pricing-card { display: grid; grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr); border-block: 1px solid #cfcfca; background: #f7f7f5; color: #1a1a1a; }
+.pricing-switcher__saving { border-radius: 9999px; background: var(--apex-success-surface); padding: 0.15rem 0.45rem; color: var(--apex-success-ink); font-size: 0.6875rem; font-weight: 750; }
+.pricing-card { display: grid; grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr); border-block: 1px solid var(--apex-border-strong); background: var(--apex-surface-subtle); color: var(--apex-text); }
 .pricing-card__summary, .pricing-card__features { min-width: 0; padding: clamp(1.75rem, 4vw, 3rem); }
 .pricing-card__summary { display: flex; flex-direction: column; }
 .pricing-card__primary { flex: 1; }
 .pricing-card__heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.4rem 1rem; }
-.pricing-card__billing { margin: 0; color: #626262; font-size: 0.8125rem; font-weight: 650; }
+.pricing-card__billing { margin: 0; color: var(--apex-text-caption); font-size: 0.8125rem; font-weight: 650; }
 .pricing-card h3 { margin: 0; font-size: clamp(1.25rem, 2vw, 1.6rem); font-weight: 650; letter-spacing: -0.02em; }
 .pricing-card__price-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem 0.65rem; margin-top: 1.1rem; }
 .pricing-card__price { min-width: 3ch; font-size: clamp(3.5rem, 8vw, 6rem); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.04em; line-height: 0.95; }
-.pricing-card__interval { color: #626262; font-size: 0.875rem; }
+.pricing-card__interval { color: var(--apex-text-caption); font-size: 0.875rem; }
 .pricing-card__details { min-height: 7.5rem; }
-.pricing-card__equivalent { margin: 1rem 0 0; color: #353535; font-size: 0.8125rem; font-weight: 700; line-height: 1.5; }
-.pricing-card__description { margin: 0.65rem 0 0; color: #525252; font-size: 0.925rem; line-height: 1.6; }
-.pricing-card__setup { margin: 0.45rem 0 0; color: #626262; font-size: 0.75rem; line-height: 1.5; }
-.pricing-card__saving { margin: 1rem 0 0; color: #315c1c; font-size: 0.8125rem; font-weight: 700; line-height: 1.5; }
-.pricing-card__action { display: inline-flex; min-height: 3rem; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 2rem; padding: 0.75rem 1.25rem; border-radius: 0.75rem; background: #1a1a1a; color: #fff; font-size: 0.875rem; font-weight: 700; text-decoration: none; transition: background-color 180ms ease; }
-.pricing-card__action:hover { background: #353535; }
+.pricing-card__equivalent { margin: 1rem 0 0; color: var(--apex-text-emphasis); font-size: 0.8125rem; font-weight: 700; line-height: 1.5; }
+.pricing-card__description { margin: 0.65rem 0 0; color: var(--apex-text-muted); font-size: 0.925rem; line-height: 1.6; }
+.pricing-card__setup { margin: 0.45rem 0 0; color: var(--apex-text-caption); font-size: 0.75rem; line-height: 1.5; }
+.pricing-card__saving { margin: 1rem 0 0; color: var(--apex-success); font-size: 0.8125rem; font-weight: 700; line-height: 1.5; }
+.pricing-card__action { display: inline-flex; min-height: 3rem; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 2rem; padding: 0.75rem 1.25rem; border-radius: 0.75rem; background: var(--apex-action); color: var(--apex-on-action); font-size: 0.875rem; font-weight: 700; text-decoration: none; transition: background-color 180ms ease; }
+.pricing-card__action:hover { background: var(--apex-action-hover); }
 .pricing-card__action:focus-visible { outline: 2px solid var(--apex-focus-on-light); outline-offset: 4px; }
 .pricing-card__action :deep(svg) { width: 1rem; height: 1rem; transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1); }
 .pricing-card__action:hover :deep(svg),
 .pricing-card__action:focus-visible :deep(svg) { transform: translateX(0.18rem); }
 .pricing-card__features { border-left: 1px solid #d8d8d3; }
 .pricing-card__features-content { height: 100%; }
-.pricing-card__features-title { margin: 0; color: #626262; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.pricing-card__features-title { margin: 0; color: var(--apex-text-caption); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 .pricing-card__features ul { display: grid; gap: 0.9rem; margin: 1.5rem 0 0; padding: 0; list-style: none; }
 .pricing-card__features li { display: flex; gap: 0.75rem; color: #3f3f3f; font-size: 0.875rem; line-height: 1.55; }
-.pricing-card__features li :deep(svg) { width: 1rem; height: 1rem; flex: 0 0 auto; margin-top: 0.2rem; color: #3b6ec2; }
-.pricing-card__fallback { margin: 1.5rem 0 0; color: #525252; font-size: 0.875rem; line-height: 1.6; }
+.pricing-card__features li :deep(svg) { width: 1rem; height: 1rem; flex: 0 0 auto; margin-top: 0.2rem; color: var(--apex-accent); }
+.pricing-card__fallback { margin: 1.5rem 0 0; color: var(--apex-text-muted); font-size: 0.875rem; line-height: 1.6; }
 .pricing-plan-copy-enter-active { transition: opacity 300ms ease, clip-path 380ms cubic-bezier(0.16, 1, 0.3, 1), transform 380ms cubic-bezier(0.16, 1, 0.3, 1); }
 .pricing-plan-copy-leave-active { transition: opacity 130ms ease, transform 130ms ease; }
 .pricing-plan-copy-enter-from { opacity: 0.35; clip-path: inset(0 0 100% 0); transform: translateY(0.4rem); }
@@ -330,13 +330,13 @@ function intervalLabel(interval: SubscriptionPlan['interval']) {
 .pricing-feature-panel-enter-from { opacity: 0; transform: translateX(0.5rem); }
 .pricing-feature-panel-leave-to { opacity: 0; }
 .pricing-feature-panel-enter-active .pricing-card__features li { animation: pricing-feature-arrive 360ms cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--feature-index) * 55ms); }
-.pricing-footnote { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin: 1.5rem 0 0; color: #4b5563; font-size: 0.75rem; line-height: 1.5; text-align: center; }
+.pricing-footnote { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin: 1.5rem 0 0; color: var(--apex-text-ui-muted); font-size: 0.75rem; line-height: 1.5; text-align: center; }
 .pricing-footnote :deep(svg) { width: 0.875rem; height: 0.875rem; flex: 0 0 auto; }
 .pricing-error, .pricing-empty { max-width: 32rem; margin: 0 auto; padding: 3rem 0; text-align: center; }
-.pricing-error > :deep(svg) { width: 2rem; height: 2rem; margin: 0 auto; color: #dc2626; }
-.pricing-error h3 { margin: 1rem 0 0; color: #111827; font-size: 1.125rem; font-weight: 650; }
-.pricing-error p, .pricing-empty p { margin: 0.5rem 0 0; color: #4b5563; font-size: 0.875rem; line-height: 1.6; }
-.pricing-error button, .pricing-empty button { min-height: 2.75rem; margin-top: 1.25rem; padding: 0.625rem 1.25rem; border: 0; border-radius: 0.75rem; background: var(--apex-action); color: #fff; cursor: pointer; font-weight: 650; }
+.pricing-error > :deep(svg) { width: 2rem; height: 2rem; margin: 0 auto; color: var(--apex-danger); }
+.pricing-error h3 { margin: 1rem 0 0; color: var(--apex-text-strong); font-size: 1.125rem; font-weight: 650; }
+.pricing-error p, .pricing-empty p { margin: 0.5rem 0 0; color: var(--apex-text-ui-muted); font-size: 0.875rem; line-height: 1.6; }
+.pricing-error button, .pricing-empty button { min-height: 2.75rem; margin-top: 1.25rem; padding: 0.625rem 1.25rem; border: 0; border-radius: 0.75rem; background: var(--apex-action); color: var(--apex-on-action); cursor: pointer; font-weight: 650; }
 .pricing-error button:hover, .pricing-empty button:hover { background: var(--apex-action-hover); }
 .pricing-error button:focus-visible, .pricing-empty button:focus-visible { outline: 2px solid var(--apex-focus-on-light); outline-offset: 4px; }
 
@@ -354,6 +354,11 @@ function intervalLabel(interval: SubscriptionPlan['interval']) {
   .pricing-card__details { min-height: 0; }
   .pricing-card__features { border-top: 1px solid #d8d8d3; border-left: 0; }
   .pricing-footnote { align-items: flex-start; }
+  .pricing-plan-copy-enter-active,
+  .pricing-feature-panel-enter-active { transition: opacity 220ms ease-out, transform 220ms cubic-bezier(0.16, 1, 0.3, 1); }
+  .pricing-plan-copy-enter-from { clip-path: none; opacity: 0.45; transform: translateY(0.2rem); }
+  .pricing-feature-panel-enter-from { transform: translateY(0.2rem); }
+  .pricing-feature-panel-enter-active .pricing-card__features li { animation: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -33,6 +33,7 @@ let activeWordIndex = 0
 let timeout: ReturnType<typeof setTimeout> | undefined
 let currentAnimation: ReturnType<typeof animate> | null = null
 let observer: IntersectionObserver | undefined
+let compactMotionQuery: MediaQueryList | undefined
 let isVisible = false
 
 function randomGlyph() {
@@ -58,7 +59,8 @@ function scheduleNext() {
   clearTimeout(timeout)
   if (!props.autoplay || !canAnimate()) return
 
-  timeout = setTimeout(scrambleNext, props.hold)
+  const hold = compactMotionQuery?.matches ? Math.max(props.hold, 3600) : props.hold
+  timeout = setTimeout(scrambleNext, hold)
 }
 
 function scrambleNext() {
@@ -71,7 +73,8 @@ function scrambleNext() {
   const source = props.words[activeWordIndex]
   const target = props.words[nextIndex]
   const characterCount = Math.max(source.length, target.length)
-  const glyphSteps = Math.ceil(props.duration / glyphInterval)
+  const duration = compactMotionQuery?.matches ? Math.min(props.duration, 0.55) : props.duration
+  const glyphSteps = Math.ceil(duration / glyphInterval)
   const animatedIndices = Array.from({ length: characterCount }, (_, index) => index)
     .filter(index => (target[index] ?? source[index] ?? '') !== ' ')
   const sequenceDenominator = Math.max(animatedIndices.length - 1, 1)
@@ -81,7 +84,7 @@ function scrambleNext() {
 
   currentAnimation?.stop()
   currentAnimation = animate(0, 1, {
-    duration: props.duration,
+    duration,
     ease: 'linear',
     onUpdate: (progress) => {
       const glyphStep = Math.floor(progress * glyphSteps)
@@ -125,6 +128,11 @@ function handleVisibilityChange() {
   else scheduleNext()
 }
 
+function handleMotionContextChange() {
+  stop()
+  scheduleNext()
+}
+
 watch(prefersReducedMotion, (reduceMotion) => {
   if (reduceMotion) {
     stop()
@@ -143,6 +151,9 @@ watch(() => props.words, () => {
 }, { deep: true })
 
 onMounted(() => {
+  compactMotionQuery = window.matchMedia('(max-width: 639px), (pointer: coarse)')
+  compactMotionQuery.addEventListener('change', handleMotionContextChange)
+
   observer = new IntersectionObserver(([entry]) => {
     isVisible = entry?.isIntersecting ?? false
     if (isVisible) scheduleNext()
@@ -156,6 +167,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   stop()
   observer?.disconnect()
+  compactMotionQuery?.removeEventListener('change', handleMotionContextChange)
   document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 

@@ -101,8 +101,8 @@ defineProps<{
 <style scoped>
 .apex-hero {
   min-height: calc(100svh - 4rem);
-  background: #fcfcfc;
-  color: #1a1a1a;
+  background: var(--apex-canvas);
+  color: var(--apex-text);
 }
 
 .apex-hero__inner {
@@ -135,7 +135,7 @@ defineProps<{
 }
 
 .apex-hero__line {
-  color: #737373;
+  color: var(--apex-text-display-muted);
   font-family: 'Space Grotesk', var(--font-heading);
   font-size: 0.95em;
   font-weight: 600;
@@ -145,7 +145,7 @@ defineProps<{
 .apex-hero__description {
   max-width: 38rem;
   margin: 1.35rem auto 0;
-  color: #525252;
+  color: var(--apex-text-muted);
   font-size: clamp(1rem, 1.2vw, 1.125rem);
   line-height: 1.6;
 }
@@ -167,24 +167,24 @@ defineProps<{
   transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
 
-.apex-hero__primary { background: #1a1a1a; color: #fff; }
-.apex-hero__primary:hover { background: #353535; transform: translateY(-2px); }
-.apex-hero__secondary { border: 1px solid #cecece; background: #fff; color: #1a1a1a; }
-.apex-hero__secondary:hover { border-color: #777; background: #f5f5f5; }
+.apex-hero__primary { background: var(--apex-action); color: var(--apex-on-action); }
+.apex-hero__primary:hover { background: var(--apex-action-hover); transform: translateY(-2px); }
+.apex-hero__secondary { border: 1px solid #cecece; background: var(--apex-surface); color: var(--apex-text); }
+.apex-hero__secondary:hover { border-color: #777; background: var(--apex-surface-hover); }
 .apex-hero__primary:focus-visible,
 .apex-hero__secondary:focus-visible { outline: 2px solid var(--apex-focus-on-light); outline-offset: 4px; }
 
 .apex-hero__audience {
   max-width: 31rem;
   margin: 1.5rem auto 0;
-  color: #626262;
+  color: var(--apex-text-caption);
   font-size: 0.875rem;
   line-height: 1.5;
 }
 
 .apex-hero__product { width: min(100%, 64rem); min-width: 0; scroll-margin-top: 5rem; }
-.apex-hero__product-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.7rem; margin-bottom: 1rem; color: #353535; font-size: 0.8rem; font-weight: 600; }
-.apex-hero__preview-label { color: #626262; font-size: 0.75rem; font-weight: 500; }
+.apex-hero__product-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.7rem; margin-bottom: 1rem; color: var(--apex-text-emphasis); font-size: 0.8rem; font-weight: 600; }
+.apex-hero__preview-label { color: var(--apex-text-caption); font-size: 0.75rem; font-weight: 500; }
 .apex-hero__composition { position: relative; min-height: 34rem; }
 
 .apex-hero__workspace {
@@ -195,25 +195,25 @@ defineProps<{
   overflow: hidden;
   border: 1px solid #dbe2ea;
   border-radius: 1rem;
-  background: #f8fafc;
+  background: var(--apex-preview-canvas);
   box-shadow: 0 2rem 4rem -2rem #0008;
 }
 
-.workspace-rail { background: #171a23; padding: 1.1rem 0.65rem; }
-.workspace-mark { margin: 0 0.5rem 1.7rem; color: #fff; font-size: 1rem; font-weight: 800; letter-spacing: -0.03em; }
+.workspace-rail { background: var(--apex-preview-rail); padding: 1.1rem 0.65rem; }
+.workspace-mark { margin: 0 0.5rem 1.7rem; color: var(--apex-on-action); font-size: 1rem; font-weight: 800; letter-spacing: -0.03em; }
 .workspace-rail__item { display: flex; align-items: center; gap: 0.5rem; border-radius: 0.45rem; padding: 0.65rem 0.5rem; color: #d4d9e2; font-size: 0.7rem; }
-.workspace-rail__item.is-selected { background: #303344; color: #fff; }
-.workspace-main { min-width: 0; color: #111827; }
-.workspace-topbar { display: flex; height: 3.2rem; align-items: center; justify-content: space-between; border-bottom: 1px solid #e2e8f0; background: #fff; padding: 0 1.1rem; font-size: 0.7rem; font-weight: 700; }
-.workspace-topbar__avatar { display: grid; width: 1.6rem; height: 1.6rem; place-items: center; border-radius: 50%; background: #ede9fe; color: #6d28d9; font-size: 0.55rem; }
+.workspace-rail__item.is-selected { background: var(--apex-preview-rail-active); color: var(--apex-on-action); }
+.workspace-main { min-width: 0; color: var(--apex-preview-text); }
+.workspace-topbar { display: flex; height: 3.2rem; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--apex-preview-border); background: var(--apex-preview-surface); padding: 0 1.1rem; font-size: 0.7rem; font-weight: 700; }
+.workspace-topbar__avatar { display: grid; width: 1.6rem; height: 1.6rem; place-items: center; border-radius: 50%; background: var(--apex-preview-accent-soft); color: var(--apex-preview-accent); font-size: 0.55rem; }
 .workspace-content { padding: 1.4rem 1.2rem; }
-.workspace-content h2 { margin: 0; color: #111827; font-family: var(--font-body); font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; }
-.workspace-content p { margin: 0.4rem 0 0; color: #64748b; font-size: 0.7rem; }
+.workspace-content h2 { margin: 0; color: var(--apex-preview-text); font-family: var(--font-body); font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; }
+.workspace-content p { margin: 0.4rem 0 0; color: var(--apex-preview-text-muted); font-size: 0.7rem; }
 .workspace-feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; margin-top: 1.5rem; }
-.workspace-feature { display: flex; min-height: 5.2rem; flex-direction: column; justify-content: space-between; border: 1px solid #e2e8f0; border-radius: 0.6rem; background: #fff; padding: 0.7rem; color: #6d28d9; }
+.workspace-feature { display: flex; min-height: 5.2rem; flex-direction: column; justify-content: space-between; border: 1px solid var(--apex-preview-border); border-radius: 0.6rem; background: var(--apex-preview-surface); padding: 0.7rem; color: var(--apex-preview-accent); }
 .workspace-feature span { color: #334155; font-size: 0.67rem; font-weight: 700; }
 .workspace-activity { display: flex; justify-content: space-between; gap: 1rem; margin-top: 1.7rem; color: #334155; font-size: 0.7rem; font-weight: 700; }
-.workspace-activity__status { color: #64748b; font-size: 0.62rem; font-weight: 500; }
+.workspace-activity__status { color: var(--apex-preview-text-muted); font-size: 0.62rem; font-weight: 500; }
 .workspace-activity__lines { display: grid; gap: 0.55rem; margin-top: 0.9rem; }
 .workspace-activity__lines span { height: 0.5rem; border-radius: 1rem; background: #e9eef5; }
 .workspace-activity__lines span:nth-child(2) { width: 75%; }
@@ -227,20 +227,20 @@ defineProps<{
   overflow: hidden;
   border: 1px solid #dce3ed;
   border-radius: 0.8rem;
-  background: #fff;
+  background: var(--apex-preview-surface);
   box-shadow: 0 2rem 4rem -1.5rem #0009;
 }
 
 .storefront-browser { display: flex; height: 1.9rem; align-items: center; gap: 0.22rem; border-bottom: 1px solid #e5e7eb; padding: 0 0.7rem; }
 .storefront-browser > span { width: 0.3rem; height: 0.3rem; border-radius: 50%; background: #d1d5db; }
-.storefront-browser p { margin-left: auto; color: #64748b; font-size: 0.55rem; }
+.storefront-browser p { margin-left: auto; color: var(--apex-preview-text-muted); font-size: 0.55rem; }
 .storefront-body { padding: 0.55rem; }
-.storefront-nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.3rem 0.25rem 0.7rem; color: #111827; }
+.storefront-nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.3rem 0.25rem 0.7rem; color: var(--apex-preview-text); }
 .storefront-nav strong { font-family: 'Space Grotesk', var(--font-heading); font-size: 0.78rem; }
 .storefront-nav span { color: #374151; font-size: 0.53rem; }
 .storefront-body img { display: block; width: 100%; aspect-ratio: 1.52; border-radius: 0.25rem; object-fit: cover; }
-.storefront-caption { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 0.2rem 0.3rem; color: #111827; font-size: 0.67rem; font-weight: 700; }
-.apex-hero__product-note { max-width: 40rem; margin: 1rem auto 0; color: #626262; font-size: 0.75rem; line-height: 1.5; text-align: center; }
+.storefront-caption { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 0.2rem 0.3rem; color: var(--apex-preview-text); font-size: 0.67rem; font-weight: 700; }
+.apex-hero__product-note { max-width: 40rem; margin: 1rem auto 0; color: var(--apex-text-caption); font-size: 0.75rem; line-height: 1.5; text-align: center; }
 
 @media (max-width: 639px) {
   .apex-hero__inner { gap: 2rem; padding: 3rem 1.25rem 3.5rem; }
@@ -261,6 +261,10 @@ defineProps<{
   .workspace-feature span { font-size: 0.55rem; }
   .apex-hero__storefront { width: 68%; }
   .storefront-nav span { display: none; }
+}
+
+@media (hover: none) {
+  .apex-hero__primary:hover { transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -19,7 +19,7 @@
         <!-- Logo -->
         <NuxtLink
           :to="marketingHome"
-          class="flex items-center shrink-0 justify-self-start rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+          class="flex min-h-11 items-center shrink-0 justify-self-start rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
           :aria-label="isApexMarketing ? 'SSU home' : undefined"
           :class="isApexMarketing
             ? (isTransparent ? 'focus-visible:outline-[var(--apex-focus-on-dark)]' : 'focus-visible:outline-[var(--apex-focus-on-light)]')
@@ -262,7 +262,7 @@
             ref="mobileMenuTrigger"
             type="button"
             @click="mobileMenuOpen = true"
-            class="lg:hidden p-2 rounded-full border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            class="lg:hidden inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             :class="[
               isTransparent ? 'border-white/20 text-white/85 hover:bg-white/10' : 'border-gray-900/10 bg-white/70 text-gray-900 shadow-sm hover:bg-gray-50',
               isApexMarketing
@@ -326,7 +326,7 @@
               <button
                 ref="mobileMenuCloseButton"
                 type="button"
-                class="p-2 rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                 :class="isApexMarketing ? 'focus-visible:outline-[var(--apex-focus-on-light)]' : 'focus-visible:outline-primary-500'"
                 aria-label="Close menu"
                 @click="closeMobile"
@@ -339,14 +339,14 @@
 
             <!-- Drawer nav -->
             <nav v-if="isApexMarketing" class="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-0.5">
-              <a v-for="link in marketingLinks" :key="link.to" :href="link.to" class="rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">{{ link.label }}</a>
+              <a v-for="link in marketingLinks" :key="link.to" :href="link.to" class="flex min-h-11 items-center rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">{{ link.label }}</a>
               <div class="mt-4 pt-4 border-t border-gray-900/[0.08] flex flex-col gap-2">
-                <NuxtLink v-if="authStore.isAuthenticated" to="/admin" class="flex items-center justify-center gap-2 rounded-xl bg-[var(--apex-action)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--apex-action-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">Dashboard</NuxtLink>
+                <NuxtLink v-if="authStore.isAuthenticated" to="/admin" class="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[var(--apex-action)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--apex-action-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">Dashboard</NuxtLink>
                 <template v-else>
-                  <NuxtLink to="/admin/login" class="flex items-center justify-center rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">Login</NuxtLink>
-                  <NuxtLink to="/register" class="flex items-center justify-center rounded-xl bg-[var(--apex-action)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--apex-action-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">Create your store</NuxtLink>
+                  <NuxtLink to="/admin/login" class="flex min-h-11 items-center justify-center rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">Login</NuxtLink>
+                  <NuxtLink to="/register" class="flex min-h-11 items-center justify-center rounded-xl bg-[var(--apex-action)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--apex-action-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">Create your store</NuxtLink>
                 </template>
-                <a v-if="!authStore.isAuthenticated" href="#pricing" class="rounded-lg px-3 py-2 text-center text-sm font-medium text-[var(--apex-action)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">View plans</a>
+                <a v-if="!authStore.isAuthenticated" href="#pricing" class="inline-flex min-h-11 items-center justify-center rounded-lg px-3 py-2 text-center text-sm font-medium text-[var(--apex-action)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-light)]" @click="closeMobile">View plans</a>
               </div>
             </nav>
             <nav v-else class="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-0.5">
@@ -463,9 +463,16 @@ interface NavCategory {
 // nested categories (childrenRecursive flattened to `children`); we keep the
 // top level plus one level of subcategories for the menu.
 const { data: shopCategories } = useLazyAsyncData('header-shop-categories', () =>
-  $apiFetch<{ data: any[] }>('/categories', { method: 'GET' })
-    .then(r => (r?.data ?? []).map(mapCategory))
-    .catch(() => [] as NavCategory[]),
+  siteConfig.value?.is_storefront_host === true
+    ? $apiFetch<{ data: any[] }>('/categories', { method: 'GET' })
+        .then(r => (r?.data ?? []).map(mapCategory))
+        .catch(() => [] as NavCategory[])
+    : Promise.resolve([] as NavCategory[]),
+  {
+    // Site config can resolve after this shared header mounts. Refetch only when
+    // that resolution confirms a real storefront; Apex keeps the empty result.
+    watch: [() => siteConfig.value?.is_storefront_host],
+  },
 )
 
 function mapCategory(c: any): NavCategory {
@@ -639,7 +646,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.apex-header__brand { color: #1a1a1a; font-family: 'Space Grotesk', var(--font-heading); font-size: 1.6rem; font-weight: 700; line-height: 1; letter-spacing: -0.04em; }
+.apex-header__brand { color: var(--apex-text); font-family: 'Space Grotesk', var(--font-heading); font-size: 1.6rem; font-weight: 700; line-height: 1; letter-spacing: -0.04em; }
 .apex-header__brand-dot { color: #6d28d9; }
 
 /* Editorial nav item: text with a center-out underline that grows on hover and

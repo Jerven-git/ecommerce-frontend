@@ -15,6 +15,7 @@ const visible = ref(false)
 const interactive = ref(false)
 const cursorElement = ref<HTMLElement | null>(null)
 let pointerQuery: MediaQueryList | undefined
+let forcedColorsQuery: MediaQueryList | undefined
 let animationFrame: number | undefined
 let nextX = 0
 let nextY = 0
@@ -61,6 +62,7 @@ function disableCursor() {
   document.documentElement.removeEventListener('pointerleave', onPointerLeave)
   document.body.classList.remove('ssu-cursor-enabled')
   visible.value = false
+  interactive.value = false
 
   if (animationFrame !== undefined) {
     window.cancelAnimationFrame(animationFrame)
@@ -69,18 +71,21 @@ function disableCursor() {
 }
 
 function syncCursorPreference() {
-  if (pointerQuery?.matches) enableCursor()
+  if (pointerQuery?.matches && !forcedColorsQuery?.matches) enableCursor()
   else disableCursor()
 }
 
 onMounted(() => {
   pointerQuery = window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)')
+  forcedColorsQuery = window.matchMedia('(forced-colors: active)')
   pointerQuery.addEventListener('change', syncCursorPreference)
+  forcedColorsQuery.addEventListener('change', syncCursorPreference)
   syncCursorPreference()
 })
 
 onBeforeUnmount(() => {
   pointerQuery?.removeEventListener('change', syncCursorPreference)
+  forcedColorsQuery?.removeEventListener('change', syncCursorPreference)
   disableCursor()
 })
 </script>
@@ -117,28 +122,39 @@ onBeforeUnmount(() => {
   left: 50%;
   width: 6px;
   height: 6px;
-  background: #315b9f;
+  background: var(--apex-cursor-rest);
   transform: translate(-50%, -50%);
   transition: background-color 160ms ease;
 }
 
 .ssu-cursor::after {
   inset: 0;
-  border: 1px solid rgb(49 91 159 / 62%);
-  background: rgb(104 152 237 / 7%);
+  border: 1px solid var(--apex-cursor-rest-border);
+  background: var(--apex-cursor-rest-surface);
   transition: border-color 160ms ease, background-color 160ms ease;
 }
 
 .ssu-cursor.is-active::before {
-  background: #6898ed;
+  background: var(--apex-cursor-active);
 }
 
 .ssu-cursor.is-active::after {
-  border-color: rgb(104 152 237 / 82%);
-  background: rgb(104 152 237 / 12%);
+  border-color: var(--apex-cursor-active-border);
+  background: var(--apex-cursor-active-surface);
 }
 
 @media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
+  .ssu-cursor {
+    display: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  body.ssu-cursor-enabled,
+  body.ssu-cursor-enabled * {
+    cursor: auto !important;
+  }
+
   .ssu-cursor {
     display: none !important;
   }

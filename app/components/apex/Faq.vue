@@ -109,12 +109,12 @@ const questions = [
 </script>
 
 <style scoped>
-.apex-faq { scroll-margin-top: 5rem; border-top: 1px solid #ececec; background: #fff; color: #1a1a1a; }
+.apex-faq { scroll-margin-top: 5rem; border-top: 1px solid var(--apex-border-soft); background: var(--apex-surface); color: var(--apex-text); }
 .apex-faq__inner { display: grid; width: min(100%, 82rem); grid-template-columns: minmax(17rem, 0.8fr) minmax(0, 1.2fr); gap: clamp(3rem, 7vw, 8rem); margin: 0 auto; padding: clamp(5rem, 9vw, 8rem) 1.5rem; }
 .apex-faq__intro h2 { max-width: 13ch; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: clamp(2.5rem, 4.8vw, 4.5rem); font-weight: 600; line-height: 1.12; letter-spacing: -0.03em; text-wrap: balance; }
-.apex-faq__intro p { max-width: 27rem; margin: 1.25rem 0 0; color: #525252; font-size: 1.05rem; line-height: 1.65; }
-.apex-faq__questions { border-top: 1px solid #dedede; }
-.apex-faq__item { border-bottom: 1px solid #dedede; }
+.apex-faq__intro p { max-width: 27rem; margin: 1.25rem 0 0; color: var(--apex-text-muted); font-size: 1.05rem; line-height: 1.65; }
+.apex-faq__questions { border-top: 1px solid var(--apex-border); }
+.apex-faq__item { border-bottom: 1px solid var(--apex-border); }
 .apex-faq__header { margin: 0; }
 .apex-faq__trigger { display: flex; width: 100%; min-height: 5rem; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.3rem 0; border: 0; background: transparent; color: inherit; cursor: pointer; font-family: 'Space Grotesk', var(--font-heading); font-size: clamp(1rem, 1.45vw, 1.2rem); font-weight: 600; line-height: 1.4; text-align: left; }
 .apex-faq__trigger:focus-visible { border-radius: 0.25rem; outline: 2px solid var(--apex-focus-on-light); outline-offset: 4px; }
@@ -122,7 +122,7 @@ const questions = [
 .apex-faq__icon :deep(svg) { width: 100%; height: 100%; }
 .apex-faq__content { overflow: hidden; }
 .apex-faq__answer { padding: 0 0 1.6rem; }
-.apex-faq__answer p { max-width: 62ch; margin: -0.2rem 0 0; color: #525252; font-size: 0.95rem; line-height: 1.7; }
+.apex-faq__answer p { max-width: 62ch; margin: -0.2rem 0 0; color: var(--apex-text-muted); font-size: 0.95rem; line-height: 1.7; }
 
 @media (max-width: 900px) {
   .apex-faq__inner { grid-template-columns: 1fr; gap: 2.5rem; }

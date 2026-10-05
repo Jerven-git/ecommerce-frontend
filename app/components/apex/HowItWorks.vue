@@ -87,23 +87,23 @@ const steps = computed(() => [
 </script>
 
 <style scoped>
-.apex-steps { scroll-margin-top: 5rem; background: #f7f7f5; color: #1a1a1a; }
+.apex-steps { scroll-margin-top: 5rem; background: var(--apex-surface-subtle); color: var(--apex-text); }
 .apex-steps__inner { width: min(100%, 82rem); margin: 0 auto; padding: clamp(5rem, 9vw, 8rem) 1.5rem; }
 .apex-steps__intro { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(17rem, 0.7fr); align-items: end; gap: 2rem; margin-bottom: 3rem; }
 .apex-steps__intro h2 { max-width: 15ch; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: clamp(2.5rem, 4.8vw, 4.5rem); font-weight: 600; line-height: 1.12; letter-spacing: -0.03em; text-wrap: balance; }
-.apex-steps__intro p { max-width: 31rem; margin: 0 0 0.35rem; color: #525252; font-size: 1.05rem; line-height: 1.65; }
-.apex-steps__list { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; border-top: 1px solid #cfcfca; padding: 0; list-style: none; }
-.apex-steps__list::after { position: absolute; z-index: 1; top: -1px; right: 0; left: 0; height: 1px; background: #1a1a1a; content: ''; opacity: 0; transform: scaleX(0); transform-origin: 0 50%; }
+.apex-steps__intro p { max-width: 31rem; margin: 0 0 0.35rem; color: var(--apex-text-muted); font-size: 1.05rem; line-height: 1.65; }
+.apex-steps__list { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; border-top: 1px solid var(--apex-border-strong); padding: 0; list-style: none; }
+.apex-steps__list::after { position: absolute; z-index: 1; top: -1px; right: 0; left: 0; height: 1px; background: var(--apex-text); content: ''; opacity: 0; transform: scaleX(0); transform-origin: 0 50%; }
 .apex-steps--in-view .apex-steps__list::after { animation: apex-steps-line-horizontal 760ms cubic-bezier(0.16, 1, 0.3, 1) both; }
 .apex-steps__step { position: relative; display: flex; min-width: 0; flex-direction: column; padding: 2rem clamp(1rem, 2vw, 2rem) 0; }
-.apex-steps__step::before { position: absolute; z-index: 2; top: -0.32rem; left: clamp(1rem, 2vw, 2rem); width: 0.62rem; height: 0.62rem; border: 1px solid #9d9d98; border-radius: 50%; background: #f7f7f5; content: ''; }
+.apex-steps__step::before { position: absolute; z-index: 2; top: -0.32rem; left: clamp(1rem, 2vw, 2rem); width: 0.62rem; height: 0.62rem; border: 1px solid var(--apex-node); border-radius: 50%; background: var(--apex-surface-subtle); content: ''; }
 .apex-steps__step:first-child { padding-left: 0; }
 .apex-steps__step:first-child::before { left: 0; }
 .apex-steps__step + .apex-steps__step { border-left: 1px solid #d9d9d5; }
 .apex-steps--in-view .apex-steps__step::before { animation: apex-steps-node-arrive 280ms cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(120ms + var(--step-index) * 130ms); }
-.apex-steps__number { color: #626262; font-family: 'Space Grotesk', var(--font-heading); font-size: 0.85rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.apex-steps__number { color: var(--apex-text-caption); font-family: 'Space Grotesk', var(--font-heading); font-size: 0.85rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .apex-steps__step h3 { margin: 2rem 0 0; font-family: 'Space Grotesk', var(--font-heading); font-size: clamp(1.4rem, 2vw, 1.9rem); font-weight: 600; line-height: 1.2; letter-spacing: -0.025em; }
-.apex-steps__step p { margin: 0.8rem 0 1.75rem; color: #525252; font-size: 0.92rem; line-height: 1.6; }
+.apex-steps__step p { margin: 0.8rem 0 1.75rem; color: var(--apex-text-muted); font-size: 0.92rem; line-height: 1.6; }
 .apex-steps__link { display: inline-flex; width: fit-content; min-height: 2.75rem; align-items: center; gap: 0.35rem; margin-top: auto; color: #252525; font-size: 0.84rem; font-weight: 700; text-decoration-line: underline; text-decoration-color: #8d8d8d; text-underline-offset: 0.3rem; }
 .apex-steps__link:hover { text-decoration-color: currentColor; }
 .apex-steps__link:focus-visible { border-radius: 0.25rem; outline: 2px solid var(--apex-focus-on-light); outline-offset: 4px; }
@@ -126,14 +126,14 @@ const steps = computed(() => [
 }
 
 @keyframes apex-steps-node-arrive {
-  from { border-color: #9d9d98; background: #f7f7f5; transform: scale(0.72); }
-  65% { border-color: #1a1a1a; background: #1a1a1a; transform: scale(1.18); }
-  to { border-color: #1a1a1a; background: #1a1a1a; transform: scale(1); }
+  from { border-color: var(--apex-node); background: var(--apex-surface-subtle); transform: scale(0.72); }
+  65% { border-color: var(--apex-text); background: var(--apex-text); transform: scale(1.18); }
+  to { border-color: var(--apex-text); background: var(--apex-text); transform: scale(1); }
 }
 
 @keyframes apex-steps-ink-in {
   from { color: #8b8b88; opacity: 0.55; }
-  to { color: #1a1a1a; opacity: 1; }
+  to { color: var(--apex-text); opacity: 1; }
 }
 
 @keyframes apex-steps-title-reveal {
@@ -149,7 +149,7 @@ const steps = computed(() => [
 @media (max-width: 900px) {
   .apex-steps__intro { grid-template-columns: 1fr; gap: 1rem; }
   .apex-steps__list { grid-template-columns: 1fr; border-top: 0; }
-  .apex-steps__list::before { position: absolute; top: 0; bottom: 0; left: 0.3rem; width: 1px; background: #cfcfca; content: ''; }
+  .apex-steps__list::before { position: absolute; top: 0; bottom: 0; left: 0.3rem; width: 1px; background: var(--apex-border-strong); content: ''; }
   .apex-steps__list::after { top: 0; right: auto; bottom: 0; left: 0.3rem; width: 1px; height: auto; transform: scaleY(0); transform-origin: 50% 0; }
   .apex-steps--in-view .apex-steps__list::after { animation-name: apex-steps-line-vertical; }
   .apex-steps__step,
@@ -169,6 +169,31 @@ const steps = computed(() => [
   .apex-steps__step:first-child::before { top: 1.85rem; }
 }
 
+@media (max-width: 639px) and (prefers-reduced-motion: no-preference) {
+  .apex-steps--in-view .apex-steps__list::after { animation-duration: 520ms; }
+  .apex-steps--in-view .apex-steps__step::before {
+    animation: apex-steps-node-arrive-mobile 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(80ms + var(--step-index) * 70ms);
+  }
+  .apex-steps--in-view .apex-steps__number,
+  .apex-steps--in-view .apex-steps__step p,
+  .apex-steps--in-view .apex-steps__link { animation: none; }
+  .apex-steps--in-view .apex-steps__step h3 {
+    animation: apex-steps-title-reveal-mobile 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(100ms + var(--step-index) * 70ms);
+  }
+}
+
+@keyframes apex-steps-node-arrive-mobile {
+  from { border-color: var(--apex-node); background: var(--apex-surface-subtle); transform: scale(0.88); }
+  to { border-color: var(--apex-text); background: var(--apex-text); transform: scale(1); }
+}
+
+@keyframes apex-steps-title-reveal-mobile {
+  from { opacity: 0.45; transform: translate3d(-0.35rem, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .apex-steps--in-view .apex-steps__list::after,
   .apex-steps--in-view .apex-steps__step::before,
@@ -177,7 +202,7 @@ const steps = computed(() => [
   .apex-steps--in-view .apex-steps__step p,
   .apex-steps--in-view .apex-steps__link { animation: none; }
   .apex-steps--in-view .apex-steps__list::after { opacity: 1; transform: scaleX(1); }
-  .apex-steps--in-view .apex-steps__step::before { border-color: #1a1a1a; background: #1a1a1a; }
+  .apex-steps--in-view .apex-steps__step::before { border-color: var(--apex-text); background: var(--apex-text); }
   .apex-steps__link :deep(svg) { transition: none; }
 
   @media (max-width: 900px) {
