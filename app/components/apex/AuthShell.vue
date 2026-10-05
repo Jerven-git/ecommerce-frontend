@@ -1,7 +1,7 @@
 <template>
   <main class="apex-auth">
     <header class="apex-auth__header">
-      <a :href="platformHomeUrl" class="apex-auth__brand" aria-label="SSU home">SSU<span class="apex-auth__brand-dot">.</span></a>
+      <a :href="platformHomeUrl" class="apex-auth__brand" aria-label="SSU home">SSU</a>
       <a :href="platformHomeUrl" class="apex-auth__home-link">
         Back to home <Icon name="heroicons:arrow-up-right" aria-hidden="true" />
       </a>

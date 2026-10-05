@@ -20,6 +20,7 @@
         <NuxtLink
           :to="marketingHome"
           class="flex items-center shrink-0 justify-self-start rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+          :aria-label="isApexMarketing ? 'SSU home' : undefined"
           :class="isApexMarketing
             ? (isTransparent ? 'focus-visible:outline-[var(--apex-focus-on-dark)]' : 'focus-visible:outline-[var(--apex-focus-on-light)]')
             : 'focus-visible:outline-primary-500'"
@@ -32,11 +33,15 @@
             class="w-auto object-contain"
           />
           <span
+            v-else-if="isApexMarketing"
+            class="apex-header__brand"
+          >SSU</span>
+          <span
             v-else
             class="text-xl font-bold tracking-tight transition-colors duration-300"
             :style="{ color: headerLogoColor }"
           >
-            {{ isApexMarketing ? 'SSU' : (siteConfig?.site_name || 'Store') }}
+            {{ siteConfig?.site_name || 'Store' }}
           </span>
         </NuxtLink>
 
@@ -634,6 +639,9 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.apex-header__brand { color: #1a1a1a; font-family: 'Space Grotesk', var(--font-heading); font-size: 1.6rem; font-weight: 700; line-height: 1; letter-spacing: -0.04em; }
+.apex-header__brand-dot { color: #6d28d9; }
+
 /* Editorial nav item: text with a center-out underline that grows on hover and
    stays drawn for the active section. Colour follows the text (currentColor),
    so it works in both the solid and transparent (over-hero) header states. */
