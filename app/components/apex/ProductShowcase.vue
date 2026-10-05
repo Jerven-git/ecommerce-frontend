@@ -186,7 +186,7 @@ const workspaceItems = [
 <style scoped>
 .apex-product {
   scroll-margin-top: 5rem;
-  border-top: 1px solid #e8e8e8;
+  border-top: 1px solid var(--apex-border-soft);
   background: var(--apex-surface);
   color: var(--apex-text);
 }
@@ -228,9 +228,9 @@ const workspaceItems = [
 
 .apex-product__stage { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(20rem, 0.85fr); align-items: stretch; gap: 1.25rem; }
 .apex-product__store, .apex-product__workspace { min-width: 0; overflow: hidden; border: 1px solid var(--apex-border); border-radius: 1rem; background: var(--apex-surface); }
-.apex-product__browser { display: flex; min-height: 2.6rem; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid #e5e5e5; padding: 0.55rem 1rem; color: var(--apex-text-caption); font-size: 0.7rem; }
+.apex-product__browser { display: flex; min-height: 2.6rem; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--apex-border-soft); padding: 0.55rem 1rem; color: var(--apex-text-caption); font-size: 0.7rem; }
 .apex-product__browser-dots { display: flex; gap: 0.3rem; }
-.apex-product__browser-dots i { width: 0.4rem; height: 0.4rem; border-radius: 50%; background: #bdbdbd; }
+.apex-product__browser-dots i { width: 0.4rem; height: 0.4rem; border-radius: 50%; background: var(--apex-border-strong); }
 .apex-product__store-body { padding: 1rem; }
 .apex-product__store-nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.2rem 0.1rem 1rem; }
 .apex-product__store-nav strong { font-family: 'Space Grotesk', var(--font-heading); font-size: 1rem; }
@@ -242,20 +242,20 @@ const workspaceItems = [
 .apex-product__store-button { display: inline-flex; align-items: center; gap: 0.3rem; border: 1px solid #ffffffa8; padding: 0.65rem 0.8rem; font-size: 0.7rem; font-weight: 700; white-space: nowrap; }
 .apex-product__store-caption { margin: 1rem 0 0.2rem; color: var(--apex-text-muted); font-size: 0.78rem; }
 
-.apex-product__workspace { display: flex; flex-direction: column; background: #f7f8fa; }
-.apex-product__workspace-top { display: flex; min-height: 2.6rem; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid #e2e5e9; padding: 0.55rem 1rem; color: var(--apex-text-caption); font-size: 0.7rem; }
-.apex-product__workspace-mark { color: #222; font-size: 0.85rem; font-weight: 800; letter-spacing: -0.03em; }
+.apex-product__workspace { display: flex; flex-direction: column; background: var(--apex-preview-canvas); }
+.apex-product__workspace-top { display: flex; min-height: 2.6rem; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--apex-preview-border); padding: 0.55rem 1rem; color: var(--apex-text-caption); font-size: 0.7rem; }
+.apex-product__workspace-mark { color: var(--apex-preview-text); font-size: 0.85rem; font-weight: 800; letter-spacing: -0.03em; }
 .apex-product__workspace-body { display: flex; flex: 1; flex-direction: column; justify-content: space-between; gap: 2rem; padding: clamp(1.25rem, 3vw, 2rem); }
 .apex-product__workspace-heading > span { color: var(--apex-text-caption); font-size: 0.75rem; }
 .apex-product__workspace-heading h3 { max-width: 20ch; margin: 0.65rem 0 0; font-family: 'Space Grotesk', var(--font-heading); font-size: clamp(1.65rem, 2.5vw, 2.4rem); font-weight: 600; line-height: 1.16; letter-spacing: -0.03em; }
-.apex-product__workspace-list { overflow: hidden; border: 1px solid #e0e3e8; border-radius: 0.75rem; background: var(--apex-surface); }
+.apex-product__workspace-list { overflow: hidden; border: 1px solid var(--apex-preview-border); border-radius: 0.75rem; background: var(--apex-preview-surface); }
 .apex-product__workspace-item { display: flex; align-items: center; gap: 0.85rem; padding: 1.1rem; }
-.apex-product__workspace-item + .apex-product__workspace-item { border-top: 1px solid #e7e9ed; }
+.apex-product__workspace-item + .apex-product__workspace-item { border-top: 1px solid var(--apex-preview-border); }
 .apex-product__workspace-icon { flex: 0 0 auto; width: 1.3rem; height: 1.3rem; color: var(--apex-preview-accent); }
 .apex-product__workspace-item div { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 0.15rem; }
 .apex-product__workspace-item strong { font-size: 0.84rem; }
-.apex-product__workspace-item div span { color: #5b6470; font-size: 0.72rem; }
-.apex-product__workspace-arrow { width: 0.9rem; height: 0.9rem; color: #7b8491; }
+.apex-product__workspace-item div span { color: var(--apex-preview-text-muted); font-size: 0.72rem; }
+.apex-product__workspace-arrow { width: 0.9rem; height: 0.9rem; color: var(--apex-preview-text-muted); }
 .apex-product__note { margin: 1rem 0 0; color: var(--apex-text-caption); font-size: 0.75rem; text-align: center; }
 
 @media (max-width: 900px) {

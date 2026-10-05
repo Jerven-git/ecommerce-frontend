@@ -200,21 +200,22 @@ function handlePointerLeave(event: PointerEvent) {
 .apex-use-cases__connector-active { opacity: 0; stroke: var(--apex-text); stroke-width: 1.5; stroke-dasharray: 1; stroke-dashoffset: 1; transition: opacity 220ms ease, stroke-dashoffset 480ms cubic-bezier(0.16, 1, 0.3, 1); }
 .apex-use-cases__connector-active.is-active { opacity: 1; stroke-dashoffset: 0; }
 .apex-use-cases__paths { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr); gap: clamp(2.5rem, 6vw, 6rem); }
-.apex-use-cases__case { min-width: 0; border-top: 1px solid #bdbdb7; padding-top: clamp(1.25rem, 2.5vw, 2rem); transition: opacity 280ms ease, transform 380ms cubic-bezier(0.16, 1, 0.3, 1); }
-.apex-use-cases__journey--engaged .apex-use-cases__case:not(.is-active) { opacity: 0.42; transform: scale(0.985); }
+.apex-use-cases__case { min-width: 0; border-top: 1px solid var(--apex-border-strong); padding-top: clamp(1.25rem, 2.5vw, 2rem); transition: transform 380ms cubic-bezier(0.16, 1, 0.3, 1); }
+.apex-use-cases__journey--engaged .apex-use-cases__case:not(.is-active) { transform: scale(0.985); }
 .apex-use-cases__case.is-active { transform: translateY(-0.3rem); }
 .apex-use-cases__visual { position: relative; margin: 0 0 clamp(1.5rem, 3vw, 2.25rem); }
-.apex-use-cases__image { height: clamp(14rem, 25vw, 21rem); overflow: hidden; border-radius: 0.75rem; background: #e6e3df; }
+.apex-use-cases__image { height: clamp(14rem, 25vw, 21rem); overflow: hidden; border-radius: 0.75rem; background: #e6e3df; transition: opacity 280ms ease; }
+.apex-use-cases__journey--engaged .apex-use-cases__case:not(.is-active) .apex-use-cases__image { opacity: 0.62; }
 .apex-use-cases__image img { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.001); transition: transform 480ms cubic-bezier(0.16, 1, 0.3, 1), filter 320ms ease; }
 .apex-use-cases__case.is-active .apex-use-cases__image img { filter: saturate(1.04) contrast(1.02); transform: scale(1.025); }
-.apex-use-cases__visual figcaption { position: absolute; right: 0.75rem; bottom: 0.75rem; border-radius: 0.35rem; background: var(--apex-surface); padding: 0.42rem 0.62rem; color: #242424; font-size: 0.68rem; font-weight: 700; }
+.apex-use-cases__visual figcaption { position: absolute; right: 0.75rem; bottom: 0.75rem; border-radius: 0.35rem; background: var(--apex-surface); padding: 0.42rem 0.62rem; color: var(--apex-text); font-size: 0.68rem; font-weight: 700; }
 .apex-use-cases__copy { display: grid; grid-template-columns: minmax(0, 1fr) minmax(10.5rem, 0.6fr); column-gap: clamp(1.5rem, 3vw, 2.75rem); }
 .apex-use-cases__copy h3 { grid-column: 1 / -1; max-width: 18ch; margin: 0; font-family: 'Space Grotesk', var(--font-heading); font-size: clamp(1.65rem, 2.7vw, 2.4rem); font-weight: 600; line-height: 1.16; letter-spacing: -0.03em; }
 .apex-use-cases__copy > p { max-width: 43ch; margin: 0.8rem 0 0; color: var(--apex-text-muted); line-height: 1.65; }
 .apex-use-cases__steps { display: grid; align-content: start; gap: 0; margin: 0.9rem 0 0; padding: 0; list-style: none; }
 .apex-use-cases__steps li { position: relative; }
 .apex-use-cases__steps li:not(:last-child)::after { position: absolute; top: 1.6rem; bottom: -0.35rem; left: 0.27rem; width: 1px; background: var(--apex-border-strong); content: ''; transition: background-color 260ms ease; }
-.apex-use-cases__step { display: grid; width: 100%; min-height: 2.25rem; grid-template-columns: 0.6rem minmax(0, 1fr) 0.9rem; align-items: center; gap: 0.55rem; border: 0; border-radius: 0.4rem; background: transparent; padding: 0.3rem 0; color: #5d5d5a; font: inherit; font-size: 0.76rem; font-weight: 700; text-align: left; cursor: pointer; transition: color 220ms ease, transform 320ms cubic-bezier(0.16, 1, 0.3, 1); }
+.apex-use-cases__step { display: grid; width: 100%; min-height: 2.25rem; grid-template-columns: 0.6rem minmax(0, 1fr) 0.9rem; align-items: center; gap: 0.55rem; border: 0; border-radius: 0.4rem; background: transparent; padding: 0.3rem 0; color: var(--apex-text-muted); font: inherit; font-size: 0.76rem; font-weight: 700; text-align: left; cursor: pointer; transition: color 220ms ease, transform 320ms cubic-bezier(0.16, 1, 0.3, 1); }
 .apex-use-cases__step:hover,
 .apex-use-cases__step.is-active { color: var(--apex-text); transform: translateX(0.25rem); }
 .apex-use-cases__step:focus-visible { outline: 2px solid var(--apex-focus-on-light); outline-offset: 3px; }
@@ -269,7 +270,8 @@ function handlePointerLeave(event: PointerEvent) {
   .apex-use-cases__steps li:not(:last-child)::after { top: 1.9rem; bottom: -0.45rem; }
   .apex-use-cases__outcome { flex-direction: column; align-items: stretch; gap: 1.25rem; margin-left: 1.5rem; }
   .apex-use-cases__action { width: 100%; justify-content: center; }
-  .apex-use-cases__journey--engaged .apex-use-cases__case:not(.is-active) { opacity: 0.72; transform: none; }
+  .apex-use-cases__journey--engaged .apex-use-cases__case:not(.is-active) { transform: none; }
+  .apex-use-cases__journey--engaged .apex-use-cases__case:not(.is-active) .apex-use-cases__image { opacity: 0.82; }
   .apex-use-cases__case.is-active .apex-use-cases__image img { filter: none; transform: scale(1.01); }
   .apex-use-cases__step:hover,
   .apex-use-cases__step.is-active { transform: none; }
@@ -286,6 +288,7 @@ function handlePointerLeave(event: PointerEvent) {
   .apex-use-cases__connector-active,
   .apex-use-cases__case,
   .apex-use-cases__case::before,
+  .apex-use-cases__image,
   .apex-use-cases__image img,
   .apex-use-cases__step,
   .apex-use-cases__step-node,

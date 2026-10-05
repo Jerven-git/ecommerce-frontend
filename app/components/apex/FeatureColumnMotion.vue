@@ -73,7 +73,7 @@ function startTyping() {
   }
 
   const activeCycle = typingCycle
-  const characterStep = compactViewport || props.description.length >= 100 ? 2 : 1
+  const characterStep = compactViewport || props.description.length >= 100 ? 3 : 2
   let characterIndex = 1
   typedDescription.value = props.description.slice(0, characterIndex)
   isTyping.value = true
@@ -145,7 +145,7 @@ onBeforeUnmount(() => {
 .apex-feature-column__typed { grid-area: 1 / 1; }
 .apex-feature-column__reserve { visibility: hidden; }
 .apex-feature-column__caret { display: inline-block; width: 1px; height: 1em; margin-left: 0.08em; background: currentcolor; vertical-align: -0.12em; animation: apex-feature-column-caret 720ms steps(1, end) infinite; }
-.apex-feature-column__detail { margin-top: auto; border-top: 1px solid #e5e5e5; padding-top: 0.75rem; color: var(--apex-text-caption); font-size: 0.72rem; font-weight: 700; }
+.apex-feature-column__detail { margin-top: auto; border-top: 1px solid var(--apex-border-soft); padding-top: 0.75rem; color: var(--apex-text-caption); font-size: 0.72rem; font-weight: 700; }
 
 @keyframes apex-feature-column-title-enter {
   from { opacity: 0.35; transform: translate3d(-2.5rem, 0, 0); }

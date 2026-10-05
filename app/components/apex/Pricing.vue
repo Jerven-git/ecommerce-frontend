@@ -284,9 +284,9 @@ function intervalLabel(interval: SubscriptionPlan['interval']) {
 .pricing-title { margin: 0; color: var(--apex-text-strong); font-family: 'Playfair Display', Georgia, serif; font-size: clamp(2.5rem, 4.8vw, 4.5rem); font-weight: 600; line-height: 1.12; letter-spacing: -0.03em; text-wrap: balance; }
 .apex-pricing__intro > p { margin: 1rem 0 0; color: var(--apex-text-ui-muted); line-height: 1.65; }
 .pricing-stage { width: min(100%, 68rem); margin: clamp(3rem, 6vw, 5rem) auto 0; }
-.pricing-loading__switcher { width: 18rem; max-width: 100%; height: 3.25rem; margin: 0 auto 1.5rem; border-radius: 9999px; background: #e5e7eb; }
-.pricing-loading__card { min-height: 28rem; border-block: 1px solid #d6d6d1; background: var(--apex-surface-subtle); }
-.pricing-switcher { display: flex; width: max-content; max-width: 100%; gap: 0.25rem; margin: 0 auto 2rem; padding: 0.3rem; border: 1px solid #ddddda; border-radius: 9999px; background: #efefec; }
+.pricing-loading__switcher { width: 18rem; max-width: 100%; height: 3.25rem; margin: 0 auto 1.5rem; border-radius: 9999px; background: var(--apex-border-soft); }
+.pricing-loading__card { min-height: 28rem; border-block: 1px solid var(--apex-border-strong); background: var(--apex-surface-subtle); }
+.pricing-switcher { display: flex; width: max-content; max-width: 100%; gap: 0.25rem; margin: 0 auto 2rem; padding: 0.3rem; border: 1px solid var(--apex-border); border-radius: 9999px; background: var(--apex-surface-hover); }
 .pricing-switcher__option { position: relative; display: flex; min-height: 2.75rem; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.6rem 1rem; border: 0; border-radius: 9999px; background: transparent; color: var(--apex-text-ui-muted); cursor: pointer; font-size: 0.875rem; font-weight: 650; white-space: nowrap; }
 .pricing-switcher__option.is-active { color: var(--apex-text-strong); }
 .pricing-switcher__option:focus-visible { outline: 2px solid var(--apex-focus-on-light); outline-offset: 3px; }
@@ -314,11 +314,11 @@ function intervalLabel(interval: SubscriptionPlan['interval']) {
 .pricing-card__action :deep(svg) { width: 1rem; height: 1rem; transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1); }
 .pricing-card__action:hover :deep(svg),
 .pricing-card__action:focus-visible :deep(svg) { transform: translateX(0.18rem); }
-.pricing-card__features { border-left: 1px solid #d8d8d3; }
+.pricing-card__features { border-left: 1px solid var(--apex-border-strong); }
 .pricing-card__features-content { height: 100%; }
 .pricing-card__features-title { margin: 0; color: var(--apex-text-caption); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 .pricing-card__features ul { display: grid; gap: 0.9rem; margin: 1.5rem 0 0; padding: 0; list-style: none; }
-.pricing-card__features li { display: flex; gap: 0.75rem; color: #3f3f3f; font-size: 0.875rem; line-height: 1.55; }
+.pricing-card__features li { display: flex; gap: 0.75rem; color: var(--apex-text-emphasis); font-size: 0.875rem; line-height: 1.55; }
 .pricing-card__features li :deep(svg) { width: 1rem; height: 1rem; flex: 0 0 auto; margin-top: 0.2rem; color: var(--apex-accent); }
 .pricing-card__fallback { margin: 1.5rem 0 0; color: var(--apex-text-muted); font-size: 0.875rem; line-height: 1.6; }
 .pricing-plan-copy-enter-active { transition: opacity 300ms ease, clip-path 380ms cubic-bezier(0.16, 1, 0.3, 1), transform 380ms cubic-bezier(0.16, 1, 0.3, 1); }
@@ -352,7 +352,7 @@ function intervalLabel(interval: SubscriptionPlan['interval']) {
   .pricing-card { grid-template-columns: 1fr; }
   .pricing-card__summary, .pricing-card__features { padding: 1.75rem; }
   .pricing-card__details { min-height: 0; }
-  .pricing-card__features { border-top: 1px solid #d8d8d3; border-left: 0; }
+  .pricing-card__features { border-top: 1px solid var(--apex-border-strong); border-left: 0; }
   .pricing-footnote { align-items: flex-start; }
   .pricing-plan-copy-enter-active,
   .pricing-feature-panel-enter-active { transition: opacity 220ms ease-out, transform 220ms cubic-bezier(0.16, 1, 0.3, 1); }

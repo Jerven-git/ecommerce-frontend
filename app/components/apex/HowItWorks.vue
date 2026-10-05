@@ -99,12 +99,12 @@ const steps = computed(() => [
 .apex-steps__step::before { position: absolute; z-index: 2; top: -0.32rem; left: clamp(1rem, 2vw, 2rem); width: 0.62rem; height: 0.62rem; border: 1px solid var(--apex-node); border-radius: 50%; background: var(--apex-surface-subtle); content: ''; }
 .apex-steps__step:first-child { padding-left: 0; }
 .apex-steps__step:first-child::before { left: 0; }
-.apex-steps__step + .apex-steps__step { border-left: 1px solid #d9d9d5; }
+.apex-steps__step + .apex-steps__step { border-left: 1px solid var(--apex-border-strong); }
 .apex-steps--in-view .apex-steps__step::before { animation: apex-steps-node-arrive 280ms cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(120ms + var(--step-index) * 130ms); }
 .apex-steps__number { color: var(--apex-text-caption); font-family: 'Space Grotesk', var(--font-heading); font-size: 0.85rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .apex-steps__step h3 { margin: 2rem 0 0; font-family: 'Space Grotesk', var(--font-heading); font-size: clamp(1.4rem, 2vw, 1.9rem); font-weight: 600; line-height: 1.2; letter-spacing: -0.025em; }
 .apex-steps__step p { margin: 0.8rem 0 1.75rem; color: var(--apex-text-muted); font-size: 0.92rem; line-height: 1.6; }
-.apex-steps__link { display: inline-flex; width: fit-content; min-height: 2.75rem; align-items: center; gap: 0.35rem; margin-top: auto; color: #252525; font-size: 0.84rem; font-weight: 700; text-decoration-line: underline; text-decoration-color: #8d8d8d; text-underline-offset: 0.3rem; }
+.apex-steps__link { display: inline-flex; width: fit-content; min-height: 2.75rem; align-items: center; gap: 0.35rem; margin-top: auto; color: var(--apex-text); font-size: 0.84rem; font-weight: 700; text-decoration-line: underline; text-decoration-color: var(--apex-node); text-underline-offset: 0.3rem; }
 .apex-steps__link:hover { text-decoration-color: currentColor; }
 .apex-steps__link:focus-visible { border-radius: 0.25rem; outline: 2px solid var(--apex-focus-on-light); outline-offset: 4px; }
 .apex-steps__link :deep(svg) { width: 1rem; height: 1rem; transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1); }
@@ -132,7 +132,7 @@ const steps = computed(() => [
 }
 
 @keyframes apex-steps-ink-in {
-  from { color: #8b8b88; opacity: 0.55; }
+  from { color: var(--apex-node); opacity: 0.55; }
   to { color: var(--apex-text); opacity: 1; }
 }
 
@@ -153,7 +153,7 @@ const steps = computed(() => [
   .apex-steps__list::after { top: 0; right: auto; bottom: 0; left: 0.3rem; width: 1px; height: auto; transform: scaleY(0); transform-origin: 50% 0; }
   .apex-steps--in-view .apex-steps__list::after { animation-name: apex-steps-line-vertical; }
   .apex-steps__step,
-  .apex-steps__step:first-child { border-bottom: 1px solid #d9d9d5; padding: 1.9rem 0 1.9rem 2rem; }
+  .apex-steps__step:first-child { border-bottom: 1px solid var(--apex-border-strong); padding: 1.9rem 0 1.9rem 2rem; }
   .apex-steps__step + .apex-steps__step { border-left: 0; }
   .apex-steps__step::before,
   .apex-steps__step:first-child::before { top: 2.15rem; left: 0; }
