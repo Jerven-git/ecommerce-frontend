@@ -2,7 +2,31 @@
   <section id="product" class="apex-product" aria-labelledby="apex-product-title">
     <div class="apex-product__inner">
       <div class="apex-product__intro">
-        <h2 id="apex-product-title">A store your customers see. <span>A workspace your team can run.</span></h2>
+        <h2 id="apex-product-title" ref="headingRef">
+          <span class="sr-only">{{ headingText }}</span>
+          <span
+            class="apex-product__animated-title"
+            :class="{ 'apex-product__animated-title--entering': isHeadingAnimating }"
+            aria-hidden="true"
+          >
+            <template v-for="(segment, segmentIndex) in headingSegments" :key="segment.text">
+              <span
+                v-for="(word, wordIndex) in segment.words"
+                :key="`${segmentIndex}-${wordIndex}-${word.text}`"
+                class="apex-product__title-word"
+                :class="{ 'apex-product__title-word--muted': segment.muted }"
+              >
+                <span
+                  v-for="letter in word.letters"
+                  :key="letter.index"
+                  class="apex-product__title-letter"
+                  :style="letterStyle(letter.index)"
+                  @animationend="handleLetterAnimationEnd(letter.index)"
+                >{{ letter.character }}</span>
+              </span>
+            </template>
+          </span>
+        </h2>
         <p>
           Give customers a storefront shaped by your brand, while your team manages the catalogue,
           orders and appearance behind it from SSU.
@@ -64,6 +88,75 @@
 </template>
 
 <script setup lang="ts">
+const headingCopy = [
+  { text: 'A store your customers see.', muted: false },
+  { text: 'A workspace your team can run.', muted: true },
+]
+
+let letterIndex = 0
+const headingSegments = headingCopy.map(segment => ({
+  ...segment,
+  words: segment.text.split(' ').map(word => ({
+    text: word,
+    letters: Array.from(word).map(character => ({ character, index: letterIndex++ })),
+  })),
+}))
+
+const headingText = headingCopy.map(segment => segment.text).join(' ')
+const headingRef = ref<HTMLElement | null>(null)
+const isHeadingAnimating = ref(false)
+const totalLetters = letterIndex
+let headingIsOnScreen = false
+let headingObserver: IntersectionObserver | undefined
+
+function letterStyle(index: number) {
+  const direction = index % 4
+
+  return {
+    '--letter-delay': `${Math.min(index * 11, 380)}ms`,
+    '--letter-x': direction === 0
+      ? '-clamp(4rem, 14vw, 10rem)'
+      : direction === 2
+        ? 'clamp(4rem, 14vw, 10rem)'
+        : '0px',
+    '--letter-y': direction === 1
+      ? '-clamp(3rem, 10vw, 7rem)'
+      : direction === 3
+        ? 'clamp(3rem, 10vw, 7rem)'
+        : '0px',
+  }
+}
+
+function handleLetterAnimationEnd(index: number) {
+  if (index === totalLetters - 1) isHeadingAnimating.value = false
+}
+
+onMounted(() => {
+  const heading = headingRef.value
+  if (!heading) return
+
+  headingObserver = new IntersectionObserver(([entry]) => {
+    if (!entry) return
+
+    if (!entry.isIntersecting) {
+      headingIsOnScreen = false
+      isHeadingAnimating.value = false
+      return
+    }
+
+    if (entry.intersectionRatio >= 0.18 && !headingIsOnScreen) {
+      headingIsOnScreen = true
+      isHeadingAnimating.value = true
+    }
+  }, { threshold: [0, 0.18] })
+
+  headingObserver.observe(heading)
+})
+
+onBeforeUnmount(() => {
+  headingObserver?.disconnect()
+})
+
 const workspaceItems = [
   { title: 'Catalogue', description: 'Products, categories and services', icon: 'heroicons:squares-2x2' },
   { title: 'Orders', description: 'Purchases and fulfilment', icon: 'heroicons:clipboard-document-list' },
@@ -82,8 +175,37 @@ const workspaceItems = [
 .apex-product__inner { width: min(100%, 82rem); margin: 0 auto; padding: clamp(5rem, 9vw, 8rem) 1.5rem; }
 .apex-product__intro { max-width: 53rem; margin: 0 auto 3.5rem; text-align: center; }
 .apex-product__intro h2 { margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: clamp(2.5rem, 4.8vw, 4.5rem); font-weight: 600; line-height: 1.12; letter-spacing: -0.03em; text-wrap: balance; }
-.apex-product__intro h2 span { color: #747474; }
+.apex-product__animated-title { display: block; }
+.apex-product__title-word { display: inline-block; margin-inline-end: 0.22em; white-space: nowrap; }
+.apex-product__title-word:last-child { margin-inline-end: 0; }
+.apex-product__title-word--muted { color: #747474; }
+.apex-product__title-letter { display: inline-block; }
+.apex-product__animated-title--entering .apex-product__title-letter {
+  animation: apex-product-letter-rewind 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--letter-delay);
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
 .apex-product__intro p { max-width: 39rem; margin: 1.35rem auto 0; color: #525252; font-size: 1.05rem; line-height: 1.65; }
+
+@keyframes apex-product-letter-rewind {
+  from { opacity: 0; transform: translate3d(var(--letter-x), var(--letter-y), 0) scale(0.96); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apex-product__animated-title--entering .apex-product__title-letter {
+    animation-duration: 180ms;
+    animation-name: apex-product-letter-fade;
+    animation-delay: 0ms;
+    will-change: opacity;
+  }
+
+  @keyframes apex-product-letter-fade {
+    from { opacity: 0.55; }
+    to { opacity: 1; }
+  }
+}
 
 .apex-product__stage { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(20rem, 0.85fr); align-items: stretch; gap: 1.25rem; }
 .apex-product__store, .apex-product__workspace { min-width: 0; overflow: hidden; border: 1px solid #dedede; border-radius: 1rem; background: #fff; }

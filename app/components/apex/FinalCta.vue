@@ -1,10 +1,22 @@
 <template>
   <section class="apex-final" aria-labelledby="apex-final-title">
     <div class="apex-final__inner">
-      <h2 id="apex-final-title">{{ isAuthenticated ? 'Ready to keep building?' : 'Ready to create your store?' }}</h2>
+      <h2 id="apex-final-title" :aria-label="finalTitle">
+        <ApexScrambleText
+          ref="titleScramble"
+          :words="finalTitleWords"
+          :autoplay="false"
+          aria-hidden="true"
+        />
+      </h2>
       <p v-if="isAuthenticated">Your SSU workspace is ready when you are.</p>
       <p v-else>Create an account, choose a plan to activate selling, and shape a storefront that feels like your business.</p>
-      <NuxtLink :to="isAuthenticated ? '/admin' : '/register'" class="apex-final__action">
+      <NuxtLink
+        :to="isAuthenticated ? '/admin' : '/register'"
+        class="apex-final__action"
+        @pointerenter="replayTitle"
+        @focus="replayTitle"
+      >
         {{ isAuthenticated ? 'Open dashboard' : 'Create your store' }}
         <Icon name="heroicons:arrow-up-right" aria-hidden="true" />
       </NuxtLink>
@@ -13,7 +25,17 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ isAuthenticated: boolean }>()
+const props = defineProps<{ isAuthenticated: boolean }>()
+
+const titleScramble = ref<{ replay: () => void } | null>(null)
+const finalTitle = computed(() => props.isAuthenticated
+  ? 'Ready to keep building?'
+  : 'Ready to create your store?')
+const finalTitleWords = computed(() => [finalTitle.value])
+
+function replayTitle() {
+  titleScramble.value?.replay()
+}
 </script>
 
 <style scoped>

@@ -1,227 +1,69 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-primary-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-    <!-- Animated background -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-      <div class="absolute inset-0 bg-gradient-to-b from-primary-950 via-primary-900 to-primary-950"></div>
-      <div class="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary-600/[0.06] rounded-full blur-[150px]"></div>
-      <div class="absolute inset-0 opacity-[0.025]" style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 40px 40px;"></div>
+  <ApexAuthShell>
+    <div v-if="registered" class="apex-auth__success">
+      <span class="apex-auth__success-icon"><Icon name="heroicons:check" aria-hidden="true" /></span>
+      <h2 ref="successHeading" tabindex="-1">Account created.</h2>
+      <p>Your store <strong>{{ registered.store.name }}</strong> is ready to set up. Sign in, choose a plan, and complete checkout to activate it.</p>
+      <NuxtLink to="/admin/login?redirect=/subscribe" class="apex-auth__button">Sign in to choose a plan <Icon name="heroicons:arrow-right" aria-hidden="true" /></NuxtLink>
+      <p class="apex-auth__secondary">You can also return later and sign in with your new account.</p>
     </div>
 
-    <div class="max-w-md w-full relative z-10">
-      <!-- Card -->
-      <div
-        class="bg-white/[0.07] backdrop-blur-xl rounded-2xl shadow-2xl border border-white/[0.12] p-8 sm:p-10"
-        :class="mounted ? 'animate-card-enter' : 'opacity-0 translate-y-6'"
-      >
-        <!-- Header -->
-        <div class="text-center mb-8" :class="mounted ? 'animate-stagger-1' : 'opacity-0 translate-y-4'">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-600/20 mb-5 ring-1 ring-primary-600/30 animate-icon-glow">
-            <Icon name="mdi:storefront-outline" class="w-8 h-8 text-primary-600" />
-          </div>
-          <h2 class="text-2xl font-bold text-white tracking-tight">Open your store</h2>
-          <p class="mt-2 text-sm text-white/50">Create your account — your store activates after checkout</p>
-        </div>
-
-        <!-- Form -->
-        <form @submit.prevent="handleRegister" class="space-y-5">
-          <!-- Store name -->
-          <div :class="mounted ? 'animate-stagger-2' : 'opacity-0 translate-y-4'">
-            <label class="block text-sm font-medium text-white/70 mb-1.5">Store name</label>
-            <div class="relative group">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Icon name="mdi:store-outline" class="w-5 h-5 text-white/30 group-focus-within:text-primary-600 transition-colors duration-200" />
-              </div>
-              <input
-                v-model="form.store_name"
-                type="text"
-                required
-                class="w-full pl-11 pr-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-primary-600/50 focus:border-primary-600/50 focus:bg-white/[0.1] transition-all duration-200"
-                placeholder="My Awesome Store"
-                @input="handleStoreNameInput"
-              />
-            </div>
-          </div>
-
-          <!-- Store slug (optional) -->
-          <div :class="mounted ? 'animate-stagger-3' : 'opacity-0 translate-y-4'">
-            <label class="block text-sm font-medium text-white/70 mb-1.5">
-              Store URL <span class="text-white/35 font-normal">(optional)</span>
-            </label>
-            <div class="relative group">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Icon name="mdi:link-variant" class="w-5 h-5 text-white/30 group-focus-within:text-primary-600 transition-colors duration-200" />
-              </div>
-              <input
-                v-model="form.store_slug"
-                type="text"
-                class="w-full pl-11 pr-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-primary-600/50 focus:border-primary-600/50 focus:bg-white/[0.1] transition-all duration-200"
-                placeholder="my-awesome-store"
-                @input="handleSlugInput"
-              />
-            </div>
-            <p class="mt-1.5 text-xs text-white/40">Letters, numbers and hyphens only. Left blank, it's generated from your store name.</p>
-          </div>
-
-          <!-- Name -->
-          <div :class="mounted ? 'animate-stagger-4' : 'opacity-0 translate-y-4'">
-            <label class="block text-sm font-medium text-white/70 mb-1.5">Your name</label>
-            <div class="relative group">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Icon name="mdi:account-outline" class="w-5 h-5 text-white/30 group-focus-within:text-primary-600 transition-colors duration-200" />
-              </div>
-              <input
-                v-model="form.name"
-                type="text"
-                required
-                class="w-full pl-11 pr-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-primary-600/50 focus:border-primary-600/50 focus:bg-white/[0.1] transition-all duration-200"
-                placeholder="Jane Founder"
-                autocomplete="name"
-              />
-            </div>
-          </div>
-
-          <!-- Email -->
-          <div :class="mounted ? 'animate-stagger-5' : 'opacity-0 translate-y-4'">
-            <label class="block text-sm font-medium text-white/70 mb-1.5">Email</label>
-            <div class="relative group">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Icon name="mdi:email-outline" class="w-5 h-5 text-white/30 group-focus-within:text-primary-600 transition-colors duration-200" />
-              </div>
-              <input
-                v-model="form.email"
-                type="email"
-                required
-                class="w-full pl-11 pr-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-primary-600/50 focus:border-primary-600/50 focus:bg-white/[0.1] transition-all duration-200"
-                placeholder="jane@example.com"
-                autocomplete="email"
-              />
-            </div>
-          </div>
-
-          <!-- Password -->
-          <div :class="mounted ? 'animate-stagger-6' : 'opacity-0 translate-y-4'">
-            <label class="block text-sm font-medium text-white/70 mb-1.5">Password</label>
-            <div class="relative group">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Icon name="mdi:lock-outline" class="w-5 h-5 text-white/30 group-focus-within:text-primary-600 transition-colors duration-200" />
-              </div>
-              <input
-                v-model="form.password"
-                :type="showPassword ? 'text' : 'password'"
-                required
-                minlength="8"
-                class="w-full pl-11 pr-12 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-primary-600/50 focus:border-primary-600/50 focus:bg-white/[0.1] transition-all duration-200"
-                placeholder="At least 8 characters"
-                autocomplete="new-password"
-              />
-              <button
-                type="button"
-                class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-white/30 hover:text-white/60 transition-colors"
-                @click="showPassword = !showPassword"
-              >
-                <Icon :name="showPassword ? 'mdi:eye-off-outline' : 'mdi:eye-outline'" class="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-
-          <!-- Password confirmation -->
-          <div :class="mounted ? 'animate-stagger-7' : 'opacity-0 translate-y-4'">
-            <label class="block text-sm font-medium text-white/70 mb-1.5">Confirm password</label>
-            <div class="relative group">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Icon name="mdi:lock-check-outline" class="w-5 h-5 text-white/30 group-focus-within:text-primary-600 transition-colors duration-200" />
-              </div>
-              <input
-                v-model="form.password_confirmation"
-                :type="showPassword ? 'text' : 'password'"
-                required
-                class="w-full pl-11 pr-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-primary-600/50 focus:border-primary-600/50 focus:bg-white/[0.1] transition-all duration-200"
-                placeholder="Repeat your password"
-                autocomplete="new-password"
-              />
-            </div>
-          </div>
-
-          <!-- Error message -->
-          <Transition
-            enter-active-class="transition duration-300 ease-out"
-            enter-from-class="opacity-0 -translate-y-2 scale-95"
-            enter-to-class="opacity-100 translate-y-0 scale-100"
-            leave-active-class="transition duration-200 ease-in"
-            leave-from-class="opacity-100 translate-y-0 scale-100"
-            leave-to-class="opacity-0 -translate-y-2 scale-95"
-          >
-            <div v-if="error" class="flex items-start gap-3 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl animate-shake">
-              <Icon name="mdi:alert-circle-outline" class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-              <p class="text-sm text-red-300">{{ error }}</p>
-            </div>
-          </Transition>
-
-          <!-- Submit button -->
-          <div :class="mounted ? 'animate-stagger-8' : 'opacity-0 translate-y-4'">
-            <button
-              type="submit"
-              class="w-full relative flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-500 active:scale-[0.97] text-white font-semibold py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary-600 disabled:active:scale-100 shadow-lg shadow-primary-600/30 hover:shadow-primary-600/50 hover:shadow-xl"
-              :disabled="loading"
-            >
-              <svg
-                v-if="loading"
-                class="animate-spin h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              <span>{{ loading ? 'Creating your store...' : 'Create Account' }}</span>
-            </button>
-            <p class="mt-4 text-center text-sm text-white/40">
-              Already have an account?
-              <NuxtLink to="/admin/login" class="text-white/70 hover:text-primary-600 transition-colors">Sign in</NuxtLink>
-            </p>
-          </div>
-        </form>
-      </div>
+    <div v-else class="apex-auth__form-heading">
+      <h2>Create your store.</h2>
+      <p>Set up your account now. Your store activates after you choose a plan and complete checkout.</p>
     </div>
 
-    <!-- Success modal -->
-    <Teleport to="body">
-      <div v-if="registered" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="registered = null"></div>
-        <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 text-center animate-card-enter">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-5">
-            <Icon name="mdi:check" class="w-8 h-8 text-green-600" />
-          </div>
-          <h3 class="text-xl font-bold text-gray-900">Account created!</h3>
-          <p class="mt-2 text-sm text-gray-500">
-            Your store <span class="font-semibold text-gray-700">{{ registered?.store?.name }}</span> is ready to go —
-            subscribe now to activate it and start selling.
-          </p>
-          <div class="mt-6 space-y-3">
-            <NuxtLink
-              to="/subscribe"
-              class="block w-full bg-primary-600 hover:bg-primary-500 text-white font-semibold py-3 px-4 rounded-xl transition-colors"
-            >
-              Subscribe &amp; activate
-            </NuxtLink>
-            <button
-              class="w-full text-sm text-gray-500 hover:text-gray-700 transition-colors"
-              @click="registered = null"
-            >
-              I'll do this later
-            </button>
-          </div>
+    <form v-if="!registered" class="apex-auth__form" @submit.prevent="handleRegister">
+      <div class="apex-auth__field">
+        <label for="register-store-name" class="apex-auth__label">Store name</label>
+        <input id="register-store-name" v-model="form.store_name" type="text" required class="apex-auth__input" placeholder="Your store name" @input="handleStoreNameInput">
+      </div>
+
+      <div class="apex-auth__field">
+        <label for="register-store-slug" class="apex-auth__label">Store URL <span class="apex-auth__hint">(optional)</span></label>
+        <input id="register-store-slug" v-model="form.store_slug" type="text" class="apex-auth__input" placeholder="your-store" aria-describedby="register-slug-hint" @input="handleSlugInput">
+        <p id="register-slug-hint" class="apex-auth__hint">Letters, numbers and hyphens only. Leave blank to generate it from your store name.</p>
+      </div>
+
+      <div class="apex-auth__form-grid">
+        <div class="apex-auth__field">
+          <label for="register-name" class="apex-auth__label">Your name</label>
+          <input id="register-name" v-model="form.name" type="text" autocomplete="name" required class="apex-auth__input" placeholder="Your name">
+        </div>
+        <div class="apex-auth__field">
+          <label for="register-email" class="apex-auth__label">Email address</label>
+          <input id="register-email" v-model="form.email" type="email" autocomplete="email" required class="apex-auth__input" placeholder="you@example.com">
         </div>
       </div>
-    </Teleport>
-  </div>
+
+      <div class="apex-auth__form-grid">
+        <div class="apex-auth__field">
+          <label for="register-password" class="apex-auth__label">Password</label>
+          <div class="apex-auth__input-wrap">
+            <input id="register-password" v-model="form.password" :type="showPassword ? 'text' : 'password'" autocomplete="new-password" required minlength="8" class="apex-auth__input apex-auth__input--password" placeholder="At least 8 characters">
+            <button type="button" class="apex-auth__toggle" :aria-label="showPassword ? 'Hide passwords' : 'Show passwords'" :aria-pressed="showPassword" @click="showPassword = !showPassword"><Icon :name="showPassword ? 'heroicons:eye-slash' : 'heroicons:eye'" aria-hidden="true" /></button>
+          </div>
+        </div>
+        <div class="apex-auth__field">
+          <label for="register-confirm" class="apex-auth__label">Confirm password</label>
+          <input id="register-confirm" v-model="form.password_confirmation" :type="showPassword ? 'text' : 'password'" autocomplete="new-password" required class="apex-auth__input" placeholder="Repeat your password">
+        </div>
+      </div>
+
+      <p v-if="error" class="apex-auth__alert" role="alert"><Icon name="heroicons:exclamation-circle" aria-hidden="true" />{{ error }}</p>
+
+      <button type="submit" class="apex-auth__button" :disabled="loading">
+        {{ loading ? 'Creating your store…' : 'Create account' }}
+        <Icon v-if="!loading" name="heroicons:arrow-right" aria-hidden="true" />
+      </button>
+    </form>
+
+    <p v-if="!registered" class="apex-auth__secondary">Already have an account? <NuxtLink to="/admin/login" class="apex-auth__link">Sign in</NuxtLink></p>
+  </ApexAuthShell>
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  layout: false,
-})
+definePageMeta({ layout: false })
 
 const authStore = useAuthStore()
 
@@ -237,8 +79,15 @@ const form = ref({
 const loading = ref(false)
 const error = ref('')
 const showPassword = ref(false)
-const mounted = ref(false)
 const registered = ref<{ store: { name: string } } | null>(null)
+const successHeading = ref<HTMLElement | null>(null)
+
+watch(registered, async (value) => {
+  if (value) {
+    await nextTick()
+    successHeading.value?.focus()
+  }
+})
 
 const slugCharactersOnly = (value: string): string =>
   value.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '').replace(/-+/g, '-')
@@ -290,51 +139,4 @@ const handleRegister = async () => {
     loading.value = false
   }
 }
-
-onMounted(() => {
-  requestAnimationFrame(() => {
-    mounted.value = true
-  })
-})
 </script>
-
-<style scoped>
-.animate-card-enter {
-  animation: card-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-@keyframes card-enter {
-  from { opacity: 0; transform: translateY(24px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.animate-stagger-1 { animation: stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both; }
-.animate-stagger-2 { animation: stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
-.animate-stagger-3 { animation: stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
-.animate-stagger-4 { animation: stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
-.animate-stagger-5 { animation: stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both; }
-.animate-stagger-6 { animation: stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both; }
-.animate-stagger-7 { animation: stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
-.animate-stagger-8 { animation: stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both; }
-@keyframes stagger-in {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.animate-icon-glow {
-  animation: icon-glow 2.5s ease-in-out infinite;
-}
-@keyframes icon-glow {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-primary, #6898ED) 0%, transparent); }
-  50% { box-shadow: 0 0 30px 6px color-mix(in srgb, var(--color-primary, #6898ED) 25%, transparent); }
-}
-
-.animate-shake { animation: shake 0.4s ease-out; }
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  15% { transform: translateX(-5px); }
-  30% { transform: translateX(5px); }
-  45% { transform: translateX(-4px); }
-  60% { transform: translateX(4px); }
-  75% { transform: translateX(-1px); }
-}
-</style>

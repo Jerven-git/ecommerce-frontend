@@ -2,9 +2,11 @@
   <section class="apex-hero" aria-labelledby="ssu-hero-title">
     <div class="apex-hero__inner">
       <div class="apex-hero__copy">
-        <h1 id="ssu-hero-title">
-          A storefront that looks like you.
-          <span>One place to run it.</span>
+        <h1 id="ssu-hero-title" aria-label="A storefront that looks like you. One place to run it.">
+          <span class="apex-hero__lead" aria-hidden="true">
+            A storefront that <ApexScrambleText :words="['looks', 'feels', 'works']" /> like you.
+          </span>
+          <span class="apex-hero__line" aria-hidden="true">One place to run it.</span>
         </h1>
 
         <p class="apex-hero__description">
@@ -127,8 +129,12 @@ defineProps<{
   text-wrap: balance;
 }
 
-.apex-hero h1 span {
+.apex-hero__lead,
+.apex-hero__line {
   display: block;
+}
+
+.apex-hero__line {
   color: #737373;
   font-family: 'Space Grotesk', var(--font-heading);
   font-size: 0.95em;

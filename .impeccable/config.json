@@ -1,0 +1,23 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "space grotesk",
+        "createdAt": "2026-10-02T05:16:02.113Z",
+        "reason": "Agent: established Apex marketing typography already used throughout the incumbent Hero and preserved by this narrow motion refinement"
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "app/components/apex/Pricing.vue"
+        ],
+        "createdAt": "2026-10-02T06:24:57.903Z",
+        "reason": "Agent: detector reads the dark card ancestor but the original CTA text is rendered on its own white background"
+      }
+    ]
+  }
+}

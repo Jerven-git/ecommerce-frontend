@@ -6,20 +6,80 @@
         <p>The practical details of setting up and running a store on SSU.</p>
       </div>
 
-      <div class="apex-faq__questions">
-        <details v-for="item in questions" :key="item.question" class="apex-faq__item">
-          <summary>
-            <span>{{ item.question }}</span>
-            <Icon name="heroicons:plus" aria-hidden="true" />
-          </summary>
-          <p>{{ item.answer }}</p>
-        </details>
-      </div>
+      <MotionConfig reduced-motion="user">
+        <AccordionRoot
+          v-model="openItem"
+          type="single"
+          collapsible
+          class="apex-faq__questions"
+        >
+          <AccordionItem
+            v-for="(item, index) in questions"
+            :key="item.question"
+            :value="itemValue(index)"
+            class="apex-faq__item"
+          >
+            <AccordionHeader as="h3" class="apex-faq__header">
+              <AccordionTrigger class="apex-faq__trigger">
+                <span>{{ item.question }}</span>
+                <motion.span
+                  class="apex-faq__icon"
+                  :initial="false"
+                  :animate="{ rotate: openItem === itemValue(index) ? 45 : 0 }"
+                  :transition="iconTransition"
+                  aria-hidden="true"
+                >
+                  <Icon name="heroicons:plus" />
+                </motion.span>
+              </AccordionTrigger>
+            </AccordionHeader>
+
+            <AccordionContent
+              force-mount
+              as-child
+              :aria-hidden="openItem === itemValue(index) ? undefined : 'true'"
+            >
+              <motion.div
+                class="apex-faq__content"
+                :initial="false"
+                :animate="{ height: openItem === itemValue(index) ? 'auto' : 0 }"
+                :transition="panelTransition"
+              >
+                <div class="apex-faq__answer">
+                  <p>{{ item.answer }}</p>
+                </div>
+              </motion.div>
+            </AccordionContent>
+          </AccordionItem>
+        </AccordionRoot>
+      </MotionConfig>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import {
+  AccordionContent,
+  AccordionHeader,
+  AccordionItem,
+  AccordionRoot,
+  AccordionTrigger,
+} from 'reka-ui'
+import { MotionConfig, motion, useReducedMotion } from 'motion-v'
+
+const openItem = ref<string>()
+const prefersReducedMotion = useReducedMotion()
+
+const itemValue = (index: number) => `faq-${index}`
+
+const panelTransition = computed(() => prefersReducedMotion.value
+  ? { duration: 0 }
+  : { duration: 0.28, ease: [0.16, 1, 0.3, 1] })
+
+const iconTransition = computed(() => prefersReducedMotion.value
+  ? { duration: 0 }
+  : { type: 'spring', stiffness: 430, damping: 32, mass: 0.65 })
+
 const questions = [
   {
     question: 'Can I use SSU for an existing business?',
@@ -55,12 +115,14 @@ const questions = [
 .apex-faq__intro p { max-width: 27rem; margin: 1.25rem 0 0; color: #525252; font-size: 1.05rem; line-height: 1.65; }
 .apex-faq__questions { border-top: 1px solid #dedede; }
 .apex-faq__item { border-bottom: 1px solid #dedede; }
-.apex-faq__item summary { display: flex; min-height: 5rem; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.3rem 0; cursor: pointer; font-family: 'Space Grotesk', var(--font-heading); font-size: clamp(1rem, 1.45vw, 1.2rem); font-weight: 600; line-height: 1.4; list-style: none; }
-.apex-faq__item summary::-webkit-details-marker { display: none; }
-.apex-faq__item summary:focus-visible { outline: 2px solid var(--apex-focus-on-light); outline-offset: 4px; }
-.apex-faq__item summary :deep(svg) { flex: 0 0 auto; width: 1.15rem; height: 1.15rem; transition: transform 180ms ease; }
-.apex-faq__item[open] summary :deep(svg) { transform: rotate(45deg); }
-.apex-faq__item p { max-width: 62ch; margin: -0.2rem 0 1.6rem; color: #525252; font-size: 0.95rem; line-height: 1.7; }
+.apex-faq__header { margin: 0; }
+.apex-faq__trigger { display: flex; width: 100%; min-height: 5rem; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.3rem 0; border: 0; background: transparent; color: inherit; cursor: pointer; font-family: 'Space Grotesk', var(--font-heading); font-size: clamp(1rem, 1.45vw, 1.2rem); font-weight: 600; line-height: 1.4; text-align: left; }
+.apex-faq__trigger:focus-visible { border-radius: 0.25rem; outline: 2px solid var(--apex-focus-on-light); outline-offset: 4px; }
+.apex-faq__icon { display: grid; flex: 0 0 auto; width: 1.15rem; height: 1.15rem; place-items: center; transform-origin: center; }
+.apex-faq__icon :deep(svg) { width: 100%; height: 100%; }
+.apex-faq__content { overflow: hidden; }
+.apex-faq__answer { padding: 0 0 1.6rem; }
+.apex-faq__answer p { max-width: 62ch; margin: -0.2rem 0 0; color: #525252; font-size: 0.95rem; line-height: 1.7; }
 
 @media (max-width: 900px) {
   .apex-faq__inner { grid-template-columns: 1fr; gap: 2.5rem; }
@@ -69,10 +131,7 @@ const questions = [
 @media (max-width: 639px) {
   .apex-faq__inner { padding: 4.5rem 1.25rem; }
   .apex-faq__intro p { font-size: 0.95rem; }
-  .apex-faq__item summary { min-height: 4.5rem; }
+  .apex-faq__trigger { min-height: 4.5rem; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .apex-faq__item summary :deep(svg) { transition: none; }
-}
 </style>
