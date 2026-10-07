@@ -4,7 +4,7 @@
     <div class="max-w-7xl mx-auto px-6 lg:px-8 py-12 md:py-16">
       <div class="grid gap-10 md:grid-cols-3">
         <div>
-          <NuxtLink to="/" class="inline-flex min-h-11 items-center rounded-md text-xl font-bold tracking-tight text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--apex-focus-on-dark)]">SSU</NuxtLink>
+          <NuxtLink to="/" class="inline-flex min-h-11 items-center rounded-md text-xl font-bold tracking-tight text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--apex-focus-on-dark)]">DATABASY</NuxtLink>
           <p class="mt-3 text-sm leading-relaxed text-white/70 max-w-xs">A branded storefront and the tools to run it, all in one place.</p>
         </div>
         <div>
@@ -28,7 +28,7 @@
         </div>
       </div>
       <div class="border-t border-white/10 mt-10 pt-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-        <p class="text-xs text-[var(--apex-on-dark-subtle)]">© {{ new Date().getFullYear() }} SSU. All rights reserved.</p>
+        <p class="text-xs text-[var(--apex-on-dark-subtle)]">© {{ new Date().getFullYear() }} DATABASY. All rights reserved.</p>
         <button type="button" class="inline-flex min-h-11 items-center gap-1.5 rounded-md text-xs font-semibold text-[var(--apex-on-dark-subtle)] hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-dark)]" @click="scrollToTop">Back to top <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg></button>
       </div>
     </div>

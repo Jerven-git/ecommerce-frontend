@@ -14,7 +14,7 @@
         @pointerleave="handlePointerLeave"
       >
         <div class="apex-use-cases__origin">
-          <span>SSU</span>
+          <span>DATABASY</span>
           <strong>Storefront + workspace</strong>
         </div>
 
@@ -128,21 +128,21 @@ const useCases = [
     image: {
       src: '/images/ForestGreen/food-960.webp',
       srcset: '/images/ForestGreen/food-640.webp 640w, /images/ForestGreen/food-960.webp 960w, /images/ForestGreen/food-1440.webp 1440w',
-      alt: 'Food photography used in an SSU demonstration storefront theme',
+      alt: 'Food photography used in a DATABASY demonstration storefront theme',
       caption: 'Demonstration theme visual',
     },
     steps: ['Choose your look', 'Add what you sell', 'Run your store'],
   },
   {
     title: 'Set up your existing business.',
-    description: 'Add your current catalogue and configure your brand, checkout and fulfilment settings on SSU at your own pace.',
+    description: 'Add your current catalogue and configure your brand, checkout and fulfilment settings on DATABASY at your own pace.',
     image: {
       src: '/images/MinimalMono/laptop-960.webp',
       srcset: '/images/MinimalMono/laptop-640.webp 640w, /images/MinimalMono/laptop-960.webp 960w, /images/MinimalMono/laptop-1440.webp 1440w',
-      alt: 'Desk photography used in an SSU demonstration storefront theme',
+      alt: 'Desk photography used in a DATABASY demonstration storefront theme',
       caption: 'Demonstration theme visual',
     },
-    steps: ['Add your catalogue', 'Set your preferences', 'Manage from SSU'],
+    steps: ['Add your catalogue', 'Set your preferences', 'Manage from DATABASY'],
   },
 ]
 

@@ -1,5 +1,7 @@
 <template>
   <div class="admin-shell super-admin-shell min-h-screen bg-admin-canvas text-admin-text md:flex" :class="themeClass">
+    <AuthLogoutProgress :visible="loggingOut" />
+
     <!-- Mobile header -->
     <header class="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-admin-border bg-admin-surface/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-admin-surface/80 md:hidden">
       <NuxtLink to="/super-admin" class="flex items-center gap-2.5 rounded-xl px-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
@@ -37,7 +39,7 @@
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17 9 21l3-2 3 2-.75-4M3 4h18l-2 13H5L3 4Z" /></svg>
         </div>
         <div class="min-w-0 leading-tight">
-          <p class="text-[13px] font-semibold tracking-tight text-admin-text">SSU Platform</p>
+          <p class="text-[13px] font-semibold tracking-tight text-admin-text">DATABASY Platform</p>
           <p class="text-[11px] font-medium text-admin-muted">Super Admin · Control Room</p>
         </div>
         <span class="ml-auto inline-flex items-center gap-1.5 rounded-full border border-admin-success/20 bg-admin-success-soft px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-admin-success" title="Platform operational">
@@ -127,16 +129,17 @@
           <AdminThemeToggle class="flex-1" show-label block />
           <button
             type="button"
-            class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-admin-border bg-admin-surface px-3 text-xs font-medium text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent"
-            title="Log out of super admin"
-            aria-label="Log out"
+            class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-admin-border bg-admin-surface px-3 text-xs font-medium text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:cursor-wait"
+            :disabled="loggingOut"
+            :title="loggingOut ? 'Signing out' : 'Log out of super admin'"
+            :aria-label="loggingOut ? 'Signing out' : 'Log out'"
             @click="handleLogout"
           >
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-            Out
+            {{ loggingOut ? 'Signing out…' : 'Out' }}
           </button>
         </div>
-        <p class="mt-3 px-1 text-[11px] leading-relaxed text-admin-muted">SSU Platform · Multi-store control room</p>
+        <p class="mt-3 px-1 text-[11px] leading-relaxed text-admin-muted">DATABASY Platform · Multi-store control room</p>
       </div>
     </aside>
 
@@ -149,7 +152,7 @@
       </div>
       <footer class="border-t border-admin-border bg-admin-surface/50 px-6 py-4">
         <div class="mx-auto flex max-w-[1280px] flex-col gap-2 text-xs text-admin-muted sm:flex-row sm:items-center sm:justify-between">
-          <span>© SSU Platform · Super Admin — scoped to platform operators only</span>
+          <span>© DATABASY Platform · Super Admin — scoped to platform operators only</span>
           <span class="inline-flex items-center gap-2">
             <span class="h-2 w-2 rounded-full bg-admin-success" aria-hidden="true" /> Data is live and authorized for your role
           </span>
@@ -166,6 +169,7 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const navOpen = ref(false)
+const loggingOut = ref(false)
 const { themeClass } = useAdminAppearance({ syncBody: true })
 
 const primaryNav = [
@@ -185,8 +189,15 @@ const isActive = (path: string) => {
 }
 
 const handleLogout = async () => {
-  await authStore.logout()
-  router.push('/admin/login')
+  if (loggingOut.value) return
+
+  loggingOut.value = true
+  try {
+    await authStore.logout()
+    await router.push('/admin/login')
+  } catch {
+    loggingOut.value = false
+  }
 }
 
 watch(() => route.path, () => { navOpen.value = false })

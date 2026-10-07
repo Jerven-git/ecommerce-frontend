@@ -1,4 +1,6 @@
 <template>
+  <AuthLogoutProgress :visible="loggingOut" />
+
   <!-- Guest pages (login, 2FA, password reset) render standalone without the admin shell -->
   <slot v-if="isGuestPage" />
 
@@ -187,10 +189,11 @@
             </div>
             <button
               @click="handleLogout"
+              :disabled="loggingOut"
               class="admin-focus tap-target w-8 h-8 flex items-center justify-center rounded-lg text-admin-muted
-                     hover:text-admin-danger hover:bg-admin-danger-soft active:scale-95 transition shrink-0"
-              aria-label="Log out"
-              title="Log out"
+                     hover:text-admin-danger hover:bg-admin-danger-soft active:scale-95 transition shrink-0 disabled:cursor-wait"
+              :aria-label="loggingOut ? 'Signing out' : 'Log out'"
+              :title="loggingOut ? 'Signing out' : 'Log out'"
             >
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -389,6 +392,7 @@ const sidebarOpen = ref(true)
 // Slide transitions are enabled only after first paint, so the shell arrives
 // settled instead of animating on load (product UIs don't choreograph arrival).
 const mounted = ref(false)
+const loggingOut = ref(false)
 
 const toggleSidebar = () => {
   sidebarOpen.value = !sidebarOpen.value
@@ -426,8 +430,15 @@ onBeforeUnmount(() => {
 })
 
 const handleLogout = async () => {
-  await authStore.logout()
-  navigateTo('/')
+  if (loggingOut.value) return
+
+  loggingOut.value = true
+  try {
+    await authStore.logout()
+    await navigateTo('/')
+  } catch {
+    loggingOut.value = false
+  }
 }
 
 const isActivePath = (path: string) => {

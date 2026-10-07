@@ -19,17 +19,17 @@
             <Icon name="heroicons:arrow-up-right" class="h-5 w-5" aria-hidden="true" />
           </NuxtLink>
           <a href="#product" class="apex-hero__secondary">
-            Explore SSU
+            Explore DATABASY
             <Icon name="heroicons:arrow-down" class="h-4 w-4" aria-hidden="true" />
           </a>
         </div>
 
         <p class="apex-hero__audience">
-          Start a new store or set up your existing business on SSU.
+          Start a new store or set up your existing business on DATABASY.
         </p>
       </div>
 
-      <div class="apex-hero__product" role="group" aria-label="Illustrative SSU workspace and demonstration storefront preview">
+      <div class="apex-hero__product" role="group" aria-label="Illustrative DATABASY workspace and demonstration storefront preview">
         <div class="apex-hero__product-heading">
           <span>Storefront + workspace</span>
           <span class="apex-hero__preview-label">Illustrative preview</span>
@@ -38,7 +38,7 @@
         <div class="apex-hero__composition">
           <div class="apex-hero__workspace" aria-hidden="true">
             <div class="workspace-rail">
-              <div class="workspace-mark">SSU</div>
+              <div class="workspace-mark">DATABASY</div>
               <div class="workspace-rail__item is-selected"><Icon name="heroicons:squares-2x2" class="h-4 w-4" /> <span>Overview</span></div>
               <div class="workspace-rail__item"><Icon name="heroicons:shopping-bag" class="h-4 w-4" /> <span>Products</span></div>
               <div class="workspace-rail__item"><Icon name="heroicons:clipboard-document-list" class="h-4 w-4" /> <span>Orders</span></div>
@@ -86,7 +86,7 @@
           </div>
         </div>
 
-        <p class="apex-hero__product-note">A visual preview of the SSU workspace alongside an Arte Gallery demonstration store.</p>
+        <p class="apex-hero__product-note">A visual preview of the DATABASY workspace alongside an Arte Gallery demonstration store.</p>
       </div>
     </div>
   </section>

@@ -29,11 +29,11 @@
         </h2>
         <p>
           Give customers a storefront shaped by your brand, while your team manages the catalogue,
-          orders and appearance behind it from SSU.
+          orders and appearance behind it from DATABASY.
         </p>
       </div>
 
-      <div class="apex-product__stage" role="group" aria-label="Illustrative connection between an SSU demonstration storefront and its workspace">
+      <div class="apex-product__stage" role="group" aria-label="Illustrative connection between a DATABASY demonstration storefront and its workspace">
         <div class="apex-product__store">
           <div class="apex-product__browser">
             <span class="apex-product__browser-dots" aria-hidden="true"><i /><i /><i /></span>
@@ -63,7 +63,7 @@
 
         <div class="apex-product__workspace">
           <div class="apex-product__workspace-top">
-            <span class="apex-product__workspace-mark">SSU</span>
+            <span class="apex-product__workspace-mark">DATABASY</span>
             <span>Illustrative workspace preview</span>
           </div>
           <div class="apex-product__workspace-body">
@@ -82,7 +82,7 @@
         </div>
       </div>
 
-      <p class="apex-product__note">Visual preview only. The storefront shown uses an SSU demonstration theme; the workspace view is illustrative.</p>
+      <p class="apex-product__note">Visual preview only. The storefront shown uses a DATABASY demonstration theme; the workspace view is illustrative.</p>
     </div>
   </section>
 </template>

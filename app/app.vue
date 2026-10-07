@@ -6,6 +6,7 @@
       <NuxtPage />
     </NuxtLayout>
     <StorefrontPageLoader />
+    <ApexEntryLoader />
   </div>
 </template>
 

@@ -20,7 +20,7 @@
         <NuxtLink
           :to="marketingHome"
           class="flex min-h-11 items-center shrink-0 justify-self-start rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
-          :aria-label="isApexMarketing ? 'SSU home' : undefined"
+          :aria-label="isApexMarketing ? 'DATABASY home' : undefined"
           :class="isApexMarketing
             ? (isTransparent ? 'focus-visible:outline-[var(--apex-focus-on-dark)]' : 'focus-visible:outline-[var(--apex-focus-on-light)]')
             : 'focus-visible:outline-primary-500'"
@@ -35,7 +35,7 @@
           <span
             v-else-if="isApexMarketing"
             class="apex-header__brand"
-          >SSU</span>
+          >DATABASY</span>
           <span
             v-else
             class="text-xl font-bold tracking-tight transition-colors duration-300"

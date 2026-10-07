@@ -3,7 +3,7 @@
     <div class="apex-faq__inner">
       <div class="apex-faq__intro">
         <h2 id="apex-faq-title">Questions before you start?</h2>
-        <p>The practical details of setting up and running a store on SSU.</p>
+        <p>The practical details of setting up and running a store on DATABASY.</p>
       </div>
 
       <MotionConfig reduced-motion="user">
@@ -82,8 +82,8 @@ const iconTransition = computed(() => prefersReducedMotion.value
 
 const questions = [
   {
-    question: 'Can I use SSU for an existing business?',
-    answer: 'Yes. Add your current products or services and configure your brand and store settings at your own pace. SSU does not automatically import data from another platform.',
+    question: 'Can I use DATABASY for an existing business?',
+    answer: 'Yes. Add your current products or services and configure your brand and store settings at your own pace. DATABASY does not automatically import data from another platform.',
   },
   {
     question: 'What happens after I create an account?',
@@ -91,15 +91,15 @@ const questions = [
   },
   {
     question: 'Can I use my own domain?',
-    answer: 'Stores can use an SSU subdomain. A custom domain requires DNS setup and verification by an SSU platform administrator before it serves your store.',
+    answer: 'Stores can use a DATABASY subdomain. A custom domain requires DNS setup and verification by a DATABASY platform administrator before it serves your store.',
   },
   {
     question: 'Can I sell products and services?',
-    answer: 'SSU has tools for product catalogues and service listings. The sections shown on your storefront depend on how your store is configured.',
+    answer: 'DATABASY has tools for product catalogues and service listings. The sections shown on your storefront depend on how your store is configured.',
   },
   {
     question: 'How do payments work?',
-    answer: 'SSU subscription checkout uses Stripe. Payment methods for your own storefront are configured separately in the admin and depend on the gateways you enable.',
+    answer: 'DATABASY subscription checkout uses Stripe. Payment methods for your own storefront are configured separately in the admin and depend on the gateways you enable.',
   },
   {
     question: 'Where do I manage my subscription?',

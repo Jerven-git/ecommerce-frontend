@@ -9,7 +9,7 @@
           aria-hidden="true"
         />
       </h2>
-      <p v-if="isAuthenticated">Your SSU workspace is ready when you are.</p>
+      <p v-if="isAuthenticated">Your DATABASY workspace is ready when you are.</p>
       <p v-else>Create an account, choose a plan to activate selling, and shape a storefront that feels like your business.</p>
       <NuxtLink
         :to="isAuthenticated ? '/admin' : '/register'"

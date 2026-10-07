@@ -58,7 +58,7 @@
 <script setup lang="ts">
 import ApexFeatureColumnMotion from './FeatureColumnMotion.vue'
 
-const introDescription = 'From what you offer to how you fulfil it, SSU brings the day-to-day parts of your store into one workspace.'
+const introDescription = 'From what you offer to how you fulfil it, DATABASY brings the day-to-day parts of your store into one workspace.'
 let introLetterIndex = 0
 const introWords = introDescription.split(' ').map((word, index) => ({
   index,
@@ -166,7 +166,7 @@ const groups = [
   },
   {
     title: 'Make it yours',
-    description: 'Keep your brand recognizable while controlling how your team works in SSU.',
+    description: 'Keep your brand recognizable while controlling how your team works in DATABASY.',
     items: [
       {
         title: 'Storefront appearance',

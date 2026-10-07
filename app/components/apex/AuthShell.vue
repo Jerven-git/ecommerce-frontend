@@ -1,7 +1,7 @@
 <template>
   <main class="apex-auth">
     <header class="apex-auth__header">
-      <a :href="platformHomeUrl" class="apex-auth__brand" aria-label="SSU home">SSU</a>
+      <a :href="platformHomeUrl" class="apex-auth__brand" aria-label="DATABASY home">DATABASY</a>
       <a :href="platformHomeUrl" class="apex-auth__home-link">
         Back to home <Icon name="heroicons:arrow-up-right" aria-hidden="true" />
       </a>
@@ -11,7 +11,7 @@
       <aside class="apex-auth__story">
         <div class="apex-auth__story-copy">
           <h1>A storefront that looks like you.<span>One place to run it.</span></h1>
-          <p>Build a branded storefront and manage the work behind it from one SSU workspace.</p>
+          <p>Build a branded storefront and manage the work behind it from one DATABASY workspace.</p>
         </div>
 
         <div class="apex-auth__preview" aria-label="Arte Gallery demonstration storefront preview">
@@ -32,14 +32,14 @@
               <span>Arte Gallery <small>Demonstration storefront</small></span>
             </div>
             <div class="apex-auth__preview-workspace" aria-hidden="true">
-              <strong>SSU workspace</strong>
+              <strong>DATABASY workspace</strong>
               <span><Icon name="heroicons:tag" /> Catalogue</span>
               <span><Icon name="heroicons:clipboard-document-list" /> Orders</span>
               <span><Icon name="heroicons:paint-brush" /> Appearance</span>
             </div>
           </div>
         </div>
-        <p class="apex-auth__preview-note">Visual preview only. Storefront shown uses an SSU demonstration theme.</p>
+        <p class="apex-auth__preview-note">Visual preview only. Storefront shown uses a DATABASY demonstration theme.</p>
       </aside>
 
       <section class="apex-auth__form-side" aria-label="Account access">
@@ -115,18 +115,21 @@ const platformHomeUrl = computed(() => {
 .apex-auth__input::placeholder { color: #656565; opacity: 1; }
 .apex-auth__input:hover { border-color: #777; }
 .apex-auth__input:focus-visible { border-color: #285095; box-shadow: 0 0 0 3px #dce9ff; }
-.apex-auth__input[readonly] { border-color: #d6d6d6; background: #f4f4f4; color: #565656; }
+.apex-auth__input[readonly], .apex-auth__input:disabled { border-color: #d6d6d6; background: #f4f4f4; color: #565656; cursor: wait; }
 .apex-auth__input--password { padding-right: 3.4rem; }
 .apex-auth__toggle { position: absolute; top: 0; right: 0.35rem; display: grid; width: 2.75rem; height: 100%; place-items: center; border: 0; background: none; color: #4c4c4c; cursor: pointer; }
+.apex-auth__toggle:disabled { opacity: 0.45; cursor: wait; }
 .apex-auth__toggle svg { width: 1.15rem; height: 1.15rem; }
 .apex-auth__link { color: #242424; font-size: 0.82rem; font-weight: 700; text-decoration: underline; text-decoration-color: #bbb; text-underline-offset: 0.22em; }
 .apex-auth__link:hover { text-decoration-color: currentColor; }
-.apex-auth__button { display: inline-flex; width: 100%; min-height: 3.2rem; align-items: center; justify-content: center; gap: 0.6rem; padding: 0.65rem 1rem; border: 1px solid #1a1a1a; border-radius: 0.7rem; background: #1a1a1a; color: #fff; font: inherit; font-size: 0.94rem; font-weight: 700; text-decoration: none; cursor: pointer; transition: background 160ms, transform 160ms; }
+.apex-auth__button { position: relative; display: inline-flex; width: 100%; min-height: 3.2rem; align-items: center; justify-content: center; gap: 0.6rem; overflow: hidden; padding: 0.65rem 1rem; border: 1px solid #1a1a1a; border-radius: 0.7rem; background: #1a1a1a; color: #fff; font: inherit; font-size: 0.94rem; font-weight: 700; text-decoration: none; cursor: pointer; transition: background 160ms, transform 160ms; }
 .apex-auth__button:hover { background: #353535; }
 .apex-auth__button:active { transform: translateY(1px); }
-.apex-auth__button:disabled { opacity: 0.55; cursor: not-allowed; }
+.apex-auth__button:disabled { opacity: 1; cursor: wait; }
 .apex-auth__button svg { width: 1rem; height: 1rem; }
 .apex-auth__button .animate-spin { width: 1.2rem; height: 1.2rem; }
+.apex-auth__button-spinner { animation: apex-auth-spin 800ms linear infinite; }
+.apex-auth__button-progress { position: absolute; right: 0; bottom: 0; left: 0; height: 2px; background: #b9d3ff; transform: scaleX(0); transform-origin: left; animation: apex-auth-progress 1.2s cubic-bezier(0.16, 1, 0.3, 1) infinite; }
 .apex-auth__secondary { margin-top: 1.35rem; color: #525252; font-size: 0.85rem; text-align: center; }
 .apex-auth__secondary .apex-auth__link { margin-left: 0.25rem; }
 .apex-auth__alert { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.85rem 1rem; border: 1px solid #e9aaaa; border-radius: 0.7rem; background: #fff6f6; color: #8a2020; font-size: 0.84rem; line-height: 1.5; }
@@ -139,6 +142,13 @@ const platformHomeUrl = computed(() => {
 .apex-auth__success > p:not(.apex-auth__secondary) { margin: 0.8rem 0 1.8rem; color: #515151; font-size: 0.95rem; line-height: 1.6; }
 .apex-auth__success h2:focus { outline: none; }
 .apex-auth :is(a, button):focus-visible { outline: 3px solid #285095; outline-offset: 3px; }
+@keyframes apex-auth-spin { to { transform: rotate(360deg); } }
+@keyframes apex-auth-progress {
+  0% { transform: scaleX(0); transform-origin: left; }
+  48% { transform: scaleX(1); transform-origin: left; }
+  52% { transform: scaleX(1); transform-origin: right; }
+  100% { transform: scaleX(0); transform-origin: right; }
+}
 @media (max-width: 900px) {
   .apex-auth__layout { grid-template-columns: 1fr; }
   .apex-auth__story { padding: 2.5rem 1.5rem; border-right: 0; border-bottom: 1px solid #e9e9e7; }
@@ -156,6 +166,6 @@ const platformHomeUrl = computed(() => {
   .apex-auth__form-grid { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .apex-auth *, .apex-auth *::before, .apex-auth *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  .apex-auth *, .apex-auth *::before, .apex-auth *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }
 </style>

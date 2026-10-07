@@ -1,5 +1,7 @@
 <template>
   <div class="subscription-lock min-h-screen flex items-center justify-center bg-admin-canvas px-4 py-12">
+    <AuthLogoutProgress :visible="loggingOut" />
+
     <div class="w-full max-w-md">
       <div
         class="bg-admin-surface rounded-2xl shadow-xl border border-admin-border p-8 sm:p-10 text-center"
@@ -30,9 +32,10 @@
           </button>
           <button
             class="w-full text-sm text-admin-muted hover:text-admin-text transition-colors py-1"
+            :disabled="loggingOut"
             @click="handleLogout"
           >
-            Sign out
+            {{ loggingOut ? 'Signing out…' : 'Sign out' }}
           </button>
         </div>
       </div>
@@ -46,6 +49,7 @@ const subscription = useSubscription()
 
 const mounted = ref(false)
 const subscribing = ref(false)
+const loggingOut = ref(false)
 
 onMounted(() => {
   requestAnimationFrame(() => {
@@ -68,8 +72,15 @@ const handleSubscribe = async () => {
 }
 
 const handleLogout = async () => {
-  await authStore.logout()
-  navigateTo('/')
+  if (loggingOut.value) return
+
+  loggingOut.value = true
+  try {
+    await authStore.logout()
+    await navigateTo('/')
+  } catch {
+    loggingOut.value = false
+  }
 }
 </script>
 

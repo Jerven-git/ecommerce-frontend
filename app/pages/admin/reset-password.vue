@@ -2,7 +2,7 @@
   <ApexAuthShell>
     <div class="apex-auth__form-heading">
       <h2>Choose a new password.</h2>
-      <p>Set a password for your SSU account, then sign in to your workspace.</p>
+      <p>Set a password for your DATABASY account, then sign in to your workspace.</p>
     </div>
 
     <div v-if="success">

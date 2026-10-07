@@ -76,7 +76,7 @@
             <p id="store-domain-help" class="mt-2 text-xs leading-relaxed text-admin-muted">
               Point an A record at
               <span v-if="expectedIps.length" class="rounded bg-admin-surface px-1.5 py-0.5 font-mono text-admin-text border border-admin-border">{{ expectedIps.join(' or ') }}</span>
-              <span v-else class="font-medium text-admin-text">the public IP configured for SSU</span>, then verify. A domain only serves traffic once verified.
+              <span v-else class="font-medium text-admin-text">the public IP configured for DATABASY</span>, then verify. A domain only serves traffic once verified.
             </p>
 
             <div class="relative mt-3">

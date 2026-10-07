@@ -108,7 +108,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: 'Shop System United',
+      title: 'DATABASY',
       htmlAttrs: {
         lang: 'en',
       },
