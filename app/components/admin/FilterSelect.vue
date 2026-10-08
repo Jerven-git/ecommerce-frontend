@@ -3,8 +3,9 @@
     <button
       ref="triggerRef"
       type="button"
-      class="group flex h-10 w-full min-w-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-2.5 text-left text-sm shadow-sm transition-[border-color,box-shadow] hover:border-primary-300 focus-visible:border-primary-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/20"
+      class="admin-filter-select__trigger group flex min-h-11 w-full min-w-0 items-center gap-2 rounded-lg border border-admin-border bg-admin-surface px-2.5 text-left text-sm transition-[border-color,box-shadow] hover:border-admin-accent/40 focus-visible:border-admin-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/20"
       :aria-label="ariaLabel"
+      :aria-describedby="describedBy"
       :aria-expanded="isOpen"
       :aria-controls="listboxId"
       aria-haspopup="listbox"
@@ -14,18 +15,18 @@
       @keydown.escape.prevent="closeSelect"
     >
       <span
-        class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-50 text-gray-500 transition-colors group-hover:bg-primary-50 group-hover:text-primary-700"
-        :class="isOpen ? 'bg-primary-50 text-primary-700' : ''"
+        class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-admin-soft text-admin-muted transition-colors group-hover:bg-admin-accent-soft group-hover:text-admin-accent"
+        :class="isOpen ? 'bg-admin-accent-soft text-admin-accent' : ''"
       >
         <Icon :name="selectedOption.icon || 'heroicons:funnel'" class="h-4 w-4" aria-hidden="true" />
       </span>
-      <span class="min-w-0 flex-1 truncate font-medium text-gray-700" :title="selectedOption.label">
+      <span class="min-w-0 flex-1 truncate font-medium text-admin-text" :title="selectedOption.label">
         {{ selectedOption.label }}
       </span>
       <Icon
         name="heroicons:chevron-down"
-        class="h-4 w-4 shrink-0 text-gray-400 transition-transform duration-150 motion-reduce:transition-none"
-        :class="isOpen ? 'rotate-180 text-primary-600' : ''"
+        class="h-4 w-4 shrink-0 text-admin-muted transition-transform duration-150 motion-reduce:transition-none"
+        :class="isOpen ? 'rotate-180 text-admin-accent' : ''"
         aria-hidden="true"
       />
     </button>
@@ -46,7 +47,7 @@
         tabindex="-1"
         :aria-label="listLabel"
         :aria-activedescendant="activeOptionId"
-        class="absolute right-0 top-[calc(100%+0.5rem)] z-50 max-h-72 w-full min-w-[13rem] overflow-y-auto rounded-xl bg-white p-1.5 shadow-[0_18px_45px_-18px_rgba(15,23,42,0.42)] outline-none"
+        class="absolute right-0 top-[calc(100%+0.5rem)] z-50 max-h-72 w-full min-w-[13rem] overflow-y-auto rounded-xl border border-admin-border bg-admin-surface p-1.5 shadow-lg outline-none"
         @keydown="handleListboxKeydown"
       >
         <button
@@ -56,18 +57,20 @@
           type="button"
           role="option"
           tabindex="-1"
-          class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition-colors"
-          :class="index === highlightedIndex
-            ? 'bg-primary-50 text-primary-800'
-            : 'text-gray-700 hover:bg-gray-50'"
+          class="flex min-h-11 w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-45"
+          :class="index === highlightedIndex && !option.disabled
+            ? 'bg-admin-accent-soft text-admin-accent-strong'
+            : 'text-admin-text hover:bg-admin-soft'"
+          :disabled="option.disabled"
           :aria-selected="option.value === modelValue"
+          :aria-disabled="option.disabled || undefined"
           :data-option-index="index"
-          @click="selectOption(option.value)"
-          @mouseenter="highlightedIndex = index"
+          @click="selectOption(option)"
+          @mouseenter="!option.disabled && (highlightedIndex = index)"
         >
           <span
-            class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
-            :class="option.value === modelValue ? 'bg-white text-primary-700' : 'bg-gray-50 text-gray-500'"
+            class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md"
+            :class="option.value === modelValue ? 'bg-admin-surface text-admin-accent' : 'bg-admin-soft text-admin-muted'"
           >
             <Icon :name="option.icon || 'heroicons:adjustments-horizontal'" class="h-4 w-4" aria-hidden="true" />
           </span>
@@ -75,7 +78,7 @@
           <Icon
             v-if="option.value === modelValue"
             name="heroicons:check"
-            class="h-4 w-4 shrink-0 text-primary-600"
+            class="h-4 w-4 shrink-0 text-admin-accent"
             aria-hidden="true"
           />
         </button>
@@ -89,6 +92,7 @@ interface FilterOption {
   value: string
   label: string
   icon?: string
+  disabled?: boolean
 }
 
 const props = withDefaults(defineProps<{
@@ -96,6 +100,7 @@ const props = withDefaults(defineProps<{
   options: FilterOption[]
   ariaLabel: string
   listLabel?: string
+  describedBy?: string
 }>(), {
   listLabel: 'Filter options',
 })
@@ -133,10 +138,7 @@ async function openSelect(direction = 0) {
 
   const selectedIndex = props.options.findIndex(option => option.value === props.modelValue)
   const baseIndex = Math.max(selectedIndex, 0)
-  highlightedIndex.value = Math.min(
-    Math.max(baseIndex + direction, 0),
-    props.options.length - 1,
-  )
+  highlightedIndex.value = findEnabledIndex(baseIndex, direction || 1)
   isOpen.value = true
 
   await nextTick()
@@ -157,13 +159,24 @@ function toggle() {
 
 function moveHighlight(amount: number) {
   if (!props.options.length) return
-  const lastIndex = props.options.length - 1
-  highlightedIndex.value = Math.min(Math.max(highlightedIndex.value + amount, 0), lastIndex)
+  highlightedIndex.value = findEnabledIndex(highlightedIndex.value + amount, amount)
   scrollToHighlighted()
 }
 
-function selectOption(value: string) {
-  emit('update:modelValue', value)
+function findEnabledIndex(start: number, direction: number) {
+  const step = direction < 0 ? -1 : 1
+  let index = Math.min(Math.max(start, 0), props.options.length - 1)
+  while (props.options[index]?.disabled && index >= 0 && index < props.options.length) index += step
+  if (index < 0 || index >= props.options.length) {
+    const fallback = props.options.findIndex(option => !option.disabled)
+    return fallback >= 0 ? fallback : 0
+  }
+  return index
+}
+
+function selectOption(option: FilterOption) {
+  if (option.disabled) return
+  emit('update:modelValue', option.value)
   closeSelect({ restoreFocus: true })
 }
 
@@ -179,19 +192,19 @@ function handleListboxKeydown(event: KeyboardEvent) {
       break
     case 'Home':
       event.preventDefault()
-      highlightedIndex.value = 0
+      highlightedIndex.value = findEnabledIndex(0, 1)
       scrollToHighlighted()
       break
     case 'End':
       event.preventDefault()
-      highlightedIndex.value = Math.max(props.options.length - 1, 0)
+      highlightedIndex.value = findEnabledIndex(Math.max(props.options.length - 1, 0), -1)
       scrollToHighlighted()
       break
     case 'Enter':
     case ' ':
       event.preventDefault()
       if (props.options[highlightedIndex.value]) {
-        selectOption(props.options[highlightedIndex.value].value)
+        selectOption(props.options[highlightedIndex.value])
       }
       break
     case 'Escape':
@@ -216,7 +229,7 @@ function handleOutsidePointer(event: PointerEvent) {
 }
 
 watch(() => props.options.length, () => {
-  highlightedIndex.value = Math.min(highlightedIndex.value, Math.max(props.options.length - 1, 0))
+  highlightedIndex.value = findEnabledIndex(Math.min(highlightedIndex.value, Math.max(props.options.length - 1, 0)), 1)
 })
 
 onMounted(() => document.addEventListener('pointerdown', handleOutsidePointer))

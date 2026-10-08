@@ -73,7 +73,7 @@
             </p>
           </div>
 
-          <form class="apex-verify__form" @submit.prevent="handleVerify">
+          <form class="apex-verify__form" @focusin="warmWorkspace" @submit.prevent="handleVerify">
             <div class="apex-verify__field">
               <label for="two-factor-code">Verification code</label>
               <input
@@ -112,6 +112,9 @@
               type="submit"
               class="apex-verify__submit"
               :disabled="loading || code.length !== 6"
+              @pointerenter="warmWorkspace"
+              @focus="warmWorkspace"
+              @touchstart.passive="warmWorkspace"
             >
               <Icon v-if="loading" name="heroicons:arrow-path" class="apex-verify__spinner" aria-hidden="true" />
               <span>{{ loading ? 'Checking code…' : 'Continue to workspace' }}</span>
@@ -144,6 +147,7 @@
 definePageMeta({ layout: false })
 
 const authStore = useAuthStore()
+const authTransition = useAuthTransition()
 const route = useRoute()
 const runtimeConfig = useRuntimeConfig()
 const requestUrl = useRequestURL()
@@ -156,11 +160,23 @@ const resendSuccess = ref('')
 const resendLoading = ref(false)
 const resendCooldown = ref(0)
 let resendTimer: ReturnType<typeof setInterval> | undefined
+let workspacePreload: Promise<void> | null = null
+let optimisticPreloadTimer: ReturnType<typeof setTimeout> | undefined
 
 // Optional ?redirect= carried over from login. Only same-origin paths.
 const getRedirect = () => {
   const candidate = route.query.redirect
   return typeof candidate === 'string' && candidate.startsWith('/') ? candidate : '/admin'
+}
+
+const warmWorkspace = () => {
+  if (!import.meta.client) return Promise.resolve()
+  if (!workspacePreload) {
+    workspacePreload = preloadRouteComponents(getRedirect()).catch(() => {
+      workspacePreload = null
+    })
+  }
+  return workspacePreload
 }
 
 const platformHomeUrl = computed(() => {
@@ -214,11 +230,19 @@ const handleVerify = async () => {
   loading.value = true
   error.value = ''
   resendSuccess.value = ''
+  const transitionStartedAt = Date.now()
+  authTransition.start('preparing', authStore.twoFactorEmail ?? '')
 
   try {
-    await authStore.verifyTwoFactor(code.value)
+    await Promise.all([authStore.verifyTwoFactor(code.value), warmWorkspace()])
+    const remainingDisplayTime = Math.max(0, 480 - (Date.now() - transitionStartedAt))
+    if (remainingDisplayTime) await new Promise(resolve => setTimeout(resolve, remainingDisplayTime))
     await navigateTo(getRedirect())
+    await nextTick()
+    if (import.meta.client) await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+    authTransition.finish()
   } catch (err: any) {
+    authTransition.finish()
     error.value = err?.data?.message || 'That code could not be verified. Check the digits and try again.'
     await nextTick()
     codeInput.value?.focus()
@@ -268,10 +292,12 @@ onMounted(() => {
   }
 
   requestAnimationFrame(() => codeInput.value?.focus())
+  optimisticPreloadTimer = setTimeout(() => { void warmWorkspace() }, 600)
 })
 
 onBeforeUnmount(() => {
   if (resendTimer) clearInterval(resendTimer)
+  clearTimeout(optimisticPreloadTimer)
 })
 </script>
 

@@ -1,14 +1,23 @@
 <template>
   <div class="relative w-full" :style="{ height: height + 'px' }">
-    <canvas ref="canvasRef" :aria-label="ariaLabel" role="img" />
+    <canvas
+      ref="canvasRef"
+      :aria-label="ariaLabel"
+      :aria-describedby="descriptionId"
+      :aria-busy="loading || undefined"
+      role="img"
+    />
+    <p :id="descriptionId" class="sr-only">
+      {{ chartDescription }}
+    </p>
     <!-- Loading -->
     <div v-if="loading" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-admin-surface/80 backdrop-blur-[1px]">
-      <span class="h-7 w-7 rounded-full border-2 border-admin-border border-t-admin-accent animate-spin" aria-hidden="true" />
+      <span class="h-7 w-7 rounded-full border-2 border-admin-border border-t-admin-accent animate-spin motion-reduce:animate-none" aria-hidden="true" />
       <span class="text-xs font-medium text-admin-muted">{{ loadingLabel }}</span>
     </div>
     <!-- Empty -->
     <div v-else-if="isEmpty" class="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
-      <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-admin-soft text-admin-muted" v-html="emptyIcon" />
+      <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-admin-soft text-admin-muted" aria-hidden="true" v-html="emptyIcon" />
       <p class="text-sm font-semibold text-admin-text">{{ emptyTitle }}</p>
       <p class="max-w-[28ch] text-xs leading-relaxed text-admin-muted">{{ emptyDescription }}</p>
     </div>
@@ -16,8 +25,36 @@
 </template>
 
 <script setup lang="ts">
-import { Chart, registerables } from 'chart.js'
-Chart.register(...registerables)
+import {
+  ArcElement,
+  BarController,
+  BarElement,
+  CategoryScale,
+  Chart,
+  DoughnutController,
+  Filler,
+  Legend,
+  LineController,
+  LineElement,
+  LinearScale,
+  PointElement,
+  Tooltip,
+} from 'chart.js'
+
+Chart.register(
+  ArcElement,
+  BarController,
+  BarElement,
+  CategoryScale,
+  DoughnutController,
+  Filler,
+  Legend,
+  LineController,
+  LineElement,
+  LinearScale,
+  PointElement,
+  Tooltip,
+)
 
 const props = withDefaults(defineProps<{
   type: 'doughnut' | 'bar' | 'line'
@@ -43,25 +80,66 @@ const props = withDefaults(defineProps<{
 })
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
+const descriptionId = `sa-chart-description-${useId()}`
 let chartInstance: Chart | null = null
+
+const chartDescription = computed(() => {
+  if (props.loading) return props.loadingLabel
+  if (props.isEmpty) return `${props.emptyTitle}. ${props.emptyDescription}`
+
+  const labels = Array.isArray(props.data?.labels) ? props.data.labels : []
+  const datasets = Array.isArray(props.data?.datasets) ? props.data.datasets : []
+  const values: string[] = []
+
+  datasets.forEach((dataset: any) => {
+    const datasetPrefix = datasets.length > 1 && dataset?.label ? `${dataset.label}, ` : ''
+    labels.forEach((label: unknown, index: number) => {
+      const value = dataset?.data?.[index]
+      if (value !== undefined && value !== null) {
+        values.push(`${datasetPrefix}${String(label)}: ${String(value)}`)
+      }
+    })
+  })
+
+  return values.length > 0
+    ? `${props.ariaLabel}. ${values.join('; ')}.`
+    : props.ariaLabel
+})
 
 const cssVar = (name: string, fallback: string) => {
   if (!import.meta.client) return fallback
+  // Super admin pins its own `--admin-*` tokens on `.super-admin-shell` so a
+  // store's Appearance theme (`--color-primary` on `:root`) can never leak in.
+  // Read the scoped element first; fall back to `:root` only when outside it.
+  const scope = document.querySelector('.super-admin-shell')
+  if (scope) {
+    const v = getComputedStyle(scope).getPropertyValue(name).trim()
+    if (v) return v
+  }
   const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
   return v || fallback
 }
 
-// watch theme class on body to redraw with correct colors
+// Watch visual preferences so canvas-only styling stays in sync with CSS.
 const themeTick = ref(0)
 let observer: MutationObserver | null = null
+let motionPreference: MediaQueryList | null = null
+const refreshVisualPreferences = () => { themeTick.value++ }
 onMounted(() => {
   if (import.meta.client) {
-    observer = new MutationObserver(() => themeTick.value++)
+    observer = new MutationObserver(refreshVisualPreferences)
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] })
+    const shell = document.querySelector('.super-admin-shell')
+    if (shell) observer.observe(shell, { attributes: true, attributeFilter: ['class', 'style'] })
+    motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)')
+    motionPreference.addEventListener('change', refreshVisualPreferences)
   }
 })
 
-onBeforeUnmount(() => observer?.disconnect())
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  motionPreference?.removeEventListener('change', refreshVisualPreferences)
+})
 
 const render = () => {
   if (!canvasRef.value || props.loading || props.isEmpty) return
@@ -73,12 +151,13 @@ const render = () => {
   void themeTick.value
   const textMuted = cssVar('--admin-text-muted', '#6b7280')
   const border = cssVar('--admin-border', '#e5e7eb')
-  const accent = cssVar('--admin-accent', '#7c3aed')
+  const accent = cssVar('--admin-accent', '#1a1a1a')
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   // merge defaults
   const baseOptions: any = {
     responsive: true,
     maintainAspectRatio: false,
-    animation: { duration: 420, easing: 'easeOutQuart' },
+    animation: reduceMotion ? false : { duration: 420, easing: 'easeOutQuart' },
     plugins: {
       legend: { display: false },
       tooltip: {

@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-auto max-w-[880px] space-y-6">
+  <div class="mx-auto max-w-[880px] space-y-4">
     <!-- Breadcrumb + title -->
     <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm text-admin-muted">
       <NuxtLink to="/super-admin/stores" class="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-transparent px-2 hover:bg-admin-soft hover:text-admin-text">
@@ -15,7 +15,7 @@
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 class="text-[26px] font-bold tracking-tight text-admin-text">Edit store</h1>
+        <h1 class="text-[22px] font-bold tracking-tight text-admin-text">Edit store</h1>
         <p class="mt-1 text-sm text-admin-muted">Update identity, domain, status, and subscription access. Changes are audited.</p>
       </div>
       <div v-if="store" class="flex items-center gap-2">
@@ -45,8 +45,8 @@
             </div>
           </div>
         </div>
-        <div class="space-y-5 p-5 sm:p-6">
-          <div class="grid gap-4 sm:grid-cols-2">
+        <div class="space-y-4 p-4 sm:p-5">
+          <div class="grid gap-3 sm:grid-cols-2">
             <div>
               <label for="store-name" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-admin-muted">Store name</label>
               <input id="store-name" v-model="form.name" type="text" required maxlength="255" class="admin-input" placeholder="e.g. Nazareck Atelier" />
@@ -61,73 +61,85 @@
             </div>
           </div>
 
-          <div class="rounded-xl border border-admin-border bg-admin-soft/40 p-4">
-            <div class="flex items-center justify-between gap-2">
-              <label for="store-domain" class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-admin-muted">
-                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c2.67 0 4.2-3.56 4.2-9S14.67 3 12 3m0 9H3" /></svg>
-                Custom domain
-              </label>
-              <span v-if="store.domain" class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" :class="store.domain_verified ? 'border-admin-success/20 bg-admin-success-soft text-admin-success' : 'border-amber-200 bg-amber-50 text-amber-700'">
-                <span class="h-1.5 w-1.5 rounded-full" :class="store.domain_verified ? 'bg-admin-success' : 'bg-amber-500'" />
-                {{ store.domain_verified ? 'Verified — live' : 'Not verified' }}
-              </span>
-            </div>
-
-            <p id="store-domain-help" class="mt-2 text-xs leading-relaxed text-admin-muted">
-              Point an A record at
-              <span v-if="expectedIps.length" class="rounded bg-admin-surface px-1.5 py-0.5 font-mono text-admin-text border border-admin-border">{{ expectedIps.join(' or ') }}</span>
-              <span v-else class="font-medium text-admin-text">the public IP configured for DATABASY</span>, then verify. A domain only serves traffic once verified.
-            </p>
-
-            <div class="relative mt-3">
-              <input
-                id="store-domain"
-                v-model="form.domain"
-                type="text"
-                placeholder="nazareck.com"
-                autocomplete="off"
-                spellcheck="false"
-                class="admin-input font-mono pl-9"
-                :class="domainInputClass"
-                aria-describedby="store-domain-help store-domain-status"
-                :aria-invalid="check && (!check.valid || !check.available) ? true : undefined"
-              />
-              <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-admin-muted">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3" /></svg>
-              </span>
-            </div>
-
-            <div id="store-domain-status" role="status" aria-live="polite" aria-atomic="true" class="min-h-[18px]">
-              <p v-if="checking" class="mt-2 inline-flex items-center gap-1.5 text-xs text-admin-muted">
-                <span class="h-3 w-3 animate-spin rounded-full border-2 border-admin-border border-t-admin-accent" /> Checking domain…
-              </p>
-              <template v-else-if="check">
-                <p v-if="!check.valid || !check.available" class="mt-2 rounded-lg border border-admin-danger/20 bg-admin-danger-soft px-3 py-2 text-xs font-medium text-admin-danger">{{ check.reason }}</p>
-                <p v-else-if="!domainVerifierConfigured" class="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">Verifier has no server IP to compare. Set <span class="font-mono font-semibold">STOREFRONT_SERVER_IPS</span> on the backend, then check again.</p>
-                <p v-else-if="check.dns?.points_at_server" class="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-admin-success">
-                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                  Available — DNS already points here. Save, then verify.
-                </p>
-                <p v-else-if="check.dns?.resolves" class="mt-2 text-xs text-amber-700">Available, but resolves to <span class="font-mono font-medium">{{ check.dns.addresses.join(', ') }}</span>. Update its A record.</p>
-                <p v-else class="mt-2 text-xs text-admin-muted">Available — no DNS yet. Propagation can take a while.</p>
-              </template>
-            </div>
-
-            <div v-if="store.domain" class="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
-              <button type="button" class="inline-flex min-h-9 items-center gap-1.5 rounded-xl border px-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50" :class="domainDirty || !domainVerifierConfigured ? 'border-admin-border bg-admin-surface text-admin-muted' : 'border-admin-success/20 bg-admin-success-soft text-admin-success hover:bg-admin-success hover:text-white'" :disabled="domainDirty || !domainVerifierConfigured || verifying" @click="verifyDomain">
-                <svg v-if="verifying" class="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                <svg v-else class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                {{ store.domain_verified ? 'Re-check DNS' : 'Verify domain' }}
-              </button>
-              <div role="status" aria-live="polite" class="text-xs">
-                <p v-if="domainDirty" class="text-admin-muted">Save your change before verifying.</p>
-                <p v-else-if="verifyError" class="font-medium text-admin-danger">{{ verifyError }}</p>
-                <p v-else-if="verifyMessage" class="font-medium text-admin-success">{{ verifyMessage }}</p>
+          <section class="overflow-hidden rounded-xl border border-admin-border bg-admin-soft/30" aria-labelledby="domain-setup-heading">
+            <div class="flex flex-col gap-3 border-b border-admin-border bg-admin-surface px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <div class="flex min-w-0 items-center gap-2.5">
+                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-admin-accent-soft text-admin-accent"><Icon name="heroicons:globe-alt" class="h-4 w-4" aria-hidden="true" /></span>
+                <div class="min-w-0">
+                  <h3 id="domain-setup-heading" class="text-sm font-semibold text-admin-text">Custom domain setup</h3>
+                  <p class="text-xs text-admin-muted">Connect, point DNS, then verify before traffic goes live.</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <a v-if="domainLiveUrl" :href="domainLiveUrl" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">Open site <Icon name="heroicons:arrow-up-right" class="h-3.5 w-3.5" aria-hidden="true" /></a>
+                <span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold" :class="domainStatusClass"><span class="h-1.5 w-1.5 rounded-full" :class="domainStatusDotClass" />{{ domainStatusLabel }}</span>
               </div>
             </div>
-          </div>
 
-          <label class="flex items-center justify-between rounded-xl border border-admin-border bg-admin-soft/30 px-4 py-3">
+            <ol class="grid border-b border-admin-border bg-admin-surface sm:grid-cols-3" aria-label="Domain setup progress">
+              <li v-for="step in domainSteps" :key="step.number" class="flex items-center gap-2.5 border-admin-border px-3 py-2.5 sm:border-r sm:last:border-r-0" :class="step.number < 3 ? 'border-b sm:border-b-0' : ''">
+                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold" :class="step.complete ? 'border-admin-success bg-admin-success text-white' : step.active ? 'border-admin-accent bg-admin-accent text-admin-on-accent' : 'border-admin-border bg-admin-soft text-admin-muted'">
+                  <Icon v-if="step.complete" name="heroicons:check" class="h-3.5 w-3.5" aria-hidden="true" /><span v-else>{{ step.number }}</span>
+                </span>
+                <span class="min-w-0"><span class="block text-xs font-semibold" :class="step.active || step.complete ? 'text-admin-text' : 'text-admin-muted'">{{ step.label }}</span><span class="block truncate text-[10px] text-admin-muted">{{ step.detail }}</span></span>
+              </li>
+            </ol>
+
+            <div class="space-y-4 p-3.5 sm:p-4">
+              <div>
+                <label for="store-domain" class="mb-1.5 block text-xs font-semibold text-admin-text">Domain name</label>
+                <div class="flex flex-col gap-2 sm:flex-row">
+                  <div class="relative min-w-0 flex-1">
+                    <input id="store-domain" v-model="form.domain" type="text" inputmode="url" maxlength="253" placeholder="shop.example.com" autocomplete="off" autocapitalize="none" spellcheck="false" class="admin-input font-mono pl-9" :class="domainInputClass" aria-describedby="store-domain-help store-domain-status" :aria-invalid="check && (!check.valid || !check.available) ? true : undefined" />
+                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-admin-muted"><Icon name="heroicons:link" class="h-4 w-4" aria-hidden="true" /></span>
+                  </div>
+                  <button v-if="form.domain" type="button" class="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50" :disabled="checking" @click="runCheck(form.domain || '')">
+                    <Icon name="heroicons:arrow-path" class="h-4 w-4" :class="checking ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" /> Check DNS
+                  </button>
+                </div>
+                <p id="store-domain-help" class="mt-1.5 text-[11px] leading-relaxed text-admin-muted">Enter only the hostname—no <span class="font-mono">https://</span>, paths, or trailing slash. Changes must be saved before verification.</p>
+                <div id="store-domain-status" role="status" aria-live="polite" aria-atomic="true" class="min-h-[18px]">
+                  <p v-if="checking" class="mt-2 inline-flex items-center gap-1.5 text-xs text-admin-muted"><span class="h-3 w-3 animate-spin rounded-full border-2 border-admin-border border-t-admin-accent" /> Checking availability and DNS…</p>
+                  <p v-else-if="domainCheckError" class="mt-2 rounded-lg border border-admin-danger/20 bg-admin-danger-soft px-3 py-2 text-xs font-medium text-admin-danger">{{ domainCheckError }}</p>
+                  <template v-else-if="check">
+                    <p v-if="!check.valid || !check.available" class="mt-2 rounded-lg border border-admin-danger/20 bg-admin-danger-soft px-3 py-2 text-xs font-medium text-admin-danger">{{ check.reason }}</p>
+                    <p v-else-if="!domainVerifierConfigured" class="mt-2 rounded-lg border border-admin-warning/20 bg-admin-warning-soft px-3 py-2 text-xs text-admin-warning">Domain checking is available, but verification needs <span class="font-mono font-semibold">STOREFRONT_SERVER_IPS</span> configured on the backend.</p>
+                    <p v-else-if="check.dns?.points_at_server" class="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-admin-success"><Icon name="heroicons:check-circle" class="h-4 w-4" aria-hidden="true" /> DNS points to DATABASY.</p>
+                    <p v-else-if="check.dns?.resolves" class="mt-2 text-xs text-admin-warning">Currently resolves to <span class="break-all font-mono font-medium">{{ check.dns.addresses.join(', ') }}</span>. Replace those A records with the values below.</p>
+                    <p v-else class="mt-2 text-xs text-admin-muted">The domain is available, but no DNS record is visible yet. Add the A record below and allow time for propagation.</p>
+                  </template>
+                </div>
+              </div>
+
+              <div class="overflow-hidden rounded-lg border border-admin-border bg-admin-surface">
+                <div class="flex items-center justify-between gap-3 border-b border-admin-border px-3 py-2.5">
+                  <div><h4 class="text-xs font-semibold text-admin-text">Required DNS records</h4><p class="text-[11px] text-admin-muted">Add these at the domain’s DNS provider.</p></div>
+                  <span v-if="check?.dns?.points_at_server" class="inline-flex items-center gap-1 text-[11px] font-semibold text-admin-success"><Icon name="heroicons:check-circle" class="h-4 w-4" aria-hidden="true" /> Detected</span>
+                </div>
+                <div v-if="expectedIps.length" class="divide-y divide-admin-border">
+                  <div v-for="ip in expectedIps" :key="ip" class="grid items-center gap-2 px-3 py-2.5 sm:grid-cols-[4rem_1fr_auto]">
+                    <div class="flex items-center gap-2 sm:contents"><span class="w-12 text-[10px] font-semibold uppercase tracking-wider text-admin-muted sm:w-auto">Type</span><span class="font-mono text-xs font-semibold text-admin-text sm:col-start-1 sm:row-start-2">A</span></div>
+                    <div class="min-w-0 sm:col-start-2 sm:row-span-2 sm:row-start-1"><span class="block text-[10px] font-semibold uppercase tracking-wider text-admin-muted">Points to</span><span class="mt-0.5 block break-all font-mono text-xs font-semibold text-admin-text">{{ ip }}</span></div>
+                    <button type="button" class="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent sm:col-start-3 sm:row-span-2 sm:row-start-1" :aria-label="`Copy DNS destination ${ip}`" @click="copyDnsValue(ip)"><Icon :name="copiedDnsValue === ip ? 'heroicons:check' : 'heroicons:document-duplicate'" class="h-3.5 w-3.5" aria-hidden="true" />{{ copiedDnsValue === ip ? 'Copied' : 'Copy' }}</button>
+                  </div>
+                </div>
+                <p v-else class="px-3 py-3 text-xs text-admin-muted">Enter a valid, available domain to load the server destination.</p>
+              </div>
+
+              <div class="flex flex-col gap-2 border-t border-admin-border pt-3 sm:flex-row sm:items-center sm:justify-between">
+                <div role="status" aria-live="polite" class="min-w-0 text-xs">
+                  <p v-if="domainDirty" class="text-admin-muted">Save changes below, then verify the saved domain.</p>
+                  <p v-else-if="verifyError" class="font-medium text-admin-danger">{{ verifyError }}</p>
+                  <p v-else-if="verifyMessage" class="font-medium text-admin-success">{{ verifyMessage }}</p>
+                  <p v-else-if="store.domain_verified_at" class="text-admin-muted">Last verified {{ formatDateTime(store.domain_verified_at) }}</p>
+                  <p v-else class="text-admin-muted">Verification checks that DNS points to an approved DATABASY server.</p>
+                </div>
+                <button v-if="store.domain" type="button" class="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg border px-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:cursor-not-allowed disabled:opacity-50" :class="domainDirty || !domainVerifierConfigured ? 'border-admin-border bg-admin-surface text-admin-muted' : 'border-admin-success/20 bg-admin-success-soft text-admin-success hover:bg-admin-success hover:text-white'" :disabled="domainDirty || !domainVerifierConfigured || verifying" @click="verifyDomain"><Icon :name="verifying ? 'heroicons:arrow-path' : 'heroicons:shield-check'" class="h-4 w-4" :class="verifying ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />{{ verifying ? 'Verifying…' : store.domain_verified ? 'Re-check verification' : 'Verify and activate' }}</button>
+              </div>
+            </div>
+          </section>
+
+          <label class="flex items-center justify-between rounded-xl border border-admin-border bg-admin-soft/30 px-3 py-2.5">
             <span class="flex items-center gap-3">
               <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-admin-surface border border-admin-border text-admin-muted">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
@@ -141,7 +153,7 @@
           </label>
           <p v-if="store.is_default" class="text-xs text-admin-muted">The default store cannot be deactivated or deleted.</p>
 
-          <p v-if="saveError" id="store-save-error" class="rounded-xl border border-admin-danger/20 bg-admin-danger-soft px-4 py-3 text-sm font-medium text-admin-danger" role="alert" tabindex="-1">{{ saveError }}</p>
+          <p v-if="saveError" id="store-save-error" class="rounded-xl border border-admin-danger/20 bg-admin-danger-soft px-3 py-2.5 text-xs font-medium text-admin-danger" role="alert" tabindex="-1">{{ saveError }}</p>
 
           <div class="flex flex-col gap-2 border-t border-admin-border pt-4 sm:flex-row sm:items-center sm:justify-between">
             <AdminButton type="submit" variant="primary" :loading="saving">
@@ -170,27 +182,27 @@
           </div>
           <span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" :class="subscriptionBadgeClass">{{ subscriptionLabel }}</span>
         </div>
-        <div class="p-5 sm:p-6">
-          <dl class="grid gap-4 text-sm sm:grid-cols-2">
-            <div class="rounded-xl bg-admin-soft/60 px-4 py-3">
+        <div class="p-4 sm:p-5">
+          <dl class="grid gap-3 text-xs sm:grid-cols-2">
+            <div class="rounded-xl bg-admin-soft/60 px-3 py-2.5">
               <dt class="text-xs font-semibold uppercase tracking-wider text-admin-muted">Plan</dt>
               <dd class="mt-1 font-semibold text-admin-text">{{ store.subscription_plan?.name ?? 'No plan' }}</dd>
             </div>
-            <div class="rounded-xl bg-admin-soft/60 px-4 py-3">
+            <div class="rounded-xl bg-admin-soft/60 px-3 py-2.5">
               <dt class="text-xs font-semibold uppercase tracking-wider text-admin-muted">Renews / expires</dt>
               <dd class="mt-1 font-medium text-admin-text">{{ store.subscription_expires_at ? formatDate(store.subscription_expires_at) : '—' }}</dd>
             </div>
-            <div class="rounded-xl bg-admin-soft/60 px-4 py-3">
+            <div class="rounded-xl bg-admin-soft/60 px-3 py-2.5">
               <dt class="text-xs font-semibold uppercase tracking-wider text-admin-muted">Subscribed</dt>
               <dd class="mt-1 font-medium text-admin-text">{{ store.subscribed_at ? formatDate(store.subscribed_at) : '—' }}</dd>
             </div>
-            <div class="rounded-xl bg-admin-soft/60 px-4 py-3">
+            <div class="rounded-xl bg-admin-soft/60 px-3 py-2.5">
               <dt class="text-xs font-semibold uppercase tracking-wider text-admin-muted">Price</dt>
               <dd class="mt-1 font-medium text-admin-text">{{ store.subscription_plan ? formatPrice(store.subscription_plan.price_cents) : '—' }}</dd>
             </div>
           </dl>
 
-          <div v-if="!store.is_default" class="mt-5 flex flex-col gap-3 rounded-xl border border-admin-border bg-admin-soft/30 p-4 sm:flex-row sm:items-center">
+          <div v-if="!store.is_default" class="mt-4 flex flex-col gap-2.5 rounded-xl border border-admin-border bg-admin-soft/30 p-3 sm:flex-row sm:items-center">
             <template v-if="store.subscription_status === 'comped'">
               <button type="button" class="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-admin-danger/20 bg-admin-danger-soft px-3 text-xs font-semibold text-admin-danger hover:bg-admin-danger hover:text-white disabled:opacity-50" :disabled="compMutating" @click="uncomp">
                 <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728" /></svg>
@@ -211,7 +223,7 @@
             </template>
             <p v-if="compError" class="text-xs font-medium text-admin-danger" role="alert">{{ compError }}</p>
           </div>
-          <p v-else class="mt-4 rounded-xl bg-admin-soft/60 px-4 py-3 text-sm text-admin-muted">The default store is always accessible.</p>
+          <p v-else class="mt-3 rounded-xl bg-admin-soft/60 px-3 py-2.5 text-xs text-admin-muted">The default store is always accessible.</p>
         </div>
       </section>
 
@@ -241,7 +253,7 @@
           <NuxtLink :to="`/super-admin/admins/new?store_id=${store.id}`" class="mt-3 inline-flex min-h-9 items-center rounded-xl bg-admin-accent px-4 text-xs font-semibold text-admin-on-accent">Add first admin</NuxtLink>
         </div>
         <ul v-else class="divide-y divide-admin-border">
-          <li v-for="a in storeAdmins" :key="a.id" class="flex items-center justify-between gap-4 px-5 py-3 sm:px-6 hover:bg-admin-soft/40 transition-colors">
+          <li v-for="a in storeAdmins" :key="a.id" class="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-5 hover:bg-admin-soft/40 transition-colors">
             <div class="flex items-center gap-3 min-w-0">
               <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-admin-soft text-xs font-bold text-admin-text">{{ a.name.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase() }}</span>
               <div class="min-w-0">
@@ -281,9 +293,11 @@ const form = ref({ name: '', slug: '', domain: '' as string | null, status: 'act
 
 const checking = ref(false)
 const check = ref<DomainAvailability | null>(null)
+const domainCheckError = ref<string | null>(null)
 const verifying = ref(false)
 const verifyMessage = ref<string | null>(null)
 const verifyError = ref<string | null>(null)
+const copiedDnsValue = ref<string | null>(null)
 
 const compPlanId = ref<number | null>(null)
 const compMutating = ref(false)
@@ -312,6 +326,7 @@ const subscriptionBadgeClass = computed(() => {
   }
 })
 const formatDate = (iso: string) => new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(iso))
+const formatDateTime = (iso: string) => new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(iso))
 const formatPrice = (cents: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100)
 const canonical = (value: string | null | undefined) => {
   const domain = (value ?? '').trim().toLowerCase()
@@ -320,6 +335,34 @@ const canonical = (value: string | null | undefined) => {
 const domainDirty = computed(() => canonical(form.value.domain) !== canonical(store.value?.domain))
 const expectedIps = computed(() => check.value?.expected_ips ?? [])
 const domainVerifierConfigured = computed(() => expectedIps.value.length > 0)
+const domainLiveUrl = computed(() => store.value?.domain_verified && !domainDirty.value && store.value.domain
+  ? `https://${canonical(store.value.domain)}`
+  : null)
+const domainStage = computed(() => {
+  if (store.value?.domain_verified && !domainDirty.value) return 4
+  if (!store.value?.domain || domainDirty.value) return 1
+  if (check.value?.dns?.points_at_server) return 3
+  return 2
+})
+const domainSteps = computed(() => [
+  { number: 1, label: 'Connect', detail: !form.value.domain?.trim() ? 'Enter domain' : domainDirty.value ? 'Save domain' : 'Domain saved', complete: domainStage.value > 1, active: domainStage.value === 1 },
+  { number: 2, label: 'Point DNS', detail: check.value?.dns?.points_at_server ? 'Record detected' : 'Add A record', complete: domainStage.value > 2, active: domainStage.value === 2 },
+  { number: 3, label: 'Verify', detail: store.value?.domain_verified && !domainDirty.value ? 'Storefront live' : 'Confirm ownership', complete: domainStage.value > 3, active: domainStage.value === 3 },
+])
+const domainStatusLabel = computed(() => {
+  if (store.value?.domain_verified && !domainDirty.value) return 'Verified · live'
+  if (domainDirty.value) return 'Unsaved change'
+  if (store.value?.domain) return 'Setup required'
+  return 'Not connected'
+})
+const domainStatusClass = computed(() => {
+  if (store.value?.domain_verified && !domainDirty.value) return 'border-admin-success/20 bg-admin-success-soft text-admin-success'
+  if (domainDirty.value || store.value?.domain) return 'border-admin-warning/20 bg-admin-warning-soft text-admin-warning'
+  return 'border-admin-border bg-admin-soft text-admin-muted'
+})
+const domainStatusDotClass = computed(() => store.value?.domain_verified && !domainDirty.value
+  ? 'bg-admin-success'
+  : domainDirty.value || store.value?.domain ? 'bg-admin-warning' : 'bg-admin-muted')
 const domainInputClass = computed(() => {
   if (!form.value.domain?.trim() || checking.value || !check.value) return 'border-admin-border focus:border-admin-accent'
   if (!check.value.valid || !check.value.available) return 'border-admin-danger focus:border-admin-danger'
@@ -334,34 +377,56 @@ const loadStore = async () => {
     store.value = storeResult.data
     form.value = { name: storeResult.data.name, slug: storeResult.data.slug, domain: storeResult.data.domain ?? '', status: storeResult.data.status }
     storeAdmins.value = adminsResult.data
-    if (form.value.domain) runCheck(form.value.domain)
   } catch (err: any) { loadError.value = err?.data?.message || 'This store could not be loaded.' }
   finally { loading.value = false }
 }
 onMounted(async () => { if (!plans.value) fetchPlans().catch(() => {}); await loadStore() })
 let checkTimer: ReturnType<typeof setTimeout> | undefined
+let copiedDnsTimer: ReturnType<typeof setTimeout> | undefined
 let checkSeq = 0
 const runCheck = async (domain: string) => {
   const seq = ++checkSeq
   checking.value = true
+  domainCheckError.value = null
   try { const result = await api.checkDomain(domain, id); if (seq === checkSeq) check.value = result }
-  catch { if (seq === checkSeq) check.value = null }
+  catch (err: any) {
+    if (seq === checkSeq) {
+      check.value = null
+      domainCheckError.value = err?.data?.message || 'The domain check could not be completed. Try again.'
+    }
+  }
   finally { if (seq === checkSeq) checking.value = false }
 }
 watch(() => form.value.domain, (domain) => {
   clearTimeout(checkTimer)
   verifyMessage.value = null; verifyError.value = null
+  domainCheckError.value = null
+  check.value = null
   const trimmed = (domain ?? '').trim()
   if (!trimmed) { checkSeq++; checking.value = false; check.value = null; return }
   checkTimer = setTimeout(() => runCheck(trimmed), 400)
 })
-onUnmounted(() => clearTimeout(checkTimer))
+onUnmounted(() => {
+  clearTimeout(checkTimer)
+  clearTimeout(copiedDnsTimer)
+})
+const copyDnsValue = async (value: string) => {
+  try {
+    await navigator.clipboard.writeText(value)
+    copiedDnsValue.value = value
+    clearTimeout(copiedDnsTimer)
+    copiedDnsTimer = setTimeout(() => { copiedDnsValue.value = null }, 1800)
+  } catch {
+    toastError('Couldn’t copy the DNS value. Select and copy it manually.')
+  }
+}
 const verifyDomain = async () => {
   verifying.value = true; verifyMessage.value = null; verifyError.value = null
   try {
     const result = await api.verifyStoreDomain(id)
     verifyMessage.value = result.message
     if (store.value) { store.value.domain_verified = result.data.domain_verified; store.value.domain_verified_at = result.data.domain_verified_at }
+    if (check.value) check.value = { ...check.value, dns: result.dns, expected_ips: result.dns.expected_ips }
   } catch (err: any) {
     verifyError.value = err?.data?.message || 'Verification failed'
     if (err?.data?.dns && store.value) { store.value.domain_verified = false; store.value.domain_verified_at = null }

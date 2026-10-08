@@ -3,7 +3,7 @@
     <button
       ref="triggerRef"
       type="button"
-      class="group flex h-10 w-full min-w-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-2.5 text-left text-sm shadow-sm transition-[border-color,box-shadow] hover:border-primary-300 focus-visible:border-primary-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/20"
+      class="admin-date-picker__trigger group flex min-h-11 w-full min-w-0 items-center gap-2 rounded-lg border border-admin-border bg-admin-surface px-2.5 text-left text-sm transition-[border-color,box-shadow] hover:border-admin-accent/40 focus-visible:border-admin-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/20"
       :aria-label="ariaLabel"
       :aria-expanded="isOpen"
       :aria-controls="dialogId"
@@ -13,18 +13,18 @@
       @keydown.escape.prevent="closePicker"
     >
       <span
-        class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-50 text-gray-500 transition-colors group-hover:bg-primary-50 group-hover:text-primary-700"
-        :class="isOpen ? 'bg-primary-50 text-primary-700' : ''"
+        class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-admin-soft text-admin-muted transition-colors group-hover:bg-admin-accent-soft group-hover:text-admin-accent"
+        :class="isOpen ? 'bg-admin-accent-soft text-admin-accent' : ''"
       >
         <Icon name="heroicons:calendar-days" class="h-4 w-4" aria-hidden="true" />
       </span>
-      <span class="min-w-0 flex-1 truncate font-medium" :class="modelValue ? 'text-gray-700' : 'text-gray-500'">
+      <span class="min-w-0 flex-1 truncate font-medium" :class="modelValue ? 'text-admin-text' : 'text-admin-muted'">
         {{ displayValue }}
       </span>
       <Icon
         name="heroicons:chevron-down"
-        class="h-4 w-4 shrink-0 text-gray-400 transition-transform duration-150 motion-reduce:transition-none"
-        :class="isOpen ? 'rotate-180 text-primary-600' : ''"
+        class="h-4 w-4 shrink-0 text-admin-muted transition-transform duration-150 motion-reduce:transition-none"
+        :class="isOpen ? 'rotate-180 text-admin-accent' : ''"
         aria-hidden="true"
       />
     </button>
@@ -42,15 +42,15 @@
         :id="dialogId"
         role="dialog"
         :aria-label="`${ariaLabel} calendar`"
-        class="absolute left-0 top-[calc(100%+0.5rem)] z-50 w-[19rem] max-w-[calc(100vw-2rem)] rounded-2xl bg-white p-3 shadow-[0_22px_55px_-22px_rgba(15,23,42,0.48)]"
+        class="absolute left-0 top-[calc(100%+0.5rem)] z-50 w-[19rem] max-w-[calc(100vw-2rem)] rounded-xl border border-admin-border bg-admin-surface p-3 shadow-lg"
         @keydown.escape.prevent="closePicker({ restoreFocus: true })"
       >
         <div class="mb-3 flex items-center justify-between gap-2 px-1">
-          <p class="text-sm font-semibold text-gray-900" aria-live="polite">{{ monthLabel }}</p>
+          <p class="text-sm font-semibold text-admin-text" aria-live="polite">{{ monthLabel }}</p>
           <div class="flex items-center gap-1">
             <button
               type="button"
-              class="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/30 disabled:cursor-not-allowed disabled:opacity-35"
+              class="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-admin-muted transition-colors hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/30 disabled:cursor-not-allowed disabled:opacity-35"
               :disabled="!canGoPrevious"
               aria-label="Previous month"
               @click="changeMonth(-1)"
@@ -59,7 +59,7 @@
             </button>
             <button
               type="button"
-              class="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/30 disabled:cursor-not-allowed disabled:opacity-35"
+              class="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-admin-muted transition-colors hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/30 disabled:cursor-not-allowed disabled:opacity-35"
               :disabled="!canGoNext"
               aria-label="Next month"
               @click="changeMonth(1)"
@@ -74,7 +74,7 @@
             v-for="weekday in weekdays"
             :key="weekday"
             role="columnheader"
-            class="flex h-8 items-center justify-center text-[11px] font-semibold text-gray-500"
+            class="flex h-8 items-center justify-center text-[11px] font-semibold text-admin-muted"
           >
             {{ weekday }}
           </span>
@@ -90,7 +90,7 @@
             :aria-label="day.accessibleLabel"
             :aria-selected="day.selected"
             :aria-current="day.today ? 'date' : undefined"
-            class="relative flex h-9 items-center justify-center rounded-lg text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary-500/35 disabled:cursor-not-allowed disabled:opacity-25"
+            class="relative flex h-9 items-center justify-center rounded-lg text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-admin-accent/35 disabled:cursor-not-allowed disabled:opacity-25"
             :class="dayClass(day)"
             @click="selectDate(day.date)"
             @focus="focusedDateIso = day.iso"
@@ -99,16 +99,16 @@
             {{ day.date.getDate() }}
             <span
               v-if="day.today && !day.selected"
-              class="absolute bottom-1 h-1 w-1 rounded-full bg-primary-600"
+              class="absolute bottom-1 h-1 w-1 rounded-full bg-admin-accent"
               aria-hidden="true"
             />
           </button>
         </div>
 
-        <div class="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
+        <div class="mt-3 flex items-center justify-between border-t border-admin-border pt-3">
           <button
             type="button"
-            class="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/30 disabled:cursor-not-allowed disabled:opacity-40"
+            class="min-h-11 rounded-lg px-2.5 text-xs font-semibold text-admin-muted transition-colors hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/30 disabled:cursor-not-allowed disabled:opacity-40"
             :disabled="!modelValue"
             @click="clearDate"
           >
@@ -116,7 +116,7 @@
           </button>
           <button
             type="button"
-            class="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-primary-700 transition-colors hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/30 disabled:cursor-not-allowed disabled:opacity-40"
+            class="min-h-11 rounded-lg px-2.5 text-xs font-semibold text-admin-accent transition-colors hover:bg-admin-accent-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/30 disabled:cursor-not-allowed disabled:opacity-40"
             :disabled="!isDateAllowed(today)"
             @click="selectDate(today)"
           >
@@ -258,10 +258,10 @@ function isDateAllowed(date: Date) {
 }
 
 function dayClass(day: CalendarDay) {
-  if (day.selected) return 'bg-primary-600 text-white shadow-sm'
-  if (!day.currentMonth) return 'text-gray-400 hover:bg-gray-50 hover:text-gray-700'
-  if (day.today) return 'bg-primary-50 text-primary-800 hover:bg-primary-100'
-  return 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+  if (day.selected) return 'bg-admin-accent text-admin-on-accent'
+  if (!day.currentMonth) return 'text-admin-muted/60 hover:bg-admin-soft hover:text-admin-text'
+  if (day.today) return 'bg-admin-accent-soft text-admin-accent hover:bg-admin-accent-soft/70'
+  return 'text-admin-text hover:bg-admin-soft'
 }
 
 async function openPicker() {

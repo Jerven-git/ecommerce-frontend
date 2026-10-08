@@ -163,6 +163,41 @@
     --skeleton-highlight: rgba(255, 255, 255, 0.08);
   }
 
+  /* Super admin is platform chrome — it must never inherit a store's
+     Appearance theme. Store admin accents follow `--color-primary` (set per
+     tenant by useTheme); this scope pins the super-admin shell to the fixed
+     Apex homepage language (near-black action, neutral surfaces) so changing
+     a store's primary colour cannot re-tint the control room. Specificity
+     beats `:root` / `.admin-theme-dark`, and the dark variant below beats the
+     generic dark theme for the same reason. */
+  .super-admin-shell {
+    --admin-canvas: var(--apex-canvas, #fcfcfc);
+    --admin-surface: var(--apex-surface, #ffffff);
+    --admin-surface-soft: var(--apex-surface-subtle, #f7f7f5);
+    --admin-text: var(--apex-text, #1a1a1a);
+    --admin-text-muted: var(--apex-text-muted, #525252);
+    --admin-border: var(--apex-border, #dedede);
+    --admin-accent: var(--apex-action, #1a1a1a);
+    --admin-on-accent: var(--apex-on-action, #ffffff);
+    --admin-accent-strong: var(--apex-action-hover, #353535);
+    --admin-accent-soft: #ececec;
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  .super-admin-shell.admin-theme-dark {
+    --admin-canvas: #0f1117;
+    --admin-surface: #171a23;
+    --admin-surface-soft: #202531;
+    --admin-text: #f8fafc;
+    --admin-text-muted: #cbd5e1;
+    --admin-border: #343b4a;
+    --admin-accent: #fafafa;
+    --admin-on-accent: #111827;
+    --admin-accent-strong: #ffffff;
+    --admin-accent-soft: rgba(255, 255, 255, 0.12);
+  }
+
   body {
     @apply bg-gray-50 text-gray-900;
     font-family: var(--font-body);

@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-3">
+  <div :class="compact ? 'grid gap-3 sm:grid-cols-2' : 'space-y-3'">
     <div>
       <label :for="searchId" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-admin-muted">Find store</label>
       <div class="relative">
@@ -19,23 +19,17 @@
     </div>
 
     <div>
-      <label :for="id" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-admin-muted">Store</label>
-      <select
-        :id="id"
-        :value="modelValue ?? ''"
-        :required="required"
-        class="admin-input"
-        :aria-describedby="statusId"
-        @change="$emit('update:modelValue', Number(($event.target as HTMLSelectElement).value) || null)"
-      >
-        <option value="" disabled>{{ loading ? 'Loading stores…' : 'Select a store…' }}</option>
-        <option v-for="store in options" :key="store.id" :value="store.id">
-          {{ store.name }} ({{ store.slug }})
-        </option>
-      </select>
+      <label :id="`${id}-label`" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-admin-muted">Store</label>
+      <AdminFilterSelect
+        v-model="selectedStoreId"
+        :options="storeSelectOptions"
+        :aria-label="required ? 'Select a store' : 'Filter by store'"
+        list-label="Available stores"
+        :described-by="statusId"
+      />
     </div>
 
-    <p :id="statusId" class="text-xs text-admin-muted" role="status" aria-live="polite">
+    <p :id="statusId" class="text-xs text-admin-muted" :class="compact ? 'sm:col-span-2' : ''" role="status" aria-live="polite">
       <template v-if="error">{{ error }}</template>
       <template v-else-if="loading">Searching stores…</template>
       <template v-else-if="search && options.length === 0">No matching stores.</template>
@@ -51,11 +45,15 @@ const props = withDefaults(defineProps<{
   id: string
   modelValue: number | null
   required?: boolean
+  compact?: boolean
+  allowAll?: boolean
 }>(), {
   required: false,
+  compact: false,
+  allowAll: false,
 })
 
-defineEmits<{ 'update:modelValue': [value: number | null] }>()
+const emit = defineEmits<{ 'update:modelValue': [value: number | null] }>()
 
 const api = useSuperAdminApi()
 const search = ref('')
@@ -64,6 +62,23 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 const searchId = computed(() => `${props.id}-search`)
 const statusId = computed(() => `${props.id}-status`)
+const selectedStoreId = computed({
+  get: () => props.modelValue?.toString() ?? '',
+  set: value => emit('update:modelValue', Number(value) || null),
+})
+const storeSelectOptions = computed(() => [
+  {
+    value: '',
+    label: loading.value ? 'Loading stores…' : (props.allowAll ? 'All stores' : 'Select a store…'),
+    icon: props.allowAll ? 'heroicons:squares-2x2' : 'heroicons:building-storefront',
+    disabled: loading.value || (!props.allowAll && props.required),
+  },
+  ...options.value.map(store => ({
+    value: String(store.id),
+    label: `${store.name} · ${store.slug}`,
+    icon: 'heroicons:building-storefront',
+  })),
+])
 
 let timer: ReturnType<typeof setTimeout> | undefined
 let sequence = 0

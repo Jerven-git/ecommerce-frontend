@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-auto max-w-[720px] space-y-6">
+  <div class="mx-auto max-w-[720px] space-y-4">
     <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm text-admin-muted">
       <NuxtLink to="/super-admin/admins" class="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-transparent px-2 hover:bg-admin-soft hover:text-admin-text">
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
@@ -10,7 +10,7 @@
     </nav>
 
     <div>
-      <h1 class="text-[26px] font-bold tracking-tight text-admin-text">{{ isNew ? 'Create admin' : 'Edit admin' }}</h1>
+      <h1 class="text-[22px] font-bold tracking-tight text-admin-text">{{ isNew ? 'Create admin' : 'Edit admin' }}</h1>
       <p v-if="isNew" class="mt-1 max-w-2xl text-sm leading-relaxed text-admin-muted">An admin belongs to a store — assign them to an existing one or provision a new store. Super admins bypass store scoping and operate platform-wide.</p>
       <p v-else class="mt-1 text-sm text-admin-muted">Update account details, reassign store, or rotate credentials.</p>
     </div>
@@ -34,8 +34,8 @@
         </div>
       </div>
 
-      <div class="space-y-5 p-5 sm:p-6">
-        <div class="grid gap-4 sm:grid-cols-2">
+      <div class="space-y-4 p-4 sm:p-5">
+        <div class="grid gap-3 sm:grid-cols-2">
           <div>
             <label for="admin-name" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-admin-muted">Name</label>
             <input id="admin-name" v-model="form.name" type="text" required maxlength="255" class="admin-input" placeholder="Ada Lovelace" />
@@ -59,7 +59,7 @@
           </select>
           <p class="mt-1.5 text-xs text-admin-muted">Choose carefully — this can’t be changed without recreating the account.</p>
         </div>
-        <div v-else class="rounded-xl border border-admin-border bg-admin-soft/50 px-4 py-3">
+        <div v-else class="rounded-xl border border-admin-border bg-admin-soft/50 px-3 py-2.5">
           <p class="text-xs font-semibold uppercase tracking-wider text-admin-muted">Role</p>
           <p class="mt-1 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" :class="form.role === 'super_admin' ? 'border-admin-accent/20 bg-admin-accent-soft text-admin-accent' : 'border-admin-info/20 bg-admin-info-soft text-admin-info'">
             <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="form.role === 'super_admin' ? 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' : 'M12 4a4 4 0 110 8 4 4 0 010-8zM5 20a7 7 0 0114 0H5z'" /></svg>
@@ -68,7 +68,7 @@
           <p class="mt-2 text-xs text-admin-muted">Role is fixed at creation. To change it, delete this account and create a new one.</p>
         </div>
 
-        <fieldset v-if="isNew && form.role === 'admin'" class="space-y-4 rounded-2xl border border-admin-accent/20 bg-admin-accent-soft/40 p-4 sm:p-5">
+        <fieldset v-if="isNew && form.role === 'admin'" class="space-y-3 rounded-xl border border-admin-accent/20 bg-admin-accent-soft/40 p-3.5 sm:p-4">
           <legend class="px-2 text-xs font-bold uppercase tracking-widest text-admin-accent-strong">Store assignment</legend>
           <p class="text-xs leading-relaxed text-admin-accent-strong/80">Assign this admin to an existing store, or provision a brand new tenant. New stores are created atomically with this admin.</p>
           <div class="flex gap-2 rounded-xl bg-admin-surface p-1 border border-admin-border w-fit">
@@ -80,7 +80,7 @@
             </button>
           </div>
           <SuperAdminStorePicker v-if="storeMode === 'existing'" id="admin-store" v-model="form.store_id" required />
-          <div v-else class="grid gap-4 sm:grid-cols-2">
+          <div v-else class="grid gap-3 sm:grid-cols-2">
             <div>
               <label for="new-store-name" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-admin-muted">Store name</label>
               <input id="new-store-name" v-model="form.store_name" type="text" required maxlength="255" class="admin-input" placeholder="Acme Atelier" />
@@ -92,7 +92,7 @@
           </div>
         </fieldset>
 
-        <div v-if="!isNew && form.role === 'admin'" class="rounded-xl border border-admin-border bg-admin-soft/30 p-4">
+        <div v-if="!isNew && form.role === 'admin'" class="rounded-xl border border-admin-border bg-admin-soft/30 p-3">
           <SuperAdminStorePicker id="admin-store" v-model="form.store_id" required />
           <p class="mt-2 text-xs leading-relaxed text-admin-muted">
             Reassigning moves this admin to another store. A store keeps working as long as it has at least one admin.
@@ -100,7 +100,7 @@
           </p>
         </div>
 
-        <div class="grid gap-4 sm:grid-cols-2">
+        <div class="grid gap-3 sm:grid-cols-2">
           <div>
             <label for="admin-password" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-admin-muted">{{ isNew ? 'Password' : 'New password' }}</label>
             <input id="admin-password" v-model="form.password" type="password" :required="isNew" minlength="8" autocomplete="new-password" class="admin-input" placeholder="••••••••" />
@@ -112,7 +112,7 @@
           </div>
         </div>
 
-        <div v-if="!isNew" class="flex items-center justify-between rounded-xl border border-admin-border bg-admin-soft/30 px-4 py-3">
+        <div v-if="!isNew" class="flex items-center justify-between rounded-xl border border-admin-border bg-admin-soft/30 px-3 py-2.5">
           <div>
             <p class="text-sm font-semibold text-admin-text">Account disabled</p>
             <p class="text-xs text-admin-muted">Disabled users can’t log in and active sessions are rejected.</p>
@@ -124,7 +124,7 @@
           </label>
         </div>
 
-        <p v-if="saveError" id="admin-save-error" class="rounded-xl border border-admin-danger/20 bg-admin-danger-soft px-4 py-3 text-sm font-medium text-admin-danger" role="alert" tabindex="-1">{{ saveError }}</p>
+        <p v-if="saveError" id="admin-save-error" class="rounded-xl border border-admin-danger/20 bg-admin-danger-soft px-3 py-2.5 text-xs font-medium text-admin-danger" role="alert" tabindex="-1">{{ saveError }}</p>
 
         <div class="flex flex-col gap-2 border-t border-admin-border pt-4 sm:flex-row sm:items-center sm:justify-between">
           <AdminButton type="submit" variant="primary" :loading="saving">

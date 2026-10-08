@@ -5,6 +5,8 @@
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+    <AuthLoginProgress />
+    <SuperAdminImpersonationProgress />
     <StorefrontPageLoader />
     <ApexEntryLoader />
   </div>

@@ -5,7 +5,7 @@
       <p>Sign in to your DATABASY workspace to manage your store.</p>
     </div>
 
-    <form class="apex-auth__form" :aria-busy="loading" @submit.prevent="handleLogin">
+    <form class="apex-auth__form" :aria-busy="loading" @focusin="warmLoginDestinations" @submit.prevent="handleLogin">
       <div class="apex-auth__field">
         <label for="login-email" class="apex-auth__label">Email address</label>
         <input id="login-email" v-model="form.email" type="email" autocomplete="email" required class="apex-auth__input" placeholder="you@example.com" :disabled="loading">
@@ -26,7 +26,7 @@
 
       <p v-if="error" class="apex-auth__alert" role="alert"><Icon name="heroicons:exclamation-circle" aria-hidden="true" />{{ error }}</p>
 
-      <button type="submit" class="apex-auth__button" :class="{ 'is-loading': loading }" :disabled="loading">
+      <button type="submit" class="apex-auth__button" :class="{ 'is-loading': loading }" :disabled="loading" @pointerenter="warmLoginDestinations" @focus="warmLoginDestinations" @touchstart.passive="warmLoginDestinations">
         <Icon v-if="loading" name="heroicons:arrow-path" class="apex-auth__button-spinner" aria-hidden="true" />
         <span aria-live="polite">{{ loading ? 'Signing you in…' : 'Sign in' }}</span>
         <Icon v-if="!loading" name="heroicons:arrow-right" aria-hidden="true" />
@@ -42,6 +42,7 @@
 definePageMeta({ layout: false })
 
 const authStore = useAuthStore()
+const authTransition = useAuthTransition()
 const route = useRoute()
 
 // Optional ?redirect= destination (fallback to admin dashboard). Only allow
@@ -55,23 +56,62 @@ const form = ref({ email: '', password: '' })
 const loading = ref(false)
 const error = ref('')
 const showPassword = ref(false)
+const routePreloads = new Map<string, Promise<void>>()
+let optimisticPreloadTimer: ReturnType<typeof setTimeout> | undefined
+
+const warmRoute = (path: string) => {
+  if (!import.meta.client) return Promise.resolve()
+  const existing = routePreloads.get(path)
+  if (existing) return existing
+
+  const request = preloadRouteComponents(path).catch(() => {
+    routePreloads.delete(path)
+  })
+  routePreloads.set(path, request)
+  return request
+}
+
+const warmLoginDestinations = () => Promise.all([
+  warmRoute('/admin/verify-2fa'),
+  warmRoute(getRedirect()),
+])
+
+const finishTransitionAfterRender = async () => {
+  await nextTick()
+  if (import.meta.client) await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+  authTransition.finish()
+}
 
 const handleLogin = async () => {
   if (loading.value) return
 
   loading.value = true
   error.value = ''
+  const transitionStartedAt = Date.now()
+  authTransition.start('authenticating', form.value.email)
 
   try {
-    const response = await authStore.login(form.value.email, form.value.password)
+    const [response] = await Promise.all([
+      authStore.login(form.value.email, form.value.password),
+      warmLoginDestinations(),
+    ])
 
     if (response.two_factor_required) {
+      authTransition.setPhase('verification')
+      const remainingDisplayTime = Math.max(0, 480 - (Date.now() - transitionStartedAt))
+      if (remainingDisplayTime) await new Promise(resolve => setTimeout(resolve, remainingDisplayTime))
       await navigateTo({ path: '/admin/verify-2fa', query: { redirect: getRedirect() } })
+      await finishTransitionAfterRender()
       return
     }
 
+    authTransition.setPhase('preparing')
+    const remainingDisplayTime = Math.max(0, 480 - (Date.now() - transitionStartedAt))
+    if (remainingDisplayTime) await new Promise(resolve => setTimeout(resolve, remainingDisplayTime))
     await navigateTo(getRedirect())
+    await finishTransitionAfterRender()
   } catch (err: any) {
+    authTransition.finish()
     error.value = err?.data?.message || 'Invalid credentials or not authorized as admin'
   } finally {
     loading.value = false
@@ -80,6 +120,12 @@ const handleLogin = async () => {
 
 onMounted(async () => {
   await authStore.checkAuth()
-  if (authStore.isAdmin) navigateTo(getRedirect())
+  if (authStore.isAdmin) {
+    navigateTo(getRedirect())
+    return
+  }
+  optimisticPreloadTimer = setTimeout(() => { void warmLoginDestinations() }, 600)
 })
+
+onBeforeUnmount(() => clearTimeout(optimisticPreloadTimer))
 </script>
