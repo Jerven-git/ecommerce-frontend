@@ -19,9 +19,7 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
-              <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-              </svg>
+              <Icon name="heroicons:tag" class="w-4 h-4 text-primary-600" aria-hidden="true" />
             </div>
             <div>
               <div class="flex items-center gap-1.5">
@@ -43,9 +41,7 @@
 
         <!-- Search bar -->
         <div v-if="categories.length" class="mt-3 relative">
-          <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+          <Icon name="heroicons:magnifying-glass" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
           <input
             v-model="searchQuery"
             type="text"
@@ -57,7 +53,7 @@
             @click="searchQuery = ''"
             class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            <Icon name="heroicons:x-mark" class="w-3.5 h-3.5" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -66,9 +62,7 @@
         <!-- Add root category -->
         <form data-guide="add-category" @submit.prevent="addCategory(null)" class="flex gap-2 items-center">
           <div class="relative flex-1">
-            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
+            <Icon name="heroicons:plus" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
             <input
               v-model="newName"
               type="text"

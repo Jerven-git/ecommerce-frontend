@@ -96,9 +96,7 @@
               class="w-10 h-10 rounded-md object-cover bg-white"
             />
             <div v-else class="w-10 h-10 rounded-md bg-white border border-gray-200 flex items-center justify-center">
-              <svg class="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M4 6h16v12H4V6z" />
-              </svg>
+              <Icon name="heroicons:photo" class="w-4 h-4 text-gray-300" aria-hidden="true" />
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-sm font-medium text-gray-900 truncate">{{ productById(id)?.name ?? `Unknown product (#${id})` }}</p>
@@ -112,9 +110,7 @@
                 class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-white rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 aria-label="Move up"
               >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                </svg>
+                <Icon name="heroicons:chevron-up" class="w-4 h-4" aria-hidden="true" />
               </button>
               <button
                 type="button"
@@ -123,9 +119,7 @@
                 class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-white rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 aria-label="Move down"
               >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
+                <Icon name="heroicons:chevron-down" class="w-4 h-4" aria-hidden="true" />
               </button>
               <button
                 type="button"
@@ -133,9 +127,7 @@
                 class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-white rounded transition-colors"
                 aria-label="Remove from fallback"
               >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <Icon name="heroicons:x-mark" class="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
           </li>

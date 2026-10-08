@@ -63,7 +63,7 @@
       <AdminEmptyState
         title="No service categories yet"
         description="Create your first category to organize services"
-        :icon="'M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z'"
+        icon="heroicons:squares-2x2"
       >
         <template #action>
           <button
@@ -81,7 +81,7 @@
       <AdminEmptyState
         title="No matching categories"
         :description="`Nothing found for &quot;${searchQuery}&quot;`"
-        :icon="'M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z'"
+        icon="heroicons:magnifying-glass"
       >
         <template #action>
           <button

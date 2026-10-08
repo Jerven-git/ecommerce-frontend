@@ -5,9 +5,7 @@
       <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-fuchsia-50 flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4 text-fuchsia-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
+            <Icon name="heroicons:video-camera" class="w-4 h-4 text-fuchsia-600" aria-hidden="true" />
           </div>
           <div>
             <h2 class="text-sm font-semibold text-gray-900">Featured Showcase</h2>
@@ -63,18 +61,8 @@
           class="mt-3 flex items-center gap-2 text-xs px-3 py-2 rounded-lg"
           :class="statusBannerClass"
         >
-          <svg
-            v-if="localValue.video_status === 'processing'"
-            class="w-3.5 h-3.5 animate-spin"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-          <svg v-else class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="statusIconPath" />
-          </svg>
+          <Icon name="heroicons:arrow-path" v-if="localValue.video_status === 'processing'" class="w-3.5 h-3.5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+          <Icon v-else :name="statusIcon" class="h-3.5 w-3.5" aria-hidden="true" />
           {{ showcaseStatusMessage }}
         </div>
       </div>
@@ -84,9 +72,7 @@
     <section class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
         <div class="w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center shrink-0">
-          <svg class="w-4 h-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h16" />
-          </svg>
+          <Icon name="heroicons:bars-3-center-left" class="w-4 h-4 text-sky-600" aria-hidden="true" />
         </div>
         <div>
           <h2 class="text-sm font-semibold text-gray-900">Section Heading</h2>
@@ -126,9 +112,7 @@
     <section class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
         <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-          <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-          </svg>
+          <Icon name="heroicons:squares-2x2" class="w-4 h-4 text-amber-600" aria-hidden="true" />
         </div>
         <div>
           <h2 class="text-sm font-semibold text-gray-900">Category Tiles</h2>
@@ -354,11 +338,11 @@ const statusBannerClass = computed(() => {
   }
 })
 
-const statusIconPath = computed(() => {
+const statusIcon = computed(() => {
   switch (localValue.value.video_status) {
-    case 'failed': return 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-    case 'ready': return 'M5 13l4 4L19 7'
-    default: return 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+    case 'failed': return 'heroicons:exclamation-circle'
+    case 'ready': return 'heroicons:check'
+    default: return 'heroicons:information-circle'
   }
 })
 </script>

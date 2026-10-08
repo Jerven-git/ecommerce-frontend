@@ -2,9 +2,7 @@
   <section data-guide="settings-theme" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
-        <svg class="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-        </svg>
+        <Icon name="heroicons:swatch" class="w-4 h-4 text-purple-600" aria-hidden="true" />
       </div>
       <div>
         <h2 class="text-sm font-semibold text-gray-900">Theme</h2>
@@ -61,12 +59,8 @@
               v-if="isActivePreset(preset)"
               class="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-primary-500 flex items-center justify-center group-hover:bg-red-500 transition-colors"
             >
-              <svg class="w-3 h-3 text-white group-hover:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-              <svg class="w-3 h-3 text-white hidden group-hover:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <Icon name="heroicons:check" class="w-3 h-3 text-white group-hover:hidden" aria-hidden="true" />
+              <Icon name="heroicons:x-mark" class="w-3 h-3 text-white hidden group-hover:block" aria-hidden="true" />
             </div>
           </button>
         </div>
@@ -199,9 +193,7 @@
               }"
             ></div>
             <div v-else class="absolute inset-0 bg-gray-50 flex items-center justify-center">
-              <svg class="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-              </svg>
+              <Icon name="heroicons:no-symbol" class="w-5 h-5 text-gray-300" aria-hidden="true" />
             </div>
             <span class="absolute bottom-0 inset-x-0 text-[9px] font-medium text-center pb-0.5 text-gray-500 bg-white/80">{{ tex.name }}</span>
           </button>

@@ -8,9 +8,7 @@
         </div>
         <NuxtLink to="/shop" class="link-arrow mb-1 hidden shrink-0 sm:inline-flex">
           View all
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
+          <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
         </NuxtLink>
       </div>
 
@@ -23,16 +21,12 @@
       </div>
 
       <div v-else-if="error" class="mt-16 flex flex-col items-center text-center">
-        <svg class="h-9 w-9 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Icon name="heroicons:exclamation-circle" class="h-9 w-9 text-red-400" aria-hidden="true" />
         <p class="mt-4 text-sm font-medium text-red-600">{{ error }}</p>
       </div>
 
       <div v-else-if="products.length === 0" class="mt-16 flex flex-col items-center text-center">
-        <svg class="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-        </svg>
+        <Icon name="heroicons:cube" class="h-10 w-10 text-gray-300" aria-hidden="true" />
         <p class="mt-4 max-w-xs text-gray-500">New products are on their way — check back soon.</p>
         <NuxtLink to="/shop" class="btn-primary mt-6 inline-flex items-center gap-2">Browse the shop</NuxtLink>
       </div>
@@ -52,9 +46,7 @@
       <div :ref="addRevealRef" class="reveal mt-12 text-center sm:hidden">
         <NuxtLink to="/shop" class="link-arrow">
           View all products
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
+          <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
         </NuxtLink>
       </div>
     </div>

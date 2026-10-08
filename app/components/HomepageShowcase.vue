@@ -65,9 +65,7 @@
                 :style="{ color: siteConfig?.theme?.primary_color || '#d946ef' }"
               >
                 {{ tile.cta_label || 'SHOP NOW' }}
-                <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
+                <Icon name="heroicons:arrow-right" class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" aria-hidden="true" />
               </span>
               <span class="block mt-1 h-0.5 w-10 rounded-full" :style="{ backgroundColor: siteConfig?.theme?.primary_color || '#d946ef' }" />
             </div>

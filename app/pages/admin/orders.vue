@@ -14,9 +14,7 @@
     <!-- Filters -->
     <div data-guide="order-filters" class="mb-6 flex flex-col sm:flex-row gap-3">
       <div class="relative flex-1">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
+        <Icon name="heroicons:magnifying-glass" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" aria-hidden="true" />
         <input
           v-model="searchQuery"
           type="text"
@@ -52,9 +50,7 @@
     <!-- Error -->
     <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">
       <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg class="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Icon name="heroicons:exclamation-circle" class="w-6 h-6 text-red-500" aria-hidden="true" />
       </div>
       <p class="font-semibold text-gray-800 mb-1">Failed to load orders</p>
       <p class="text-sm text-red-500 mb-6">{{ error }}</p>
@@ -66,7 +62,7 @@
       <AdminEmptyState
         title="No orders yet"
         description="Orders will appear here once customers start purchasing"
-        icon="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+        icon="heroicons:clipboard-document-list"
       />
     </AdminCard>
 
@@ -75,7 +71,7 @@
       <AdminEmptyState
         title="No matching orders"
         description="Try adjusting your search or filter"
-        icon="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        icon="heroicons:magnifying-glass"
       />
     </AdminCard>
 
@@ -182,13 +178,8 @@
               </select>
               <!-- Custom chevron -->
               <span class="pointer-events-none absolute inset-y-0 right-2 flex items-center">
-                <svg v-if="updatingOrderId === order.id" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                <svg v-else class="w-3.5 h-3.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
+                <Icon name="heroicons:arrow-path" v-if="updatingOrderId === order.id" class="w-3.5 h-3.5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+                <Icon name="heroicons:chevron-down" v-else class="w-3.5 h-3.5 opacity-60" aria-hidden="true" />
               </span>
             </div>
           </div>
@@ -206,13 +197,7 @@
           <span class="text-xs text-gray-400 shrink-0">&middot;</span>
           <span class="text-xs text-gray-500 shrink-0">{{ itemCount(order) }} {{ itemCount(order) === 1 ? 'item' : 'items' }}</span>
           <span class="ml-auto text-sm font-bold text-gray-900 shrink-0">{{ formatIn(parseFloat(String(order.total_amount)), order.currency) }}</span>
-          <svg
-            class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
-            :class="{ 'rotate-180': isExpanded(order.id) }"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
+          <Icon name="heroicons:chevron-down" class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200" :class="{ 'rotate-180': isExpanded(order.id) }" aria-hidden="true" />
         </button>
 
         <!-- Customer + Shipping grid -->
@@ -298,9 +283,7 @@
                     <option value="returned">Returned</option>
                   </select>
                   <span class="pointer-events-none absolute inset-y-0 right-1.5 flex items-center">
-                    <svg class="w-3 h-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <Icon name="heroicons:chevron-down" class="w-3 h-3 opacity-60" aria-hidden="true" />
                   </span>
                 </div>
               </div>
@@ -408,14 +391,10 @@
     >
       <div v-if="toast" class="fixed top-4 right-4 z-40 max-w-sm">
         <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl shadow-lg px-4 py-3 flex items-start gap-3">
-          <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <Icon name="heroicons:exclamation-circle" class="w-5 h-5 shrink-0 mt-0.5" aria-hidden="true" />
           <p class="text-sm font-medium">{{ toast }}</p>
           <button @click="toast = null" class="shrink-0 text-red-400 hover:text-red-600">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <Icon name="heroicons:x-mark" class="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       </div>

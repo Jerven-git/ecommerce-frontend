@@ -11,16 +11,7 @@
         class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors"
         :class="chipClass"
       >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path
-            v-for="(d, i) in iconPaths"
-            :key="i"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            :d="d"
-          />
-        </svg>
+        <Icon :name="icon" class="h-4 w-4" aria-hidden="true" />
       </span>
     </div>
     <p class="truncate font-bold tabular-nums text-admin-text" :class="hero ? 'text-3xl' : 'text-2xl'">{{ value }}</p>
@@ -36,8 +27,8 @@ const props = withDefaults(defineProps<{
   value: string | number
   hint?: string
   tone?: 'brand' | 'positive' | 'attention' | 'neutral'
-  /** One or more SVG path `d` strings for the corner glyph. */
-  icon: string | string[]
+  /** Heroicons name for the corner glyph. */
+  icon: string
   /** Optional destination — renders the tile as a link with a hover affordance. */
   to?: string
   /** Larger value + padding for a primary metric. */
@@ -47,8 +38,6 @@ const props = withDefaults(defineProps<{
 }>(), { tone: 'neutral', hero: false, emphasizeHint: false })
 
 const NuxtLinkComponent = resolveComponent('NuxtLink')
-
-const iconPaths = computed(() => (Array.isArray(props.icon) ? props.icon : [props.icon]))
 
 const chipClass = computed(() => ({
   brand: 'bg-admin-accent-soft text-admin-accent-strong',

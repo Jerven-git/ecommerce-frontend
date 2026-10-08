@@ -7,7 +7,7 @@
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex min-w-0 items-center gap-3">
         <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-admin-accent text-admin-on-accent" aria-hidden="true">
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 0h6v6h-6v-6Z" /></svg>
+          <Icon name="heroicons:squares-2x2" class="h-4 w-4" aria-hidden="true" />
         </span>
         <div class="min-w-0">
           <h1 class="text-2xl font-bold tracking-tight text-admin-text">Platform overview</h1>
@@ -16,11 +16,11 @@
       </div>
       <div class="flex flex-wrap items-center gap-2">
         <NuxtLink to="/super-admin/stores" class="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-admin-border bg-admin-surface px-2.5 text-[11px] font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8h6" /></svg>
+          <Icon name="heroicons:building-storefront" class="h-4 w-4" aria-hidden="true" />
           Stores
         </NuxtLink>
         <NuxtLink to="/super-admin/admins/new" class="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-admin-accent px-2.5 text-[11px] font-semibold text-admin-on-accent hover:bg-admin-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14" /></svg>
+          <Icon name="heroicons:plus" class="h-4 w-4" aria-hidden="true" />
           New admin
         </NuxtLink>
       </div>
@@ -46,13 +46,15 @@
               <span v-else>{{ m.sub }}</span>
             </p>
           </div>
-          <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border [&_svg]:h-4 [&_svg]:w-4" :class="m.chip" v-html="m.icon" aria-hidden="true" />
+          <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border" :class="m.chip">
+            <Icon :name="m.icon" class="h-4 w-4" aria-hidden="true" />
+          </span>
         </div>
       </div>
     </div>
 
     <p v-if="statsError" role="alert" class="flex flex-wrap items-center gap-2 rounded-lg border border-admin-danger/20 bg-admin-danger-soft px-3 py-2.5 text-xs text-admin-danger">
-      <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
+      <Icon name="heroicons:exclamation-triangle" class="h-4 w-4 shrink-0" aria-hidden="true" />
       {{ statsError }}
       <button type="button" class="ml-auto inline-flex min-h-10 items-center rounded-lg border border-admin-danger/20 bg-admin-surface px-2.5 text-[11px] font-semibold hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-danger" @click="loadOverview">Try again</button>
     </p>
@@ -189,7 +191,7 @@
           </div>
           <NuxtLink to="/super-admin/activity" class="inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
             Activity
-            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+            <Icon name="heroicons:arrow-right" class="h-3.5 w-3.5" aria-hidden="true" />
           </NuxtLink>
         </div>
         <div class="mt-2">
@@ -236,11 +238,11 @@
     <details class="group rounded-xl border border-admin-border bg-admin-surface">
       <summary class="flex min-h-10 cursor-pointer list-none items-center gap-2 px-3 text-[11px] font-semibold text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-admin-accent [&::-webkit-details-marker]:hidden">
         <span class="flex h-7 w-7 items-center justify-center rounded-md bg-admin-info-soft text-admin-info" aria-hidden="true">
-          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <Icon name="heroicons:information-circle" class="h-3.5 w-3.5" aria-hidden="true" />
         </span>
         Data coverage and limits
         <span class="ml-auto hidden text-[10px] font-medium text-admin-muted sm:inline">Verified sources only</span>
-        <svg class="h-4 w-4 text-admin-muted transition-transform group-open:rotate-180 motion-reduce:transition-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6" /></svg>
+        <Icon name="heroicons:chevron-down" class="h-4 w-4 text-admin-muted transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
       </summary>
       <div class="border-t border-admin-border px-3 py-2.5">
         <p class="text-[11px] text-admin-muted">Current charts use <span class="font-mono text-admin-text">/super-admin/overview</span> and role-scoped <span class="font-mono text-admin-text">GET /activity-log</span>.</p>
@@ -259,7 +261,7 @@
         <div class="flex items-center justify-between gap-3 border-b border-admin-border px-3 py-2.5">
           <div class="flex items-center gap-2.5">
             <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-admin-accent-soft text-admin-accent">
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <Icon name="heroicons:clock" class="h-4 w-4" aria-hidden="true" />
             </span>
             <div>
               <h2 class="text-[13px] font-semibold text-admin-text">Recent activity</h2>
@@ -268,7 +270,7 @@
           </div>
           <NuxtLink to="/super-admin/activity" class="inline-flex min-h-10 items-center gap-1 rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
             View all
-            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+            <Icon name="heroicons:arrow-right" class="h-3.5 w-3.5" aria-hidden="true" />
           </NuxtLink>
         </div>
 
@@ -314,7 +316,7 @@
         </div>
         <div v-else class="px-5 py-8 text-center">
           <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-lg bg-admin-soft text-admin-muted">
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5h6m-6 4h6m-6 4h6M4 4h.01M4 8h.01M4 12h.01M4 16h.01" /></svg>
+            <Icon name="heroicons:list-bullet" class="h-4 w-4" aria-hidden="true" />
           </div>
           <p class="mt-2 text-[13px] font-semibold text-admin-text">No activity yet</p>
           <p class="mx-auto mt-1 max-w-md text-xs text-admin-muted">Events appear after a store or admin changes.</p>
@@ -330,7 +332,7 @@
           </div>
           <NuxtLink to="/super-admin/stores" class="inline-flex min-h-10 items-center gap-1 rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
             All
-            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+            <Icon name="heroicons:arrow-right" class="h-3.5 w-3.5" aria-hidden="true" />
           </NuxtLink>
         </div>
 
@@ -373,7 +375,7 @@
         </div>
         <div v-else class="px-5 py-8 text-center">
           <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-lg bg-admin-soft text-admin-muted">
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" /></svg>
+            <Icon name="heroicons:building-storefront" class="h-4 w-4" aria-hidden="true" />
           </div>
           <p class="mt-2 text-[13px] font-semibold text-admin-text">No stores yet</p>
           <NuxtLink to="/super-admin/admins/new" class="mt-2 inline-flex min-h-10 items-center rounded-lg bg-admin-accent px-2.5 text-[11px] font-semibold text-admin-on-accent hover:bg-admin-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">Create first admin</NuxtLink>
@@ -416,10 +418,10 @@ const dashboardStatus = computed(() => {
 })
 
 const icons = {
-  store: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8h6"/></svg>',
-  globe: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zM12 2a15 15 0 010 18M12 2a15 15 0 000 18M3.6 9h16.8M3.6 15h16.8"/></svg>',
-  users: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4a4 4 0 110 8 4 4 0 010-8zM5 20a7 7 0 0114 0H5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8l2 2 4-4"/></svg>',
-  shield: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>',
+  store: 'heroicons:building-storefront',
+  globe: 'heroicons:globe-alt',
+  users: 'heroicons:user-group',
+  shield: 'heroicons:shield-check',
 }
 
 const fmt = (n: number) => n.toLocaleString()

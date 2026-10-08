@@ -4,9 +4,7 @@
     class="flex flex-col gap-2.5 border-b border-admin-warning bg-admin-warning-soft px-3 py-2.5 text-xs sm:flex-row sm:items-center sm:justify-between sm:px-4"
   >
     <div class="flex items-center gap-3 text-admin-warning">
-      <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-      </svg>
+      <Icon name="heroicons:exclamation-triangle" class="h-5 w-5 shrink-0" aria-hidden="true" />
       <span>
         You are impersonating
         <span class="font-semibold">{{ targetEmail }}</span>

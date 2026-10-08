@@ -19,10 +19,7 @@
       <!-- Stripe return: processing -->
       <div v-if="statusParam === 'success' && polling" class="mb-6">
         <div class="bg-white rounded-2xl border border-primary-100 shadow-sm p-6 flex items-center gap-4">
-          <svg class="animate-spin h-6 w-6 text-primary-600 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
+          <Icon name="heroicons:arrow-path" class="animate-spin h-6 w-6 text-primary-600 shrink-0 motion-reduce:animate-none" aria-hidden="true" />
           <div>
             <p class="font-semibold text-gray-900">Payment received — activating your store…</p>
             <p class="text-sm text-gray-500">This usually takes a moment. We’ll refresh automatically.</p>
@@ -83,7 +80,7 @@
             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Features</p>
             <ul v-if="currentPlanFeatures.length" class="mt-1 space-y-1">
               <li v-for="f in currentPlanFeatures" :key="f" class="flex items-center gap-1.5 text-sm text-gray-600">
-                <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                <Icon name="heroicons:check" class="w-4 h-4 text-green-500 shrink-0" aria-hidden="true" />
                 {{ f }}
               </li>
             </ul>
@@ -153,7 +150,7 @@
 
             <ul class="mt-4 space-y-2 flex-1">
               <li v-for="feature in plan.features" :key="feature" class="flex items-start gap-2 text-sm text-gray-600">
-                <svg class="w-4 h-4 text-green-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                <Icon name="heroicons:check" class="w-4 h-4 text-green-500 shrink-0 mt-0.5" aria-hidden="true" />
                 <span>{{ feature }}</span>
               </li>
             </ul>

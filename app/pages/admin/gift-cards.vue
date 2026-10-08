@@ -17,7 +17,7 @@
           v-else-if="denominations.length === 0"
           title="No denominations yet"
           description="Add one to enable gift card purchases."
-          :icon="'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7'"
+          icon="heroicons:gift"
         />
         <table v-else class="w-full">
           <thead class="bg-gray-50 border-b border-gray-200/70">
@@ -75,7 +75,7 @@
           v-else-if="cards.length === 0"
           title="No gift cards found"
           description="Issued gift cards will appear here."
-          :icon="'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7'"
+          icon="heroicons:gift"
         />
         <table v-else class="w-full">
           <thead class="bg-gray-50 border-b border-gray-200/70">

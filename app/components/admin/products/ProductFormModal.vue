@@ -9,10 +9,7 @@
     <template #header>
       <div class="flex items-center gap-3 min-w-0">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :class="editingProduct ? 'bg-primary-50' : 'bg-green-50'">
-          <svg class="w-4 h-4" :class="editingProduct ? 'text-primary-600' : 'text-green-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path v-if="editingProduct" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
+          <Icon :name="editingProduct ? 'heroicons:pencil-square' : 'heroicons:plus'" class="h-4 w-4" :class="editingProduct ? 'text-primary-600' : 'text-green-600'" aria-hidden="true" />
         </div>
         <div class="min-w-0">
           <h2 class="text-sm font-semibold text-gray-900 truncate">{{ editingProduct ? 'Edit Product' : 'New Product' }}</h2>
@@ -60,9 +57,7 @@
                       <input v-model.number="form.stock" type="number" min="0" required class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-primary-400 focus:ring-1 focus:ring-primary-400 outline-none transition-all" placeholder="0" />
                     </div>
                     <div v-else class="flex items-start gap-2 px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg">
-                      <svg class="w-3.5 h-3.5 text-blue-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                      <Icon name="heroicons:information-circle" class="w-3.5 h-3.5 text-blue-400 mt-0.5 shrink-0" aria-hidden="true" />
                       <p class="text-xs text-blue-600">Stock is managed per variant below.</p>
                     </div>
                   </div>
@@ -146,9 +141,7 @@
                         leave-to-class="opacity-0 scale-95"
                       >
                         <div v-if="computedVolumeCbm > 0" class="flex items-center gap-2 px-3 py-1.5 bg-primary-50 border border-primary-100 rounded-lg">
-                          <svg class="w-3.5 h-3.5 text-primary-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
+                          <Icon name="heroicons:information-circle" class="w-3.5 h-3.5 text-primary-500 shrink-0" aria-hidden="true" />
                           <span class="text-xs text-primary-700 font-medium">
                             Volume: {{ computedVolumeCbm.toFixed(6) }} m&sup3; ({{ (computedVolumeCbm * 1000).toFixed(3) }} L)
                           </span>
@@ -166,7 +159,7 @@
                   <div class="border border-gray-200 rounded-lg overflow-hidden">
                     <div class="flex items-center justify-between px-3 py-2 bg-gray-50 border-b border-gray-200">
                       <p v-if="categoryBreadcrumb" class="text-xs text-gray-600 flex items-center gap-1.5">
-                        <svg class="w-3 h-3 text-primary-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                        <Icon name="heroicons:tag" class="w-3 h-3 text-primary-500 shrink-0" aria-hidden="true" />
                         {{ categoryBreadcrumb }}
                       </p>
                       <p v-else class="text-xs text-gray-400">No category selected</p>
@@ -210,9 +203,7 @@
                             title="Remove image"
                             aria-label="Remove image"
                           >
-                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            <Icon name="heroicons:x-mark" class="w-3 h-3" aria-hidden="true" />
                           </button>
                         </div>
                         <AdminMediaAltEditor
@@ -244,9 +235,7 @@
                           title="Remove staged file"
                           aria-label="Remove staged file"
                         >
-                          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
+                          <Icon name="heroicons:x-mark" class="w-3 h-3" aria-hidden="true" />
                         </button>
                       </div>
                     </div>
@@ -277,9 +266,7 @@
                           class="h-20 w-28 rounded-lg object-cover border border-gray-200"
                         />
                         <div v-else class="h-20 w-28 rounded-lg border border-dashed border-gray-200 bg-gray-50 flex items-center justify-center text-gray-300">
-                          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
+                          <Icon name="heroicons:photo" class="w-6 h-6" aria-hidden="true" />
                         </div>
                         <button
                           v-if="hoverImageUrl"
@@ -289,9 +276,7 @@
                           title="Remove hover image"
                           aria-label="Remove hover image"
                         >
-                          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
+                          <Icon name="heroicons:x-mark" class="w-3 h-3" aria-hidden="true" />
                         </button>
                       </div>
                       <input
@@ -418,9 +403,7 @@
                   leave-to-class="opacity-0"
                 >
                   <div v-if="formError" class="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-lg text-sm text-red-700">
-                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <Icon name="heroicons:exclamation-circle" class="w-4 h-4 shrink-0" aria-hidden="true" />
                     {{ formError }}
                   </div>
                 </Transition>
@@ -441,10 +424,7 @@
           class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           :disabled="submitting"
         >
-          <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
+          <Icon name="heroicons:arrow-path" v-if="submitting" class="w-4 h-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
           {{ submitting ? 'Saving...' : (editingProduct ? 'Save Changes' : 'Add Product') }}
         </button>
       </div>

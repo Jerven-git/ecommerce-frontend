@@ -23,9 +23,7 @@
         <!-- Error -->
         <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">
           <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <svg class="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <Icon name="heroicons:exclamation-circle" class="w-7 h-7 text-red-500" aria-hidden="true" />
           </div>
           <p class="font-semibold text-gray-800 mb-2">{{ errorTitle }}</p>
           <p class="text-sm text-gray-500">{{ error }}</p>
@@ -75,9 +73,7 @@
 
             <!-- Out of stock warning -->
             <div v-if="backorderData.stock_available === false" class="mt-4 flex items-start gap-2 p-3 bg-red-50 border border-red-100 rounded-xl">
-              <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <Icon name="heroicons:exclamation-circle" class="w-4 h-4 text-red-500 shrink-0 mt-0.5" aria-hidden="true" />
               <p class="text-xs text-red-800 leading-relaxed">
                 This item is currently out of stock and cannot be purchased at this time. Please contact us for assistance.
               </p>
@@ -85,9 +81,7 @@
 
             <!-- Expiry warning -->
             <div v-else class="mt-4 flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl">
-              <svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <Icon name="heroicons:clock" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" aria-hidden="true" />
               <p class="text-xs text-amber-800 leading-relaxed">
                 This payment link expires on {{ formatDate(backorderData.expires_at) }}. Please complete your payment before then.
               </p>
@@ -162,9 +156,7 @@
             </template>
 
             <div v-if="payError" class="mt-4 flex items-start gap-2.5 p-3.5 bg-red-50 border border-red-100 rounded-xl">
-              <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <Icon name="heroicons:exclamation-circle" class="w-4 h-4 text-red-500 shrink-0 mt-0.5" aria-hidden="true" />
               <p class="text-sm text-red-700">{{ payError }}</p>
             </div>
           </div>
@@ -192,9 +184,7 @@
         <!-- Confirm without paying success state -->
         <div v-else-if="confirmSuccess" class="bg-white rounded-2xl border border-blue-100 shadow-sm p-10 text-center">
           <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <svg class="w-7 h-7 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
+            <Icon name="heroicons:check" class="w-7 h-7 text-blue-500" aria-hidden="true" />
           </div>
           <p class="font-semibold text-gray-800 mb-2">Order Confirmed!</p>
           <p class="text-sm text-gray-500">Your order has been confirmed. The store will contact you to arrange payment.</p>
@@ -204,9 +194,7 @@
         <!-- Payment success state -->
         <div v-else-if="paymentSuccess" class="bg-white rounded-2xl border border-green-100 shadow-sm p-10 text-center">
           <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <svg class="w-7 h-7 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
+            <Icon name="heroicons:check" class="w-7 h-7 text-green-500" aria-hidden="true" />
           </div>
           <p class="font-semibold text-gray-800 mb-2">Payment Successful!</p>
           <p class="text-sm text-gray-500">Your backorder payment has been received. We'll process your order shortly.</p>

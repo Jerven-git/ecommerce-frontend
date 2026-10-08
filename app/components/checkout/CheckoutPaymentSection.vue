@@ -4,9 +4,7 @@
     <div v-if="allDeferredBackorder" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
       <h2 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-5">Place Order</h2>
       <div class="flex items-start gap-2.5 p-3.5 bg-primary-50 border border-primary-100 rounded-xl mb-5">
-        <svg class="w-4 h-4 text-primary-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Icon name="heroicons:information-circle" class="w-4 h-4 text-primary-500 shrink-0 mt-0.5" aria-hidden="true" />
         <p class="text-xs text-primary-800 leading-relaxed">
           All items in your cart are on backorder and will be charged later. No payment is required now — you'll receive a payment link when your items become available.
         </p>
@@ -33,9 +31,7 @@
 
       <!-- None available -->
       <div v-else-if="paymentMethods.length === 0" class="flex items-start gap-3 p-4 bg-amber-50 border border-amber-100 rounded-xl">
-        <svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Icon name="heroicons:exclamation-triangle" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" aria-hidden="true" />
         <p class="text-xs text-amber-800 font-medium">Online payment isn't available for this store right now. Please contact the store to complete your order.</p>
       </div>
 
@@ -148,9 +144,7 @@ const ErrorAlert = defineComponent({
   props: { message: { type: String, required: true } },
   template: `
     <div class="mt-4 flex items-start gap-2.5 p-3.5 bg-red-50 border border-red-100 rounded-xl">
-      <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
+      <Icon name="heroicons:exclamation-circle" class="w-4 h-4 text-red-500 shrink-0 mt-0.5" aria-hidden="true" />
       <p class="text-sm text-red-700">{{ message }}</p>
     </div>
   `

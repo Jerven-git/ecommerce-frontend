@@ -52,11 +52,7 @@
           class="cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 -ml-1"
           title="Drag to reorder or move under another category"
         >
-          <svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor">
-            <circle cx="5" cy="3.5" r="1.25"/><circle cx="11" cy="3.5" r="1.25"/>
-            <circle cx="5" cy="8" r="1.25"/><circle cx="11" cy="8" r="1.25"/>
-            <circle cx="5" cy="12.5" r="1.25"/><circle cx="11" cy="12.5" r="1.25"/>
-          </svg>
+          <Icon name="heroicons:bars-2" class="h-3.5 w-3.5" aria-hidden="true" />
         </div>
 
         <!-- Expand/collapse toggle -->
@@ -67,13 +63,7 @@
           :aria-label="`${isExpanded ? 'Collapse' : 'Expand'} ${category.name}`"
           :aria-expanded="isExpanded"
         >
-          <svg
-            class="w-3.5 h-3.5 transition-transform duration-200"
-            :class="{ 'rotate-90': isExpanded }"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
+          <Icon name="heroicons:chevron-right" class="w-3.5 h-3.5 transition-transform duration-200" :class="{ 'rotate-90': isExpanded }" aria-hidden="true" />
         </button>
         <div v-else class="w-5 h-5 flex items-center justify-center shrink-0">
           <div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
@@ -141,16 +131,16 @@
         <!-- Actions -->
         <div v-if="editingId !== category.id" class="flex shrink-0 items-center gap-0.5 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
           <button type="button" @click="$emit('start-add', category.id)" class="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-gray-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" :aria-label="`Add subcategory to ${category.name}`" title="Add subcategory">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            <Icon name="heroicons:plus" class="w-3.5 h-3.5" aria-hidden="true" />
           </button>
           <button type="button" @click="$emit('edit-cover', category)" class="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-gray-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" :class="{ 'text-amber-500': category.image_url }" :aria-label="`Edit cover image for ${category.name}`" title="Cover image">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+            <Icon name="heroicons:photo" class="w-3.5 h-3.5" aria-hidden="true" />
           </button>
           <button type="button" @click="$emit('start-edit', category)" class="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" :aria-label="`Edit ${category.name}`" title="Edit name or parent">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+            <Icon name="heroicons:pencil-square" class="w-3.5 h-3.5" aria-hidden="true" />
           </button>
           <button type="button" @click="$emit('confirm-delete', category)" class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-gray-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" :aria-label="`Delete ${category.name}`" title="Delete category">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            <Icon name="heroicons:trash" class="w-3.5 h-3.5" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -174,10 +164,10 @@
         autofocus
       />
       <button type="button" @click="$emit('save-add', category.id)" class="p-1.5 rounded-lg text-primary-600 hover:text-primary-800 hover:bg-primary-50 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" :disabled="!addingName.trim() || saving" aria-label="Add subcategory" title="Add subcategory">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+        <Icon name="heroicons:check" class="w-4 h-4" aria-hidden="true" />
       </button>
       <button type="button" @click="$emit('cancel-add')" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" aria-label="Cancel adding subcategory" title="Cancel">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        <Icon name="heroicons:x-mark" class="w-4 h-4" aria-hidden="true" />
       </button>
     </div>
 

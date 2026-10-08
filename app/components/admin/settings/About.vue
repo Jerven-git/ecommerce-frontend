@@ -2,9 +2,7 @@
   <section data-guide="settings-about" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-        <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Icon name="heroicons:information-circle" class="w-4 h-4 text-amber-600" aria-hidden="true" />
       </div>
       <div>
         <h2 class="text-sm font-semibold text-gray-900">About Page</h2>
@@ -58,9 +56,7 @@
           <!-- Card header (mimics the actual page card) -->
           <div class="px-5 py-3 border-b border-gray-100 flex items-center gap-3">
             <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" :style="{ backgroundColor: (themeColors.primary) + '18' }">
-              <svg class="w-3.5 h-3.5" :style="{ color: themeColors.primary }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
+              <Icon name="heroicons:book-open" class="w-3.5 h-3.5" :style="{ color: themeColors.primary }" aria-hidden="true" />
             </div>
             <div>
               <p class="text-xs font-semibold text-gray-900">Our Story</p>
@@ -103,7 +99,7 @@
                 class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity shadow-sm hover:bg-red-600 z-10"
                 @click="removeHighlightItem(i)"
               >
-                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                <Icon name="heroicons:x-mark" class="w-3 h-3" aria-hidden="true" />
               </button>
 
               <!-- Icon -->
@@ -134,7 +130,7 @@
               class="rounded-xl border-2 border-dashed border-gray-200 p-4 flex flex-col items-center justify-center text-gray-300 hover:text-primary-500 hover:border-primary-300 transition-all min-h-[100px]"
               @click="addHighlightItem"
             >
-              <svg class="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+              <Icon name="heroicons:plus" class="w-6 h-6 mb-1" aria-hidden="true" />
               <span class="text-[10px] font-medium">Add Highlight</span>
             </button>
           </div>

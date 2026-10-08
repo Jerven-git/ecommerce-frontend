@@ -33,9 +33,7 @@
     <!-- Error -->
     <div v-else-if="error" class="max-w-md mx-auto px-4 py-20 text-center">
       <div class="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-4">
-        <svg class="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Icon name="heroicons:exclamation-circle" class="w-7 h-7 text-red-500" aria-hidden="true" />
       </div>
       <p class="text-sm font-medium text-red-600 mb-4">{{ error }}</p>
       <NuxtLink to="/shop" class="btn-primary inline-block">Back to Shop</NuxtLink>
@@ -74,17 +72,13 @@
                     @click.stop="prevImage"
                     class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-md text-gray-700 hover:bg-white transition-all opacity-0 group-hover:opacity-100"
                   >
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
+                    <Icon name="heroicons:chevron-left" class="w-5 h-5" aria-hidden="true" />
                   </button>
                   <button
                     @click.stop="nextImage"
                     class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-md text-gray-700 hover:bg-white transition-all opacity-0 group-hover:opacity-100"
                   >
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
+                    <Icon name="heroicons:chevron-right" class="w-5 h-5" aria-hidden="true" />
                   </button>
                 </template>
 
@@ -177,9 +171,7 @@
                     v-if="selectedValues[option.id] === value.id"
                     class="absolute top-1 right-1 w-4 h-4 rounded-full bg-[var(--color-secondary)] flex items-center justify-center"
                   >
-                    <svg class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+                    <Icon name="heroicons:check" class="w-2.5 h-2.5 text-white" aria-hidden="true" />
                   </span>
                 </button>
               </div>
@@ -220,9 +212,7 @@
                 :disabled="quantity <= 1"
                 class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" d="M5 12h14" />
-                </svg>
+                <Icon name="heroicons:minus" class="w-4 h-4" aria-hidden="true" />
               </button>
               <span class="w-12 h-10 flex items-center justify-center text-sm font-semibold text-gray-900 border-x border-gray-300">
                 {{ quantity }}
@@ -232,9 +222,7 @@
                 :disabled="(!hasVariants || !!selectedVariant) && !product.can_backorder && quantity >= effectiveStock"
                 class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" d="M12 5v14M5 12h14" />
-                </svg>
+                <Icon name="heroicons:plus" class="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -277,9 +265,7 @@
             class="group inline-flex items-center gap-2 text-sm font-medium tracking-wide text-gray-900 border-b border-gray-300 pb-1 hover:border-gray-900 transition-colors"
           >
             View All Products
-            <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
+            <Icon name="heroicons:arrow-right" class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
           </NuxtLink>
         </div>
       </div>
@@ -308,9 +294,7 @@
             @click="showLightbox = false"
             class="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
           >
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <Icon name="heroicons:x-mark" class="w-5 h-5" aria-hidden="true" />
           </button>
 
           <!-- Prev / Next in lightbox -->
@@ -319,17 +303,13 @@
               @click.stop="prevImage"
               class="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
             >
-              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
+              <Icon name="heroicons:chevron-left" class="w-6 h-6" aria-hidden="true" />
             </button>
             <button
               @click.stop="nextImage"
               class="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
             >
-              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
+              <Icon name="heroicons:chevron-right" class="w-6 h-6" aria-hidden="true" />
             </button>
           </template>
 

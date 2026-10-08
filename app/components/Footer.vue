@@ -29,7 +29,7 @@
       </div>
       <div class="border-t border-white/10 mt-10 pt-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
         <p class="text-xs text-[var(--apex-on-dark-subtle)]">© {{ new Date().getFullYear() }} DATABASY. All rights reserved.</p>
-        <button type="button" class="inline-flex min-h-11 items-center gap-1.5 rounded-md text-xs font-semibold text-[var(--apex-on-dark-subtle)] hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-dark)]" @click="scrollToTop">Back to top <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg></button>
+        <button type="button" class="inline-flex min-h-11 items-center gap-1.5 rounded-md text-xs font-semibold text-[var(--apex-on-dark-subtle)] hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--apex-focus-on-dark)]" @click="scrollToTop">Back to top <Icon name="heroicons:chevron-up" class="w-3.5 h-3.5" aria-hidden="true" /></button>
       </div>
     </div>
   </footer>
@@ -95,9 +95,7 @@
           @click="scrollToTop"
         >
           Back to top
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-          </svg>
+          <Icon name="heroicons:chevron-up" class="w-3.5 h-3.5" aria-hidden="true" />
         </button>
       </div>
     </div>

@@ -25,9 +25,7 @@
         <div class="px-6 py-5 border-b border-gray-200/70">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center shrink-0">
-              <svg class="w-5 h-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4a4 4 0 110 8 4 4 0 010-8zm-7 16a7 7 0 1114 0H5z" />
-              </svg>
+              <Icon name="heroicons:user" class="w-5 h-5 text-primary-600" aria-hidden="true" />
             </div>
             <div>
               <p class="text-sm font-semibold text-gray-900">{{ isEditing ? 'Edit admin account' : 'Create admin account' }}</p>
@@ -105,10 +103,7 @@
               class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-60"
               :disabled="saving"
             >
-              <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
+              <Icon name="heroicons:arrow-path" v-if="saving" class="w-4 h-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
               <span>{{ isEditing ? 'Save changes' : 'Create admin' }}</span>
             </button>
             <button
@@ -152,7 +147,7 @@
           v-else-if="!users.length"
           title="No admin accounts found."
           description="Create the first one from the form on the left."
-          :icon="'M12 4a4 4 0 110 8 4 4 0 010-8zm-7 16a7 7 0 1114 0H5z'"
+          icon="heroicons:user-group"
         />
 
         <div v-else class="divide-y divide-gray-100">

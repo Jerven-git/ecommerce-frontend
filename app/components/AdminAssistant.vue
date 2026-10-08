@@ -8,9 +8,7 @@
         aria-label="Open help assistant"
         @click="open = true"
       >
-        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Icon name="heroicons:question-mark-circle" class="h-5 w-5" aria-hidden="true" />
         <span>Help</span>
       </button>
       <button
@@ -46,9 +44,7 @@
         <!-- Header -->
         <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-primary-600 text-white shrink-0">
           <div class="flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <Icon name="heroicons:question-mark-circle" class="w-5 h-5" aria-hidden="true" />
             <h3 class="text-sm font-bold">Help Assistant</h3>
           </div>
           <div class="flex items-center gap-1">
@@ -64,9 +60,7 @@
               class="w-7 h-7 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 rounded-md transition-colors"
               aria-label="Close"
             >
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <Icon name="heroicons:x-mark" class="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -133,9 +127,7 @@
             class="w-9 h-9 shrink-0 flex items-center justify-center bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             aria-label="Send"
           >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
+            <Icon name="heroicons:arrow-right" class="w-4 h-4" aria-hidden="true" />
           </button>
         </form>
       </div>

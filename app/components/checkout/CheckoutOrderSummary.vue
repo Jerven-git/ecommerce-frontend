@@ -22,9 +22,7 @@
       <!-- Backorder notice -->
       <div v-if="hasBackorderItems" class="py-3 border-b border-gray-100">
         <div class="flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl">
-          <svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <Icon name="heroicons:clock" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" aria-hidden="true" />
           <p class="text-xs text-amber-800 leading-relaxed">
             Some items are out of stock and will be placed on backorder. You'll be notified when they're available.
           </p>
@@ -50,19 +48,14 @@
             class="px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-50 rounded-lg transition-colors shrink-0"
           >
             <span v-if="applyingDiscount" class="flex items-center gap-1.5">
-              <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
+              <Icon name="heroicons:arrow-path" class="w-3.5 h-3.5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
             </span>
             <span v-else>Apply</span>
           </button>
         </div>
         <div v-else class="flex items-center justify-between px-3 py-2 bg-green-50 border border-green-100 rounded-lg">
           <div class="flex items-center gap-2">
-            <svg class="w-4 h-4 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
+            <Icon name="heroicons:check" class="w-4 h-4 text-green-600 shrink-0" aria-hidden="true" />
             <div>
               <p class="text-xs font-bold text-green-700 font-mono tracking-wider">{{ appliedDiscount.code }}</p>
               <p class="text-xs text-green-600">
@@ -71,9 +64,7 @@
             </div>
           </div>
           <button type="button" @click="$emit('removeDiscount')" class="text-gray-400 hover:text-red-500 transition-colors">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <Icon name="heroicons:x-mark" class="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
         <p v-if="discountError" class="mt-1.5 text-xs text-red-600">{{ discountError }}</p>
@@ -98,28 +89,21 @@
             class="px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-50 rounded-lg transition-colors shrink-0"
           >
             <span v-if="validatingGiftCard" class="flex items-center gap-1.5">
-              <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
+              <Icon name="heroicons:arrow-path" class="w-3.5 h-3.5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
             </span>
             <span v-else>Apply</span>
           </button>
         </div>
         <div v-else class="flex items-center justify-between px-3 py-2 bg-green-50 border border-green-100 rounded-lg">
           <div class="flex items-center gap-2">
-            <svg class="w-4 h-4 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
+            <Icon name="heroicons:check" class="w-4 h-4 text-green-600 shrink-0" aria-hidden="true" />
             <div>
               <p class="text-xs font-bold text-green-700 font-mono tracking-wider">{{ appliedGiftCard.code }}</p>
               <p class="text-xs text-green-600">Balance: {{ format(appliedGiftCard.balance) }}</p>
             </div>
           </div>
           <button type="button" @click="$emit('removeGiftCard')" class="text-gray-400 hover:text-red-500 transition-colors">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <Icon name="heroicons:x-mark" class="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
         <p v-if="giftCardError" class="mt-1.5 text-xs text-red-600">{{ giftCardError }}</p>
@@ -175,9 +159,7 @@
             <span class="font-medium">Unavailable</span>
           </div>
           <div class="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl">
-            <svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <Icon name="heroicons:exclamation-triangle" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" aria-hidden="true" />
             <p class="text-xs text-amber-800 leading-relaxed">
               We don't currently ship to this location. Please try a different address or contact us for assistance.
             </p>

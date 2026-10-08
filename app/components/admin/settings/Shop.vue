@@ -2,9 +2,7 @@
   <section data-guide="settings-shop" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-        <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-        </svg>
+        <Icon name="heroicons:shopping-bag" class="w-4 h-4 text-blue-600" aria-hidden="true" />
       </div>
       <div>
         <h2 class="text-sm font-semibold text-gray-900">Shop Page</h2>
@@ -102,9 +100,7 @@
                 :key="i"
                 class="group/perk relative flex items-center gap-1.5 bg-white/15 backdrop-blur-sm pl-3 pr-1.5 py-1.5 rounded-full"
               >
-                <svg class="h-3 w-3 text-white/70 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="PERK_ICONS[i % PERK_ICONS.length]" />
-                </svg>
+                <Icon :name="PERK_ICONS[i % PERK_ICONS.length]" class="h-3 w-3 shrink-0 text-white/70" aria-hidden="true" />
                 <input
                   :value="perk"
                   @input="updatePerk(i, ($event.target as HTMLInputElement).value)"
@@ -119,7 +115,7 @@
                   class="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center opacity-0 group-hover/perk:opacity-100 transition-opacity hover:bg-red-500"
                   @click="removePerk(i)"
                 >
-                  <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+                  <Icon name="heroicons:x-mark" class="w-2.5 h-2.5" aria-hidden="true" />
                 </button>
               </div>
 
@@ -130,7 +126,7 @@
                 class="flex items-center gap-1 bg-white/10 px-3 py-1.5 rounded-full text-white/30 hover:text-white/70 hover:bg-white/20 transition-all"
                 @click="addPerk"
               >
-                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                <Icon name="heroicons:plus" class="w-3 h-3" aria-hidden="true" />
                 <span class="text-[9px] font-medium">Add</span>
               </button>
             </div>
@@ -145,9 +141,7 @@
                 :style="{ color: themeColors.primary }"
                 placeholder="Button text"
               />
-              <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
+              <Icon name="heroicons:arrow-right" class="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
             </div>
           </div>
         </div>
@@ -161,9 +155,9 @@ import type { ShopHeader, ShopPromo } from '~/composables/useSiteConfig'
 import { DEFAULT_THEME } from '~/composables/useSiteConfig'
 
 const PERK_ICONS = [
-  'M5 13l4 4L19 7',
-  'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15',
-  'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
+  'heroicons:check',
+  'heroicons:arrow-path',
+  'heroicons:lock-closed',
 ]
 
 const props = defineProps<{

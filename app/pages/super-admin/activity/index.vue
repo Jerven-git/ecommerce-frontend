@@ -23,7 +23,7 @@
     <section class="rounded-xl border border-admin-border bg-admin-surface p-3 shadow-sm" aria-labelledby="filters-heading">
       <div class="flex items-center gap-2.5">
         <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-admin-accent-soft text-admin-accent">
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9M3 16h13M15 14l4 4m0 0l-4 4m4-4H9" /></svg>
+          <Icon name="heroicons:clipboard-document-list" class="h-4 w-4" aria-hidden="true" />
         </span>
         <div>
           <h2 id="filters-heading" class="text-sm font-semibold text-admin-text">Narrow the audit trail</h2>
@@ -74,12 +74,11 @@
           <p class="hidden text-xs text-admin-muted sm:block">Filters stay in place while you move between result pages.</p>
           <div class="flex flex-col-reverse gap-2 sm:flex-row">
             <button type="button" class="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent" @click="clearFilters">
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+              <Icon name="heroicons:x-mark" class="h-4 w-4" aria-hidden="true" />
               Reset
             </button>
             <button type="submit" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-admin-accent px-3 text-xs font-semibold text-admin-on-accent hover:bg-admin-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50" :disabled="loading">
-              <svg v-if="loading" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-              <Icon v-else name="heroicons:magnifying-glass" class="h-4 w-4" aria-hidden="true" />
+              <Icon :name="loading ? 'heroicons:arrow-path' : 'heroicons:magnifying-glass'" class="h-4 w-4" :class="loading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
               Show results
             </button>
           </div>
@@ -137,14 +136,14 @@
                 </td>
                 <td class="px-4 py-3">
                   <span v-if="entry.store" class="inline-flex items-center gap-1.5 text-xs font-medium text-admin-text">
-                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" /></svg>
+                    <Icon name="heroicons:building-storefront" class="h-3 w-3" aria-hidden="true" />
                     {{ entry.store.name }}
                   </span>
                   <span v-else class="text-xs text-admin-muted">Platform</span>
                 </td>
                 <td class="whitespace-nowrap px-4 py-3">
                   <time class="inline-flex items-center gap-1.5 text-xs tabular-nums text-admin-muted" :datetime="entry.created_at">
-                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <Icon name="heroicons:clock" class="h-3.5 w-3.5" aria-hidden="true" />
                     {{ formatDate(entry.created_at) }}
                   </time>
                 </td>

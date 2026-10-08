@@ -10,9 +10,7 @@
         <Icon v-if="selected" :name="`circle-flags:${selected.code.toLowerCase()}`" class="w-5 h-5 shrink-0" />
         <Icon v-else name="circle-flags:xx" class="w-5 h-5 shrink-0 opacity-40" />
         <span class="text-gray-700 font-medium">{{ selected?.dial || '+?' }}</span>
-        <svg class="w-3 h-3 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
+        <Icon name="heroicons:chevron-down" class="w-3 h-3 text-gray-400 shrink-0" aria-hidden="true" />
       </button>
 
       <!-- Dropdown -->

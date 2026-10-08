@@ -5,9 +5,7 @@
       <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
+            <Icon name="heroicons:video-camera" class="w-4 h-4 text-rose-600" aria-hidden="true" />
           </div>
           <div>
             <h2 class="text-sm font-semibold text-gray-900">Watch &amp; Shop</h2>
@@ -68,9 +66,7 @@
       <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM4 10h16" />
-            </svg>
+            <Icon name="heroicons:credit-card" class="w-4 h-4 text-amber-600" aria-hidden="true" />
           </div>
           <div>
             <h2 class="text-sm font-semibold text-gray-900">Cards</h2>
@@ -88,9 +84,7 @@
           :disabled="uploading"
           @click="triggerUpload"
         >
-          <svg class="w-3.5 h-3.5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-          </svg>
+          <Icon name="heroicons:plus" class="w-3.5 h-3.5 inline-block mr-1" aria-hidden="true" />
           {{ uploading ? 'Uploading…' : 'Add card' }}
         </button>
       </div>
@@ -128,9 +122,7 @@
         v-if="localValue.cards.length > SOFT_CAP"
         class="px-6 py-2 text-xs text-amber-700 bg-amber-50 border-b border-amber-100 flex items-center gap-2"
       >
-        <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.736-3L13.732 4a2 2 0 00-3.464 0L3.34 16a2 2 0 001.732 3z" />
-        </svg>
+        <Icon name="heroicons:exclamation-triangle" class="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
         You have more than {{ SOFT_CAP }} cards. The carousel is fastest with {{ SOFT_CAP }} or fewer.
       </div>
 
@@ -139,9 +131,7 @@
       <!-- Empty state -->
       <div v-if="localValue.cards.length === 0" class="p-10 text-center">
         <div class="w-12 h-12 mx-auto rounded-2xl bg-gray-50 flex items-center justify-center mb-3">
-          <svg class="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" />
-          </svg>
+          <Icon name="heroicons:rectangle-stack" class="w-6 h-6 text-gray-300" aria-hidden="true" />
         </div>
         <p class="text-sm text-gray-500 mb-1">No cards yet.</p>
         <p class="text-xs text-gray-400">Click "Add card" to upload a short product video.</p>
@@ -179,10 +169,7 @@
               v-if="card.media_status === 'processing'"
               class="absolute top-2 left-2 bg-amber-100 text-amber-800 text-[10px] font-medium px-2 py-1 rounded-full inline-flex items-center gap-1"
             >
-              <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
+              <Icon name="heroicons:arrow-path" class="w-3 h-3 animate-spin motion-reduce:animate-none" aria-hidden="true" />
               Optimizing
             </div>
             <div
@@ -199,9 +186,7 @@
               :title="`Remove card ${i + 1}`"
               @click="removeCard(card.id)"
             >
-              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <Icon name="heroicons:x-mark" class="w-3 h-3" aria-hidden="true" />
             </button>
           </div>
 

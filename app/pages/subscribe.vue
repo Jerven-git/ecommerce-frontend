@@ -10,10 +10,7 @@
     <div class="w-full max-w-3xl relative z-10">
       <!-- Initial auth check -->
       <div v-if="checkingAuth" class="flex flex-col items-center justify-center py-24">
-        <svg class="animate-spin h-8 w-8 text-white/50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-        </svg>
+        <Icon name="heroicons:arrow-path" class="animate-spin h-8 w-8 text-white/50 motion-reduce:animate-none" aria-hidden="true" />
         <p class="mt-4 text-sm text-white/40">Loading your subscription…</p>
       </div>
 
@@ -108,10 +105,7 @@
               class="bg-white/[0.07] backdrop-blur-xl rounded-2xl shadow-2xl border border-white/[0.12] p-8 sm:p-10"
               :class="mounted ? 'animate-card-enter' : 'opacity-0 translate-y-6'"
             >
-              <svg class="animate-spin h-10 w-10 mx-auto text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
+              <Icon name="heroicons:arrow-path" class="animate-spin h-10 w-10 mx-auto text-primary-600 motion-reduce:animate-none" aria-hidden="true" />
               <h2 class="mt-6 text-xl font-bold text-white tracking-tight">Payment received — activating your store…</h2>
               <p class="mt-3 text-sm text-white/50 leading-relaxed">
                 This usually takes a moment. We'll let you know the instant your store is live.
@@ -163,10 +157,7 @@
             </div>
 
             <div v-if="plansLoading" class="flex justify-center py-12">
-              <svg class="animate-spin h-8 w-8 text-white/50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
+              <Icon name="heroicons:arrow-path" class="animate-spin h-8 w-8 text-white/50 motion-reduce:animate-none" aria-hidden="true" />
             </div>
 
             <div v-if="plansError" class="max-w-md mx-auto mb-8">
@@ -215,16 +206,7 @@
                   :disabled="checkoutLoading === plan.slug"
                   @click="handleCheckout(plan)"
                 >
-                  <svg
-                    v-if="checkoutLoading === plan.slug"
-                    class="animate-spin h-5 w-5 mx-auto"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
+                  <Icon name="heroicons:arrow-path" v-if="checkoutLoading === plan.slug" class="animate-spin h-5 w-5 mx-auto motion-reduce:animate-none" aria-hidden="true" />
                   <span v-else>Subscribe now</span>
                 </button>
               </div>

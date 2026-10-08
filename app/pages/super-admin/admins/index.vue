@@ -15,7 +15,7 @@
           <span class="h-2 w-2 rounded-full bg-admin-accent" /> {{ pagination.total.toLocaleString() }} total
         </span>
         <AdminButton to="/super-admin/admins/new" variant="primary">
-          <template #icon><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14" /></svg></template>
+          <template #icon><Icon name="heroicons:plus" class="h-4 w-4" aria-hidden="true" /></template>
           New admin
         </AdminButton>
       </div>
@@ -29,16 +29,15 @@
             <div class="relative">
               <input id="admin-search" v-model="search" type="search" class="admin-input rounded-lg pl-10" placeholder="Search admins…" />
               <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-admin-muted">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 110-15 7.5 7.5 0 010 15z" /></svg>
+                <Icon name="heroicons:magnifying-glass" class="h-4 w-4" aria-hidden="true" />
               </span>
               <button v-if="search" type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 text-admin-muted hover:text-admin-text" aria-label="Clear search" title="Clear search" @click="search=''; refresh(1)">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                <Icon name="heroicons:x-mark" class="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
           </div>
           <button type="submit" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-admin-border bg-admin-surface px-2.5 text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50" :disabled="loading">
-            <svg v-if="loading" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-            <svg v-else class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 110-15 7.5 7.5 0 010 15z" /></svg>
+            <Icon :name="loading ? 'heroicons:arrow-path' : 'heroicons:magnifying-glass'" class="h-4 w-4" :class="loading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
             Search
           </button>
         </form>
@@ -79,13 +78,13 @@
                 </td>
                 <td class="px-4 py-3">
                   <span class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-semibold" :class="admin.is_super_admin ? 'bg-admin-accent-soft text-admin-accent' : 'bg-admin-info-soft text-admin-info'">
-                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="admin.is_super_admin ? 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' : 'M12 4a4 4 0 110 8 4 4 0 010-8zm-7 16a7 7 0 1114 0H5z'" /></svg>
+                    <Icon :name="admin.is_super_admin ? 'heroicons:shield-check' : 'heroicons:user'" class="h-3.5 w-3.5" aria-hidden="true" />
                     {{ admin.is_super_admin ? 'super admin' : 'admin' }}
                   </span>
                 </td>
                 <td class="px-4 py-3">
                   <span v-if="admin.store" class="inline-flex items-center gap-1.5 text-xs font-medium text-admin-text">
-                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" /></svg>
+                    <Icon name="heroicons:building-storefront" class="h-3 w-3" aria-hidden="true" />
                     {{ admin.store.name }}
                   </span>
                   <span v-else class="text-xs text-admin-muted">All stores</span>
@@ -135,8 +134,7 @@
             </div>
             <div class="mt-4 grid gap-2" :class="!admin.is_super_admin && admin.status === 'active' ? 'grid-cols-2' : 'grid-cols-1'">
               <button v-if="!admin.is_super_admin && admin.status === 'active'" type="button" class="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-admin-border bg-admin-surface px-2.5 text-xs font-medium text-admin-text hover:bg-admin-soft disabled:cursor-wait disabled:opacity-50" :disabled="impersonation.transitioning" @pointerenter="warmAdminRoute" @focus="warmAdminRoute" @touchstart.passive="warmAdminRoute" @click="startImpersonation(admin)">
-                <svg v-if="impersonation.transitionTargetId === admin.id" class="h-4 w-4 animate-spin motion-reduce:animate-none" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                <svg v-else class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" /></svg>
+                <Icon :name="impersonation.transitionTargetId === admin.id ? 'heroicons:arrow-path' : 'heroicons:arrow-right-end-on-rectangle'" class="h-4 w-4" :class="impersonation.transitionTargetId === admin.id ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
                 {{ impersonation.transitionTargetId === admin.id ? 'Opening…' : 'Impersonate' }}
               </button>
               <AdminButton :to="`/super-admin/admins/${admin.id}`" variant="secondary" block>Edit admin</AdminButton>
@@ -166,9 +164,9 @@ const pagination = ref({ current_page: 1, last_page: 1, total: 0 })
 
 const initials = (name: string) => name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
 
-const editIcon = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>'
-const impersonateIcon = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>'
-const loadingIcon = '<svg class="animate-spin motion-reduce:animate-none" fill="none" viewBox="0 0 24 24"><circle opacity=".25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path opacity=".75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>'
+const editIcon = 'heroicons:pencil-square'
+const impersonateIcon = 'heroicons:arrow-right-end-on-rectangle'
+const loadingIcon = 'heroicons:arrow-path'
 let adminRoutePreload: Promise<void> | null = null
 let optimisticPreloadTimer: ReturnType<typeof setTimeout> | undefined
 

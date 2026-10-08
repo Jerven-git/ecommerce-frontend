@@ -5,9 +5,7 @@
       <!-- Header -->
       <div class="text-center mb-8">
         <div class="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <svg class="w-7 h-7 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
+          <Icon name="heroicons:cube" class="w-7 h-7 text-purple-600" aria-hidden="true" />
         </div>
         <h1 class="text-2xl font-bold text-gray-900">Track Your Order</h1>
         <p class="text-sm text-gray-500 mt-1">Enter your tracking number to see shipment status</p>
@@ -35,9 +33,7 @@
       <!-- Error -->
       <div v-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-8 text-center">
         <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-3">
-          <svg class="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <Icon name="heroicons:x-mark" class="w-6 h-6 text-red-500" aria-hidden="true" />
         </div>
         <p class="font-semibold text-gray-800 mb-1">Tracking not found</p>
         <p class="text-sm text-gray-500">Please check your tracking number and try again.</p>
@@ -73,9 +69,7 @@
                 class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors"
                 :class="isStepReached(step.value) ? step.activeClass : 'bg-gray-100 text-gray-300'"
               >
-                <svg v-if="isStepReached(step.value)" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
+                <Icon name="heroicons:check" v-if="isStepReached(step.value)" class="w-4 h-4" aria-hidden="true" />
                 <div v-else class="w-2 h-2 rounded-full bg-gray-300"></div>
               </div>
               <div>

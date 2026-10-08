@@ -2,9 +2,7 @@
   <section data-guide="settings-footer" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
-        <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
+        <Icon name="heroicons:bars-3" class="w-4 h-4 text-slate-600" aria-hidden="true" />
       </div>
       <div>
         <h2 class="text-sm font-semibold text-gray-900">Footer</h2>

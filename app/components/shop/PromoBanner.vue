@@ -22,18 +22,19 @@
           :key="i"
           class="flex items-center gap-2 text-sm text-white/85"
         >
-          <svg class="h-4 w-4 shrink-0" :style="{ color: 'var(--color-primary-300)' }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="perkIcons[i % perkIcons.length]" />
-          </svg>
+          <Icon
+            :name="perkIcons[i % perkIcons.length]"
+            class="h-4 w-4 shrink-0"
+            :style="{ color: 'var(--color-primary-300)' }"
+            aria-hidden="true"
+          />
           {{ perk }}
         </div>
       </div>
 
       <NuxtLink to="/shop" class="promo-cta mt-10">
         {{ promo?.button_text || 'Shop New Arrivals' }}
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-        </svg>
+        <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
       </NuxtLink>
     </div>
   </section>
@@ -49,9 +50,9 @@ const defaultPerks = ['Free Shipping', 'Easy Returns', 'Secure Checkout']
 const displayPerks = computed(() => promo.value?.perks?.length ? promo.value.perks : defaultPerks)
 
 const perkIcons = [
-  'M5 13l4 4L19 7',
-  'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15',
-  'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
+  'heroicons:check',
+  'heroicons:arrow-path',
+  'heroicons:lock-closed',
 ]
 </script>
 

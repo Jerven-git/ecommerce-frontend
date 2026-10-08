@@ -2,9 +2,7 @@
   <section data-guide="settings-homepage-sections" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-        <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-        </svg>
+        <Icon name="heroicons:window" class="w-4 h-4 text-amber-600" aria-hidden="true" />
       </div>
       <div>
         <h2 class="text-sm font-semibold text-gray-900">Homepage Sections</h2>
@@ -59,7 +57,7 @@
                 class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity shadow-sm hover:bg-red-600 z-10"
                 @click="removeStepItem(i)"
               >
-                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                <Icon name="heroicons:x-mark" class="w-3 h-3" aria-hidden="true" />
               </button>
 
               <!-- Icon -->
@@ -92,7 +90,7 @@
               class="rounded-xl border-2 border-dashed border-gray-200 p-4 flex flex-col items-center justify-center text-gray-300 hover:text-primary-500 hover:border-primary-300 transition-all min-h-[120px]"
               @click="addStepItem"
             >
-              <svg class="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+              <Icon name="heroicons:plus" class="w-6 h-6 mb-1" aria-hidden="true" />
               <span class="text-[10px] font-medium">Add Step</span>
             </button>
           </div>
@@ -122,7 +120,7 @@
                 class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity shadow-sm hover:bg-red-600 z-10"
                 @click="removeFeatureItem(i)"
               >
-                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                <Icon name="heroicons:x-mark" class="w-3 h-3" aria-hidden="true" />
               </button>
 
               <!-- Icon -->
@@ -153,7 +151,7 @@
               class="rounded-xl border-2 border-dashed border-gray-200 p-4 flex flex-col items-center justify-center text-gray-300 hover:text-primary-500 hover:border-primary-300 transition-all min-h-[100px]"
               @click="addFeatureItem"
             >
-              <svg class="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+              <Icon name="heroicons:plus" class="w-6 h-6 mb-1" aria-hidden="true" />
               <span class="text-[10px] font-medium">Add Feature</span>
             </button>
           </div>
@@ -183,7 +181,7 @@
                 class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity shadow-sm hover:bg-red-600 z-10"
                 @click="removeStatItem(i)"
               >
-                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                <Icon name="heroicons:x-mark" class="w-3 h-3" aria-hidden="true" />
               </button>
 
               <input
@@ -209,7 +207,7 @@
               class="rounded-lg border-2 border-dashed border-white/20 py-4 flex flex-col items-center justify-center text-white/30 hover:text-white/70 hover:border-white/40 transition-all"
               @click="addStatItem"
             >
-              <svg class="w-5 h-5 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+              <Icon name="heroicons:plus" class="w-5 h-5 mb-0.5" aria-hidden="true" />
               <span class="text-[8px] font-medium">Add</span>
             </button>
           </div>

@@ -27,9 +27,7 @@
           :aria-label="'Scroll left'"
           @click="scrollByPage(-1)"
         >
-          <svg class="w-4 h-4 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
-          </svg>
+          <Icon name="heroicons:chevron-left" class="w-4 h-4 text-gray-800" aria-hidden="true" />
         </button>
 
         <!-- Track -->
@@ -97,9 +95,7 @@
                   :style="{ color: siteConfig?.theme?.primary_color || '#d946ef' }"
                 >
                   SHOP NOW
-                  <svg class="w-3 h-3 transition-transform group-hover/chip:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
+                  <Icon name="heroicons:arrow-right" class="w-3 h-3 transition-transform group-hover/chip:translate-x-0.5" aria-hidden="true" />
                 </span>
               </div>
             </NuxtLink>
@@ -114,9 +110,7 @@
           :aria-label="'Scroll right'"
           @click="scrollByPage(1)"
         >
-          <svg class="w-4 h-4 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
-          </svg>
+          <Icon name="heroicons:chevron-right" class="w-4 h-4 text-gray-800" aria-hidden="true" />
         </button>
       </div>
     </div>

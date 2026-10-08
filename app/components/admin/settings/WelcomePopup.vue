@@ -2,9 +2,7 @@
   <section data-guide="settings-welcome-popup" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-        <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-        </svg>
+        <Icon name="heroicons:gift" class="w-4 h-4 text-amber-600" aria-hidden="true" />
       </div>
       <div>
         <h2 class="text-sm font-semibold text-gray-900">Welcome Popup</h2>
@@ -86,9 +84,7 @@
           <!-- Preview hint -->
           <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
             <div class="flex items-start gap-3">
-              <svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <Icon name="heroicons:information-circle" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" aria-hidden="true" />
               <div>
                 <p class="text-sm font-medium text-amber-800">How it works</p>
                 <p class="text-xs text-amber-600 mt-0.5">The popup shows once per visitor. When they enter their email, a unique single-use discount code is generated and displayed instantly. The code can only be used once at checkout.</p>

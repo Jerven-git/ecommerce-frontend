@@ -2,9 +2,7 @@
   <section data-guide="settings-contact" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center shrink-0">
-        <svg class="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
+        <Icon name="heroicons:envelope" class="w-4 h-4 text-rose-600" aria-hidden="true" />
       </div>
       <div>
         <h2 class="text-sm font-semibold text-gray-900">Contact</h2>
@@ -58,9 +56,7 @@
           <!-- Card header (mimics the actual page) -->
           <div class="px-5 py-3 border-b border-gray-100 flex items-center gap-3">
             <div class="w-7 h-7 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
-              <svg class="w-3.5 h-3.5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
+              <Icon name="heroicons:envelope" class="w-3.5 h-3.5 text-primary-600" aria-hidden="true" />
             </div>
             <div class="flex-1 min-w-0">
               <input
@@ -118,7 +114,7 @@
                   class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/entry:opacity-100 transition-opacity shadow-sm hover:bg-red-600 z-10"
                   @click="emit('remove-entry', i)"
                 >
-                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                  <Icon name="heroicons:x-mark" class="w-3 h-3" aria-hidden="true" />
                 </button>
 
                 <!-- Label -->
@@ -132,9 +128,7 @@
                 <!-- Email row -->
                 <div class="flex items-center gap-2 mb-1.5">
                   <div class="w-6 h-6 rounded-md bg-primary-50 flex items-center justify-center shrink-0">
-                    <svg class="w-3 h-3 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
+                    <Icon name="heroicons:envelope" class="w-3 h-3 text-primary-600" aria-hidden="true" />
                   </div>
                   <input
                     v-model="entry.email"
@@ -147,9 +141,7 @@
                 <!-- Phone row -->
                 <div class="flex items-center gap-2">
                   <div class="w-6 h-6 rounded-md bg-emerald-50 flex items-center justify-center shrink-0">
-                    <svg class="w-3 h-3 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
+                    <Icon name="heroicons:phone" class="w-3 h-3 text-emerald-600" aria-hidden="true" />
                   </div>
                   <input
                     v-model="entry.phone"
@@ -166,7 +158,7 @@
                 class="w-full rounded-xl border-2 border-dashed border-gray-200 py-3 flex items-center justify-center gap-1.5 text-gray-300 hover:text-primary-500 hover:border-primary-300 transition-all"
                 @click="emit('add-entry')"
               >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                <Icon name="heroicons:plus" class="w-4 h-4" aria-hidden="true" />
                 <span class="text-[10px] font-medium">Add Contact</span>
               </button>
             </div>
@@ -197,7 +189,7 @@
                 class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity shadow-sm hover:bg-red-600 z-10"
                 @click="removePromiseItem(i)"
               >
-                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                <Icon name="heroicons:x-mark" class="w-3 h-3" aria-hidden="true" />
               </button>
 
               <!-- Icon -->
@@ -228,7 +220,7 @@
               class="rounded-lg border-2 border-dashed border-white/20 py-6 flex flex-col items-center justify-center text-white/30 hover:text-white/70 hover:border-white/40 transition-all"
               @click="addPromiseItem"
             >
-              <svg class="w-5 h-5 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+              <Icon name="heroicons:plus" class="w-5 h-5 mb-0.5" aria-hidden="true" />
               <span class="text-[8px] font-medium">Add</span>
             </button>
           </div>
@@ -291,7 +283,7 @@
               @click="removeFaq(i)"
               aria-label="Remove FAQ"
             >
-              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+              <Icon name="heroicons:x-mark" class="w-3 h-3" aria-hidden="true" />
             </button>
 
             <div class="flex items-center gap-2">
@@ -321,7 +313,7 @@
             class="w-full rounded-xl border-2 border-dashed border-gray-200 py-3 flex items-center justify-center gap-1.5 text-gray-300 hover:text-primary-500 hover:border-primary-300 transition-all"
             @click="addFaq"
           >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            <Icon name="heroicons:plus" class="w-4 h-4" aria-hidden="true" />
             <span class="text-[11px] font-medium">Add FAQ</span>
           </button>
         </div>

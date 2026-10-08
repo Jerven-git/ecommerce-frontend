@@ -17,7 +17,9 @@
     </div>
     <!-- Empty -->
     <div v-else-if="isEmpty" class="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
-      <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-admin-soft text-admin-muted" aria-hidden="true" v-html="emptyIcon" />
+      <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-admin-soft text-admin-muted">
+        <Icon :name="emptyIcon" class="h-5 w-5" aria-hidden="true" />
+      </span>
       <p class="text-sm font-semibold text-admin-text">{{ emptyTitle }}</p>
       <p class="max-w-[28ch] text-xs leading-relaxed text-admin-muted">{{ emptyDescription }}</p>
     </div>
@@ -75,7 +77,7 @@ const props = withDefaults(defineProps<{
   isEmpty: false,
   emptyTitle: 'No data yet',
   emptyDescription: 'Data will appear here once available.',
-  emptyIcon: '<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3v18h18M7 14l3-3 3 3 5-6" /></svg>',
+  emptyIcon: 'heroicons:chart-bar-square',
   ariaLabel: 'Chart',
 })
 

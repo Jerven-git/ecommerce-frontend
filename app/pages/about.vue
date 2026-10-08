@@ -124,9 +124,7 @@
         <div class="mt-9 flex flex-wrap items-center justify-center gap-4">
           <NuxtLink v-if="isEnabled('shop')" to="/shop" class="about-cta-primary">
             Browse the shop
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
+            <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
           </NuxtLink>
           <NuxtLink v-if="isEnabled('contact')" to="/contact" class="about-cta-ghost">Get in touch</NuxtLink>
         </div>

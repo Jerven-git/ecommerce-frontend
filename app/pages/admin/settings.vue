@@ -23,9 +23,7 @@
           : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'"
         @click="activeTab = tab.id"
       >
-        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="tab.icon" />
-        </svg>
+        <Icon :name="tab.icon" class="h-4 w-4 shrink-0" aria-hidden="true" />
         {{ tab.label }}
       </button>
     </nav>
@@ -36,9 +34,7 @@
     <!-- Error -->
     <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">
       <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg class="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Icon name="heroicons:exclamation-circle" class="w-6 h-6 text-red-500" aria-hidden="true" />
       </div>
       <p class="font-semibold text-gray-800 mb-1">Failed to load settings</p>
       <p class="text-sm text-red-500 mb-6">{{ error }}</p>
@@ -153,11 +149,11 @@ const router = useRouter()
 
 // --- Tabs ---
 const tabs = [
-  { id: 'general', label: 'General', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
-  { id: 'appearance', label: 'Appearance', icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01' },
-  { id: 'pages', label: 'Pages', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
-  { id: 'popup', label: 'Popup', icon: 'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7' },
-  { id: 'modules', label: 'Modules', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z' },
+  { id: 'general', label: 'General', icon: 'heroicons:building-office-2' },
+  { id: 'appearance', label: 'Appearance', icon: 'heroicons:swatch' },
+  { id: 'pages', label: 'Pages', icon: 'heroicons:document-text' },
+  { id: 'popup', label: 'Popup', icon: 'heroicons:gift' },
+  { id: 'modules', label: 'Modules', icon: 'heroicons:squares-2x2' },
 ] as const
 
 type TabId = typeof tabs[number]['id']

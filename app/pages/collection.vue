@@ -121,9 +121,7 @@
           <!-- Search -->
           <div class="flex-1 flex items-center rounded-xl border border-gray-200 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500/20 focus-within:border-primary-400 transition-all bg-white">
             <span class="flex items-center pl-3.5 pr-2 text-gray-400 shrink-0">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
-              </svg>
+              <Icon name="heroicons:magnifying-glass" class="w-4 h-4" aria-hidden="true" />
             </span>
             <input
               v-model="searchQuery"
@@ -159,9 +157,7 @@
         <!-- Error -->
         <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center max-w-sm mx-auto mt-8">
           <div class="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-3">
-            <svg class="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <Icon name="heroicons:exclamation-circle" class="w-6 h-6 text-red-500" aria-hidden="true" />
           </div>
           <p class="text-sm font-medium text-red-600 mb-4">{{ error }}</p>
           <button @click="fetchProducts" class="btn-primary">Retry</button>
@@ -170,9 +166,7 @@
         <!-- Empty State -->
         <div v-else-if="products.length === 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center max-w-sm mx-auto mt-8">
           <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
-            <svg class="w-7 h-7 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13M7 13L5.4 5M17 21a1 1 0 100-2 1 1 0 000 2zm-10 0a1 1 0 100-2 1 1 0 000 2z" />
-            </svg>
+            <Icon name="heroicons:shopping-cart" class="w-7 h-7 text-gray-300" aria-hidden="true" />
           </div>
           <p class="text-sm font-semibold text-gray-900 mb-1">No products found</p>
           <p class="text-sm text-gray-400 mb-5">Try adjusting your search or filter to find what you're looking for.</p>

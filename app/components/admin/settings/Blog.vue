@@ -2,9 +2,7 @@
   <section data-guide="settings-blog" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
-        <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-        </svg>
+        <Icon name="heroicons:newspaper" class="w-4 h-4 text-indigo-600" aria-hidden="true" />
       </div>
       <div class="flex-1 min-w-0">
         <h2 class="text-sm font-semibold text-gray-900">Blog Page</h2>
@@ -16,9 +14,7 @@
           class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100 transition-colors"
         >
           Manage posts
-          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
+          <Icon name="heroicons:chevron-right" class="w-3 h-3" aria-hidden="true" />
         </NuxtLink>
         <NuxtLink
           to="/admin/post-categories"

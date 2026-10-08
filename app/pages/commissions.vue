@@ -22,9 +22,7 @@
           class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center"
         >
           <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-emerald-50 flex items-center justify-center">
-            <svg class="w-7 h-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
+            <Icon name="heroicons:check" class="w-7 h-7 text-emerald-600" aria-hidden="true" />
           </div>
           <h2 class="text-xl font-bold text-gray-900">Request submitted</h2>
           <p class="mt-2 text-sm text-gray-600 max-w-md mx-auto">

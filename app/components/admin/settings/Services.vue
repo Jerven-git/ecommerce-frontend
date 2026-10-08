@@ -2,9 +2,7 @@
   <section data-guide="settings-services" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center shrink-0">
-        <svg class="w-4 h-4 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-        </svg>
+        <Icon name="heroicons:adjustments-horizontal" class="w-4 h-4 text-teal-600" aria-hidden="true" />
       </div>
       <div class="flex-1 min-w-0">
         <h2 class="text-sm font-semibold text-gray-900">Services Page</h2>
@@ -164,7 +162,7 @@
                 class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/summary:opacity-100 transition-opacity shadow-sm hover:bg-red-600 z-10"
                 @click="removeSummaryItem(i)"
               >
-                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                <Icon name="heroicons:x-mark" class="w-3 h-3" aria-hidden="true" />
               </button>
               <input
                 :value="item.title"
@@ -187,7 +185,7 @@
               class="rounded-xl border-2 border-dashed border-gray-200 p-4 flex flex-col items-center justify-center text-gray-300 hover:text-primary-500 hover:border-primary-300 transition-all min-h-[80px]"
               @click="addSummaryItem"
             >
-              <svg class="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+              <Icon name="heroicons:plus" class="w-5 h-5 mb-1" aria-hidden="true" />
               <span class="text-[10px] font-medium">Add Summary</span>
             </button>
           </div>
@@ -224,7 +222,7 @@
                 class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/stat:opacity-100 transition-opacity shadow-sm hover:bg-red-600 z-10"
                 @click="removeStatItem(i)"
               >
-                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                <Icon name="heroicons:x-mark" class="w-3 h-3" aria-hidden="true" />
               </button>
               <input
                 :value="stat.value"
@@ -247,7 +245,7 @@
               class="rounded-xl border-2 border-dashed border-gray-200 p-4 flex flex-col items-center justify-center text-gray-300 hover:text-primary-500 hover:border-primary-300 transition-all min-h-[80px]"
               @click="addStatItem"
             >
-              <svg class="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+              <Icon name="heroicons:plus" class="w-5 h-5 mb-1" aria-hidden="true" />
               <span class="text-[10px] font-medium">Add Stat</span>
             </button>
           </div>
@@ -263,17 +261,13 @@
         class="flex items-center gap-3 rounded-xl border border-dashed border-gray-200 bg-gray-50/60 p-4 hover:border-primary-300 hover:bg-primary-50/40 transition-colors group"
       >
         <div class="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center shrink-0 group-hover:border-primary-300">
-          <svg class="w-4 h-4 text-gray-500 group-hover:text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
+          <Icon name="heroicons:cube" class="w-4 h-4 text-gray-500 group-hover:text-primary-600" aria-hidden="true" />
         </div>
         <div class="flex-1 min-w-0">
           <p class="text-sm font-semibold text-gray-900">Manage services in Admin → Services</p>
           <p class="text-xs text-gray-500 mt-0.5">Each service has its own detail page, full content, and SEO. Categories live under Service Categories.</p>
         </div>
-        <svg class="w-4 h-4 text-gray-400 group-hover:text-primary-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
+        <Icon name="heroicons:chevron-right" class="w-4 h-4 text-gray-400 group-hover:text-primary-500 shrink-0" aria-hidden="true" />
       </NuxtLink>
 
       <!-- CTA banner -->

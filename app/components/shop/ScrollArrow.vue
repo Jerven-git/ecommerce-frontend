@@ -9,14 +9,11 @@
         small ? 'w-[26px] h-[26px] sm:w-[28px] sm:h-[28px]' : 'w-[30px] h-[30px] sm:w-8 sm:h-8'
       ]"
     >
-      <svg :class="small ? 'w-3.5 h-3.5' : 'w-4 h-4'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          :d="direction === 'left' ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'"
-        />
-      </svg>
+      <Icon
+        :name="direction === 'left' ? 'heroicons:chevron-left' : 'heroicons:chevron-right'"
+        :class="small ? 'h-3.5 w-3.5' : 'h-4 w-4'"
+        aria-hidden="true"
+      />
     </button>
   </Transition>
 </template>

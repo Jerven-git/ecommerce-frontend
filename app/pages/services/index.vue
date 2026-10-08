@@ -118,9 +118,7 @@
               </p>
               <span class="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 border-b border-primary-600/30 group-hover:border-primary-700 transition-colors pb-0.5">
                 {{ service.cta_label || 'Learn more' }}
-                <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
+                <Icon name="heroicons:chevron-right" class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
               </span>
             </div>
 
@@ -138,9 +136,7 @@
                 decoding="async"
               />
               <div v-else class="w-full h-full flex items-center justify-center text-gray-300">
-                <svg class="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+                <Icon name="heroicons:photo" class="w-16 h-16" aria-hidden="true" />
               </div>
             </div>
           </NuxtLink>
@@ -151,9 +147,7 @@
     <!-- Empty state -->
     <section v-if="!loadingServices && !serviceGroups.length" class="bg-white border-b border-gray-100">
       <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-24 flex flex-col items-center text-center">
-        <svg class="h-11 w-11 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
-        </svg>
+        <Icon name="heroicons:chat-bubble-left-right" class="h-11 w-11 text-gray-300" aria-hidden="true" />
         <p class="mt-4 text-lg font-semibold text-gray-900">Services are on the way</p>
         <p class="mt-1 max-w-sm text-gray-500">We're putting the finishing touches on our services. Check back shortly.</p>
       </div>

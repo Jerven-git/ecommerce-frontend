@@ -97,9 +97,7 @@
           v-if="selectedGateways.length === 0"
           class="mt-2 flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg"
         >
-          <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4a2 2 0 00-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" />
-          </svg>
+          <Icon name="heroicons:exclamation-triangle" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" aria-hidden="true" />
           <div class="text-xs text-amber-800 leading-relaxed">
             <p class="font-semibold">No bundled payment gateway supports {{ form.currency_code }}.</p>
             <p class="mt-0.5">PayPal, Square, and Stripe cannot process this currency. You'll need a regional provider before going live.</p>

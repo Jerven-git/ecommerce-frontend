@@ -19,9 +19,7 @@
       <section data-guide="tax-config" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200/70 flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
-            </svg>
+            <Icon name="heroicons:receipt-percent" class="w-4 h-4 text-amber-600" aria-hidden="true" />
           </div>
           <div>
             <p class="text-sm font-semibold text-gray-900">Tax Configuration</p>
@@ -144,9 +142,7 @@
         >
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-              <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <Icon name="heroicons:globe-alt" class="w-4 h-4 text-blue-600" aria-hidden="true" />
             </div>
             <div class="text-left">
               <div class="flex items-center gap-1.5">
@@ -156,18 +152,14 @@
               <p class="text-xs text-gray-500">Optional &mdash; set different tax rates for different countries</p>
             </div>
           </div>
-          <svg class="w-5 h-5 text-gray-400 transition-transform" :class="showRegional ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
+          <Icon name="heroicons:chevron-down" class="w-5 h-5 text-gray-400 transition-transform" :class="showRegional ? 'rotate-180' : ''" aria-hidden="true" />
         </button>
 
         <div v-if="showRegional" class="px-6 pb-5 space-y-3 border-t border-gray-200/70 pt-4">
           <!-- Add Country button -->
           <div class="flex justify-end">
             <button @click="addCountryRule" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-primary-600 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors">
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
+              <Icon name="heroicons:plus" class="w-3.5 h-3.5" aria-hidden="true" />
               Add Country
             </button>
           </div>
@@ -222,14 +214,10 @@
                 </select>
               </div>
               <button @click="toggleStates(idx)" class="text-gray-400 hover:text-gray-600 p-1 transition-colors" :title="rule._showStates ? 'Hide states' : 'Show states'">
-                <svg class="w-4 h-4 transition-transform" :class="rule._showStates ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
+                <Icon name="heroicons:chevron-down" class="w-4 h-4 transition-transform" :class="rule._showStates ? 'rotate-180' : ''" aria-hidden="true" />
               </button>
               <button @click="removeCountryRule(idx)" class="text-gray-400 hover:text-red-500 p-1 transition-colors">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
+                <Icon name="heroicons:trash" class="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
 
@@ -263,9 +251,7 @@
                   <option value="exclusive">Excl</option>
                 </select>
                 <button @click="removeStateRule(rule.country, sIdx)" class="text-gray-400 hover:text-red-500 p-0.5">
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <Icon name="heroicons:x-mark" class="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -275,7 +261,7 @@
             v-if="countryRules.length === 0"
             title="No country-specific rules"
             description='Click "Add Country" to set different rates per region.'
-            :icon="'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z'"
+            icon="heroicons:globe-alt"
           />
         </div>
       </section>
@@ -284,9 +270,7 @@
       <section v-show="form.tax_enabled" data-guide="tax-preview" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200/70 flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
+            <Icon name="heroicons:calculator" class="w-4 h-4 text-primary-600" aria-hidden="true" />
           </div>
           <div>
             <p class="text-sm font-semibold text-gray-900">Calculation Preview</p>

@@ -24,9 +24,7 @@
             class="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white text-secondary-700 shadow-[0_8px_22px_-10px_rgba(15,23,42,0.45)] transition-colors hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary-200 sm:right-4 sm:top-4"
             aria-label="Close discount offer"
           >
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <Icon name="heroicons:x-mark" class="h-5 w-5" aria-hidden="true" />
           </button>
 
           <div class="grid md:grid-cols-[0.9fr_1.1fr]">
@@ -37,9 +35,7 @@
               <div class="relative max-w-md">
                 <div class="mb-7 flex items-center gap-3 text-sm font-semibold text-white">
                   <span class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                    </svg>
+                    <Icon name="heroicons:gift" class="h-5 w-5" aria-hidden="true" />
                   </span>
                   <span>A welcome gift</span>
                 </div>
@@ -53,9 +49,7 @@
               </div>
 
               <div class="relative mt-8 hidden items-center gap-3 border-t border-white/15 pt-5 text-sm text-white/80 md:flex">
-                <svg class="h-5 w-5 shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-16 10h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
+                <Icon name="heroicons:envelope" class="h-5 w-5 shrink-0 text-white" aria-hidden="true" />
                 Available immediately after sign-up
               </div>
             </section>
@@ -66,9 +60,7 @@
                   <div v-if="submitted" key="success" aria-live="polite">
                     <template v-if="discountCode">
                       <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-primary-700">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 13l4 4L19 7" />
-                        </svg>
+                        <Icon name="heroicons:check" class="h-6 w-6" aria-hidden="true" />
                       </div>
                       <h3 class="text-2xl font-bold tracking-[-0.02em] text-secondary-900">Your discount is ready</h3>
                       <p class="mt-3 text-sm leading-6 text-secondary-600">
@@ -78,12 +70,8 @@
                         <span class="select-all font-mono text-xl font-bold tracking-[0.16em] text-primary-800">{{ discountCode }}</span>
                       </div>
                       <button ref="successButtonRef" type="button" class="btn-primary mt-4 flex min-h-11 w-full items-center justify-center gap-2 text-sm" @click="copyCode">
-                        <svg v-if="!copied" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 002 2v8a2 2 0 002 2z" />
-                        </svg>
-                        <svg v-else class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 13l4 4L19 7" />
-                        </svg>
+                        <Icon name="heroicons:square-2-stack" v-if="!copied" class="h-4 w-4" aria-hidden="true" />
+                        <Icon name="heroicons:check" v-else class="h-4 w-4" aria-hidden="true" />
                         {{ copied ? 'Code copied' : 'Copy discount code' }}
                       </button>
                       <p v-if="copyError" class="mt-3 text-sm leading-5 text-red-700" role="alert">{{ copyError }}</p>
@@ -94,9 +82,7 @@
 
                     <template v-else>
                       <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-secondary-100 text-secondary-700">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 9v4m0 4h.01M5.07 19h13.86a2 2 0 001.74-3L13.74 4a2 2 0 00-3.48 0L3.33 16a2 2 0 001.74 3z" />
-                        </svg>
+                        <Icon name="heroicons:exclamation-triangle" class="h-6 w-6" aria-hidden="true" />
                       </div>
                       <h3 class="text-2xl font-bold tracking-[-0.02em] text-secondary-900">No code is available</h3>
                       <p class="mt-3 text-sm leading-6 text-secondary-600">{{ terminalMessage }}</p>
@@ -142,9 +128,7 @@
                       leave-to-class="opacity-0"
                     >
                       <div v-if="errorMsg" id="welcome-email-error" class="mt-3 flex items-start gap-2 rounded-xl bg-red-50 p-3 text-red-700" role="alert">
-                        <svg class="mt-0.5 h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                        <Icon name="heroicons:exclamation-circle" class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                         <p class="text-sm leading-5">{{ errorMsg }}</p>
                       </div>
                     </Transition>
@@ -154,10 +138,7 @@
                       class="btn-primary mt-4 flex min-h-11 w-full items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
                       :disabled="submitting"
                     >
-                      <svg v-if="submitting" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
+                      <Icon name="heroicons:arrow-path" v-if="submitting" class="h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
                       {{ submitting ? 'Unlocking your code...' : 'Reveal My Discount' }}
                     </button>
 
@@ -183,9 +164,7 @@
         title="Open discount offer"
         @click="open"
       >
-        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-        </svg>
+        <Icon name="heroicons:gift" class="h-6 w-6" aria-hidden="true" />
       </button>
     </Transition>
   </Teleport>

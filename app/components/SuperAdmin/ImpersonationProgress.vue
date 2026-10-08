@@ -18,7 +18,7 @@
 
         <main class="impersonation-progress__body">
           <div class="impersonation-progress__mark" aria-hidden="true">
-            <Icon :name="isLeaving ? 'heroicons:arrow-left-start-on-rectangle' : 'heroicons:arrow-right-end-on-rectangle'" />
+            <Icon :name="isLeaving ? 'heroicons:arrow-left-start-on-rectangle' : 'heroicons:arrow-right-end-on-rectangle'" aria-hidden="true" />
           </div>
           <h2>{{ heading }}</h2>
           <p>{{ phaseMessage }}</p>

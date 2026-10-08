@@ -11,12 +11,12 @@
     </p>
     <div class="grid grid-cols-2 gap-2 sm:flex">
       <button type="button" class="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-admin-border bg-admin-surface px-3 text-xs font-medium text-admin-text hover:bg-admin-soft disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent" :disabled="currentPage <= 1 || loading" :aria-label="`Go to previous page, page ${currentPage - 1}`" title="Previous page" @click="$emit('change', currentPage - 1)">
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        <Icon name="heroicons:chevron-left" class="h-4 w-4" aria-hidden="true" />
         Previous
       </button>
       <button type="button" class="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-admin-border bg-admin-surface px-3 text-xs font-medium text-admin-text hover:bg-admin-soft disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent" :disabled="currentPage >= lastPage || loading" :aria-label="`Go to next page, page ${currentPage + 1}`" title="Next page" @click="$emit('change', currentPage + 1)">
         Next
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        <Icon name="heroicons:chevron-right" class="h-4 w-4" aria-hidden="true" />
       </button>
     </div>
   </nav>

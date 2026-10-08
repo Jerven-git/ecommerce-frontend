@@ -15,9 +15,7 @@
           @click="openAddModal"
           class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shrink-0"
         >
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
+          <Icon name="heroicons:plus" class="w-4 h-4" aria-hidden="true" />
           Add Discount
         </button>
       </template>
@@ -26,9 +24,7 @@
     <!-- Filters -->
     <div data-guide="discount-filters" class="mb-6 flex flex-col sm:flex-row gap-3">
       <div class="relative flex-1">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
+        <Icon name="heroicons:magnifying-glass" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" aria-hidden="true" />
         <input
           v-model="searchQuery"
           type="text"
@@ -57,9 +53,7 @@
     <!-- Error -->
     <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">
       <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg class="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Icon name="heroicons:exclamation-circle" class="w-6 h-6 text-red-500" aria-hidden="true" />
       </div>
       <p class="font-semibold text-gray-800 mb-1">Failed to load discounts</p>
       <p class="text-sm text-red-500 mb-6">{{ error }}</p>
@@ -71,7 +65,7 @@
       <AdminEmptyState
         title="No discounts yet"
         description="Create your first discount code to start offering promotions"
-        icon="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+        icon="heroicons:tag"
       >
         <template #action>
           <button @click="openAddModal" class="text-white btn-primary">Add Discount</button>
@@ -84,9 +78,7 @@
       <!-- Table header -->
       <div class="px-6 py-4 border-b border-gray-200/70 flex items-center gap-3">
         <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center shrink-0">
-          <svg class="w-4 h-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-          </svg>
+          <Icon name="heroicons:tag" class="w-4 h-4 text-violet-600" aria-hidden="true" />
         </div>
         <div>
           <p class="text-sm font-semibold text-gray-900">Discount Codes</p>
@@ -167,18 +159,14 @@
                     class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
                     title="Edit discount"
                   >
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
+                    <Icon name="heroicons:pencil-square" class="w-4 h-4" aria-hidden="true" />
                   </button>
                   <button
                     @click="deleteDiscount(discount.id)"
                     class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                     title="Delete discount"
                   >
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
+                    <Icon name="heroicons:trash" class="w-4 h-4" aria-hidden="true" />
                   </button>
                 </div>
               </td>
@@ -239,9 +227,7 @@
       <template #header>
         <div class="flex items-center gap-3 min-w-0">
           <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-            </svg>
+            <Icon name="heroicons:tag" class="w-4 h-4 text-violet-600" aria-hidden="true" />
           </div>
           <div class="min-w-0">
             <h2 class="text-sm font-semibold text-gray-900 truncate">{{ editingDiscount ? 'Edit Discount' : 'New Discount' }}</h2>
@@ -359,9 +345,7 @@
 
                 <!-- Form error -->
                 <div v-if="formError" class="flex items-start gap-2.5 p-3 bg-red-50 border border-red-100 rounded-lg">
-                  <svg class="w-4 h-4 text-red-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <Icon name="heroicons:exclamation-circle" class="w-4 h-4 text-red-500 mt-0.5 shrink-0" aria-hidden="true" />
                   <p class="text-sm text-red-700">{{ formError }}</p>
                 </div>
       </form>
@@ -375,10 +359,7 @@
             :disabled="submitting"
             class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white text-sm font-semibold rounded-lg transition-colors"
           >
-            <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
+            <Icon name="heroicons:arrow-path" v-if="submitting" class="w-4 h-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
             {{ submitting ? 'Saving…' : 'Save Discount' }}
           </button>
         </div>

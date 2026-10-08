@@ -36,14 +36,7 @@
 
               <!-- Icon tile -->
               <div class="relative z-10 w-16 h-16 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center shadow-xl shadow-green-200 animate-icon-pop">
-                <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path
-                    class="check-path"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
+                <Icon name="heroicons:check" class="w-8 h-8 text-white" aria-hidden="true" />
               </div>
             </div>
 
@@ -61,25 +54,19 @@
             <div class="grid grid-cols-3 gap-3 mb-8 animate-slide-up" style="animation-delay: 0.38s;">
               <div class="flex flex-col items-center gap-1.5 p-3 bg-gray-50 rounded-xl border border-gray-100">
                 <div class="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center">
-                  <svg class="w-3.5 h-3.5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <Icon name="heroicons:check-circle" class="w-3.5 h-3.5 text-green-600" aria-hidden="true" />
                 </div>
                 <span class="text-xs font-medium text-gray-600 leading-tight">Order<br/>Confirmed</span>
               </div>
               <div class="flex flex-col items-center gap-1.5 p-3 bg-gray-50 rounded-xl border border-gray-100">
                 <div class="w-7 h-7 rounded-lg bg-primary-100 flex items-center justify-center">
-                  <svg class="w-3.5 h-3.5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
+                  <Icon name="heroicons:envelope" class="w-3.5 h-3.5 text-primary-600" aria-hidden="true" />
                 </div>
                 <span class="text-xs font-medium text-gray-600 leading-tight">Email<br/>Sent</span>
               </div>
               <div class="flex flex-col items-center gap-1.5 p-3 bg-gray-50 rounded-xl border border-gray-100">
                 <div class="w-7 h-7 rounded-lg bg-purple-100 flex items-center justify-center">
-                  <svg class="w-3.5 h-3.5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                  </svg>
+                  <Icon name="heroicons:cube" class="w-3.5 h-3.5 text-purple-600" aria-hidden="true" />
                 </div>
                 <span class="text-xs font-medium text-gray-600 leading-tight">Being<br/>Processed</span>
               </div>
@@ -92,9 +79,7 @@
                 class="inline-flex items-center justify-center gap-2 btn-primary w-full"
               >
                 Continue Shopping
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
+                <Icon name="heroicons:arrow-right" class="w-4 h-4" aria-hidden="true" />
               </NuxtLink>
               <NuxtLink to="/" class="btn-secondary w-full block text-center">
                 Back to Home

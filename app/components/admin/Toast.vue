@@ -16,9 +16,7 @@
             class="admin-toast__icon"
             :class="chip[t.variant]"
           >
-            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" :d="glyph[t.variant]" />
-            </svg>
+            <Icon :name="glyph[t.variant]" class="h-3.5 w-3.5" aria-hidden="true" />
           </span>
 
           <div class="min-w-0 flex-1">
@@ -39,9 +37,7 @@
             aria-label="Dismiss notification"
             @click="dismiss(t.id)"
           >
-            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <Icon name="heroicons:x-mark" class="h-3.5 w-3.5" aria-hidden="true" />
           </button>
         </div>
       </TransitionGroup>
@@ -61,9 +57,9 @@ const chip: Record<AdminToast['variant'], string> = {
 }
 
 const glyph: Record<AdminToast['variant'], string> = {
-  success: 'M5 13l4 4L19 7',
-  error: 'M12 9v3.75m0 3.25h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z',
-  info: 'M12 16v-4m0-4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z',
+  success: 'heroicons:check',
+  error: 'heroicons:exclamation-triangle',
+  info: 'heroicons:information-circle',
 }
 
 const runAction = (t: AdminToast) => {

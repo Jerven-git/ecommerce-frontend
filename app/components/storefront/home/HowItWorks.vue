@@ -29,9 +29,7 @@
       <div :ref="addRevealRef" class="reveal mt-14" style="transition-delay: 0.5s">
         <NuxtLink to="/shop" class="btn-primary inline-flex text-white items-center gap-2">
           Start Shopping
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
+          <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
         </NuxtLink>
       </div>
     </div>

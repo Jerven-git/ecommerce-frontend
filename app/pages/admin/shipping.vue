@@ -20,9 +20,7 @@
       <section data-guide="shipping-fees" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200/70 flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <Icon name="heroicons:currency-dollar" class="w-4 h-4 text-primary-600" aria-hidden="true" />
           </div>
           <div>
             <h2 class="text-sm font-semibold text-gray-900">General Options</h2>
@@ -112,7 +110,7 @@
                     <input v-model.number="tier.rate" type="number" step="0.01" min="0" class="flex-1 px-2 py-1.5 text-xs outline-none w-full" placeholder="Rate" />
                   </div>
                   <button type="button" @click="form.express_weight_tiers.splice(index, 1)" class="p-1 text-gray-400 hover:text-red-500 transition-colors shrink-0">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    <Icon name="heroicons:x-mark" class="w-4 h-4" aria-hidden="true" />
                   </button>
                 </div>
                 <button
@@ -120,7 +118,7 @@
                   @click="form.express_weight_tiers.push({ max_weight_g: 0, rate: 0 })"
                   class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-200 rounded-lg transition-colors"
                 >
-                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                  <Icon name="heroicons:plus" class="w-3 h-3" aria-hidden="true" />
                   Add tier
                 </button>
                 <p class="text-xs text-gray-500">Orders are matched to the first tier where total weight &le; max weight</p>
@@ -202,9 +200,7 @@
       <section data-guide="shipping-zones" class="bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200/70 flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <Icon name="heroicons:globe-alt" class="w-4 h-4 text-green-600" aria-hidden="true" />
           </div>
           <div>
             <div class="flex items-center gap-1.5">
@@ -272,9 +268,7 @@
             </div>
             <!-- Permanent note about product shipping mode -->
             <div v-if="zone.enabled" class="mt-3 flex items-start gap-2 px-3 py-2.5 bg-blue-50 border border-blue-100 rounded-lg">
-              <svg class="w-4 h-4 text-blue-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <Icon name="heroicons:information-circle" class="w-4 h-4 text-blue-500 shrink-0 mt-0.5" aria-hidden="true" />
               <p class="text-xs text-blue-800 leading-relaxed">Each product has a shipping calculation mode: <strong>Weight</strong> (uses Per KG rate) or <strong>Dimensions</strong> (uses Per CBM rate). Set this when creating or editing a product to control which rate applies.</p>
             </div>
           </div>
@@ -285,10 +279,7 @@
       <section class="bg-white rounded-2xl border border-gray-200/70 shadow-sm">
         <div class="px-6 py-4 border-b border-gray-200/70 flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
+            <Icon name="heroicons:map-pin" class="w-4 h-4 text-amber-600" aria-hidden="true" />
           </div>
           <div>
             <div class="flex items-center gap-1.5">

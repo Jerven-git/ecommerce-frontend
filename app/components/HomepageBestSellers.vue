@@ -32,9 +32,7 @@
             @click="scrollBy(-1)"
             aria-label="Scroll left"
           >
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
+            <Icon name="heroicons:chevron-left" class="w-5 h-5" aria-hidden="true" />
           </button>
           <button
             type="button"
@@ -43,9 +41,7 @@
             @click="scrollBy(1)"
             aria-label="Scroll right"
           >
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
+            <Icon name="heroicons:chevron-right" class="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
       </div>

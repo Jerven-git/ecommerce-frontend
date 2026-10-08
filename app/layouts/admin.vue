@@ -51,9 +51,7 @@
       title="Open navigation"
     >
       <span class="sr-only">Open navigation</span>
-      <svg class="admin-open-nav__icon h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m6 5 7 7-7 7m5-14 7 7-7 7" />
-      </svg>
+      <Icon name="heroicons:chevron-double-right" class="admin-open-nav__icon h-6 w-6 shrink-0" aria-hidden="true" />
     </button>
 
     <!-- Sidebar -->
@@ -82,9 +80,7 @@
           @click="toggleSidebar"
           aria-label="Collapse sidebar"
         >
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
+          <Icon name="heroicons:chevron-left" class="h-4 w-4" aria-hidden="true" />
         </button>
       </div>
 
@@ -106,16 +102,7 @@
                 :class="linkClass(item.to)"
                 @click="closeSidebarOnMobile"
               >
-                <svg class="w-4 h-4 shrink-0 transition-colors" :class="iconClass(item)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    v-for="(d, i) in item.paths"
-                    :key="i"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    :d="d"
-                  />
-                </svg>
+                <Icon :name="item.icon" class="h-4 w-4 shrink-0 transition-colors" :class="iconClass(item)" aria-hidden="true" />
                 <span class="min-w-0 truncate">{{ item.label }}</span>
               </NuxtLink>
             </template>
@@ -139,16 +126,7 @@
                 :class="item.accent === 'purple' ? 'text-admin-accent-strong hover:bg-admin-accent-soft font-medium' : linkClass(item.to)"
                 @click="closeSidebarOnMobile"
               >
-                <svg class="w-4 h-4 shrink-0 transition-colors" :class="iconClass(item)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    v-for="(d, i) in item.paths"
-                    :key="i"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    :d="d"
-                  />
-                </svg>
+                <Icon :name="item.icon" class="h-4 w-4 shrink-0 transition-colors" :class="iconClass(item)" aria-hidden="true" />
                 <span class="min-w-0 truncate">{{ item.label }}</span>
               </NuxtLink>
             </template>
@@ -170,9 +148,7 @@
             target="_blank"
             rel="noopener"
           >
-            <svg class="w-4 h-4 shrink-0 text-admin-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
+            <Icon name="heroicons:arrow-top-right-on-square" class="w-4 h-4 shrink-0 text-admin-muted" aria-hidden="true" />
             <span>View Store</span>
           </a>
 
@@ -195,9 +171,7 @@
               :aria-label="loggingOut ? 'Signing out' : 'Log out'"
               :title="loggingOut ? 'Signing out' : 'Log out'"
             >
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
+              <Icon name="heroicons:arrow-right-start-on-rectangle" class="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -218,9 +192,7 @@
                      transition-colors hover:bg-admin-soft"
               title="Replay the admin guide"
             >
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <Icon name="heroicons:question-mark-circle" class="w-3.5 h-3.5" aria-hidden="true" />
               Guide
             </button>
             <a
@@ -230,9 +202,7 @@
               target="_blank"
               rel="noopener"
             >
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
+              <Icon name="heroicons:arrow-top-right-on-square" class="w-3.5 h-3.5" aria-hidden="true" />
               View Store
             </a>
           </div>
@@ -310,8 +280,8 @@ interface NavItem {
   label: string
   /** Header title; defaults to `label` when omitted. */
   title?: string
-  /** SVG path `d` strings rendered inside the icon. */
-  paths: string[]
+  /** Heroicons name rendered beside the navigation label. */
+  icon: string
   /** Optional visibility predicate (module flag / role gate). */
   show?: () => boolean
   /** Optional accent styling (e.g. the Super Admin link). */
@@ -328,39 +298,39 @@ const mainGroups: NavGroup[] = [
   {
     heading: 'Overview',
     items: [
-      { to: '/admin', label: 'Dashboard', paths: ['M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6'] },
+      { to: '/admin', label: 'Dashboard', icon: 'heroicons:home' },
     ],
   },
   {
     heading: 'Catalog',
     items: [
-      { to: '/admin/products', label: 'Products', paths: ['M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'] },
-      { to: '/admin/categories', label: 'Categories', paths: ['M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'] },
-      { to: '/admin/services', label: 'Services', paths: ['M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'] },
-      { to: '/admin/service-categories', label: 'Service Categories', paths: ['M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z'] },
+      { to: '/admin/products', label: 'Products', icon: 'heroicons:cube' },
+      { to: '/admin/categories', label: 'Categories', icon: 'heroicons:tag' },
+      { to: '/admin/services', label: 'Services', icon: 'heroicons:wrench-screwdriver' },
+      { to: '/admin/service-categories', label: 'Service Categories', icon: 'heroicons:squares-2x2' },
     ],
   },
   {
     heading: 'Content',
     items: [
-      { to: '/admin/posts', label: 'Blog Posts', paths: ['M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z'] },
-      { to: '/admin/post-categories', label: 'Blog Categories', paths: ['M4 6h16M4 10h16M4 14h10M4 18h10'] },
+      { to: '/admin/posts', label: 'Blog Posts', icon: 'heroicons:newspaper' },
+      { to: '/admin/post-categories', label: 'Blog Categories', icon: 'heroicons:rectangle-stack' },
     ],
   },
   {
     heading: 'Sales',
     items: [
-      { to: '/admin/orders', label: 'Orders', paths: ['M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'] },
-      { to: '/admin/backorders', label: 'Backorders', paths: ['M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'] },
-      { to: '/admin/discounts', label: 'Discounts', title: 'Discount Codes', paths: ['M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'] },
-      { to: '/admin/gift-cards', label: 'Gift Cards', show: () => isEnabled('gift_cards'), paths: ['M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7'] },
-      { to: '/admin/commissions', label: 'Commissions', show: () => isEnabled('commissions'), paths: ['M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z'] },
+      { to: '/admin/orders', label: 'Orders', icon: 'heroicons:clipboard-document-list' },
+      { to: '/admin/backorders', label: 'Backorders', icon: 'heroicons:clock' },
+      { to: '/admin/discounts', label: 'Discounts', title: 'Discount Codes', icon: 'heroicons:tag' },
+      { to: '/admin/gift-cards', label: 'Gift Cards', show: () => isEnabled('gift_cards'), icon: 'heroicons:gift' },
+      { to: '/admin/commissions', label: 'Commissions', show: () => isEnabled('commissions'), icon: 'heroicons:banknotes' },
     ],
   },
   {
     heading: 'Reports',
     items: [
-      { to: '/admin/tax-report', label: 'Tax Report', paths: ['M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'] },
+      { to: '/admin/tax-report', label: 'Tax Report', icon: 'heroicons:chart-bar' },
     ],
   },
 ]
@@ -370,18 +340,18 @@ const settingsGroups: NavGroup[] = [
   {
     heading: 'Settings',
     items: [
-      { to: '/admin/settings', label: 'Site Settings', title: 'Settings', paths: ['M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z', 'M15 12a3 3 0 11-6 0 3 3 0 016 0z'] },
-      { to: '/admin/shipping', label: 'Shipping', paths: ['M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z', 'M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0'] },
-      { to: '/admin/tax-settings', label: 'Tax', paths: ['M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z'] },
-      { to: '/admin/payment-settings', label: 'Payments', paths: ['M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z'] },
-      { to: '/admin/subscription', label: 'Subscription', title: 'Subscription', paths: ['M5 5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2H5z', 'M8 14h8M8 10h8'] },
+      { to: '/admin/settings', label: 'Site Settings', title: 'Settings', icon: 'heroicons:cog-6-tooth' },
+      { to: '/admin/shipping', label: 'Shipping', icon: 'heroicons:truck' },
+      { to: '/admin/tax-settings', label: 'Tax', icon: 'heroicons:calculator' },
+      { to: '/admin/payment-settings', label: 'Payments', icon: 'heroicons:credit-card' },
+      { to: '/admin/subscription', label: 'Subscription', title: 'Subscription', icon: 'heroicons:rectangle-stack' },
     ],
   },
   {
     heading: 'Access',
     items: [
-      { to: '/admin/users', label: 'Admin Users', show: () => authStore.isSuperAdmin, paths: ['M17 20h5V4H2v16h5m10 0v-2a4 4 0 00-4-4H11a4 4 0 00-4 4v2m10 0H7m10-11a3 3 0 11-6 0 3 3 0 016 0zm-8 0a3 3 0 11-6 0 3 3 0 016 0z'] },
-      { to: '/super-admin', label: 'Super Admin', show: () => authStore.isSuperAdmin, accent: 'purple', paths: ['M9.75 17 9 21l3-2 3 2-.75-4M3 4h18l-2 13H5L3 4Z'] },
+      { to: '/admin/users', label: 'Admin Users', show: () => authStore.isSuperAdmin, icon: 'heroicons:user-group' },
+      { to: '/super-admin', label: 'Super Admin', show: () => authStore.isSuperAdmin, accent: 'purple', icon: 'heroicons:shield-check' },
     ],
   },
 ]

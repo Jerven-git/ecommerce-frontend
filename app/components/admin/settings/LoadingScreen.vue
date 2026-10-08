@@ -2,9 +2,7 @@
   <section data-guide="settings-loading-screen" class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
     <div class="flex items-center gap-3 border-b border-gray-100 px-6 py-4">
       <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600">
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 0114.93-4M20 12a8 8 0 01-14.93 4M19 4v4h-4M5 20v-4h4" />
-        </svg>
+        <Icon name="heroicons:arrow-path" class="h-4 w-4" aria-hidden="true" />
       </div>
       <div class="min-w-0">
         <h2 class="text-sm font-semibold text-gray-900">Loading screen</h2>
@@ -50,9 +48,7 @@
               @click="emit('update:animation', option.value)"
             >
               <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-primary-600 shadow-sm" aria-hidden="true">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="option.icon" />
-                </svg>
+                <Icon :name="option.icon" class="h-4 w-4" aria-hidden="true" />
               </span>
               <span class="min-w-0">
                 <span class="block text-sm font-semibold text-gray-900">{{ option.label }}</span>
@@ -103,9 +99,9 @@ const animationOptions: Array<{
   description: string
   icon: string
 }> = [
-  { value: 'bounce', label: 'Bounce', description: 'A calm vertical lift', icon: 'M12 19V5m0 0L7 10m5-5l5 5' },
-  { value: 'rotate', label: 'Rotate', description: 'A continuous turn', icon: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15' },
-  { value: 'slide', label: 'Slide', description: 'A smooth side motion', icon: 'M5 12h14m0 0l-4-4m4 4l-4 4' },
+  { value: 'bounce', label: 'Bounce', description: 'A calm vertical lift', icon: 'heroicons:arrow-up' },
+  { value: 'rotate', label: 'Rotate', description: 'A continuous turn', icon: 'heroicons:arrow-path' },
+  { value: 'slide', label: 'Slide', description: 'A smooth side motion', icon: 'heroicons:arrows-right-left' },
 ]
 </script>
 

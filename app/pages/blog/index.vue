@@ -135,9 +135,7 @@
 
         <!-- Error -->
         <div v-else-if="error" class="flex flex-col items-center py-20 text-center">
-          <svg class="h-10 w-10 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <Icon name="heroicons:exclamation-circle" class="h-10 w-10 text-red-400" aria-hidden="true" />
           <p class="mt-4 max-w-xs font-medium text-red-600">{{ error }}</p>
           <button @click="loadPosts" class="btn-primary mt-6">Retry</button>
         </div>

@@ -13,17 +13,13 @@
           @click="$emit('add-option')"
           class="inline-flex items-center gap-1.5 text-[0.7rem] font-semibold text-primary-600 bg-primary-50 border border-primary-200 px-3 py-1.5 rounded-full cursor-pointer transition-all hover:bg-primary-100 hover:border-primary-300 hover:-translate-y-px active:translate-y-0"
         >
-          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
+          <Icon name="heroicons:plus" class="w-3 h-3" aria-hidden="true" />
           Add Option
         </button>
       </div>
 
       <div v-if="variantOptions.length === 0" class="text-center py-5 px-4 border-2 border-dashed border-stone-200 rounded-2xl bg-stone-50 text-stone-400 text-[0.72rem] leading-relaxed">
-        <svg class="w-5 h-5 text-stone-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h7" />
-        </svg>
+        <Icon name="heroicons:bars-3-bottom-left" class="w-5 h-5 text-stone-300 mx-auto mb-2" aria-hidden="true" />
         <p>No options yet. Add one above — e.g. Color, Size, Storage.</p>
       </div>
 
@@ -46,9 +42,7 @@
               class="inline-flex items-center justify-center w-7 h-7 rounded-md text-stone-400 cursor-pointer transition-all shrink-0 hover:bg-red-50 hover:text-red-500 hover:scale-110 active:scale-95"
               title="Remove option"
             >
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <Icon name="heroicons:x-mark" class="w-3.5 h-3.5" aria-hidden="true" />
             </button>
           </div>
 
@@ -71,9 +65,7 @@
                 class="inline-flex items-center justify-center w-6 h-6 rounded-md text-stone-400 cursor-pointer transition-all shrink-0 hover:bg-red-50 hover:text-red-500 hover:scale-110 active:scale-95"
                 title="Remove value"
               >
-                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <Icon name="heroicons:x-mark" class="w-3 h-3" aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -83,9 +75,7 @@
             @click="$emit('add-option-value', optIdx)"
             class="inline-flex items-center gap-1.5 text-[0.7rem] font-semibold text-primary-500 bg-transparent border-none p-0 cursor-pointer transition-colors hover:text-primary-700"
           >
-            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
+            <Icon name="heroicons:plus" class="w-3 h-3" aria-hidden="true" />
             Add Value
           </button>
         </div>
@@ -169,9 +159,7 @@
                         class="absolute -top-1 -right-1 hidden group-hover:flex w-4 h-4 rounded-full bg-red-500 text-white items-center justify-center shadow"
                         title="Remove image"
                       >
-                        <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <Icon name="heroicons:x-mark" class="w-2.5 h-2.5" aria-hidden="true" />
                       </button>
                       <button
                         type="button"
@@ -179,9 +167,7 @@
                         class="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 bg-black/40 flex items-center justify-center transition-opacity"
                         title="Replace image"
                       >
-                        <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
+                        <Icon name="heroicons:photo" class="w-3.5 h-3.5 text-white" aria-hidden="true" />
                       </button>
                     </div>
                     <button
@@ -191,9 +177,7 @@
                       class="w-9 h-9 rounded-lg border-[1.5px] border-dashed border-stone-300 bg-stone-50 text-stone-400 flex items-center justify-center cursor-pointer transition-all hover:border-primary-400 hover:text-primary-500 hover:bg-primary-50"
                       title="Upload image"
                     >
-                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
+                      <Icon name="heroicons:photo" class="w-3.5 h-3.5" aria-hidden="true" />
                     </button>
                     <input
                       :ref="el => fileInputRefs[dIdx] = el as HTMLInputElement | null"
@@ -204,9 +188,7 @@
                     />
                   </template>
                   <span v-else class="text-stone-200 inline-flex" title="Save product first to add image">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
+                    <Icon name="heroicons:photo" class="w-3.5 h-3.5" aria-hidden="true" />
                   </span>
                 </div>
               </td>
@@ -220,9 +202,7 @@
                   class="inline-flex items-center justify-center w-7 h-7 rounded-md text-stone-400 cursor-pointer transition-all hover:bg-red-50 hover:text-red-500 hover:scale-110 active:scale-95"
                   title="Remove variant"
                 >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <Icon name="heroicons:x-mark" class="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
               </td>
             </tr>
@@ -235,9 +215,7 @@
     <div v-if="variantsError" class="flex overflow-hidden rounded-xl border border-rose-100">
       <div class="w-1 shrink-0 bg-rose-500"></div>
       <div class="flex items-start gap-2 px-3 py-2.5 bg-rose-50 text-rose-700 text-xs leading-relaxed w-full">
-        <svg class="w-3.5 h-3.5 shrink-0 mt-px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-        </svg>
+        <Icon name="heroicons:exclamation-triangle" class="w-3.5 h-3.5 shrink-0 mt-px" aria-hidden="true" />
         <span>{{ variantsError }}</span>
       </div>
     </div>

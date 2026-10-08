@@ -10,19 +10,7 @@
       }"
     >
       <slot name="icon">
-        <svg
-          class="w-6 h-6"
-          :class="{
-            'text-red-500': variant === 'danger',
-            'text-green-500': variant === 'success',
-            'text-amber-500': variant === 'warning',
-          }"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
+        <Icon name="heroicons:exclamation-triangle" class="w-6 h-6" :class="{ 'text-red-500': variant === 'danger', 'text-green-500': variant === 'success', 'text-amber-500': variant === 'warning', }" aria-hidden="true" />
       </slot>
     </div>
 
@@ -50,10 +38,7 @@
             'bg-amber-500 hover:bg-amber-600': variant === 'warning',
           }"
         >
-          <svg v-if="loading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
+          <Icon name="heroicons:arrow-path" v-if="loading" class="w-4 h-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
           {{ loading ? loadingText : confirmText }}
         </button>
       </div>

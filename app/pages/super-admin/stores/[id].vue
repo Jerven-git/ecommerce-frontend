@@ -3,7 +3,7 @@
     <!-- Breadcrumb + title -->
     <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm text-admin-muted">
       <NuxtLink to="/super-admin/stores" class="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-transparent px-2 hover:bg-admin-soft hover:text-admin-text">
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        <Icon name="heroicons:arrow-left" class="h-4 w-4" aria-hidden="true" />
         Stores
       </NuxtLink>
       <span class="text-admin-border">/</span>
@@ -37,7 +37,7 @@
         <div class="border-b border-admin-border px-5 py-4 sm:px-6">
           <div class="flex items-center gap-2.5">
             <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-admin-accent-soft text-admin-accent">
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8h6" /></svg>
+              <Icon name="heroicons:building-storefront" class="h-4 w-4" aria-hidden="true" />
             </span>
             <div>
               <h2 class="text-sm font-semibold text-admin-text">Identity</h2>
@@ -142,7 +142,7 @@
           <label class="flex items-center justify-between rounded-xl border border-admin-border bg-admin-soft/30 px-3 py-2.5">
             <span class="flex items-center gap-3">
               <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-admin-surface border border-admin-border text-admin-muted">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                <Icon name="heroicons:bolt" class="h-4 w-4" aria-hidden="true" />
               </span>
               <span>
                 <span class="block text-sm font-semibold text-admin-text">Store active</span>
@@ -157,11 +157,11 @@
 
           <div class="flex flex-col gap-2 border-t border-admin-border pt-4 sm:flex-row sm:items-center sm:justify-between">
             <AdminButton type="submit" variant="primary" :loading="saving">
-              <template #icon><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></template>
+              <template #icon><Icon name="heroicons:check" class="h-4 w-4" aria-hidden="true" /></template>
               Save changes
             </AdminButton>
             <AdminButton v-if="!store.is_default" variant="danger" :loading="deleting" :disabled="store.users_count > 0" @click="del">
-              <template #icon><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></template>
+              <template #icon><Icon name="heroicons:trash" class="h-4 w-4" aria-hidden="true" /></template>
               {{ store.users_count > 0 ? `Has ${store.users_count} admin${store.users_count === 1 ? '' : 's'} — reassign first` : 'Delete store' }}
             </AdminButton>
           </div>
@@ -173,7 +173,7 @@
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-admin-border px-5 py-4 sm:px-6">
           <div class="flex items-center gap-2.5">
             <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <Icon name="heroicons:currency-dollar" class="h-4 w-4" aria-hidden="true" />
             </span>
             <div>
               <h2 class="text-sm font-semibold text-admin-text">Subscription</h2>
@@ -205,7 +205,7 @@
           <div v-if="!store.is_default" class="mt-4 flex flex-col gap-2.5 rounded-xl border border-admin-border bg-admin-soft/30 p-3 sm:flex-row sm:items-center">
             <template v-if="store.subscription_status === 'comped'">
               <button type="button" class="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-admin-danger/20 bg-admin-danger-soft px-3 text-xs font-semibold text-admin-danger hover:bg-admin-danger hover:text-white disabled:opacity-50" :disabled="compMutating" @click="uncomp">
-                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728" /></svg>
+                <Icon name="heroicons:no-symbol" class="h-3.5 w-3.5" aria-hidden="true" />
                 Revoke comp
               </button>
               <p class="text-xs leading-relaxed text-admin-muted">Removing the comp re-locks the store until the owner subscribes.</p>
@@ -217,7 +217,7 @@
                 <option v-for="plan in compPlans" :key="plan.id" :value="plan.id">{{ plan.name }} — {{ formatPrice(plan.price_cents) }}/{{ plan.interval }}</option>
               </select>
               <button type="button" class="inline-flex min-h-9 items-center gap-1.5 rounded-xl bg-admin-accent px-4 text-xs font-semibold text-admin-on-accent hover:bg-admin-accent-strong disabled:opacity-50" :disabled="compMutating" @click="comp">
-                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1" /></svg>
+                <Icon name="heroicons:currency-dollar" class="h-3.5 w-3.5" aria-hidden="true" />
                 Comp — grant access
               </button>
             </template>
@@ -232,7 +232,7 @@
         <div class="flex flex-col gap-3 border-b border-admin-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div class="flex items-center gap-2.5">
             <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-admin-info-soft text-admin-info border border-admin-info/15">
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4a4 4 0 110 8 4 4 0 010-8zM5 20a7 7 0 0114 0H5z" /></svg>
+              <Icon name="heroicons:user-group" class="h-4 w-4" aria-hidden="true" />
             </span>
             <div>
               <h2 class="text-sm font-semibold text-admin-text">Admins</h2>
@@ -240,14 +240,14 @@
             </div>
           </div>
           <AdminButton :to="`/super-admin/admins/new?store_id=${store.id}`" variant="primary" size="sm">
-            <template #icon><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14" /></svg></template>
+            <template #icon><Icon name="heroicons:plus" class="h-4 w-4" aria-hidden="true" /></template>
             Add admin
           </AdminButton>
         </div>
 
         <div v-if="storeAdmins.length === 0" class="px-6 py-10 text-center">
           <div class="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-admin-soft text-admin-muted">
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4a4 4 0 110 8 4 4 0 010-8zM5 20a7 7 0 0114 0H5z" /></svg>
+            <Icon name="heroicons:user" class="h-5 w-5" aria-hidden="true" />
           </div>
           <p class="mt-2 text-sm font-medium text-admin-muted">No admins assigned to this store yet.</p>
           <NuxtLink :to="`/super-admin/admins/new?store_id=${store.id}`" class="mt-3 inline-flex min-h-9 items-center rounded-xl bg-admin-accent px-4 text-xs font-semibold text-admin-on-accent">Add first admin</NuxtLink>
@@ -304,7 +304,7 @@ const compMutating = ref(false)
 const compError = ref<string | null>(null)
 const compPlans = computed(() => plans.value ?? [])
 
-const editIcon = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>'
+const editIcon = 'heroicons:pencil-square'
 
 const subscriptionLabel = computed(() => {
   switch (store.value?.subscription_status) {

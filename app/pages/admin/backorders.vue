@@ -27,9 +27,7 @@
     <!-- Filters -->
     <div data-guide="backorder-filters" class="mb-6 flex flex-col sm:flex-row gap-3">
       <div class="relative flex-1">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
+        <Icon name="heroicons:magnifying-glass" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" aria-hidden="true" />
         <input
           v-model="searchQuery"
           type="text"
@@ -63,9 +61,7 @@
     <!-- Error -->
     <div v-else-if="error" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">
       <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg class="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Icon name="heroicons:exclamation-circle" class="w-6 h-6 text-red-500" aria-hidden="true" />
       </div>
       <p class="font-semibold text-gray-800 mb-1">Failed to load backorders</p>
       <p class="text-sm text-red-500 mb-6">{{ error }}</p>
@@ -77,7 +73,7 @@
       <AdminEmptyState
         title="No backorders"
         description="Backorders will appear here when customers order out-of-stock items"
-        icon="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+        icon="heroicons:clock"
       />
     </AdminCard>
 
@@ -292,15 +288,10 @@
           class="border rounded-xl shadow-lg px-4 py-3 flex items-start gap-3"
           :class="toastType === 'success' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'"
         >
-          <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path v-if="toastType === 'success'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <Icon :name="toastType === 'success' ? 'heroicons:check' : 'heroicons:exclamation-circle'" class="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
           <p class="text-sm font-medium">{{ toast }}</p>
           <button @click="toast = null" class="shrink-0 opacity-60 hover:opacity-100">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <Icon name="heroicons:x-mark" class="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       </div>

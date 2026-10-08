@@ -17,6 +17,132 @@
         ],
         "createdAt": "2026-10-02T06:24:57.903Z",
         "reason": "Agent: detector reads the dark card ancestor but the original CTA text is rendered on its own white background"
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "app/pages/admin/index.vue"
+        ],
+        "createdAt": "2026-10-08T02:14:30.971Z",
+        "reason": "False positive: conditional branches pair gray text only with white or gray backgrounds"
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "app/pages/admin/gift-cards.vue"
+        ],
+        "createdAt": "2026-10-08T02:14:30.989Z",
+        "reason": "False positive: disabled status uses gray text on a gray neutral badge"
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "app/pages/admin/discounts.vue"
+        ],
+        "createdAt": "2026-10-08T02:14:31.002Z",
+        "reason": "False positive: gray controls use white or gray neutral backgrounds, not colored surfaces"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "bounce",
+        "files": [
+          "app/pages/admin/settings.vue"
+        ],
+        "createdAt": "2026-10-08T02:15:22.697Z",
+        "reason": "Domain value for the configurable loader animation option, not a CSS easing declaration"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "animate-bounce",
+        "files": [
+          "app/pages/checkout.vue"
+        ],
+        "createdAt": "2026-10-08T02:15:22.863Z",
+        "reason": "Intentional loading-state dot motion that communicates ongoing checkout processing"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "files": [
+          "app/pages/order-success.vue"
+        ],
+        "createdAt": "2026-10-08T02:15:23.076Z",
+        "reason": "Intentional restrained celebratory entrance on successful order completion"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "animate-bounce",
+        "files": [
+          "app/pages/payment/complete.vue"
+        ],
+        "createdAt": "2026-10-08T02:15:23.243Z",
+        "reason": "Intentional loading-state dot motion that communicates payment verification"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "files": [
+          "app/pages/payment/complete.vue"
+        ],
+        "createdAt": "2026-10-08T02:15:23.402Z",
+        "reason": "Intentional one-time card entrance for payment completion state"
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "app/components/admin/products/ProductTable.vue"
+        ],
+        "createdAt": "2026-10-08T02:15:33.755Z",
+        "reason": "False positive: green and gray classes are mutually exclusive conditional status branches"
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "app/components/admin/products/ProductVariantEditor.vue"
+        ],
+        "createdAt": "2026-10-08T02:15:33.901Z",
+        "reason": "False positive: gray is the resting state and red background only appears with red text on hover"
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "app/components/admin/settings/tabs/GeneralTab.vue"
+        ],
+        "createdAt": "2026-10-08T02:15:34.049Z",
+        "reason": "False positive: gray is the resting state and red background only appears with red text on hover"
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "app/pages/admin/posts/index.vue"
+        ],
+        "createdAt": "2026-10-08T02:15:34.273Z",
+        "reason": "False positive: status branches and hover states do not render gray text on colored backgrounds"
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "app/pages/admin/services/index.vue"
+        ],
+        "createdAt": "2026-10-08T02:15:34.489Z",
+        "reason": "False positive: status branches and hover states do not render gray text on colored backgrounds"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "['bounce",
+        "files": [
+          "app/pages/admin/settings.vue"
+        ],
+        "createdAt": "2026-10-08T02:15:42.264Z",
+        "reason": "Domain value inside the loader animation allowlist, not a CSS easing declaration"
       }
     ]
   }

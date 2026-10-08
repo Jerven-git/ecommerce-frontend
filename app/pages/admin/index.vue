@@ -201,9 +201,7 @@
               >{{ idx + 1 }}</span>
               <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gray-50 border border-gray-100 overflow-hidden flex items-center justify-center shrink-0">
                 <img v-if="prod.thumb_url || prod.image_url" :src="prod.thumb_url || prod.image_url" :alt="prod.name" class="w-full h-full object-cover" loading="lazy" />
-                <svg v-else class="w-4 h-4 sm:w-5 sm:h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="icons.products" />
-                </svg>
+                <Icon v-else :name="icons.products" class="h-4 w-4 text-gray-300 sm:h-5 sm:w-5" aria-hidden="true" />
               </div>
               <div class="flex-1 min-w-0">
                 <p class="text-[13px] sm:text-sm font-semibold text-gray-900 truncate pr-2" :title="prod.name">{{ prod.name }}</p>
@@ -238,9 +236,7 @@
         <div class="px-6 py-4 border-b border-gray-200/70 flex items-center justify-between gap-3">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
-              <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.orders" />
-              </svg>
+              <Icon :name="icons.orders" class="h-4 w-4 text-emerald-600" aria-hidden="true" />
             </div>
             <div>
               <p class="text-sm font-semibold text-gray-900">Recent Orders</p>
@@ -403,13 +399,13 @@ const revenueChartSubtitle = computed(() => {
 const hasOrdersData = computed(() => (analytics.value?.series.some(s => s.orders > 0) ?? false))
 const hasRevenueData = computed(() => (analytics.value?.series.some(s => s.revenue > 0) ?? false))
 
-// Icon path sets shared between the stat tiles and the recent-orders panel.
+// Heroicons shared between the stat tiles and the recent-orders panel.
 const icons = {
-  revenue: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-  products: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
-  orders: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
-  pending: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-  chart: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+  revenue: 'heroicons:currency-dollar',
+  products: 'heroicons:cube',
+  orders: 'heroicons:clipboard-document-list',
+  pending: 'heroicons:clock',
+  chart: 'heroicons:chart-bar',
 }
 
 const formatCompact = (num: number): string => {

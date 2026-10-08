@@ -2,7 +2,7 @@
   <div class="mx-auto max-w-[720px] space-y-4">
     <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm text-admin-muted">
       <NuxtLink to="/super-admin/admins" class="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-transparent px-2 hover:bg-admin-soft hover:text-admin-text">
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        <Icon name="heroicons:arrow-left" class="h-4 w-4" aria-hidden="true" />
         Admins
       </NuxtLink>
       <span class="text-admin-border">/</span>
@@ -25,7 +25,7 @@
       <div class="border-b border-admin-border px-5 py-4 sm:px-6">
         <div class="flex items-center gap-2.5">
           <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-admin-accent-soft text-admin-accent">
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+            <Icon name="heroicons:user" class="h-4 w-4" aria-hidden="true" />
           </span>
           <div>
             <h2 class="text-sm font-semibold text-admin-text">Account</h2>
@@ -45,7 +45,7 @@
             <div class="relative">
               <input id="admin-email" v-model="form.email" type="email" required maxlength="255" autocomplete="email" class="admin-input pl-9 font-mono text-sm" placeholder="ada@ssu.example" />
               <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-admin-muted">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                <Icon name="heroicons:envelope" class="h-4 w-4" aria-hidden="true" />
               </span>
             </div>
           </div>
@@ -62,7 +62,7 @@
         <div v-else class="rounded-xl border border-admin-border bg-admin-soft/50 px-3 py-2.5">
           <p class="text-xs font-semibold uppercase tracking-wider text-admin-muted">Role</p>
           <p class="mt-1 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" :class="form.role === 'super_admin' ? 'border-admin-accent/20 bg-admin-accent-soft text-admin-accent' : 'border-admin-info/20 bg-admin-info-soft text-admin-info'">
-            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="form.role === 'super_admin' ? 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' : 'M12 4a4 4 0 110 8 4 4 0 010-8zM5 20a7 7 0 0114 0H5z'" /></svg>
+            <Icon :name="form.role === 'super_admin' ? 'heroicons:shield-check' : 'heroicons:user'" class="h-3.5 w-3.5" aria-hidden="true" />
             {{ form.role === 'super_admin' ? 'Super admin' : 'Admin' }}
           </p>
           <p class="mt-2 text-xs text-admin-muted">Role is fixed at creation. To change it, delete this account and create a new one.</p>
@@ -96,7 +96,7 @@
           <SuperAdminStorePicker id="admin-store" v-model="form.store_id" required />
           <p class="mt-2 text-xs leading-relaxed text-admin-muted">
             Reassigning moves this admin to another store. A store keeps working as long as it has at least one admin.
-            <NuxtLink v-if="admin?.store" :to="`/super-admin/stores/${admin.store.id}`" class="inline-flex items-center gap-1 font-semibold text-admin-accent hover:underline">Edit current store <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></NuxtLink>
+            <NuxtLink v-if="admin?.store" :to="`/super-admin/stores/${admin.store.id}`" class="inline-flex items-center gap-1 font-semibold text-admin-accent hover:underline">Edit current store <Icon name="heroicons:arrow-right" class="h-3 w-3" aria-hidden="true" /></NuxtLink>
           </p>
         </div>
 
@@ -128,11 +128,11 @@
 
         <div class="flex flex-col gap-2 border-t border-admin-border pt-4 sm:flex-row sm:items-center sm:justify-between">
           <AdminButton type="submit" variant="primary" :loading="saving">
-            <template #icon><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></template>
+            <template #icon><Icon name="heroicons:check" class="h-4 w-4" aria-hidden="true" /></template>
             {{ isNew ? 'Create admin' : 'Save changes' }}
           </AdminButton>
           <AdminButton v-if="!isNew" variant="danger" :loading="deleting" @click="del">
-            <template #icon><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></template>
+            <template #icon><Icon name="heroicons:trash" class="h-4 w-4" aria-hidden="true" /></template>
             Delete admin
           </AdminButton>
         </div>

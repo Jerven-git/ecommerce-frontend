@@ -57,15 +57,11 @@
         <div class="hero-stagger mt-8 flex flex-wrap items-center gap-3 md:mt-10 md:gap-4" style="animation-delay: 0.55s">
           <NuxtLink to="/shop" class="hero-cta-primary">
             Shop Now
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
+            <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
           </NuxtLink>
           <button type="button" class="hero-cta-ghost" @click="scrollToFeatured">
             Discover more
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
+            <Icon name="heroicons:arrow-down" class="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>

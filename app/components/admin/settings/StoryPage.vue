@@ -3,9 +3,7 @@
     <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3 min-w-0">
         <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
-          <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
+          <Icon name="heroicons:book-open" class="w-4 h-4 text-indigo-600" aria-hidden="true" />
         </div>
         <div class="min-w-0">
           <h2 class="text-sm font-semibold text-gray-900">Our Story Page</h2>

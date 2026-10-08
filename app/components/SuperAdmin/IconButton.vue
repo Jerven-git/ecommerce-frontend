@@ -13,7 +13,12 @@
     ]"
     @click="$emit('click', $event)"
   >
-    <span class="shrink-0 [&_svg]:h-4 [&_svg]:w-4" v-html="icon" aria-hidden="true" />
+    <Icon
+      :name="icon"
+      class="h-4 w-4 shrink-0"
+      :class="icon === 'heroicons:arrow-path' ? 'animate-spin motion-reduce:animate-none' : ''"
+      aria-hidden="true"
+    />
     <span v-if="label" class="text-xs font-semibold tracking-tight">{{ label }}</span>
   </component>
 </template>

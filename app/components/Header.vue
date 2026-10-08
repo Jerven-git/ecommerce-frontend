@@ -78,13 +78,7 @@
                 @focus="openMenu(link.to)"
               >
                 {{ link.label }}
-                <svg
-                  class="w-3.5 h-3.5 transition-transform duration-200"
-                  :class="openDropdown === link.to ? 'rotate-180' : ''"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
+                <Icon name="heroicons:chevron-down" class="w-3.5 h-3.5 transition-transform duration-200" :class="openDropdown === link.to ? 'rotate-180' : ''" aria-hidden="true" />
               </NuxtLink>
 
               <Transition
@@ -192,10 +186,7 @@
             :class="isTransparent ? 'border-white/25 text-white/85 hover:text-white hover:bg-white/10' : 'border-primary-600/25 bg-primary-600/[0.06] text-primary-700 hover:bg-primary-600/[0.12]'"
           >
             <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
+            <Icon name="heroicons:cog-6-tooth" class="w-3.5 h-3.5" aria-hidden="true" />
             Admin
           </NuxtLink>
 
@@ -212,9 +203,7 @@
             :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
             aria-label="Favorites"
           >
-            <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
+            <Icon name="heroicons:heart" class="w-[18px] h-[18px]" aria-hidden="true" />
             <span
               v-if="favoritesStore.count > 0"
               class="absolute top-0.5 right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none"
@@ -232,9 +221,7 @@
             aria-label="Cart"
           >
             <img v-if="siteConfig?.cart_icon_url" :src="siteConfig.cart_icon_url" alt="Cart" class="w-[18px] h-[18px] object-contain" />
-            <svg v-else class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
+            <Icon name="heroicons:shopping-cart" v-else class="w-[18px] h-[18px]" aria-hidden="true" />
             <span
               v-if="cartStore.itemCount > 0"
               class="absolute top-0.5 right-0.5 min-w-[16px] h-4 bg-primary-600 text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none"
@@ -273,9 +260,7 @@
             aria-controls="mobile-menu-dialog"
             :aria-expanded="mobileMenuOpen"
           >
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <Icon name="heroicons:bars-3" class="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -331,9 +316,7 @@
                 aria-label="Close menu"
                 @click="closeMobile"
               >
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <Icon name="heroicons:x-mark" class="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
 
@@ -360,9 +343,7 @@
                     @click="mobileShopOpen = !mobileShopOpen"
                   >
                     <span>{{ link.label }}</span>
-                    <svg class="w-4 h-4 transition-transform duration-200" :class="mobileShopOpen ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <Icon name="heroicons:chevron-down" class="w-4 h-4 transition-transform duration-200" :class="mobileShopOpen ? 'rotate-180' : ''" aria-hidden="true" />
                   </button>
                   <div v-show="mobileShopOpen" class="ml-3 pl-3 border-l border-gray-100 flex flex-col">
                     <NuxtLink
@@ -403,10 +384,7 @@
                   @click="closeMobile"
                 >
                   <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-600/[0.12] shrink-0">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
+                    <Icon name="heroicons:cog-6-tooth" class="w-3.5 h-3.5" aria-hidden="true" />
                   </span>
                   <span class="min-w-0 flex-1">Admin dashboard</span>
                   <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" aria-hidden="true" />

@@ -15,9 +15,7 @@
           @click="productForm.openAddModal(); categories.initCategoryForProduct([])"
           class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
         >
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-          </svg>
+          <Icon name="heroicons:plus" class="w-4 h-4" aria-hidden="true" />
           Add Product
         </button>
       </template>
@@ -42,9 +40,7 @@
     <!-- Error -->
     <div v-else-if="products.error.value" class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">
       <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg class="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Icon name="heroicons:exclamation-circle" class="w-6 h-6 text-red-500" aria-hidden="true" />
       </div>
       <p class="font-semibold text-gray-800 mb-1">Failed to load products</p>
       <p class="text-sm text-red-500 mb-6">{{ products.error.value }}</p>
@@ -61,7 +57,7 @@
       <AdminEmptyState
         title="No products yet"
         description="Add your first product to get started"
-        :icon="'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'"
+        icon="heroicons:cube"
       >
         <template #action>
           <button

@@ -14,13 +14,7 @@
         @click.stop="$emit('toggle', category.id)"
         class="w-4 h-4 flex items-center justify-center rounded text-gray-400 hover:text-gray-600 shrink-0"
       >
-        <svg
-          class="w-3 h-3 transition-transform duration-200"
-          :class="{ 'rotate-90': isExpanded }"
-          fill="none" viewBox="0 0 24 24" stroke="currentColor"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
+        <Icon name="heroicons:chevron-right" class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-90': isExpanded }" aria-hidden="true" />
       </button>
       <div v-else class="w-4 h-4 shrink-0"></div>
 
@@ -30,9 +24,7 @@
         class="w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors duration-150"
         :class="isSelected ? 'border-primary-500 bg-primary-500' : 'border-gray-300 bg-white'"
       >
-        <svg v-if="isSelected" class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-        </svg>
+        <Icon name="heroicons:check" v-if="isSelected" class="w-3 h-3 text-white" aria-hidden="true" />
       </div>
       <!-- Disabled indicator for parent nodes -->
       <div

@@ -19,9 +19,7 @@
         <!-- Empty State -->
         <div v-if="cartStore.items.length === 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-14 text-center max-w-sm mx-auto mt-8">
           <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-5">
-            <svg class="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
+            <Icon name="heroicons:shopping-bag" class="w-8 h-8 text-gray-300" aria-hidden="true" />
           </div>
           <p class="text-base font-semibold text-gray-900 mb-1">Your cart is empty</p>
           <p class="text-sm text-gray-400 mb-6">Add some products to get started!</p>
@@ -30,9 +28,7 @@
             class="inline-flex items-center gap-2 btn-primary"
           >
             Continue Shopping
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
+            <Icon name="heroicons:arrow-right" class="w-4 h-4" aria-hidden="true" />
           </NuxtLink>
         </div>
 
@@ -60,9 +56,7 @@
                     decoding="async"
                   />
                   <div v-else class="w-full h-full flex items-center justify-center">
-                    <svg class="w-8 h-8 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
+                    <Icon name="heroicons:photo" class="w-8 h-8 text-gray-200" aria-hidden="true" />
                   </div>
                 </div>
 
@@ -76,9 +70,7 @@
                   <!-- Backorder indicator -->
                   <div v-if="item.quantity > item.stock && item.can_backorder" class="mt-1.5 flex items-center gap-1.5">
                     <span class="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">
-                      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                      <Icon name="heroicons:clock" class="w-3 h-3" aria-hidden="true" />
                       {{ item.stock > 0 ? `${item.quantity - item.stock} on backorder` : 'Backorder' }}
                     </span>
                   </div>

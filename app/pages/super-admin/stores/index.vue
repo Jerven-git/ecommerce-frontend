@@ -19,7 +19,7 @@
         </div>
         <AdminButton to="/super-admin/admins/new" variant="primary">
           <template #icon>
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14" /></svg>
+            <Icon name="heroicons:plus" class="h-4 w-4" aria-hidden="true" />
           </template>
           New admin + store
         </AdminButton>
@@ -29,7 +29,7 @@
     <div class="rounded-xl border border-admin-accent/20 bg-admin-accent-soft px-3 py-2.5 text-xs leading-relaxed text-admin-accent-strong dark:bg-admin-accent-soft/60">
       <div class="flex gap-3">
         <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-admin-surface text-admin-accent shadow-sm">
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <Icon name="heroicons:information-circle" class="h-4 w-4" aria-hidden="true" />
         </span>
         <div>
           <p class="font-semibold">How provisioning works</p>
@@ -53,17 +53,16 @@
                 placeholder="Name, slug, or domain"
               />
               <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-admin-muted">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 110-15 7.5 7.5 0 010 15z" /></svg>
+                <Icon name="heroicons:magnifying-glass" class="h-4 w-4" aria-hidden="true" />
               </span>
               <button v-if="search" type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 text-admin-muted hover:text-admin-text" aria-label="Clear search" title="Clear search" @click="search=''; refresh(1)">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                <Icon name="heroicons:x-mark" class="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
           </div>
           <div class="flex gap-2">
             <button type="submit" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-admin-border bg-admin-surface px-2.5 text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50" :disabled="loading">
-              <svg v-if="loading" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-              <svg v-else class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 110-15 7.5 7.5 0 010 15z" /></svg>
+              <Icon :name="loading ? 'heroicons:arrow-path' : 'heroicons:magnifying-glass'" class="h-4 w-4" :class="loading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
               Search
             </button>
             <button v-if="search" type="button" class="inline-flex min-h-10 items-center rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text" @click="search=''; refresh(1)">Reset</button>
@@ -105,7 +104,7 @@
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-3">
                     <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-admin-soft text-admin-muted group-hover:text-admin-accent">
-                      <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8h6" /></svg>
+                      <Icon name="heroicons:building-storefront" class="h-4.5 w-4.5" aria-hidden="true" />
                     </span>
                     <div class="min-w-0">
                       <div class="flex items-center gap-1.5">
@@ -163,7 +162,7 @@
             </div>
             <div class="mt-4 grid grid-cols-2 gap-2">
               <AdminButton :to="`/super-admin/stores/${store.id}`" variant="secondary" block>
-                <template #icon><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></template>
+                <template #icon><Icon name="heroicons:pencil-square" class="h-4 w-4" aria-hidden="true" /></template>
                 Manage
               </AdminButton>
               <AdminButton :to="`/super-admin/stores/${store.id}`" variant="secondary" block>View</AdminButton>
@@ -194,8 +193,8 @@ const error = ref<string | null>(null)
 const search = ref('')
 const pagination = ref({ current_page: 1, last_page: 1, total: 0 })
 
-const viewIcon = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>'
-const editIcon = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>'
+const viewIcon = 'heroicons:eye'
+const editIcon = 'heroicons:pencil-square'
 
 const refresh = async (page = 1) => {
   loading.value = true
