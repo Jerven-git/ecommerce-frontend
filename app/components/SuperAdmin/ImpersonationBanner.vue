@@ -6,15 +6,13 @@
     <div class="flex items-center gap-3 text-admin-warning">
       <Icon name="heroicons:exclamation-triangle" class="h-5 w-5 shrink-0" aria-hidden="true" />
       <span>
-        You are impersonating
-        <span class="font-semibold">{{ targetEmail }}</span>
-        as
-        <span class="font-semibold">{{ impersonatorEmail }}</span>
+        Viewing <span class="font-semibold">{{ targetEmail }}</span>.
+        Original operator: <span class="font-semibold">{{ impersonatorEmail }}</span>
       </span>
     </div>
     <button
       type="button"
-      class="inline-flex min-h-10 items-center justify-center rounded-lg border border-admin-warning bg-admin-surface px-2.5 py-1.5 text-[11px] font-medium text-admin-warning hover:bg-admin-warning-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-warning"
+      class="inline-flex min-h-11 items-center justify-center rounded-lg border border-admin-warning bg-admin-surface px-2.5 py-1.5 text-[11px] font-medium text-admin-warning hover:bg-admin-warning-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-warning"
       :disabled="impersonation.loading"
       @pointerenter="warmSuperAdminRoute"
       @focus="warmSuperAdminRoute"

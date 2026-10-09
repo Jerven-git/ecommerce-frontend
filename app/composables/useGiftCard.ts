@@ -105,8 +105,9 @@ export function useGiftCardPurchase() {
     try {
       const res = await $apiFetch<any>('/gift-card-denominations')
       denominations.value = res?.data ?? []
-      if (denominations.value.length > 0 && !form.value.gift_card_denomination_id) {
-        form.value.gift_card_denomination_id = denominations.value[0].id
+      const firstDenomination = denominations.value.at(0)
+      if (firstDenomination && !form.value.gift_card_denomination_id) {
+        form.value.gift_card_denomination_id = firstDenomination.id
       }
     } finally {
       loadingDenominations.value = false

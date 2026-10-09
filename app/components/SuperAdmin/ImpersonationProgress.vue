@@ -233,14 +233,12 @@ onBeforeUnmount(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .impersonation-progress *,
-  .impersonation-progress *::before,
-  .impersonation-progress *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  .impersonation-progress-enter-active,
+  .impersonation-progress-leave-active,
+  .impersonation-progress__steps li { transition: none; }
+  .impersonation-progress__track span {
+    animation: none;
+    transform: scaleX(0.72);
   }
-
-  .impersonation-progress__track span { transform: scaleX(0.72); }
 }
 </style>

@@ -117,10 +117,10 @@
             <p class="text-sm font-semibold text-admin-text">Account disabled</p>
             <p class="text-xs text-admin-muted">Disabled users can’t log in and active sessions are rejected.</p>
           </div>
-          <label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
-            <input type="checkbox" class="peer sr-only" :checked="form.status === 'disabled'" @change="form.status = ($event.target as HTMLInputElement).checked ? 'disabled' : 'active'" />
-            <span class="pointer-events-none absolute inset-0 rounded-full bg-admin-border transition-colors peer-checked:bg-admin-danger" />
-            <span class="pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
+          <label class="relative inline-flex h-11 w-11 cursor-pointer items-center">
+            <input type="checkbox" class="peer sr-only" aria-label="Disable this admin account" :checked="form.status === 'disabled'" @change="form.status = ($event.target as HTMLInputElement).checked ? 'disabled' : 'active'" />
+            <span class="pointer-events-none absolute inset-x-0 top-2.5 h-6 rounded-full bg-admin-border transition-colors peer-checked:bg-admin-danger" />
+            <span class="pointer-events-none absolute left-0.5 top-3 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
           </label>
         </div>
 

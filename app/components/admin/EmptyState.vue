@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 // Empty states that teach the interface rather than showing blank space.
-const props = defineProps<{
+withDefaults(defineProps<{
   title: string
   description?: string
   /** Heroicons name used for the empty-state glyph. */

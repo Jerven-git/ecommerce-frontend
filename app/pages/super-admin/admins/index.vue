@@ -27,16 +27,16 @@
           <div class="min-w-0 flex-1 sm:max-w-sm">
             <label id="admins-heading" for="admin-search" class="sr-only">Search admins</label>
             <div class="relative">
-              <input id="admin-search" v-model="search" type="search" class="admin-input rounded-lg pl-10" placeholder="Search admins…" />
+              <input id="admin-search" v-model="search" type="search" class="admin-input rounded-lg pl-10 pr-11" placeholder="Search admins…" />
               <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-admin-muted">
                 <Icon name="heroicons:magnifying-glass" class="h-4 w-4" aria-hidden="true" />
               </span>
-              <button v-if="search" type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 text-admin-muted hover:text-admin-text" aria-label="Clear search" title="Clear search" @click="search=''; refresh(1)">
+              <button v-if="search" type="button" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-admin-muted hover:text-admin-text" aria-label="Clear search" title="Clear search" @click="search=''; refresh(1)">
                 <Icon name="heroicons:x-mark" class="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
           </div>
-          <button type="submit" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-admin-border bg-admin-surface px-2.5 text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50" :disabled="loading">
+          <button type="submit" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-admin-border bg-admin-surface px-2.5 text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50" :disabled="loading">
             <Icon :name="loading ? 'heroicons:arrow-path' : 'heroicons:magnifying-glass'" class="h-4 w-4" :class="loading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
             Search
           </button>
@@ -99,7 +99,7 @@
                     <SuperAdminIconButton
                       v-if="!admin.is_super_admin && admin.status === 'active'"
                       :icon="impersonation.transitionTargetId === admin.id ? loadingIcon : impersonateIcon"
-                      :aria-label="impersonation.transitionTargetId === admin.id ? `Opening ${admin.name}'s workspace` : 'Impersonate admin'"
+                      :ariaLabel="impersonation.transitionTargetId === admin.id ? `Opening ${admin.name}'s workspace` : 'Impersonate admin'"
                       :tooltip="impersonation.transitionTargetId === admin.id ? 'Preparing merchant workspace' : 'Impersonate — open their store as them'"
                       variant="soft"
                       :disabled="impersonation.transitioning"
@@ -108,7 +108,7 @@
                       @touchstart.passive="warmAdminRoute"
                       @click="startImpersonation(admin)"
                     />
-                    <SuperAdminIconButton :icon="editIcon" :to="`/super-admin/admins/${admin.id}`" aria-label="Edit admin" tooltip="Edit admin" variant="ghost" />
+                    <SuperAdminIconButton :icon="editIcon" :to="`/super-admin/admins/${admin.id}`" ariaLabel="Edit admin" tooltip="Edit admin" variant="ghost" />
                   </div>
                 </td>
               </tr>
@@ -133,7 +133,7 @@
               <span class="rounded-md bg-admin-soft px-2.5 py-1 font-medium text-admin-text">{{ admin.store?.name ?? 'All stores' }}</span>
             </div>
             <div class="mt-4 grid gap-2" :class="!admin.is_super_admin && admin.status === 'active' ? 'grid-cols-2' : 'grid-cols-1'">
-              <button v-if="!admin.is_super_admin && admin.status === 'active'" type="button" class="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-admin-border bg-admin-surface px-2.5 text-xs font-medium text-admin-text hover:bg-admin-soft disabled:cursor-wait disabled:opacity-50" :disabled="impersonation.transitioning" @pointerenter="warmAdminRoute" @focus="warmAdminRoute" @touchstart.passive="warmAdminRoute" @click="startImpersonation(admin)">
+              <button v-if="!admin.is_super_admin && admin.status === 'active'" type="button" class="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg border border-admin-border bg-admin-surface px-2.5 text-xs font-medium text-admin-text hover:bg-admin-soft disabled:cursor-wait disabled:opacity-50" :disabled="impersonation.transitioning" @pointerenter="warmAdminRoute" @focus="warmAdminRoute" @touchstart.passive="warmAdminRoute" @click="startImpersonation(admin)">
                 <Icon :name="impersonation.transitionTargetId === admin.id ? 'heroicons:arrow-path' : 'heroicons:arrow-right-end-on-rectangle'" class="h-4 w-4" :class="impersonation.transitionTargetId === admin.id ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
                 {{ impersonation.transitionTargetId === admin.id ? 'Opening…' : 'Impersonate' }}
               </button>

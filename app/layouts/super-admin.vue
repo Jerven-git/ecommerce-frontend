@@ -53,7 +53,7 @@
             v-for="item in primaryNav"
             :key="item.path"
             :to="item.path"
-            class="group flex min-h-10 items-center gap-2 rounded-lg px-2.5 py-1 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent"
+            class="group flex min-h-11 items-center gap-2 rounded-lg px-2.5 py-1 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent"
             :class="isActive(item.path) ? 'bg-admin-accent text-admin-on-accent font-semibold' : 'text-admin-muted hover:bg-admin-soft hover:text-admin-text font-medium'"
             :aria-current="isActive(item.path) ? 'page' : undefined"
           >
@@ -71,7 +71,7 @@
             v-for="item in dirNav"
             :key="item.path"
             :to="item.path"
-            class="group flex min-h-10 items-center gap-2 rounded-lg px-2.5 py-1 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent"
+            class="group flex min-h-11 items-center gap-2 rounded-lg px-2.5 py-1 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent"
             :class="isActive(item.path) ? 'bg-admin-accent-soft text-admin-accent-strong font-semibold border border-admin-accent/15' : 'text-admin-muted hover:bg-admin-soft hover:text-admin-text font-medium'"
             :aria-current="isActive(item.path) ? 'page' : undefined"
           >
@@ -89,7 +89,7 @@
             v-for="item in auditNav"
             :key="item.path"
             :to="item.path"
-            class="group flex min-h-10 items-center gap-2 rounded-lg px-2.5 py-1 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent"
+            class="group flex min-h-11 items-center gap-2 rounded-lg px-2.5 py-1 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent"
             :class="isActive(item.path) ? 'bg-admin-accent-soft text-admin-accent-strong font-semibold border border-admin-accent/15' : 'text-admin-muted hover:bg-admin-soft hover:text-admin-text font-medium'"
             :aria-current="isActive(item.path) ? 'page' : undefined"
           >
@@ -112,7 +112,7 @@
             <p class="truncate text-[10px] text-admin-muted">{{ authStore.user?.email || 'super admin' }}</p>
           </div>
         </div>
-        <NuxtLink to="/super-admin/admins" class="flex min-h-10 w-full items-center gap-2 rounded-lg px-2.5 text-[11px] font-medium text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent" title="Impersonate a store admin without sharing credentials">
+        <NuxtLink to="/super-admin/admins" class="flex min-h-11 w-full items-center gap-2 rounded-lg px-2.5 text-[11px] font-medium text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent" title="Impersonate a store admin without sharing credentials">
           <Icon name="heroicons:arrows-right-left" class="h-4 w-4" aria-hidden="true" />
           Merchant access
           <Icon name="heroicons:chevron-right" class="ml-auto h-3.5 w-3.5" aria-hidden="true" />
@@ -121,7 +121,7 @@
           <AdminThemeToggle class="flex-1" show-label block />
           <button
             type="button"
-            class="inline-flex h-10 w-10 items-center justify-center rounded-lg text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:cursor-wait"
+            class="inline-flex h-11 w-11 items-center justify-center rounded-lg text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:cursor-wait"
             :disabled="loggingOut"
             :title="loggingOut ? 'Signing out' : 'Log out of super admin'"
             :aria-label="loggingOut ? 'Signing out' : 'Log out'"
@@ -163,14 +163,21 @@ const navOpen = ref(false)
 const loggingOut = ref(false)
 const { themeClass } = useAdminAppearance({ syncBody: true })
 
-const primaryNav = [
+type NavItem = {
+  path: string
+  label: string
+  icon: string
+  badge?: string | number
+}
+
+const primaryNav: NavItem[] = [
   { path: '/super-admin', label: 'Dashboard', icon: 'heroicons:home' },
 ]
-const dirNav = [
+const dirNav: NavItem[] = [
   { path: '/super-admin/stores', label: 'Stores', icon: 'heroicons:building-storefront' },
   { path: '/super-admin/admins', label: 'Admins', icon: 'heroicons:user-group' },
 ]
-const auditNav = [
+const auditNav: NavItem[] = [
   { path: '/super-admin/activity', label: 'Activity log', icon: 'heroicons:clipboard-document-list' },
 ]
 
@@ -214,7 +221,7 @@ watch(() => route.path, () => { navOpen.value = false })
 }
 
 .super-admin-content :deep(.admin-btn) {
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   border-radius: 0.5rem;
   padding: 0.375rem 0.75rem;
   font-size: 0.75rem;

@@ -49,23 +49,23 @@
                 id="store-search"
                 v-model="search"
                 type="search"
-                class="admin-input rounded-lg pl-10"
+                class="admin-input rounded-lg pl-10 pr-11"
                 placeholder="Name, slug, or domain"
               />
               <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-admin-muted">
                 <Icon name="heroicons:magnifying-glass" class="h-4 w-4" aria-hidden="true" />
               </span>
-              <button v-if="search" type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 text-admin-muted hover:text-admin-text" aria-label="Clear search" title="Clear search" @click="search=''; refresh(1)">
+              <button v-if="search" type="button" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-admin-muted hover:text-admin-text" aria-label="Clear search" title="Clear search" @click="search=''; refresh(1)">
                 <Icon name="heroicons:x-mark" class="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
           </div>
           <div class="flex gap-2">
-            <button type="submit" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-admin-border bg-admin-surface px-2.5 text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50" :disabled="loading">
+            <button type="submit" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-admin-border bg-admin-surface px-2.5 text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50" :disabled="loading">
               <Icon :name="loading ? 'heroicons:arrow-path' : 'heroicons:magnifying-glass'" class="h-4 w-4" :class="loading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
               Search
             </button>
-            <button v-if="search" type="button" class="inline-flex min-h-10 items-center rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text" @click="search=''; refresh(1)">Reset</button>
+            <button v-if="search" type="button" class="inline-flex min-h-11 items-center rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text" @click="search=''; refresh(1)">Reset</button>
           </div>
         </form>
       </div>
@@ -136,8 +136,8 @@
                 </td>
                 <td class="px-4 py-3">
                   <div class="flex items-center justify-end gap-1">
-                    <SuperAdminIconButton :icon="viewIcon" :to="`/super-admin/stores/${store.id}`" aria-label="Manage store" tooltip="Manage store" variant="soft" />
-                    <SuperAdminIconButton :icon="editIcon" :to="`/super-admin/stores/${store.id}`" aria-label="Edit store" tooltip="Edit store" variant="ghost" />
+                    <SuperAdminIconButton :icon="viewIcon" :to="`/super-admin/stores/${store.id}`" ariaLabel="Manage store" tooltip="Manage store" variant="soft" />
+                    <SuperAdminIconButton :icon="editIcon" :to="`/super-admin/stores/${store.id}`" ariaLabel="Edit store" tooltip="Edit store" variant="ghost" />
                   </div>
                 </td>
               </tr>

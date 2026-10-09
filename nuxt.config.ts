@@ -5,7 +5,9 @@ export default defineNuxtConfig({
   // node_modules cache default can be owned by the container user, which makes
   // local production builds fail before compilation begins.
   buildDir: '.nuxt',
-  devtools: { enabled: true },
+  // DevTools exposes development-only RPC and project metadata endpoints.
+  // Never include it in preview or production server builds.
+  devtools: { enabled: process.env.NODE_ENV === 'development' },
   ssr: true,
 
   routeRules: {

@@ -12,7 +12,7 @@
       @click="toggle"
       @keydown.down.prevent="openSelect(1)"
       @keydown.up.prevent="openSelect(-1)"
-      @keydown.escape.prevent="closeSelect"
+      @keydown.escape.prevent="closeSelect()"
     >
       <span
         class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-admin-soft text-admin-muted transition-colors group-hover:bg-admin-accent-soft group-hover:text-admin-accent"

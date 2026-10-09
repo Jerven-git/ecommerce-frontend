@@ -93,7 +93,7 @@
                     <input id="store-domain" v-model="form.domain" type="text" inputmode="url" maxlength="253" placeholder="shop.example.com" autocomplete="off" autocapitalize="none" spellcheck="false" class="admin-input font-mono pl-9" :class="domainInputClass" aria-describedby="store-domain-help store-domain-status" :aria-invalid="check && (!check.valid || !check.available) ? true : undefined" />
                     <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-admin-muted"><Icon name="heroicons:link" class="h-4 w-4" aria-hidden="true" /></span>
                   </div>
-                  <button v-if="form.domain" type="button" class="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50" :disabled="checking" @click="runCheck(form.domain || '')">
+                  <button v-if="form.domain" type="button" class="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50" :disabled="checking" @click="runCheck(form.domain || '')">
                     <Icon name="heroicons:arrow-path" class="h-4 w-4" :class="checking ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" /> Check DNS
                   </button>
                 </div>
@@ -134,7 +134,7 @@
                   <p v-else-if="store.domain_verified_at" class="text-admin-muted">Last verified {{ formatDateTime(store.domain_verified_at) }}</p>
                   <p v-else class="text-admin-muted">Verification checks that DNS points to an approved DATABASY server.</p>
                 </div>
-                <button v-if="store.domain" type="button" class="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg border px-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:cursor-not-allowed disabled:opacity-50" :class="domainDirty || !domainVerifierConfigured ? 'border-admin-border bg-admin-surface text-admin-muted' : 'border-admin-success/20 bg-admin-success-soft text-admin-success hover:bg-admin-success hover:text-white'" :disabled="domainDirty || !domainVerifierConfigured || verifying" @click="verifyDomain"><Icon :name="verifying ? 'heroicons:arrow-path' : 'heroicons:shield-check'" class="h-4 w-4" :class="verifying ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />{{ verifying ? 'Verifying…' : store.domain_verified ? 'Re-check verification' : 'Verify and activate' }}</button>
+                <button v-if="store.domain" type="button" class="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg border px-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:cursor-not-allowed disabled:opacity-50" :class="domainDirty || !domainVerifierConfigured ? 'border-admin-border bg-admin-surface text-admin-muted' : 'border-admin-success/20 bg-admin-success-soft text-admin-success hover:bg-admin-success hover:text-white'" :disabled="domainDirty || !domainVerifierConfigured || verifying" @click="verifyDomain"><Icon :name="verifying ? 'heroicons:arrow-path' : 'heroicons:shield-check'" class="h-4 w-4" :class="verifying ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />{{ verifying ? 'Verifying…' : store.domain_verified ? 'Re-check verification' : 'Verify and activate' }}</button>
               </div>
             </div>
           </section>
@@ -149,7 +149,11 @@
                 <span class="block text-xs text-admin-muted">Inactive stores are hidden from storefront and admin login.</span>
               </span>
             </span>
-            <input type="checkbox" class="h-5 w-9 appearance-none rounded-full bg-admin-border p-0.5 transition-colors checked:bg-admin-success focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent [&:checked>span]:translate-x-4" :checked="form.status === 'active'" :disabled="store.is_default && form.status === 'active'" @change="form.status = ($event.target as HTMLInputElement).checked ? 'active' : 'inactive'" />
+            <span class="relative inline-flex h-11 w-11 shrink-0 items-center">
+              <input type="checkbox" class="peer sr-only" aria-label="Store active" :checked="form.status === 'active'" :disabled="store.is_default && form.status === 'active'" @change="form.status = ($event.target as HTMLInputElement).checked ? 'active' : 'inactive'" />
+              <span class="pointer-events-none absolute inset-x-0 top-2.5 h-6 rounded-full bg-admin-border transition-colors peer-checked:bg-admin-success peer-focus-visible:ring-2 peer-focus-visible:ring-admin-accent peer-disabled:opacity-50" />
+              <span class="pointer-events-none absolute left-0.5 top-3 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5 peer-disabled:opacity-70" />
+            </span>
           </label>
           <p v-if="store.is_default" class="text-xs text-admin-muted">The default store cannot be deactivated or deleted.</p>
 
@@ -263,7 +267,7 @@
             </div>
             <div class="flex items-center gap-2 shrink-0">
               <span class="hidden sm:inline-flex rounded-full border px-2 py-1 text-xs font-semibold" :class="a.status === 'active' ? 'border-admin-success/20 bg-admin-success-soft text-admin-success' : 'border-admin-border bg-admin-soft text-admin-muted'">{{ a.status }}</span>
-              <SuperAdminIconButton :icon="editIcon" :to="`/super-admin/admins/${a.id}`" :aria-label="`Edit ${a.name}`" tooltip="Edit admin" variant="ghost" />
+              <SuperAdminIconButton :icon="editIcon" :to="`/super-admin/admins/${a.id}`" :ariaLabel="`Edit ${a.name}`" tooltip="Edit admin" variant="ghost" />
             </div>
           </li>
         </ul>

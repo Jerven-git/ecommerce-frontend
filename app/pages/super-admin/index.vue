@@ -15,11 +15,11 @@
         </div>
       </div>
       <div class="flex flex-wrap items-center gap-2">
-        <NuxtLink to="/super-admin/stores" class="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-admin-border bg-admin-surface px-2.5 text-[11px] font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
+        <NuxtLink to="/super-admin/stores" class="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-admin-border bg-admin-surface px-2.5 text-[11px] font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
           <Icon name="heroicons:building-storefront" class="h-4 w-4" aria-hidden="true" />
           Stores
         </NuxtLink>
-        <NuxtLink to="/super-admin/admins/new" class="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-admin-accent px-2.5 text-[11px] font-semibold text-admin-on-accent hover:bg-admin-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
+        <NuxtLink to="/super-admin/admins/new" class="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-admin-accent px-2.5 text-[11px] font-semibold text-admin-on-accent hover:bg-admin-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
           <Icon name="heroicons:plus" class="h-4 w-4" aria-hidden="true" />
           New admin
         </NuxtLink>
@@ -56,7 +56,7 @@
     <p v-if="statsError" role="alert" class="flex flex-wrap items-center gap-2 rounded-lg border border-admin-danger/20 bg-admin-danger-soft px-3 py-2.5 text-xs text-admin-danger">
       <Icon name="heroicons:exclamation-triangle" class="h-4 w-4 shrink-0" aria-hidden="true" />
       {{ statsError }}
-      <button type="button" class="ml-auto inline-flex min-h-10 items-center rounded-lg border border-admin-danger/20 bg-admin-surface px-2.5 text-[11px] font-semibold hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-danger" @click="loadOverview">Try again</button>
+      <button type="button" class="ml-auto inline-flex min-h-11 items-center rounded-lg border border-admin-danger/20 bg-admin-surface px-2.5 text-[11px] font-semibold hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-danger" @click="loadOverview">Try again</button>
     </p>
 
     <!-- Charts -->
@@ -189,7 +189,7 @@
             <h2 class="text-[13px] font-semibold text-admin-text">Activity mix</h2>
             <p class="mt-0.5 text-[11px] text-admin-muted">Top types across the latest 50 events</p>
           </div>
-          <NuxtLink to="/super-admin/activity" class="inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
+          <NuxtLink to="/super-admin/activity" class="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
             Activity
             <Icon name="heroicons:arrow-right" class="h-3.5 w-3.5" aria-hidden="true" />
           </NuxtLink>
@@ -236,7 +236,7 @@
 
     <!-- Data coverage -->
     <details class="group rounded-xl border border-admin-border bg-admin-surface">
-      <summary class="flex min-h-10 cursor-pointer list-none items-center gap-2 px-3 text-[11px] font-semibold text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-admin-accent [&::-webkit-details-marker]:hidden">
+      <summary class="flex min-h-11 cursor-pointer list-none items-center gap-2 px-3 text-[11px] font-semibold text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-admin-accent [&::-webkit-details-marker]:hidden">
         <span class="flex h-7 w-7 items-center justify-center rounded-md bg-admin-info-soft text-admin-info" aria-hidden="true">
           <Icon name="heroicons:information-circle" class="h-3.5 w-3.5" aria-hidden="true" />
         </span>
@@ -268,7 +268,7 @@
               <p class="text-[11px] text-admin-muted">Newest first</p>
             </div>
           </div>
-          <NuxtLink to="/super-admin/activity" class="inline-flex min-h-10 items-center gap-1 rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
+          <NuxtLink to="/super-admin/activity" class="inline-flex min-h-11 items-center gap-1 rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
             View all
             <Icon name="heroicons:arrow-right" class="h-3.5 w-3.5" aria-hidden="true" />
           </NuxtLink>
@@ -330,7 +330,7 @@
             <h2 class="text-[13px] font-semibold text-admin-text">Newest stores</h2>
             <p class="text-[11px] text-admin-muted">Last five provisioned</p>
           </div>
-          <NuxtLink to="/super-admin/stores" class="inline-flex min-h-10 items-center gap-1 rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
+          <NuxtLink to="/super-admin/stores" class="inline-flex min-h-11 items-center gap-1 rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">
             All
             <Icon name="heroicons:arrow-right" class="h-3.5 w-3.5" aria-hidden="true" />
           </NuxtLink>
@@ -378,7 +378,7 @@
             <Icon name="heroicons:building-storefront" class="h-4 w-4" aria-hidden="true" />
           </div>
           <p class="mt-2 text-[13px] font-semibold text-admin-text">No stores yet</p>
-          <NuxtLink to="/super-admin/admins/new" class="mt-2 inline-flex min-h-10 items-center rounded-lg bg-admin-accent px-2.5 text-[11px] font-semibold text-admin-on-accent hover:bg-admin-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">Create first admin</NuxtLink>
+          <NuxtLink to="/super-admin/admins/new" class="mt-2 inline-flex min-h-11 items-center rounded-lg bg-admin-accent px-2.5 text-[11px] font-semibold text-admin-on-accent hover:bg-admin-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent">Create first admin</NuxtLink>
         </div>
       </div>
     </div>

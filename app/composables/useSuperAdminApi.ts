@@ -1,4 +1,4 @@
-export type SubscriptionStatus = 'unsubscribed' | 'pending' | 'active' | 'cancelled' | 'expired' | 'comped'
+export type SuperAdminSubscriptionStatus = 'unsubscribed' | 'pending' | 'active' | 'cancelled' | 'expired' | 'comped'
 
 export interface SubscriptionPlanInfo {
   id: number
@@ -17,7 +17,7 @@ export interface Store {
   domain_verified_at: string | null
   domain_verified: boolean
   status: 'active' | 'inactive'
-  subscription_status: SubscriptionStatus
+  subscription_status: SuperAdminSubscriptionStatus
   subscription_plan_id: number | null
   subscription_plan: SubscriptionPlanInfo | null
   subscribed_at: string | null

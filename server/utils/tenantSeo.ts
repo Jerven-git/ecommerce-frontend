@@ -52,7 +52,7 @@ export async function fetchTenantApi<T>(
   return await $fetch<T>(`${apiRoot(event)}${path}`, {
     query,
     headers: requestTenantHeaders(event),
-  })
+  }) as T
 }
 
 export async function fetchAllTenantEntities<T extends SitemapEntity>(
@@ -100,7 +100,7 @@ export function tenantBaseUrl(event: H3Event, config: TenantSeoConfig): string {
 
 export function indexingEnabled(event: H3Event): boolean {
   const value = useRuntimeConfig(event).public.seoIndexingEnabled
-  return value === true || value === 'true'
+  return String(value).toLowerCase() === 'true'
 }
 
 export function xmlEscape(value: string): string {
@@ -111,4 +111,3 @@ export function xmlEscape(value: string): string {
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&apos;')
 }
-

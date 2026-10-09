@@ -10,7 +10,7 @@
       aria-haspopup="dialog"
       @click="toggle"
       @keydown.down.prevent="openPicker"
-      @keydown.escape.prevent="closePicker"
+      @keydown.escape.prevent="closePicker()"
     >
       <span
         class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-admin-soft text-admin-muted transition-colors group-hover:bg-admin-accent-soft group-hover:text-admin-accent"

@@ -23,7 +23,7 @@
       <AdminFilterSelect
         v-model="selectedStoreId"
         :options="storeSelectOptions"
-        :aria-label="required ? 'Select a store' : 'Filter by store'"
+        :ariaLabel="required ? 'Select a store' : 'Filter by store'"
         list-label="Available stores"
         :described-by="statusId"
       />

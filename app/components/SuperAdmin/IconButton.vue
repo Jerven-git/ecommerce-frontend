@@ -45,9 +45,9 @@ defineEmits<{ click: [e: MouseEvent] }>()
 const NuxtLink = resolveComponent('NuxtLink')
 
 const sizeClasses = computed(() => {
-  if (props.label) return 'h-9 gap-1.5 px-3'
-  if (props.size === 'sm') return 'h-8 w-8'
-  return 'h-9 w-9'
+  if (props.label) return 'min-h-11 gap-1.5 px-3'
+  if (props.size === 'sm') return 'h-11 w-11'
+  return 'h-11 w-11'
 })
 
 const variantClasses = computed(() => ({

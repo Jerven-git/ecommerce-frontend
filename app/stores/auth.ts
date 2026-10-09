@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-interface User {
+export interface User {
   id: number
   name: string
   email: string
@@ -11,7 +11,7 @@ interface User {
   is_impersonating?: boolean
   impersonator?: { id: number; name: string; email: string; is_super_admin?: boolean } | null
   store_id?: number | null
-  store?: { id: number; name: string; slug: string; domain: string | null; domain_verified?: boolean; subscription_status?: string; subscription_expires_at?: string | null } | null
+  store?: { id: number; name: string; slug: string; domain?: string | null; domain_verified?: boolean; subscription_status?: string; subscription_expires_at?: string | null } | null
   status?: 'active' | 'disabled'
   email_verified_at?: string | null
   created_at?: string
@@ -113,6 +113,22 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
+    adoptAuthenticatedUser(user: User) {
+      this.user = user
+      this.isAuthenticated = true
+      rememberStoreSlug(user.store?.slug)
+    },
+
+    clearSessionState(options: { preserveTwoFactor?: boolean } = {}) {
+      this.user = null
+      this.isAuthenticated = false
+      if (!options.preserveTwoFactor) {
+        this.twoFactorRequired = false
+        this.twoFactorEmail = null
+      }
+      useImpersonationStore().reset()
+    },
+
     async login(email: string, password: string) {
       this.loading = true
       this.error = null
@@ -142,8 +158,7 @@ export const useAuthStore = defineStore('auth', {
 
         // Fallback for any non-2FA response
         if (response.user) {
-          this.user = response.user
-          this.isAuthenticated = true
+          this.adoptAuthenticatedUser(response.user)
         }
 
         return response
@@ -168,12 +183,9 @@ export const useAuthStore = defineStore('auth', {
         })
 
         if (response.user) {
-          this.user = response.user
-          this.isAuthenticated = true
+          this.adoptAuthenticatedUser(response.user)
           this.twoFactorRequired = false
           this.twoFactorEmail = null
-
-          rememberStoreSlug(response.user.store?.slug)
 
           // The site config cache is keyed in Nuxt useState, so it survives
           // logout/login of different admins. Force-refresh so the new admin's
@@ -253,10 +265,7 @@ export const useAuthStore = defineStore('auth', {
           method: 'POST'
         })
 
-        this.user = null
-        this.isAuthenticated = false
-        this.twoFactorRequired = false
-        this.twoFactorEmail = null
+        this.clearSessionState()
 
         // Drop the previous admin's cached theme so the login page (and any
         // next admin who logs in) doesn't render with the wrong store's data.
@@ -282,19 +291,29 @@ export const useAuthStore = defineStore('auth', {
         })
 
         if (response.user) {
-          this.user = response.user
-          this.isAuthenticated = true
-          rememberStoreSlug(response.user.store?.slug)
+          this.adoptAuthenticatedUser(response.user)
         } else {
-          this.user = null
-          this.isAuthenticated = false
+          // During the mandatory 2FA handoff the backend intentionally reports
+          // no authenticated user until the code is verified. Route middleware
+          // still calls checkAuth(), so preserve the pending challenge instead
+          // of bouncing the operator back to the login screen.
+          this.clearSessionState({ preserveTwoFactor: this.twoFactorRequired })
         }
-      } catch (error) {
-        // Not authenticated
-        this.user = null
-        this.isAuthenticated = false
-        this.twoFactorRequired = false
-        this.twoFactorEmail = null
+        return true
+      } catch (error: any) {
+        const status = error?.statusCode ?? error?.response?.status
+        const code = error?.data?.code ?? error?.response?._data?.code
+
+        // Only authoritative authentication failures clear a valid client
+        // session. A timeout or transient network failure must not sign the
+        // operator out or discard an active impersonation recovery path.
+        if (status === 401 || (status === 403 && code === 'account_disabled')) {
+          this.clearSessionState()
+        } else {
+          this.error = error?.data?.message || 'Your session could not be verified. Check your connection and try again.'
+        }
+
+        return false
       } finally {
         this.loading = false
       }

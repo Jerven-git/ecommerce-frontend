@@ -58,12 +58,21 @@ export const useImpersonationStore = defineStore('impersonation', {
         this.transitionPhase = 'preparing'
 
         const authStore = useAuthStore()
+        authStore.adoptAuthenticatedUser({
+          ...response.data.user,
+          is_admin: true,
+          is_super_admin: false,
+          is_impersonating: true,
+          impersonator: response.data.impersonator ?? null,
+        })
         await authStore.checkAuth()
 
         // The session user just changed — refresh the cached site config so
-        // the theme matches the new effective user's store.
+        // the theme matches the new effective user's store. This refresh is
+        // presentational: a failure must not misreport a successful identity
+        // switch as a failed impersonation.
         const { fetchSiteConfig } = useSiteConfig()
-        await fetchSiteConfig(true)
+        await fetchSiteConfig(true).catch(() => undefined)
 
         return response
       } catch (err: any) {
@@ -107,12 +116,20 @@ export const useImpersonationStore = defineStore('impersonation', {
         this.impersonator = null
         this.transitionPhase = 'preparing'
 
+        authStore.adoptAuthenticatedUser({
+          ...response.data.user,
+          is_admin: true,
+          is_super_admin: response.data.user.is_super_admin === true,
+          is_impersonating: false,
+          impersonator: null,
+        })
         await authStore.checkAuth()
 
         // The session user just changed — refresh the cached site config so
-        // the theme matches the new effective user's store.
+        // the theme matches the restored operator. Keep it non-blocking for
+        // the same reason as the enter flow above.
         const { fetchSiteConfig } = useSiteConfig()
-        await fetchSiteConfig(true)
+        await fetchSiteConfig(true).catch(() => undefined)
 
         return response
       } catch (err: any) {

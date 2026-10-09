@@ -112,7 +112,7 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
   const fetchWithRetry = async <T = any>(url: string, opts: any, maxRetries = 3): Promise<T> => {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
-        return await $apiFetch<T>(url, opts)
+        return await $apiFetch<T>(url, opts) as T
       } catch (err: any) {
         const status = err?.status ?? err?.statusCode ?? err?.response?.status
         if (status === 429 && attempt < maxRetries) {

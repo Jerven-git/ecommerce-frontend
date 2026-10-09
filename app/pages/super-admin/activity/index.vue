@@ -38,7 +38,7 @@
               v-for="option in logFilterOptions"
               :key="option.value"
               type="button"
-              class="inline-flex min-h-10 items-center gap-1.5 rounded-lg border px-2.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent"
+              class="inline-flex min-h-11 items-center gap-1.5 rounded-lg border px-2.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent"
               :class="filters.log_name === option.value ? 'border-admin-accent bg-admin-accent text-admin-on-accent' : 'border-admin-border bg-admin-surface text-admin-muted hover:bg-admin-soft hover:text-admin-text'"
               :aria-pressed="filters.log_name === option.value"
               @click="filters.log_name = option.value"
@@ -55,7 +55,7 @@
             <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-admin-muted">From</label>
             <AdminDatePicker
               v-model="filters.from"
-              aria-label="Activity start date"
+              ariaLabel="Activity start date"
               placeholder="Start date"
               :max="filters.to"
             />
@@ -64,7 +64,7 @@
             <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-admin-muted">To</label>
             <AdminDatePicker
               v-model="filters.to"
-              aria-label="Activity end date"
+              ariaLabel="Activity end date"
               placeholder="End date"
               :min="filters.from"
             />
@@ -73,11 +73,11 @@
         <div class="mt-3.5 flex flex-col-reverse gap-2 border-t border-admin-border pt-3.5 sm:flex-row sm:items-center sm:justify-between">
           <p class="hidden text-xs text-admin-muted sm:block">Filters stay in place while you move between result pages.</p>
           <div class="flex flex-col-reverse gap-2 sm:flex-row">
-            <button type="button" class="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent" @click="clearFilters">
+            <button type="button" class="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent" @click="clearFilters">
               <Icon name="heroicons:x-mark" class="h-4 w-4" aria-hidden="true" />
               Reset
             </button>
-            <button type="submit" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-admin-accent px-3 text-xs font-semibold text-admin-on-accent hover:bg-admin-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50" :disabled="loading">
+            <button type="submit" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-admin-accent px-3 text-xs font-semibold text-admin-on-accent hover:bg-admin-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50" :disabled="loading">
               <Icon :name="loading ? 'heroicons:arrow-path' : 'heroicons:magnifying-glass'" class="h-4 w-4" :class="loading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
               Show results
             </button>

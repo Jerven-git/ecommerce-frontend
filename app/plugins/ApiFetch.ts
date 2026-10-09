@@ -64,11 +64,15 @@ export default defineNuxtPlugin(() => {
             } else if (response.status === 403 && (response._data as any)?.code === 'account_disabled') {
                 if (process.client) {
                     const authStore = useAuthStore()
-                    authStore.user = null
-                    authStore.isAuthenticated = false
-                    authStore.twoFactorRequired = false
-                    authStore.twoFactorEmail = null
                     authStore.error = (response._data as any)?.message || 'Your account has been disabled.'
+
+                    // A disabled impersonated account must retain the one safe
+                    // recovery action: leaving impersonation. The backend
+                    // rejects every other protected operation.
+                    const impersonation = useImpersonationStore()
+                    if (authStore.isImpersonating || impersonation.isImpersonating) return
+
+                    authStore.clearSessionState()
                     navigateTo('/admin/login')
                 }
             } else if (response.status === 402 && (response._data as any)?.code === 'subscription_required') {
@@ -92,10 +96,7 @@ export default defineNuxtPlugin(() => {
             if (process.client) {
                 const authStore = useAuthStore()
                 if (authStore.isAuthenticated) {
-                    authStore.user = null
-                    authStore.isAuthenticated = false
-                    authStore.twoFactorRequired = false
-                    authStore.twoFactorEmail = null
+                    authStore.clearSessionState()
                     navigateTo('/admin/login')
                 }
             }
