@@ -17,13 +17,15 @@ export interface Store {
   domain_verified_at: string | null
   domain_verified: boolean
   status: 'active' | 'inactive'
+  timezone: string | null
+  resolved_timezone: string
+  platform_timezone: string
   subscription_status: SuperAdminSubscriptionStatus
   subscription_plan_id: number | null
   subscription_plan: SubscriptionPlanInfo | null
   subscribed_at: string | null
   subscription_expires_at: string | null
   is_default: boolean
-  default_currency_id: number | null
   users_count: number
   created_at: string
   updated_at: string
@@ -56,6 +58,28 @@ export interface DomainVerification {
   message: string
   dns: DomainDns & { verified: boolean }
   data: { id: number; domain: string; domain_verified_at: string | null; domain_verified: boolean }
+}
+
+export type StoreReadinessState = 'ready' | 'attention' | 'not_applicable'
+
+export interface StoreReadinessCheck {
+  id: string
+  label: string
+  state: StoreReadinessState
+  required: boolean
+  detail: string
+}
+
+export interface StoreReadiness {
+  status: 'ready' | 'needs_attention'
+  summary: {
+    required_ready: number
+    required_total: number
+    attention: number
+  }
+  shop_enabled: boolean
+  storefront_url: string | null
+  checks: StoreReadinessCheck[]
 }
 
 export interface AdminUser {
@@ -120,7 +144,7 @@ interface StoreInput {
   slug?: string
   domain?: string | null
   status?: 'active' | 'inactive'
-  default_currency_id?: number | null
+  timezone?: string | null
 }
 
 interface AdminUserInput {
@@ -149,8 +173,8 @@ export const useSuperAdminApi = () => {
     showStore: (id: number) => $apiFetch<{ data: Store }>(`/super-admin/stores/${id}`),
     listStoreAdmins: (id: number) =>
       $apiFetch<{ data: AdminUser[] }>(`/super-admin/stores/${id}/admins`),
-    createStore: (body: StoreInput) =>
-      $apiFetch<{ data: Store }>('/super-admin/stores', { method: 'POST', body }),
+    getStoreReadiness: (id: number) =>
+      $apiFetch<{ data: StoreReadiness }>(`/super-admin/stores/${id}/readiness`),
     updateStore: (id: number, body: Partial<StoreInput>) =>
       $apiFetch<{ data: Store }>(`/super-admin/stores/${id}`, { method: 'PATCH', body }),
     deleteStore: (id: number) =>

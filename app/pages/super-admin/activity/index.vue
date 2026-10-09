@@ -189,13 +189,18 @@
 import type { ActivityEntry } from '~/composables/useSuperAdminApi'
 
 const api = useSuperAdminApi()
+const route = useRoute()
 const entries = ref<ActivityEntry[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 const pagination = ref({ current_page: 1, last_page: 1, total: 0 })
 
+const requestedStoreId = Number(Array.isArray(route.query.store_id) ? route.query.store_id[0] : route.query.store_id)
 const filters = ref<{ store_id: number | null; log_name: string; from: string; to: string }>({
-  store_id: null, log_name: '', from: '', to: '',
+  store_id: Number.isInteger(requestedStoreId) && requestedStoreId > 0 ? requestedStoreId : null,
+  log_name: '',
+  from: '',
+  to: '',
 })
 
 const formatDate = (iso: string) => new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso))

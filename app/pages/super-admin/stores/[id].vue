@@ -32,6 +32,44 @@
     <div v-else-if="!store" role="alert" class="rounded-2xl border border-admin-danger/20 bg-admin-danger-soft p-6 text-sm text-admin-danger">Store not found.</div>
 
     <template v-else>
+      <!-- Support shortcuts -->
+      <section class="overflow-hidden rounded-2xl border border-admin-border bg-admin-surface shadow-sm" aria-labelledby="support-shortcuts-heading">
+        <div class="flex flex-col gap-3 border-b border-admin-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div class="flex min-w-0 items-center gap-2.5">
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-admin-info-soft text-admin-info">
+              <Icon name="heroicons:wrench-screwdriver" class="h-4 w-4" aria-hidden="true" />
+            </span>
+            <div class="min-w-0">
+              <h2 id="support-shortcuts-heading" class="text-sm font-semibold text-admin-text">Support shortcuts</h2>
+              <p class="text-xs leading-relaxed text-admin-muted">Storefront, audit trail, identifiers, and merchant workspace access.</p>
+            </div>
+          </div>
+          <span class="font-mono text-[11px] font-medium text-admin-muted">Store ID {{ store.id }}</span>
+        </div>
+        <div class="grid gap-px bg-admin-border sm:grid-cols-2 lg:grid-cols-4">
+          <a v-if="supportStorefrontUrl" :href="supportStorefrontUrl" target="_blank" rel="noopener noreferrer" class="flex min-h-14 items-center gap-2.5 bg-admin-surface px-4 py-3 text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-admin-accent">
+            <Icon name="heroicons:arrow-top-right-on-square" class="h-4 w-4 shrink-0 text-admin-accent" aria-hidden="true" />
+            <span class="min-w-0"><span class="block">Open storefront</span><span class="mt-0.5 block truncate font-normal text-admin-muted">New tab</span></span>
+          </a>
+          <span v-else class="flex min-h-14 cursor-not-allowed items-center gap-2.5 bg-admin-surface px-4 py-3 text-xs font-semibold text-admin-muted" title="Activate the store and resolve its storefront route first">
+            <Icon name="heroicons:globe-alt" class="h-4 w-4 shrink-0" aria-hidden="true" />
+            <span><span class="block">Storefront unavailable</span><span class="mt-0.5 block font-normal">Check readiness</span></span>
+          </span>
+          <NuxtLink :to="`/super-admin/activity?store_id=${store.id}`" class="flex min-h-14 items-center gap-2.5 bg-admin-surface px-4 py-3 text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-admin-accent">
+            <Icon name="heroicons:clipboard-document-list" class="h-4 w-4 shrink-0 text-admin-accent" aria-hidden="true" />
+            <span><span class="block">View store activity</span><span class="mt-0.5 block font-normal text-admin-muted">Filtered audit trail</span></span>
+          </NuxtLink>
+          <a href="#store-admins" class="flex min-h-14 items-center gap-2.5 bg-admin-surface px-4 py-3 text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-admin-accent">
+            <Icon name="heroicons:user-group" class="h-4 w-4 shrink-0 text-admin-accent" aria-hidden="true" />
+            <span><span class="block">Merchant admins</span><span class="mt-0.5 block font-normal text-admin-muted">{{ storeAdmins.length }} assigned</span></span>
+          </a>
+          <button type="button" class="flex min-h-14 items-center gap-2.5 bg-admin-surface px-4 py-3 text-left text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-admin-accent" @click="copyStoreReference">
+            <Icon :name="copiedStoreReference ? 'heroicons:check' : 'heroicons:document-duplicate'" class="h-4 w-4 shrink-0" :class="copiedStoreReference ? 'text-admin-success' : 'text-admin-accent'" aria-hidden="true" />
+            <span><span class="block">{{ copiedStoreReference ? 'Reference copied' : 'Copy reference' }}</span><span class="mt-0.5 block font-normal text-admin-muted">ID, slug, and domain</span></span>
+          </button>
+        </div>
+      </section>
+
       <!-- Store form -->
       <form class="rounded-2xl border border-admin-border bg-admin-surface shadow-sm" :aria-describedby="saveError ? 'store-save-error' : undefined" @submit.prevent="save">
         <div class="border-b border-admin-border px-5 py-4 sm:px-6">
@@ -59,6 +97,30 @@
               <input id="store-slug" v-model="form.slug" type="text" required maxlength="255" pattern="[a-z0-9-]+" :disabled="store.is_default" class="admin-input font-mono" placeholder="nazareck-atelier" />
               <p class="mt-1 text-[11px] text-admin-muted">Lowercase letters, numbers, hyphens only.</p>
             </div>
+          </div>
+
+          <div>
+            <div class="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+              <label for="store-timezone" class="text-xs font-semibold uppercase tracking-wider text-admin-muted">Store timezone <span class="font-normal normal-case tracking-normal">(optional)</span></label>
+              <span class="rounded-md bg-admin-soft px-2 py-1 font-mono text-[10px] font-semibold text-admin-muted">Effective: {{ selectedTimezone }}</span>
+            </div>
+            <input
+              id="store-timezone"
+              v-model="form.timezone"
+              list="store-timezone-options"
+              type="text"
+              maxlength="64"
+              autocomplete="off"
+              autocapitalize="none"
+              spellcheck="false"
+              class="admin-input font-mono"
+              placeholder="Use platform default"
+              aria-describedby="store-timezone-help"
+            />
+            <datalist id="store-timezone-options">
+              <option v-for="timezoneOption in timezoneOptions" :key="timezoneOption" :value="timezoneOption" />
+            </datalist>
+            <p id="store-timezone-help" class="mt-1 text-[11px] leading-relaxed text-admin-muted">Use an IANA identifier such as <span class="font-mono">Asia/Singapore</span>. Leave blank to inherit <span class="font-mono">{{ store.platform_timezone }}</span>.</p>
           </div>
 
           <section class="overflow-hidden rounded-xl border border-admin-border bg-admin-soft/30" aria-labelledby="domain-setup-heading">
@@ -172,6 +234,67 @@
         </div>
       </form>
 
+      <!-- Store readiness -->
+      <section class="overflow-hidden rounded-2xl border border-admin-border bg-admin-surface shadow-sm" aria-labelledby="store-readiness-heading">
+        <div class="flex flex-col gap-3 border-b border-admin-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div class="flex min-w-0 items-center gap-2.5">
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-admin-accent-soft text-admin-accent">
+              <Icon name="heroicons:shield-check" class="h-4 w-4" aria-hidden="true" />
+            </span>
+            <div class="min-w-0">
+              <h2 id="store-readiness-heading" class="text-sm font-semibold text-admin-text">Store readiness</h2>
+              <p class="text-xs leading-relaxed text-admin-muted">Operational checks from tenant, access, routing, and commerce configuration.</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span v-if="readiness" class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" :class="readiness.status === 'ready' ? 'border-admin-success/20 bg-admin-success-soft text-admin-success' : 'border-admin-warning/20 bg-admin-warning-soft text-admin-warning'">
+              <Icon :name="readiness.status === 'ready' ? 'heroicons:check-circle' : 'heroicons:exclamation-triangle'" class="h-3.5 w-3.5" aria-hidden="true" />
+              {{ readiness.status === 'ready' ? 'Required checks ready' : 'Needs attention' }}
+            </span>
+            <button type="button" class="inline-flex h-11 w-11 items-center justify-center rounded-xl text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:cursor-wait disabled:opacity-50" :disabled="readinessLoading" aria-label="Refresh store readiness" title="Refresh readiness" @click="loadReadiness">
+              <Icon name="heroicons:arrow-path" class="h-4 w-4" :class="readinessLoading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+
+        <div v-if="readinessLoading && !readiness" class="px-5 py-8 text-center" role="status" aria-live="polite">
+          <div class="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-admin-border border-t-admin-accent motion-reduce:animate-none" aria-hidden="true" />
+          <p class="mt-2 text-xs font-medium text-admin-muted">Checking store readiness…</p>
+        </div>
+
+        <div v-else-if="readinessError && !readiness" class="px-5 py-6 sm:px-6" role="alert">
+          <div class="flex flex-col gap-3 rounded-xl border border-admin-danger/20 bg-admin-danger-soft px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-xs font-medium leading-relaxed text-admin-danger">{{ readinessError }}</p>
+            <button type="button" class="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-semibold text-admin-danger hover:bg-admin-danger hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-danger" @click="loadReadiness">
+              <Icon name="heroicons:arrow-path" class="h-4 w-4" aria-hidden="true" /> Try again
+            </button>
+          </div>
+        </div>
+
+        <template v-else-if="readiness">
+          <div class="flex flex-col gap-1.5 border-b border-admin-border bg-admin-soft/30 px-5 py-3 text-xs sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <p class="font-semibold text-admin-text">{{ readiness.summary.required_ready }} of {{ readiness.summary.required_total }} required checks ready</p>
+            <p v-if="readiness.storefront_url" class="min-w-0 break-all text-admin-muted"><span class="font-medium text-admin-text">Route:</span> {{ readiness.storefront_url }}</p>
+          </div>
+          <ul class="divide-y divide-admin-border" aria-label="Store readiness checks">
+            <li v-for="checkItem in readiness.checks" :key="checkItem.id" class="flex items-start gap-3 px-5 py-3.5 sm:px-6">
+              <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg" :class="readinessStateClass(checkItem.state)">
+                <Icon :name="readinessStateIcon(checkItem.state)" class="h-4 w-4" aria-hidden="true" />
+              </span>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 class="text-sm font-semibold text-admin-text">{{ checkItem.label }}</h3>
+                  <span class="rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide" :class="checkItem.required ? 'bg-admin-accent-soft text-admin-accent' : 'bg-admin-soft text-admin-muted'">{{ checkItem.required ? 'Required' : 'Optional' }}</span>
+                </div>
+                <p class="mt-0.5 max-w-3xl text-xs leading-relaxed text-admin-muted">{{ checkItem.detail }}</p>
+              </div>
+              <span class="hidden shrink-0 pt-1 text-[11px] font-semibold sm:inline" :class="readinessStateTextClass(checkItem.state)">{{ readinessStateLabel(checkItem.state) }}</span>
+            </li>
+          </ul>
+          <p v-if="readinessError" class="border-t border-admin-border px-5 py-2.5 text-xs text-admin-warning sm:px-6" role="status">The last refresh failed; showing the previous readiness result.</p>
+        </template>
+      </section>
+
       <!-- Subscription -->
       <section class="rounded-2xl border border-admin-border bg-admin-surface shadow-sm">
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-admin-border px-5 py-4 sm:px-6">
@@ -232,7 +355,7 @@
       </section>
 
       <!-- Admins -->
-      <section class="rounded-2xl border border-admin-border bg-admin-surface shadow-sm">
+      <section id="store-admins" class="scroll-mt-4 rounded-2xl border border-admin-border bg-admin-surface shadow-sm">
         <div class="flex flex-col gap-3 border-b border-admin-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div class="flex items-center gap-2.5">
             <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-admin-info-soft text-admin-info border border-admin-info/15">
@@ -267,6 +390,18 @@
             </div>
             <div class="flex items-center gap-2 shrink-0">
               <span class="hidden sm:inline-flex rounded-full border px-2 py-1 text-xs font-semibold" :class="a.status === 'active' ? 'border-admin-success/20 bg-admin-success-soft text-admin-success' : 'border-admin-border bg-admin-soft text-admin-muted'">{{ a.status }}</span>
+              <SuperAdminIconButton
+                v-if="!a.is_super_admin && a.status === 'active'"
+                :icon="impersonation.transitionTargetId === a.id ? 'heroicons:arrow-path' : 'heroicons:arrow-right-end-on-rectangle'"
+                :ariaLabel="impersonation.transitionTargetId === a.id ? `Opening ${a.name}'s workspace` : `Impersonate ${a.name}`"
+                :tooltip="impersonation.transitionTargetId === a.id ? 'Preparing merchant workspace' : 'Impersonate — open their store workspace'"
+                variant="soft"
+                :disabled="impersonation.transitioning"
+                @pointerenter="warmAdminRoute"
+                @focus="warmAdminRoute"
+                @touchstart.passive="warmAdminRoute"
+                @click="startImpersonation(a)"
+              />
               <SuperAdminIconButton :icon="editIcon" :to="`/super-admin/admins/${a.id}`" :ariaLabel="`Edit ${a.name}`" tooltip="Edit admin" variant="ghost" />
             </div>
           </li>
@@ -277,11 +412,12 @@
 </template>
 
 <script setup lang="ts">
-import type { Store, AdminUser, DomainAvailability } from '~/composables/useSuperAdminApi'
+import type { Store, AdminUser, DomainAvailability, StoreReadiness, StoreReadinessState } from '~/composables/useSuperAdminApi'
 
 const route = useRoute()
 const router = useRouter()
 const api = useSuperAdminApi()
+const impersonation = useImpersonationStore()
 const { plans, fetchPlans } = useSubscription()
 const { toastSuccess, toastError } = useAdminToast()
 
@@ -293,7 +429,10 @@ const loadError = ref<string | null>(null)
 const saving = ref(false)
 const deleting = ref(false)
 const saveError = ref<string | null>(null)
-const form = ref({ name: '', slug: '', domain: '' as string | null, status: 'active' as 'active' | 'inactive' })
+const form = ref({ name: '', slug: '', domain: '' as string | null, status: 'active' as 'active' | 'inactive', timezone: '' })
+const readiness = ref<StoreReadiness | null>(null)
+const readinessLoading = ref(false)
+const readinessError = ref<string | null>(null)
 
 const checking = ref(false)
 const check = ref<DomainAvailability | null>(null)
@@ -302,6 +441,7 @@ const verifying = ref(false)
 const verifyMessage = ref<string | null>(null)
 const verifyError = ref<string | null>(null)
 const copiedDnsValue = ref<string | null>(null)
+const copiedStoreReference = ref(false)
 
 const compPlanId = ref<number | null>(null)
 const compMutating = ref(false)
@@ -309,6 +449,33 @@ const compError = ref<string | null>(null)
 const compPlans = computed(() => plans.value ?? [])
 
 const editIcon = 'heroicons:pencil-square'
+
+const supportedTimezoneValues = (Intl as typeof Intl & { supportedValuesOf?: (key: 'timeZone') => string[] }).supportedValuesOf
+const timezoneOptions = supportedTimezoneValues
+  ? Array.from(new Set(['UTC', ...supportedTimezoneValues('timeZone')])).sort()
+  : ['UTC', 'Asia/Singapore', 'Asia/Tokyo', 'Australia/Sydney', 'Europe/London', 'America/Los_Angeles', 'America/New_York']
+const selectedTimezone = computed(() => form.value.timezone.trim() || store.value?.platform_timezone || 'UTC')
+
+const readinessStateIcon = (state: StoreReadinessState) => {
+  if (state === 'ready') return 'heroicons:check-circle'
+  if (state === 'attention') return 'heroicons:exclamation-triangle'
+  return 'heroicons:minus-circle'
+}
+const readinessStateClass = (state: StoreReadinessState) => {
+  if (state === 'ready') return 'bg-admin-success-soft text-admin-success'
+  if (state === 'attention') return 'bg-admin-warning-soft text-admin-warning'
+  return 'bg-admin-soft text-admin-muted'
+}
+const readinessStateTextClass = (state: StoreReadinessState) => {
+  if (state === 'ready') return 'text-admin-success'
+  if (state === 'attention') return 'text-admin-warning'
+  return 'text-admin-muted'
+}
+const readinessStateLabel = (state: StoreReadinessState) => {
+  if (state === 'ready') return 'Ready'
+  if (state === 'attention') return 'Attention'
+  return 'Not required'
+}
 
 const subscriptionLabel = computed(() => {
   switch (store.value?.subscription_status) {
@@ -329,8 +496,8 @@ const subscriptionBadgeClass = computed(() => {
     default: return 'border-admin-border bg-admin-soft text-admin-muted border'
   }
 })
-const formatDate = (iso: string) => new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(iso))
-const formatDateTime = (iso: string) => new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(iso))
+const formatDate = (iso: string) => new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: store.value?.resolved_timezone || 'UTC' }).format(new Date(iso))
+const formatDateTime = (iso: string) => new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: store.value?.resolved_timezone || 'UTC', timeZoneName: 'short' }).format(new Date(iso))
 const formatPrice = (cents: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100)
 const canonical = (value: string | null | undefined) => {
   const domain = (value ?? '').trim().toLowerCase()
@@ -341,6 +508,9 @@ const expectedIps = computed(() => check.value?.expected_ips ?? [])
 const domainVerifierConfigured = computed(() => expectedIps.value.length > 0)
 const domainLiveUrl = computed(() => store.value?.domain_verified && !domainDirty.value && store.value.domain
   ? `https://${canonical(store.value.domain)}`
+  : null)
+const supportStorefrontUrl = computed(() => store.value?.status === 'active'
+  ? readiness.value?.storefront_url ?? domainLiveUrl.value
   : null)
 const domainStage = computed(() => {
   if (store.value?.domain_verified && !domainDirty.value) return 4
@@ -379,15 +549,39 @@ const loadStore = async () => {
   try {
     const [storeResult, adminsResult] = await Promise.all([api.showStore(id), api.listStoreAdmins(id)])
     store.value = storeResult.data
-    form.value = { name: storeResult.data.name, slug: storeResult.data.slug, domain: storeResult.data.domain ?? '', status: storeResult.data.status }
+    form.value = { name: storeResult.data.name, slug: storeResult.data.slug, domain: storeResult.data.domain ?? '', status: storeResult.data.status, timezone: storeResult.data.timezone ?? '' }
     storeAdmins.value = adminsResult.data
+    void loadReadiness()
   } catch (err: any) { loadError.value = err?.data?.message || 'This store could not be loaded.' }
   finally { loading.value = false }
+}
+const loadReadiness = async () => {
+  readinessLoading.value = true
+  readinessError.value = null
+  try {
+    const result = await api.getStoreReadiness(id)
+    readiness.value = result.data
+  } catch (err: any) {
+    readinessError.value = err?.data?.message || 'Store readiness could not be checked. Try again.'
+  } finally {
+    readinessLoading.value = false
+  }
 }
 onMounted(async () => { if (!plans.value) fetchPlans().catch(() => {}); await loadStore() })
 let checkTimer: ReturnType<typeof setTimeout> | undefined
 let copiedDnsTimer: ReturnType<typeof setTimeout> | undefined
+let copiedStoreReferenceTimer: ReturnType<typeof setTimeout> | undefined
+let adminRoutePreload: Promise<void> | null = null
 let checkSeq = 0
+const warmAdminRoute = () => {
+  if (!import.meta.client) return Promise.resolve()
+  if (!adminRoutePreload) {
+    adminRoutePreload = preloadRouteComponents('/admin').catch(() => {
+      adminRoutePreload = null
+    })
+  }
+  return adminRoutePreload
+}
 const runCheck = async (domain: string) => {
   const seq = ++checkSeq
   checking.value = true
@@ -413,7 +607,26 @@ watch(() => form.value.domain, (domain) => {
 onUnmounted(() => {
   clearTimeout(checkTimer)
   clearTimeout(copiedDnsTimer)
+  clearTimeout(copiedStoreReferenceTimer)
 })
+const copyStoreReference = async () => {
+  if (!store.value) return
+  const reference = [
+    `Store #${store.value.id}`,
+    store.value.name,
+    store.value.slug,
+    store.value.domain,
+  ].filter(Boolean).join(' · ')
+
+  try {
+    await navigator.clipboard.writeText(reference)
+    copiedStoreReference.value = true
+    clearTimeout(copiedStoreReferenceTimer)
+    copiedStoreReferenceTimer = setTimeout(() => { copiedStoreReference.value = false }, 1800)
+  } catch {
+    toastError('Couldn’t copy the store reference. Select the store details manually.')
+  }
+}
 const copyDnsValue = async (value: string) => {
   try {
     await navigator.clipboard.writeText(value)
@@ -431,6 +644,7 @@ const verifyDomain = async () => {
     verifyMessage.value = result.message
     if (store.value) { store.value.domain_verified = result.data.domain_verified; store.value.domain_verified_at = result.data.domain_verified_at }
     if (check.value) check.value = { ...check.value, dns: result.dns, expected_ips: result.dns.expected_ips }
+    void loadReadiness()
   } catch (err: any) {
     verifyError.value = err?.data?.message || 'Verification failed'
     if (err?.data?.dns && store.value) { store.value.domain_verified = false; store.value.domain_verified_at = null }
@@ -441,24 +655,53 @@ const save = async () => {
   try {
     const payload = { ...form.value, domain: form.value.domain?.trim() || null }
     const result = await api.updateStore(id, payload)
-    store.value = result.data; form.value.domain = result.data.domain ?? ''; toastSuccess('Store saved')
+    store.value = result.data; form.value.domain = result.data.domain ?? ''; form.value.timezone = result.data.timezone ?? ''; toastSuccess('Store saved'); void loadReadiness()
   } catch (err: any) {
-    saveError.value = err?.data?.errors?.domain?.[0] || err?.data?.message || 'Failed to save'
+    saveError.value = err?.data?.errors?.timezone?.[0] || err?.data?.errors?.domain?.[0] || err?.data?.message || 'Failed to save'
     toastError('Couldn’t save the store'); await nextTick(); document.getElementById('store-save-error')?.focus()
   } finally { saving.value = false }
 }
 const comp = async () => {
   compMutating.value = true; compError.value = null
-  try { const result = await api.compStore(id, compPlanId.value ? { subscription_plan_id: compPlanId.value } : {}); store.value = result.data; toastSuccess('Store comped — access granted') }
+  try { const result = await api.compStore(id, compPlanId.value ? { subscription_plan_id: compPlanId.value } : {}); store.value = result.data; toastSuccess('Store comped — access granted'); void loadReadiness() }
   catch (err: any) { compError.value = err?.data?.message || 'Couldn’t comp this store'; toastError('Couldn’t comp the store') }
   finally { compMutating.value = false }
 }
 const uncomp = async () => {
   if (!confirm('Revoke this comp? The store will be locked until it subscribes.')) return
   compMutating.value = true; compError.value = null
-  try { const result = await api.uncompStore(id); store.value = result.data; toastSuccess('Comp revoked') }
+  try { const result = await api.uncompStore(id); store.value = result.data; toastSuccess('Comp revoked'); void loadReadiness() }
   catch (err: any) { compError.value = err?.data?.message || 'Couldn’t revoke this comp'; toastError('Couldn’t revoke the comp') }
   finally { compMutating.value = false }
+}
+const startImpersonation = async (admin: AdminUser) => {
+  if (impersonation.transitioning) return
+
+  try {
+    const transitionStartedAt = Date.now()
+    const startRequest = impersonation.start(admin.id, {
+      name: admin.name,
+      email: admin.email,
+      store: admin.store,
+    })
+    const preloadRequest = warmAdminRoute()
+
+    await Promise.all([startRequest, preloadRequest])
+    const remainingDisplayTime = Math.max(0, 480 - (Date.now() - transitionStartedAt))
+    if (remainingDisplayTime) {
+      await new Promise(resolve => setTimeout(resolve, remainingDisplayTime))
+    }
+    await router.push('/admin')
+    await nextTick()
+
+    if (import.meta.client) {
+      await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+    }
+    impersonation.finishTransition()
+  } catch (err: any) {
+    impersonation.finishTransition()
+    toastError(err?.data?.message || 'Impersonation could not be started.')
+  }
 }
 const del = async () => {
   if (!confirm('Delete this store? Admins must be reassigned first.')) return

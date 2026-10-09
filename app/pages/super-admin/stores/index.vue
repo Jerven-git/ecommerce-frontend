@@ -13,7 +13,7 @@
       <div class="flex flex-wrap items-center gap-2">
         <div class="hidden sm:flex items-center gap-2 rounded-xl border border-admin-border bg-admin-surface px-3 py-2 text-xs text-admin-muted">
           <span class="h-2 w-2 rounded-full bg-admin-success" aria-hidden="true" />
-          {{ pagination.total.toLocaleString() }} total
+          {{ pagination.total.toLocaleString() }} {{ hasAppliedCriteria ? 'matching' : 'total' }}
           <span class="text-admin-border">·</span>
           <span>Live directory</span>
         </div>
@@ -41,8 +41,8 @@
     <section class="overflow-hidden rounded-xl border border-admin-border bg-admin-surface" aria-labelledby="stores-heading">
       <!-- Toolbar -->
       <div class="border-b border-admin-border p-3 sm:px-4">
-        <form class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between" role="search" @submit.prevent="refresh(1)">
-          <div class="min-w-0 flex-1 sm:max-w-sm">
+        <form class="grid gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(16rem,1.5fr)_repeat(3,minmax(0,1fr))_auto]" role="search" @submit.prevent="refresh(1)">
+          <div class="min-w-0 sm:col-span-2 xl:col-span-1">
             <label id="stores-heading" for="store-search" class="sr-only">Search stores</label>
             <div class="relative">
               <input
@@ -60,12 +60,41 @@
               </button>
             </div>
           </div>
-          <div class="flex gap-2">
-            <button type="submit" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-admin-border bg-admin-surface px-2.5 text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50" :disabled="loading">
-              <Icon :name="loading ? 'heroicons:arrow-path' : 'heroicons:magnifying-glass'" class="h-4 w-4" :class="loading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
-              Search
+          <div>
+            <label for="store-status-filter" class="sr-only">Store status</label>
+            <select id="store-status-filter" v-model="status" class="admin-input rounded-lg" aria-label="Filter by store status">
+              <option value="">All store statuses</option>
+              <option value="active">Active stores</option>
+              <option value="inactive">Inactive stores</option>
+            </select>
+          </div>
+          <div>
+            <label for="store-access-filter" class="sr-only">Subscription access</label>
+            <select id="store-access-filter" v-model="subscriptionStatus" class="admin-input rounded-lg" aria-label="Filter by subscription access">
+              <option value="">All access states</option>
+              <option value="active">Active subscription</option>
+              <option value="comped">Comped access</option>
+              <option value="pending">Pending subscription</option>
+              <option value="unsubscribed">Unsubscribed</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="expired">Expired</option>
+            </select>
+          </div>
+          <div>
+            <label for="store-domain-filter" class="sr-only">Custom domain status</label>
+            <select id="store-domain-filter" v-model="domainStatus" class="admin-input rounded-lg" aria-label="Filter by custom domain status">
+              <option value="">All domain states</option>
+              <option value="verified">Verified domain</option>
+              <option value="unverified">Needs verification</option>
+              <option value="none">No custom domain</option>
+            </select>
+          </div>
+          <div class="flex gap-2 sm:col-span-2 xl:col-span-1">
+            <button type="submit" class="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50 xl:flex-none" :disabled="loading">
+              <Icon :name="loading ? 'heroicons:arrow-path' : 'heroicons:funnel'" class="h-4 w-4" :class="loading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
+              Apply
             </button>
-            <button v-if="search" type="button" class="inline-flex min-h-11 items-center rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text" @click="search=''; refresh(1)">Reset</button>
+            <button v-if="hasCriteria" type="button" class="inline-flex min-h-11 items-center rounded-lg px-3 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent" @click="resetFilters">Reset</button>
           </div>
         </form>
       </div>
@@ -78,23 +107,25 @@
       <AdminEmptyState
         v-else-if="stores.length === 0"
         title="No stores found"
-        description="Try a different search, or create an admin and provision their store."
+        :description="hasAppliedCriteria ? 'Adjust or reset the current filters to broaden the results.' : 'Create an admin to provision their store.'"
       >
         <template #action>
-          <AdminButton to="/super-admin/admins/new" variant="primary">New admin + store</AdminButton>
+          <button v-if="hasAppliedCriteria" type="button" class="inline-flex min-h-11 items-center justify-center rounded-lg bg-admin-accent px-4 text-sm font-semibold text-white hover:bg-admin-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent" @click="resetFilters">Reset filters</button>
+          <AdminButton v-else to="/super-admin/admins/new" variant="primary">New admin + store</AdminButton>
         </template>
       </AdminEmptyState>
 
       <template v-else>
         <!-- Desktop table -->
         <div class="hidden overflow-x-auto md:block">
-          <table class="w-full min-w-[820px] text-sm">
+          <table class="w-full min-w-[940px] text-sm">
             <caption class="sr-only">Stores matching the current search</caption>
             <thead class="border-b border-admin-border bg-admin-soft/35">
               <tr class="text-left text-xs font-semibold text-admin-text">
                 <th scope="col" class="px-4 py-3">Store</th>
                 <th scope="col" class="px-4 py-3">Domain</th>
                 <th scope="col" class="px-4 py-3">Status</th>
+                <th scope="col" class="px-4 py-3">Access</th>
                 <th scope="col" class="px-4 py-3 text-center">Admins</th>
                 <th scope="col" class="px-4 py-3 text-right"><span class="sr-only">Actions</span></th>
               </tr>
@@ -131,6 +162,9 @@
                     <span class="h-1.5 w-1.5 rounded-full" :class="store.status === 'active' ? 'bg-admin-success' : 'bg-admin-muted'" /> {{ store.status }}
                   </span>
                 </td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex rounded-md px-2 py-1 text-[11px] font-semibold" :class="accessStateClass(store.subscription_status)">{{ accessStateLabel(store.subscription_status) }}</span>
+                </td>
                 <td class="px-4 py-3 text-center text-xs font-semibold tabular-nums text-admin-text">
                   {{ store.users_count }}
                 </td>
@@ -158,6 +192,7 @@
             </div>
             <div class="mt-3 flex items-center gap-2 text-xs text-admin-muted">
               <span class="rounded-md bg-admin-soft px-2 py-1 font-medium text-admin-text">{{ store.users_count }} admins</span>
+              <span class="rounded-md px-2 py-1 text-[11px] font-semibold" :class="accessStateClass(store.subscription_status)">{{ accessStateLabel(store.subscription_status) }}</span>
               <span v-if="store.domain" class="rounded-md px-2 py-1 text-[11px] font-bold uppercase" :class="store.domain_verified ? 'bg-admin-success-soft text-admin-success' : 'bg-amber-50 text-amber-700'">{{ store.domain_verified ? 'verified' : 'unverified' }}</span>
             </div>
             <div class="mt-4 grid grid-cols-2 gap-2">
@@ -191,10 +226,32 @@ const stores = ref<Store[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 const search = ref('')
+const status = ref('')
+const subscriptionStatus = ref('')
+const domainStatus = ref('')
 const pagination = ref({ current_page: 1, last_page: 1, total: 0 })
+const appliedCriteria = ref({ search: '', status: '', subscriptionStatus: '', domainStatus: '' })
+
+const hasCriteria = computed(() => Boolean(search.value.trim() || status.value || subscriptionStatus.value || domainStatus.value))
+const hasAppliedCriteria = computed(() => Object.values(appliedCriteria.value).some(Boolean))
 
 const viewIcon = 'heroicons:eye'
 const editIcon = 'heroicons:pencil-square'
+
+const accessStateLabel = (value: Store['subscription_status']) => ({
+  active: 'Subscribed',
+  comped: 'Comped',
+  pending: 'Pending',
+  unsubscribed: 'Unsubscribed',
+  cancelled: 'Cancelled',
+  expired: 'Expired',
+})[value]
+
+const accessStateClass = (value: Store['subscription_status']) => {
+  if (value === 'active' || value === 'comped') return 'bg-admin-success-soft text-admin-success'
+  if (value === 'pending') return 'bg-admin-warning-soft text-admin-warning'
+  return 'bg-admin-soft text-admin-muted'
+}
 
 const refresh = async (page = 1) => {
   loading.value = true
@@ -204,6 +261,9 @@ const refresh = async (page = 1) => {
       page,
       per_page: 25,
       search: search.value.trim() || undefined,
+      status: status.value || undefined,
+      subscription_status: subscriptionStatus.value || undefined,
+      domain_status: domainStatus.value || undefined,
     })
     stores.value = result.data
     pagination.value = {
@@ -211,11 +271,25 @@ const refresh = async (page = 1) => {
       last_page: result.last_page,
       total: result.total,
     }
+    appliedCriteria.value = {
+      search: search.value.trim(),
+      status: status.value,
+      subscriptionStatus: subscriptionStatus.value,
+      domainStatus: domainStatus.value,
+    }
   } catch (err: any) {
     error.value = err?.data?.message || 'Stores could not be loaded. Check your connection and try again.'
   } finally {
     loading.value = false
   }
+}
+
+const resetFilters = () => {
+  search.value = ''
+  status.value = ''
+  subscriptionStatus.value = ''
+  domainStatus.value = ''
+  void refresh(1)
 }
 
 onMounted(() => refresh())
