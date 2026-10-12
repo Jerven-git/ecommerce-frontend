@@ -38,9 +38,9 @@
       </div>
     </div>
 
-    <section class="overflow-hidden rounded-xl border border-admin-border bg-admin-surface" aria-labelledby="stores-heading">
+    <section class="relative overflow-visible rounded-xl border border-admin-border bg-admin-surface" aria-labelledby="stores-heading" :aria-busy="loading || undefined">
       <!-- Toolbar -->
-      <div class="border-b border-admin-border p-3 sm:px-4">
+      <div class="relative z-20 border-b border-admin-border p-3 sm:px-4">
         <form class="grid gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(16rem,1.5fr)_repeat(3,minmax(0,1fr))_auto]" role="search" @submit.prevent="refresh(1)">
           <div class="min-w-0 sm:col-span-2 xl:col-span-1">
             <label id="stores-heading" for="store-search" class="sr-only">Search stores</label>
@@ -60,35 +60,24 @@
               </button>
             </div>
           </div>
-          <div>
-            <label for="store-status-filter" class="sr-only">Store status</label>
-            <select id="store-status-filter" v-model="status" class="admin-input rounded-lg" aria-label="Filter by store status">
-              <option value="">All store statuses</option>
-              <option value="active">Active stores</option>
-              <option value="inactive">Inactive stores</option>
-            </select>
-          </div>
-          <div>
-            <label for="store-access-filter" class="sr-only">Subscription access</label>
-            <select id="store-access-filter" v-model="subscriptionStatus" class="admin-input rounded-lg" aria-label="Filter by subscription access">
-              <option value="">All access states</option>
-              <option value="active">Active subscription</option>
-              <option value="comped">Comped access</option>
-              <option value="pending">Pending subscription</option>
-              <option value="unsubscribed">Unsubscribed</option>
-              <option value="cancelled">Cancelled</option>
-              <option value="expired">Expired</option>
-            </select>
-          </div>
-          <div>
-            <label for="store-domain-filter" class="sr-only">Custom domain status</label>
-            <select id="store-domain-filter" v-model="domainStatus" class="admin-input rounded-lg" aria-label="Filter by custom domain status">
-              <option value="">All domain states</option>
-              <option value="verified">Verified domain</option>
-              <option value="unverified">Needs verification</option>
-              <option value="none">No custom domain</option>
-            </select>
-          </div>
+          <AdminFilterSelect
+            v-model="status"
+            :options="storeStatusOptions"
+            aria-label="Filter by store status"
+            list-label="Store status filters"
+          />
+          <AdminFilterSelect
+            v-model="subscriptionStatus"
+            :options="subscriptionStatusOptions"
+            aria-label="Filter by subscription access"
+            list-label="Subscription access filters"
+          />
+          <AdminFilterSelect
+            v-model="domainStatus"
+            :options="domainStatusOptions"
+            aria-label="Filter by custom domain status"
+            list-label="Custom domain status filters"
+          />
           <div class="flex gap-2 sm:col-span-2 xl:col-span-1">
             <button type="submit" class="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50 xl:flex-none" :disabled="loading">
               <Icon :name="loading ? 'heroicons:arrow-path' : 'heroicons:funnel'" class="h-4 w-4" :class="loading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
@@ -99,9 +88,74 @@
         </form>
       </div>
 
-      <div v-if="loading" class="px-6 py-12 text-center">
-        <div class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-admin-border border-t-admin-accent" aria-hidden="true" />
-        <p class="mt-3 text-sm font-medium text-admin-muted" role="status" aria-live="polite">Loading stores…</p>
+      <div v-if="initialLoading" role="status" aria-live="polite">
+        <p class="sr-only">Loading stores…</p>
+
+        <!-- Desktop table skeleton -->
+        <div class="hidden overflow-x-auto md:block" aria-hidden="true">
+          <table class="w-full min-w-[940px] text-sm">
+            <thead class="border-b border-admin-border bg-admin-soft/35">
+              <tr class="text-left text-xs font-semibold text-admin-text">
+                <th scope="col" class="px-4 py-3">Store</th>
+                <th scope="col" class="px-4 py-3">Domain</th>
+                <th scope="col" class="px-4 py-3">Status</th>
+                <th scope="col" class="px-4 py-3">Access</th>
+                <th scope="col" class="px-4 py-3 text-center">Admins</th>
+                <th scope="col" class="px-4 py-3"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-admin-border">
+              <tr v-for="row in 6" :key="row">
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <span class="skeleton h-8 w-8 shrink-0 rounded-lg" />
+                    <div class="min-w-0 flex-1 space-y-2">
+                      <span class="skeleton block h-3.5" :class="row % 2 ? 'w-28' : 'w-36'" />
+                      <span class="skeleton block h-3" :class="row % 2 ? 'w-20' : 'w-24'" />
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-2">
+                    <span class="skeleton h-3 w-28" />
+                    <span class="skeleton h-5 w-16 rounded-md" />
+                  </div>
+                </td>
+                <td class="px-4 py-3"><span class="skeleton block h-6 w-16 rounded-md" /></td>
+                <td class="px-4 py-3"><span class="skeleton block h-6 w-20 rounded-md" /></td>
+                <td class="px-4 py-3"><span class="skeleton mx-auto block h-3 w-5" /></td>
+                <td class="px-4 py-3">
+                  <div class="flex justify-end gap-1">
+                    <span class="skeleton h-9 w-9 rounded-lg" />
+                    <span class="skeleton h-9 w-9 rounded-lg" />
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile card skeleton -->
+        <ul class="divide-y divide-admin-border md:hidden" aria-hidden="true">
+          <li v-for="row in 4" :key="row" class="p-3">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0 flex-1 space-y-2">
+                <span class="skeleton block h-3.5" :class="row % 2 ? 'w-36' : 'w-28'" />
+                <span class="skeleton block h-3 w-20" />
+                <span class="skeleton block h-3 w-32" />
+              </div>
+              <span class="skeleton h-6 w-16 shrink-0 rounded-md" />
+            </div>
+            <div class="mt-3 flex gap-2">
+              <span class="skeleton h-6 w-20 rounded-md" />
+              <span class="skeleton h-6 w-16 rounded-md" />
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-2">
+              <span class="skeleton h-11 rounded-lg" />
+              <span class="skeleton h-11 rounded-lg" />
+            </div>
+          </li>
+        </ul>
       </div>
       <SuperAdminErrorState v-else-if="error" :message="error" @retry="refresh(pagination.current_page)" />
       <AdminEmptyState
@@ -207,6 +261,7 @@
       </template>
 
       <SuperAdminPagination
+        v-if="!initialLoading"
         :current-page="pagination.current_page"
         :last-page="pagination.last_page"
         :total="pagination.total"
@@ -232,6 +287,30 @@ const domainStatus = ref('')
 const pagination = ref({ current_page: 1, last_page: 1, total: 0 })
 const appliedCriteria = ref({ search: '', status: '', subscriptionStatus: '', domainStatus: '' })
 
+const storeStatusOptions = [
+  { value: '', label: 'All store statuses', icon: 'heroicons:squares-2x2' },
+  { value: 'active', label: 'Active stores', icon: 'heroicons:check-circle' },
+  { value: 'inactive', label: 'Inactive stores', icon: 'heroicons:pause-circle' },
+]
+
+const subscriptionStatusOptions = [
+  { value: '', label: 'All access states', icon: 'heroicons:key' },
+  { value: 'active', label: 'Active subscription', icon: 'heroicons:check-badge' },
+  { value: 'comped', label: 'Comped access', icon: 'heroicons:gift' },
+  { value: 'pending', label: 'Pending subscription', icon: 'heroicons:clock' },
+  { value: 'unsubscribed', label: 'Unsubscribed', icon: 'heroicons:no-symbol' },
+  { value: 'cancelled', label: 'Cancelled', icon: 'heroicons:x-circle' },
+  { value: 'expired', label: 'Expired', icon: 'heroicons:calendar-days' },
+]
+
+const domainStatusOptions = [
+  { value: '', label: 'All domain states', icon: 'heroicons:globe-alt' },
+  { value: 'verified', label: 'Verified domain', icon: 'heroicons:shield-check' },
+  { value: 'unverified', label: 'Needs verification', icon: 'heroicons:exclamation-triangle' },
+  { value: 'none', label: 'No custom domain', icon: 'heroicons:link-slash' },
+]
+
+const initialLoading = computed(() => loading.value && stores.value.length === 0)
 const hasCriteria = computed(() => Boolean(search.value.trim() || status.value || subscriptionStatus.value || domainStatus.value))
 const hasAppliedCriteria = computed(() => Object.values(appliedCriteria.value).some(Boolean))
 

@@ -31,10 +31,13 @@
       </div>
     </section>
 
-    <section class="section-accent py-14 sm:py-20">
+    <section v-if="canReceiveEnquiries || hasDirectContactContent" class="section-accent py-14 sm:py-20">
       <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div class="grid items-start gap-12 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)] lg:gap-16">
-          <div class="min-w-0">
+        <div
+          class="grid items-start gap-12 lg:gap-16"
+          :class="canReceiveEnquiries && hasDirectContactContent ? 'lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)]' : 'mx-auto max-w-3xl'"
+        >
+          <div v-if="canReceiveEnquiries" class="min-w-0">
             <div class="mb-9 border-b border-secondary-200/70 pb-7">
               <p class="storefront-kicker">Send an enquiry</p>
               <h2 class="text-2xl font-semibold text-secondary-950 sm:text-3xl">Tell us what’s happening</h2>
@@ -191,11 +194,15 @@
             </Transition>
           </div>
 
-          <aside class="min-w-0 border-t border-secondary-200/70 pt-8 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0">
-            <p class="storefront-kicker">Direct contact</p>
-            <h2 class="text-xl font-semibold text-secondary-950">{{ contactPage.info_title }}</h2>
+          <aside
+            v-if="hasDirectContactContent"
+            class="min-w-0 border-t border-secondary-200/70 pt-8"
+            :class="canReceiveEnquiries ? 'lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0' : ''"
+          >
+            <p v-if="hasContactIntro" class="storefront-kicker">Direct contact</p>
+            <h2 v-if="contactPage.info_title" class="text-xl font-semibold text-secondary-950">{{ contactPage.info_title }}</h2>
             <p v-if="contactPage.info_subtitle" class="mt-2 text-sm font-medium text-secondary-700">{{ contactPage.info_subtitle }}</p>
-            <p class="mt-3 text-sm leading-6 text-gray-600">{{ contactPage.info_description }}</p>
+            <p v-if="contactPage.info_description" class="mt-3 text-sm leading-6 text-gray-600">{{ contactPage.info_description }}</p>
             <p v-if="contactPage.info_badge" class="mt-5 border-y border-secondary-200/70 py-4 text-sm font-medium text-secondary-800">
               {{ contactPage.info_badge }}
             </p>
@@ -237,8 +244,8 @@
                 <div v-for="(promise, i) in promises" :key="i" class="grid grid-cols-[1.5rem_1fr] gap-3 py-4">
                   <Icon :name="promise.icon || 'heroicons:check-circle'" class="mt-0.5 h-5 w-5 text-primary-700" />
                   <div>
-                    <p class="text-sm font-semibold text-secondary-900">{{ promise.title }}</p>
-                    <p class="mt-1 text-sm leading-6 text-gray-600">{{ promise.description }}</p>
+                    <p v-if="promise.title" class="text-sm font-semibold text-secondary-900">{{ promise.title }}</p>
+                    <p v-if="promise.description" class="mt-1 text-sm leading-6 text-gray-600">{{ promise.description }}</p>
                   </div>
                 </div>
               </div>
@@ -251,9 +258,9 @@
     <section v-if="faqs.length" class="border-t border-secondary-200/70 bg-white py-16 sm:py-20">
       <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div ref="faqHeadingRef" class="reveal mb-10">
-          <p class="storefront-kicker">{{ faqLabel }}</p>
-          <h2 class="text-3xl font-semibold text-secondary-950">{{ faqHeading }}</h2>
-          <p class="mt-3 max-w-2xl text-sm leading-6 text-gray-600">{{ faqSubtitle }}</p>
+          <p v-if="faqLabel" class="storefront-kicker">{{ faqLabel }}</p>
+          <h2 v-if="faqHeading" class="text-3xl font-semibold text-secondary-950">{{ faqHeading }}</h2>
+          <p v-if="faqSubtitle" class="mt-3 max-w-2xl text-sm leading-6 text-gray-600">{{ faqSubtitle }}</p>
         </div>
 
         <MotionAccordion :items="faqs" />
@@ -297,7 +304,13 @@ const contactPage = computed(() => siteConfig.value?.contact_page ?? {
   promises: [],
 })
 
-const promises = computed(() => contactPage.value.promises ?? [])
+const promises = computed(() => (contactPage.value.promises ?? []).filter(item => item.title || item.description))
+const hasContactIntro = computed(() => !!(
+  contactPage.value.info_title
+  || contactPage.value.info_subtitle
+  || contactPage.value.info_description
+  || contactPage.value.info_badge
+))
 const form = ref<ContactForm>(emptyForm())
 const submitting = ref(false)
 const success = ref(false)
@@ -335,6 +348,12 @@ const contactEntries = computed(() => {
 
   return []
 })
+const canReceiveEnquiries = computed(() => contactEntries.value.some(entry => isValidEmail(entry.email || '')))
+const hasDirectContactContent = computed(() => !!(
+  hasContactIntro.value
+  || contactEntries.value.length
+  || promises.value.length
+))
 
 const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`
 
@@ -361,10 +380,13 @@ const defaultFaqs = [
   },
 ]
 
-const faqs = computed(() => contactPage.value.faqs?.length ? contactPage.value.faqs : defaultFaqs)
-const faqLabel = computed(() => contactPage.value.faq_label || 'Frequently asked questions')
-const faqHeading = computed(() => contactPage.value.faq_heading || 'A few answers before you write')
-const faqSubtitle = computed(() => contactPage.value.faq_subtitle || 'If your question is not covered here, send us a message above.')
+const faqs = computed(() => siteConfig.value?.contact_page
+  ? (contactPage.value.faqs ?? []).filter(item => item.question || item.answer)
+  : defaultFaqs,
+)
+const faqLabel = computed(() => siteConfig.value?.contact_page ? (contactPage.value.faq_label ?? '') : 'Frequently asked questions')
+const faqHeading = computed(() => siteConfig.value?.contact_page ? (contactPage.value.faq_heading ?? '') : 'A few answers before you write')
+const faqSubtitle = computed(() => siteConfig.value?.contact_page ? (contactPage.value.faq_subtitle ?? '') : 'If your question is not covered here, send us a message above.')
 
 const { revealRef: faqHeadingRef } = useScrollReveal()
 

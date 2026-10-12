@@ -20,6 +20,15 @@ const runtimeConfig = useRuntimeConfig()
 const requestUrl = useRequestURL()
 useTheme()
 
+const platformRoutePrefixes = ['/admin', '/super-admin', '/register', '/subscribe']
+const platformTitle = computed(() => {
+  const isPlatformRoute = platformRoutePrefixes.some(prefix =>
+    route.path === prefix || route.path.startsWith(`${prefix}/`),
+  )
+
+  return isPlatformRoute ? 'DATABASY' : undefined
+})
+
 const crawlerDirective = computed(() => {
   if (!isSeoIndexingEnabled(runtimeConfig.public.seoIndexingEnabled)) {
     return 'noindex,nofollow,noarchive'
@@ -31,6 +40,9 @@ const crawlerDirective = computed(() => {
 })
 
 useSeoMeta({
+  title: () => platformTitle.value,
+  ogTitle: () => platformTitle.value,
+  twitterTitle: () => platformTitle.value,
   robots: () => crawlerDirective.value,
 })
 

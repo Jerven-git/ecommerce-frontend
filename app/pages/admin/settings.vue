@@ -246,13 +246,26 @@ const tabConfirmMessages: Record<TabId, string> = {
   modules: 'Apply these module visibility changes? Disabled pages will redirect to the homepage.',
 }
 
-// Showcase and Watch & Shop now live as sections inside Pages → Homepage,
-// so validation errors there focus the user there rather than at a top-level tab.
-function focusHomepageSubTab() {
-  if (activeTab.value !== 'pages') activeTab.value = 'pages'
-  if (route.query.sub !== 'homepage') {
-    router.replace({ query: { ...route.query, tab: 'pages', sub: 'homepage' } })
+function contactEntriesForSave(): ContactEntry[] {
+  return form.value.contact_entries
+    .map((entry) => ({
+      label: entry.label.trim(),
+      email: entry.email.trim(),
+      phone: entry.phone.trim(),
+    }))
+    .filter((entry) => entry.label || entry.email || entry.phone)
+}
+
+function apiErrorMessage(err: any): string {
+  const errors = err?.data?.errors
+  if (errors && typeof errors === 'object') {
+    for (const messages of Object.values(errors)) {
+      if (Array.isArray(messages) && typeof messages[0] === 'string') return messages[0]
+      if (typeof messages === 'string') return messages
+    }
   }
+
+  return err?.data?.message || err?.message || 'Failed to save settings'
 }
 
 const confirmMessage = computed(() => tabConfirmMessages[activeTab.value])
@@ -267,74 +280,6 @@ function requestSave() {
     return
   }
 
-  // Showcase: any tile that's been touched (has a title, category, or product)
-  // must be fully wired (both category AND product). Runs whether the section
-  // is hidden or visible — half-configured tiles in storage are bugs waiting
-  // to happen the moment the toggle flips on.
-  const showcase = form.value.homepage_showcase
-  const partialTileIndex = showcase.tiles.findIndex(
-    (t) => (t.title || t.category_id != null || t.featured_product_id != null)
-      && (t.category_id == null || t.featured_product_id == null),
-  )
-  if (partialTileIndex >= 0) {
-    const tile = showcase.tiles[partialTileIndex]!
-    const missing = tile.category_id == null ? 'a category' : 'a product'
-    focusHomepageSubTab()
-    showToast(`Tile ${partialTileIndex + 1}: select ${missing} before saving.`, 'error')
-    return
-  }
-
-  if (showcase.enabled) {
-    if (!showcase.heading.trim()) {
-      focusHomepageSubTab()
-      showToast('Showcase needs a heading before saving.', 'error')
-      return
-    }
-
-    const anyComplete = showcase.tiles.some(
-      (t) => t.category_id != null && t.featured_product_id != null,
-    )
-    if (!anyComplete) {
-      focusHomepageSubTab()
-      showToast('Showcase is enabled but no tile has a category and product. Configure at least one tile or hide the section.', 'error')
-      return
-    }
-  }
-
-  // Watch & Shop: every card needs a product, regardless of section visibility.
-  // A card without a product has no chip, no link target — it's a broken row.
-  const watchShop = form.value.homepage_watch_shop
-  const missingProductIndex = watchShop.cards.findIndex((c) => !c.product?.id)
-  if (missingProductIndex >= 0) {
-    focusHomepageSubTab()
-    showToast(`Card ${missingProductIndex + 1}: select a product before saving.`, 'error')
-    return
-  }
-
-  if (watchShop.enabled) {
-    if (!watchShop.heading.trim()) {
-      focusHomepageSubTab()
-      showToast('Watch & Shop needs a heading before saving.', 'error')
-      return
-    }
-
-    if (watchShop.cards.length === 0) {
-      focusHomepageSubTab()
-      showToast('Watch & Shop is enabled but has no cards. Add at least one or hide the section.', 'error')
-      return
-    }
-  }
-
-  // Best Sellers: heading is the only hard requirement (the section is auto
-  // by default, and an empty fallback list is fine — the section just hides
-  // itself when there's nothing to render). We don't gate on the fallback
-  // being filled, since a store with real sales never needs it.
-  const bestSellers = form.value.homepage_best_sellers
-  if (bestSellers.enabled && !bestSellers.heading.trim()) {
-    focusHomepageSubTab()
-    showToast('Best Sellers needs a heading before saving.', 'error')
-    return
-  }
 
   saveConfirmOpen.value = true
 }
@@ -819,7 +764,11 @@ async function loadSettings() {
         contact_email: response.data.contact_email || "",
         contact_phone: response.data.contact_phone || "",
         contact_entries: response.data.contact_entries?.length
-          ? response.data.contact_entries
+          ? response.data.contact_entries.map((entry: Partial<ContactEntry>) => ({
+              label: entry.label ?? '',
+              email: entry.email ?? '',
+              phone: entry.phone ?? '',
+            }))
           : [{ label: '', email: '', phone: '' }],
         social_links: Array.isArray(response.data.social_links)
           ? response.data.social_links.map((s: any) => ({
@@ -975,7 +924,7 @@ async function loadSettings() {
             { question: 'Can I change or cancel my order?', answer: 'Orders can be modified or cancelled within 1 hour of placing them. After that, the order enters processing and can no longer be changed. Please contact us immediately if you need to make a change.' },
             { question: 'Do you offer international shipping?', answer: 'Yes! We ship to most countries worldwide. International shipping times and costs vary by destination and will be calculated at checkout.' },
           ]
-          cp.faqs = Array.isArray(cp.faqs) && cp.faqs.length
+          cp.faqs = Array.isArray(cp.faqs)
             ? cp.faqs.map((f: any) => ({ question: f?.question ?? '', answer: f?.answer ?? '' }))
             : defaultFaqs
           cp.faq_label = cp.faq_label ?? 'FAQ'
@@ -1098,6 +1047,7 @@ async function loadSettings() {
 // --- Save settings ---
 async function saveSettings() {
   saving.value = true
+  let settingsSaved = false
 
   try {
     // 1) Upload pending files
@@ -1106,10 +1056,8 @@ async function saveSettings() {
       ;(form.value[urlFields[collection as MediaCollection]] as string) = serverUrl
     }
 
-    // 2) Execute pending deletions
-    await media.deleteAllMarked()
-
-    // 3) PATCH text fields
+    // 2) Save the configuration before destructive media deletions. This keeps
+    // existing files intact when validation or authorization rejects the PATCH.
     await $apiFetch("/site-config", {
       method: "PATCH",
       body: {
@@ -1141,7 +1089,9 @@ async function saveSettings() {
         contact_image_url: form.value.contact_image_url || null,
         contact_email: form.value.contact_email,
         contact_phone: form.value.contact_phone,
-        contact_entries: form.value.contact_entries,
+        // Blank rows are editor affordances, not storefront content. A label is
+        // optional when the row still contains an email address or phone number.
+        contact_entries: contactEntriesForSave(),
         social_links: (form.value.social_links || [])
           .filter((s) => s.platform && s.url)
           .map((s) => ({
@@ -1155,9 +1105,18 @@ async function saveSettings() {
         welcome_popup_heading: form.value.welcome_popup.welcome_popup_heading,
         welcome_popup_body: form.value.welcome_popup.welcome_popup_body,
         welcome_popup_discount_id: form.value.welcome_popup.welcome_popup_discount_id,
-        homepage_steps: form.value.homepage_steps,
-        homepage_features: form.value.homepage_features,
-        homepage_stats: form.value.homepage_stats,
+        homepage_steps: {
+          ...form.value.homepage_steps,
+          items: form.value.homepage_steps.items.filter((item) => item.title.trim() || item.description.trim()),
+        },
+        homepage_features: {
+          ...form.value.homepage_features,
+          items: form.value.homepage_features.items.filter((item) => item.title.trim() || item.description.trim()),
+        },
+        homepage_stats: {
+          ...form.value.homepage_stats,
+          items: form.value.homepage_stats.items.filter((item) => item.value.trim() || item.label.trim()),
+        },
         // image_url is server-owned (comes from the media upload); merge the
         // resolved URL back into the statement object on save.
         homepage_statement: {
@@ -1198,15 +1157,39 @@ async function saveSettings() {
           subtitle: form.value.homepage_best_sellers.subtitle,
           fallback_product_ids: form.value.homepage_best_sellers.fallback_product_ids ?? [],
         },
-        about_highlights: form.value.about_highlights,
+        about_highlights: {
+          ...form.value.about_highlights,
+          items: form.value.about_highlights.items.filter((item) => item.title.trim() || item.description.trim()),
+        },
         shop_header: form.value.shop_header,
-        shop_promo: form.value.shop_promo,
-        contact_page: form.value.contact_page,
+        shop_promo: {
+          ...form.value.shop_promo,
+          perks: form.value.shop_promo.perks.filter((perk) => perk.trim()),
+        },
+        contact_page: {
+          ...form.value.contact_page,
+          promises: form.value.contact_page.promises.filter((item) => item.title.trim() || item.description.trim()),
+          faqs: form.value.contact_page.faqs.filter((item) => item.question.trim() || item.answer.trim()),
+        },
         blog_page: form.value.blog_page,
         blog_overlay_color: form.value.blog_overlay_color,
         blog_overlay_opacity: form.value.blog_overlay_opacity,
         blog_image_url: form.value.blog_image_url || null,
-        services_page: form.value.services_page,
+        services_page: {
+          ...form.value.services_page,
+          summary: form.value.services_page.summary
+            ? {
+                ...form.value.services_page.summary,
+                items: form.value.services_page.summary.items.filter((item) => item.title.trim() || item.description.trim()),
+              }
+            : null,
+          stats: form.value.services_page.stats
+            ? {
+                ...form.value.services_page.stats,
+                items: form.value.services_page.stats.items.filter((item) => item.value.trim() || item.label.trim()),
+              }
+            : null,
+        },
         services_overlay_color: form.value.services_overlay_color,
         services_overlay_opacity: form.value.services_overlay_opacity,
         services_image_url: form.value.services_image_url || null,
@@ -1254,6 +1237,10 @@ async function saveSettings() {
         ),
       },
     })
+    settingsSaved = true
+
+    // 3) Only execute destructive media removals after the config is accepted.
+    await media.deleteAllMarked()
 
     // Refresh shared siteConfig so the theme updates live
     const { fetchSiteConfig, broadcastConfigUpdate } = useSiteConfig()
@@ -1269,7 +1256,12 @@ async function saveSettings() {
     showToast('All settings saved', 'success')
   } catch (err: any) {
     console.error("Save failed:", err?.data || err)
-    showToast(err?.data?.message || err?.message || 'Failed to save settings', 'error')
+    showToast(
+      settingsSaved
+        ? 'Your content was saved, but one or more media files could not be removed. Try saving again.'
+        : apiErrorMessage(err),
+      'error',
+    )
   } finally {
     saving.value = false
   }

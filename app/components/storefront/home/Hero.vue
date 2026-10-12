@@ -48,10 +48,10 @@
 
     <div class="relative z-10 mx-auto flex w-full max-w-7xl flex-col justify-end px-6 pb-16 pt-28 lg:px-8 lg:pb-28">
       <div class="max-w-2xl">
-        <h1 class="hero-stagger display-1 font-bold text-white text-balance drop-shadow-sm" style="animation-delay: 0.15s">
+        <h1 v-if="heroTitle" class="hero-stagger display-1 font-bold text-white text-balance drop-shadow-sm" style="animation-delay: 0.15s">
           {{ heroTitle }}
         </h1>
-        <p class="hero-stagger mt-4 max-w-xl text-base leading-relaxed text-white/85 md:mt-6 md:text-xl" style="animation-delay: 0.35s">
+        <p v-if="heroSubtitle" class="hero-stagger mt-4 max-w-xl text-base leading-relaxed text-white/85 md:mt-6 md:text-xl" style="animation-delay: 0.35s">
           {{ heroSubtitle }}
         </p>
         <div class="hero-stagger mt-8 flex flex-wrap items-center gap-3 md:mt-10 md:gap-4" style="animation-delay: 0.55s">
@@ -90,8 +90,8 @@ const imageLoaded = ref(false)
 const videoReady = ref(false)
 const heroVideoRef = ref<HTMLVideoElement | null>(null)
 
-const heroTitle = computed(() => props.siteConfig?.hero_title || 'Welcome to Our Store')
-const heroSubtitle = computed(() => props.siteConfig?.hero_subtitle || 'Discover amazing products')
+const heroTitle = computed(() => props.siteConfig ? (props.siteConfig.hero_title ?? '') : 'Welcome to Our Store')
+const heroSubtitle = computed(() => props.siteConfig ? (props.siteConfig.hero_subtitle ?? '') : 'Discover amazing products')
 const heroAltText = computed(() => props.siteConfig?.pages_seo?.home?.cover_alt_text ?? '')
 const isHeroVideo = computed(() => props.siteConfig?.hero_media_mime?.startsWith('video/'))
 const isFullBleed = computed(() => props.siteConfig?.hero_full_bleed ?? false)

@@ -13,7 +13,7 @@
           >
             {{ bestSellers.label }}
           </p>
-          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight uppercase text-[var(--color-secondary,#4B5979)]">
+          <h2 v-if="bestSellers.heading" class="text-2xl sm:text-3xl font-extrabold tracking-tight uppercase text-[var(--color-secondary,#4B5979)]">
             {{ bestSellers.heading }}
           </h2>
           <p

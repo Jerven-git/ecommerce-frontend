@@ -15,6 +15,11 @@ type SeoFields = {
   noindex?: boolean | null
 }
 
+type StaticPageSeoOverrides = {
+  title?: MaybeRefOrGetter<string | null | undefined>
+  siteName?: MaybeRefOrGetter<string | null | undefined>
+}
+
 type EntityLike = SeoFields & {
   title?: string | null
   name?: string | null
@@ -130,7 +135,11 @@ export function useEntitySeo(entity: MaybeRefOrGetter<EntityLike | null | undefi
   })
 }
 
-export function useStaticPageSeo(slug: string, fallback?: { title?: string; description?: string }) {
+export function useStaticPageSeo(
+  slug: string,
+  fallback?: { title?: string; description?: string },
+  overrides?: StaticPageSeoOverrides,
+) {
   const { siteConfig } = useSiteConfig()
   const route = useRoute()
   const runtimeConfig = useRuntimeConfig()
@@ -148,11 +157,12 @@ export function useStaticPageSeo(slug: string, fallback?: { title?: string; desc
       services: 'Services',
       shop: 'Shop',
     }
-    const title = configuredTitle(
+    const siteName = firstNonEmpty(toValue(overrides?.siteName), cfg.site_name)
+    const title = firstNonEmpty(toValue(overrides?.title)) ?? configuredTitle(
       page.seo_title,
       fallback?.title ?? defaultPageTitles[slug],
       cfg.default_seo_title,
-      cfg.site_name,
+      siteName,
     )
     const description = firstNonEmpty(
       page.seo_description,
@@ -163,8 +173,6 @@ export function useStaticPageSeo(slug: string, fallback?: { title?: string; desc
     const indexingDisabled = !isSeoIndexingEnabled(runtimeConfig.public.seoIndexingEnabled)
     const robots = indexingDisabled || page.noindex ? 'noindex,nofollow,noarchive' : undefined
     const canonical = buildCanonical(cfg, route.path, requestHostname)
-    const siteName = firstNonEmpty(cfg.site_name)
-
     return { title, description, ogImage, robots, canonical, siteName }
   })
 

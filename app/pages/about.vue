@@ -58,8 +58,8 @@
           <div ref="storyCardRef" class="reveal" :class="storyImage ? '' : 'mx-auto max-w-3xl'" style="transition-delay: 0.1s">
             <p class="mb-3 text-sm font-medium" :style="{ color: 'var(--color-primary-700)' }">Our story</p>
             <h2 class="display-2 font-bold text-gray-900">Built for people who care what they buy.</h2>
-            <p class="mt-6 whitespace-pre-line break-words text-lg leading-relaxed text-gray-600">
-              {{ siteConfig?.about_content || 'Welcome to our store. We are committed to providing quality products and excellent customer service.' }}
+            <p v-if="aboutContent" class="mt-6 whitespace-pre-line break-words text-lg leading-relaxed text-gray-600">
+              {{ aboutContent }}
             </p>
             <p v-if="siteConfig?.site_name" class="mt-8 text-sm font-semibold text-gray-900">— The {{ siteConfig.site_name }} team</p>
           </div>
@@ -68,7 +68,7 @@
     </section>
 
     <!-- ──────────────────────  WHY CHOOSE US  ────────────────────── -->
-    <section class="section-accent py-20 lg:py-24">
+    <section v-if="highlights.length" class="section-accent py-20 lg:py-24">
       <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div ref="valuesHeadingRef" class="reveal max-w-2xl">
           <h2 class="display-2 font-bold text-gray-900">Why customers choose us</h2>
@@ -85,8 +85,8 @@
             :style="{ transitionDelay: `${0.1 + i * 0.12}s` }"
           >
             <Icon :name="item.icon || DEFAULT_ICON" class="h-7 w-7" :style="{ color: 'var(--color-primary-600)' }" />
-            <h3 class="mt-5 text-lg font-semibold text-gray-900">{{ item.title }}</h3>
-            <p class="mt-2 leading-relaxed text-gray-600">{{ item.description }}</p>
+            <h3 v-if="item.title" class="mt-5 text-lg font-semibold text-gray-900">{{ item.title }}</h3>
+            <p v-if="item.description" class="mt-2 leading-relaxed text-gray-600">{{ item.description }}</p>
           </div>
         </div>
       </div>
@@ -149,6 +149,10 @@ const { addRevealRef } = useScrollRevealAll()
 
 const siteName = computed(() => siteConfig.value?.site_name || 'Us')
 const storyImage = computed(() => siteConfig.value?.about_image_url || null)
+const aboutContent = computed(() => siteConfig.value
+  ? (siteConfig.value.about_content ?? '')
+  : 'Welcome to our store. We are committed to providing quality products and excellent customer service.',
+)
 
 const defaultHighlights: AboutHighlightItem[] = [
   { icon: 'heroicons:check-circle', title: 'Quality Assured', description: 'Every product is carefully selected and tested before it reaches you.' },
@@ -156,7 +160,10 @@ const defaultHighlights: AboutHighlightItem[] = [
   { icon: 'heroicons:face-smile', title: 'Happy Customers', description: 'Dedicated to your satisfaction on every order, always.' },
 ]
 
-const highlights = computed(() => siteConfig.value?.about_highlights?.items?.length ? siteConfig.value.about_highlights.items : defaultHighlights)
+const highlights = computed(() => siteConfig.value?.about_highlights
+  ? (siteConfig.value.about_highlights.items ?? []).filter(item => item.title || item.description)
+  : defaultHighlights,
+)
 
 // Social proof — reuse the store's headline numbers as a trust band.
 const defaultStats = [
@@ -165,7 +172,10 @@ const defaultStats = [
   { value: '99%', label: 'Satisfaction Rate' },
   { value: '24/7', label: 'Support' },
 ]
-const stats = computed(() => siteConfig.value?.homepage_stats?.items?.length ? siteConfig.value.homepage_stats.items : defaultStats)
+const stats = computed(() => siteConfig.value?.homepage_stats
+  ? (siteConfig.value.homepage_stats.items ?? []).filter(stat => stat.value || stat.label)
+  : defaultStats,
+)
 
 const imageLoading = ref(false)
 const imageLoaded = ref(false)

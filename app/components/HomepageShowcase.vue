@@ -59,7 +59,7 @@
             <div class="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent pointer-events-none" />
 
             <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
-              <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-2 drop-shadow-sm line-clamp-2">{{ tile.title }}</h3>
+              <h3 v-if="tile.title" class="text-base sm:text-lg font-bold text-gray-900 mb-2 drop-shadow-sm line-clamp-2">{{ tile.title }}</h3>
               <span
                 class="inline-flex items-center gap-1 text-[11px] sm:text-xs font-bold uppercase tracking-widest"
                 :style="{ color: siteConfig?.theme?.primary_color || '#d946ef' }"

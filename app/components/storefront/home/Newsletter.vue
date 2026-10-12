@@ -9,8 +9,8 @@
       <div class="grid items-center gap-10 md:grid-cols-2">
         <div>
           <p v-if="label" class="mb-3 text-sm font-medium text-white/60">{{ label }}</p>
-          <h2 class="display-2 font-bold">{{ heading }}</h2>
-          <p class="mt-4 max-w-md text-white/70">{{ subtitle }}</p>
+          <h2 v-if="heading" class="display-2 font-bold">{{ heading }}</h2>
+          <p v-if="subtitle" class="mt-4 max-w-md text-white/70">{{ subtitle }}</p>
         </div>
         <div>
           <form class="flex flex-col gap-3 sm:flex-row" @submit.prevent="subscribe">
@@ -30,7 +30,7 @@
             </button>
           </form>
           <p v-if="message" class="mt-4 text-sm font-medium text-white/90">{{ message }}</p>
-          <p v-else class="mt-4 text-xs text-white/50">{{ disclaimer }}</p>
+          <p v-else-if="disclaimer" class="mt-4 text-xs text-white/50">{{ disclaimer }}</p>
         </div>
       </div>
     </div>
@@ -48,10 +48,10 @@ const { $apiFetch } = useNuxtApp()
 const email = ref('')
 const submitting = ref(false)
 const message = ref('')
-const label = computed(() => props.config?.label || 'Stay in the loop')
-const heading = computed(() => props.config?.heading || "Don't miss a deal.")
-const subtitle = computed(() => props.config?.subtitle || 'Get the latest products, exclusive offers, and updates delivered straight to your inbox.')
-const disclaimer = computed(() => props.config?.disclaimer || 'No spam, ever. Unsubscribe anytime.')
+const label = computed(() => props.config ? (props.config.label ?? '') : 'Stay in the loop')
+const heading = computed(() => props.config ? (props.config.heading ?? '') : "Don't miss a deal.")
+const subtitle = computed(() => props.config ? (props.config.subtitle ?? '') : 'Get the latest products, exclusive offers, and updates delivered straight to your inbox.')
+const disclaimer = computed(() => props.config ? (props.config.disclaimer ?? '') : 'No spam, ever. Unsubscribe anytime.')
 const { revealRef: newsletterRef } = useScrollReveal()
 
 async function subscribe() {

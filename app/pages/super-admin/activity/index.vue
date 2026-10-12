@@ -73,9 +73,8 @@
         <div class="mt-3.5 flex flex-col-reverse gap-2 border-t border-admin-border pt-3.5 sm:flex-row sm:items-center sm:justify-between">
           <p class="hidden text-xs text-admin-muted sm:block">Filters stay in place while you move between result pages.</p>
           <div class="flex flex-col-reverse gap-2 sm:flex-row">
-            <button type="button" class="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-2.5 text-[11px] font-semibold text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent" @click="clearFilters">
-              <Icon name="heroicons:x-mark" class="h-4 w-4" aria-hidden="true" />
-              Reset
+            <button type="button" class="inline-flex h-11 w-11 items-center justify-center rounded-lg text-admin-muted hover:bg-admin-soft hover:text-admin-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:cursor-wait disabled:opacity-50" :disabled="loading" aria-label="Reset activity filters" title="Reset activity filters" @click="clearFilters">
+              <Icon name="heroicons:arrow-path" class="h-4 w-4" aria-hidden="true" />
             </button>
             <button type="submit" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-admin-accent px-3 text-xs font-semibold text-admin-on-accent hover:bg-admin-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent disabled:opacity-50" :disabled="loading">
               <Icon :name="loading ? 'heroicons:arrow-path' : 'heroicons:magnifying-glass'" class="h-4 w-4" :class="loading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />

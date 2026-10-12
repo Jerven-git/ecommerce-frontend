@@ -1,13 +1,13 @@
 <template>
-  <section class="section-accent py-16 lg:py-24">
+  <section v-if="visible" class="section-accent py-16 lg:py-24">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
       <div ref="headingRef" class="reveal max-w-2xl">
         <p v-if="label" class="mb-3 text-sm font-medium" :style="{ color: 'var(--color-primary-700)' }">{{ label }}</p>
-        <h2 class="display-2 font-bold text-gray-900">{{ heading }}</h2>
-        <p class="mt-4 text-lg text-gray-600">{{ subtitle }}</p>
+        <h2 v-if="heading" class="display-2 font-bold text-gray-900">{{ heading }}</h2>
+        <p v-if="subtitle" class="mt-4 text-lg text-gray-600">{{ subtitle }}</p>
       </div>
 
-      <ol class="mt-10 grid gap-x-10 gap-y-10 md:mt-16 md:gap-y-12 md:grid-cols-3">
+      <ol v-if="steps.length" class="mt-10 grid gap-x-10 gap-y-10 md:mt-16 md:gap-y-12 md:grid-cols-3">
         <li
           v-for="(step, index) in steps"
           :key="index"
@@ -21,8 +21,8 @@
             </span>
             <span class="h-px flex-1 bg-gray-300" />
           </div>
-          <h3 class="mt-5 text-lg font-semibold text-gray-900">{{ step.title }}</h3>
-          <p class="mt-2 leading-relaxed text-gray-600">{{ step.description }}</p>
+          <h3 v-if="step.title" class="mt-5 text-lg font-semibold text-gray-900">{{ step.title }}</h3>
+          <p v-if="step.description" class="mt-2 leading-relaxed text-gray-600">{{ step.description }}</p>
         </li>
       </ol>
 
@@ -49,10 +49,14 @@ const defaultSteps: HomepageStep[] = [
   { icon: 'heroicons:shield-check', title: 'Fast Checkout', description: 'Secure payment and fast delivery straight to your doorstep.' },
 ]
 
-const label = computed(() => props.config?.label || 'Simple & Easy')
-const heading = computed(() => props.config?.heading || 'How It Works')
-const subtitle = computed(() => props.config?.subtitle || 'Start shopping in just three easy steps — no hassle, no confusion.')
-const steps = computed(() => props.config?.items?.length ? props.config.items : defaultSteps)
+const label = computed(() => props.config ? (props.config.label ?? '') : 'Simple & Easy')
+const heading = computed(() => props.config ? (props.config.heading ?? '') : 'How It Works')
+const subtitle = computed(() => props.config ? (props.config.subtitle ?? '') : 'Start shopping in just three easy steps — no hassle, no confusion.')
+const steps = computed(() => props.config
+  ? (props.config.items ?? []).filter(step => step.title || step.description)
+  : defaultSteps,
+)
+const visible = computed(() => !!(label.value || heading.value || subtitle.value || steps.value.length))
 const { revealRef: headingRef } = useScrollReveal()
 const { addRevealRef } = useScrollRevealAll()
 </script>

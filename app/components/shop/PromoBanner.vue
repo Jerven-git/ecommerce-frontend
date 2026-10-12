@@ -1,5 +1,5 @@
 <template>
-  <section class="relative overflow-hidden bg-secondary-900 py-20 text-white">
+  <section v-if="visible" class="relative overflow-hidden bg-secondary-900 py-20 text-white">
     <!-- Soft, theme-driven glow (replaces the floating orbs) -->
     <div
       class="pointer-events-none absolute inset-0"
@@ -9,11 +9,11 @@
 
     <div class="relative z-10 mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 text-center">
       <p v-if="badge" class="mb-4 text-sm font-medium text-white/55">{{ badge }}</p>
-      <h2 class="display-2 font-bold whitespace-pre-line">
-        {{ promo?.heading || 'New arrivals\nevery single week.' }}
+      <h2 v-if="heading" class="display-2 font-bold whitespace-pre-line">
+        {{ heading }}
       </h2>
-      <p class="mx-auto mt-4 max-w-lg text-white/70">
-        {{ promo?.subtitle || 'Stay ahead of the trend. Fresh drops, exclusive deals, and hand-picked collections — updated weekly just for you.' }}
+      <p v-if="subtitle" class="mx-auto mt-4 max-w-lg text-white/70">
+        {{ subtitle }}
       </p>
 
       <div class="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
@@ -32,8 +32,8 @@
         </div>
       </div>
 
-      <NuxtLink to="/shop" class="promo-cta mt-10">
-        {{ promo?.button_text || 'Shop New Arrivals' }}
+      <NuxtLink v-if="buttonText" to="/shop" class="promo-cta mt-10">
+        {{ buttonText }}
         <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
       </NuxtLink>
     </div>
@@ -44,10 +44,17 @@
 const { siteConfig } = useSiteConfig()
 
 const promo = computed(() => siteConfig.value?.shop_promo)
-const badge = computed(() => promo.value?.badge ?? 'Members get more')
+const badge = computed(() => promo.value ? (promo.value.badge ?? '') : 'Members get more')
+const heading = computed(() => promo.value ? (promo.value.heading ?? '') : 'New arrivals\nevery single week.')
+const subtitle = computed(() => promo.value ? (promo.value.subtitle ?? '') : 'Stay ahead of the trend. Fresh drops, exclusive deals, and hand-picked collections — updated weekly just for you.')
+const buttonText = computed(() => promo.value ? (promo.value.button_text ?? '') : 'Shop New Arrivals')
 
 const defaultPerks = ['Free Shipping', 'Easy Returns', 'Secure Checkout']
-const displayPerks = computed(() => promo.value?.perks?.length ? promo.value.perks : defaultPerks)
+const displayPerks = computed(() => promo.value
+  ? (promo.value.perks ?? []).filter(Boolean)
+  : defaultPerks,
+)
+const visible = computed(() => !!(badge.value || heading.value || subtitle.value || buttonText.value || displayPerks.value.length))
 
 const perkIcons = [
   'heroicons:check',

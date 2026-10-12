@@ -37,6 +37,7 @@
             {{ heroLabel }}
           </p>
           <h1
+            v-if="heroHeading"
             class="hero-stagger display-1 font-bold leading-tight text-white text-balance drop-shadow-sm"
             style="animation-delay: 0.25s"
           >
@@ -67,8 +68,8 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10">
           <div v-for="(item, i) in summary" :key="i" class="border-t border-gray-200 pt-4">
-            <p class="text-sm font-semibold text-gray-900 mb-1">{{ item.title }}</p>
-            <p class="text-sm text-gray-600 leading-relaxed">{{ item.description }}</p>
+            <p v-if="item.title" class="text-sm font-semibold text-gray-900 mb-1">{{ item.title }}</p>
+            <p v-if="item.description" class="text-sm text-gray-600 leading-relaxed">{{ item.description }}</p>
           </div>
         </div>
       </div>
@@ -158,8 +159,8 @@
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10">
           <div v-for="(stat, i) in stats" :key="i" class="border-t border-gray-200 pt-4">
-            <p class="text-3xl sm:text-5xl font-bold tabular-nums text-gray-900 mb-1" :style="{ fontFamily: 'var(--font-heading)' }">{{ stat.value }}</p>
-            <p class="text-sm text-gray-600 leading-relaxed">{{ stat.label }}</p>
+            <p v-if="stat.value" class="text-3xl sm:text-5xl font-bold tabular-nums text-gray-900 mb-1" :style="{ fontFamily: 'var(--font-heading)' }">{{ stat.value }}</p>
+            <p v-if="stat.label" class="text-sm text-gray-600 leading-relaxed">{{ stat.label }}</p>
           </div>
         </div>
       </div>
@@ -175,7 +176,7 @@
             :style="{ background: 'radial-gradient(70% 130% at 50% -10%, color-mix(in srgb, var(--color-primary) 42%, transparent), transparent 62%)' }"
           />
           <div class="relative">
-            <h3 class="display-2 font-bold mb-3">{{ bottomCta.heading }}</h3>
+            <h3 v-if="bottomCta.heading" class="display-2 font-bold mb-3">{{ bottomCta.heading }}</h3>
             <p v-if="bottomCta.subtitle" class="text-white/70 mb-7 max-w-lg mx-auto">{{ bottomCta.subtitle }}</p>
             <NuxtLink
               v-if="bottomCta.button_link"
@@ -258,19 +259,28 @@ const serviceGroups = computed<Array<{ category: ServiceCategory | null; items: 
 // --- Page chrome from site config (unchanged) ---
 const servicesCfg = computed(() => siteConfig.value?.services_page)
 
-const heroLabel = computed(() => servicesCfg.value?.header?.label || 'Our services')
-const heroHeading = computed(() => servicesCfg.value?.header?.heading || 'Services built around you')
-const heroSubtitle = computed(() => servicesCfg.value?.header?.subtitle || '')
+const heroLabel = computed(() => servicesCfg.value ? (servicesCfg.value.header?.label ?? '') : 'Our services')
+const heroHeading = computed(() => servicesCfg.value ? (servicesCfg.value.header?.heading ?? '') : 'Services built around you')
+const heroSubtitle = computed(() => servicesCfg.value?.header?.subtitle ?? '')
 const heroImage = computed(() => siteConfig.value?.services_image_url || null)
 const overlayColor = computed(() => siteConfig.value?.services_overlay_color || '#000000')
 const overlayOpacity = computed(() => siteConfig.value?.services_overlay_opacity ?? 40)
 
-const primaryCta = computed(() => servicesCfg.value?.header?.primary_cta || null)
-const secondaryCta = computed(() => servicesCfg.value?.header?.secondary_cta || null)
+const primaryCta = computed(() => {
+  const cta = servicesCfg.value?.header?.primary_cta
+  return cta?.label && cta?.link ? cta : null
+})
+const secondaryCta = computed(() => {
+  const cta = servicesCfg.value?.header?.secondary_cta
+  return cta?.label && cta?.link ? cta : null
+})
 
-const summary = computed(() => servicesCfg.value?.summary?.items ?? [])
-const stats = computed(() => servicesCfg.value?.stats?.items ?? [])
-const bottomCta = computed(() => servicesCfg.value?.cta || null)
+const summary = computed(() => (servicesCfg.value?.summary?.items ?? []).filter(item => item.title || item.description))
+const stats = computed(() => (servicesCfg.value?.stats?.items ?? []).filter(stat => stat.value || stat.label))
+const bottomCta = computed(() => {
+  const cta = servicesCfg.value?.cta
+  return cta && (cta.heading || cta.subtitle || (cta.button_label && cta.button_link)) ? cta : null
+})
 
 useStaticPageSeo('services', {
   title: `${servicesCfg.value?.header?.label || 'Services'} – ${siteConfig.value?.site_name || ''}`,

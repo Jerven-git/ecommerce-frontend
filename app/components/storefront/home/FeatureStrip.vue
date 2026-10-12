@@ -1,5 +1,5 @@
 <template>
-  <section class="border-t border-gray-100 bg-white py-12 lg:py-16">
+  <section v-if="features.length" class="border-t border-gray-100 bg-white py-12 lg:py-16">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
       <div class="grid gap-y-10 md:grid-cols-3 md:gap-y-0">
         <div
@@ -11,8 +11,8 @@
           :style="{ transitionDelay: `${0.1 + index * 0.12}s` }"
         >
           <Icon :name="feature.icon ?? defaultFeatureIcons[index % defaultFeatureIcons.length]!" class="h-7 w-7" :style="{ color: 'var(--color-primary-600)' }" />
-          <h3 class="mt-5 text-lg font-semibold text-gray-900">{{ feature.title }}</h3>
-          <p class="mt-2 leading-relaxed text-gray-600">{{ feature.description }}</p>
+          <h3 v-if="feature.title" class="mt-5 text-lg font-semibold text-gray-900">{{ feature.title }}</h3>
+          <p v-if="feature.description" class="mt-2 leading-relaxed text-gray-600">{{ feature.description }}</p>
         </div>
       </div>
     </div>
@@ -38,6 +38,9 @@ const defaultFeatures: HomepageFeature[] = [
   { icon: 'heroicons:bolt', title: 'Fast Delivery', description: 'Quick and reliable shipping to your doorstep.' },
 ]
 
-const features = computed(() => props.config?.items?.length ? props.config.items : defaultFeatures)
+const features = computed(() => props.config
+  ? (props.config.items ?? []).filter(feature => feature.title || feature.description)
+  : defaultFeatures,
+)
 const { addRevealRef } = useScrollRevealAll()
 </script>
