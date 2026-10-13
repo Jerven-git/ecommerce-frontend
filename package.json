@@ -5,6 +5,9 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
+    "audit:runtime": "node scripts/audit-runtime.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:list": "playwright test --list",
     "generate": "NUXT_PUBLIC_STATIC_GENERATION=true nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
@@ -20,7 +23,7 @@
     "laravel-echo": "^2.3.1",
     "marked": "^14.1.3",
     "motion-v": "^2.3.0",
-    "nuxt": "^4.6.0",
+    "nuxt": "^4.6.1",
     "philippines": "^1.0.0",
     "pusher-js": "^8.4.3",
     "reka-ui": "^2.10.5",
@@ -36,6 +39,7 @@
     "@iconify-json/simple-icons": "^1.2.92",
     "@nuxt/fonts": "^0.14.0",
     "@nuxtjs/tailwindcss": "^6.14.0",
+    "@playwright/test": "1.63.0",
     "@types/node": "^25.0.8",
     "@types/three": "^0.186.0",
     "typescript": "~5.9.3",

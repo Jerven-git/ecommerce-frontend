@@ -16,11 +16,14 @@
           ref="dialogPanelRef"
           class="welcome-popup-panel relative max-h-[calc(100dvh-2rem)] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-[0_28px_80px_-24px_rgba(15,23,42,0.65)] sm:max-h-[calc(100dvh-3rem)]"
           tabindex="-1"
+          :data-storefront-section="editorPreview ? 'welcome-popup' : undefined"
+          :data-editor-label="editorPreview ? 'Welcome popup' : undefined"
         >
           <button
             ref="closeButtonRef"
             type="button"
             @click="close"
+            :disabled="editorPreview"
             class="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white text-secondary-700 shadow-[0_8px_22px_-10px_rgba(15,23,42,0.45)] transition-colors hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary-200 sm:right-4 sm:top-4"
             aria-label="Close discount offer"
           >
@@ -114,7 +117,7 @@
                       inputmode="email"
                       class="input-field"
                       placeholder="name@example.com"
-                      :disabled="submitting"
+                      :disabled="submitting || editorPreview"
                       :aria-invalid="Boolean(errorMsg)"
                       :aria-describedby="errorMsg ? 'welcome-email-help welcome-email-error' : 'welcome-email-help'"
                     />
@@ -136,7 +139,7 @@
                     <button
                       type="submit"
                       class="btn-primary mt-4 flex min-h-11 w-full items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
-                      :disabled="submitting"
+                      :disabled="submitting || editorPreview"
                     >
                       <Icon name="heroicons:arrow-path" v-if="submitting" class="h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
                       {{ submitting ? 'Unlocking your code...' : 'Reveal My Discount' }}
@@ -171,6 +174,7 @@
 </template>
 
 <script setup lang="ts">
+const { editorPreview = false } = defineProps<{ editorPreview?: boolean }>()
 const { siteConfig } = useSiteConfig()
 const { $apiFetch } = useNuxtApp()
 
@@ -214,6 +218,11 @@ function clearShowTimer() {
 // offer recoverable through the quieter floating launcher.
 onMounted(() => {
   if (!import.meta.client) return
+  if (editorPreview) {
+    visible.value = true
+    launcherVisible.value = false
+    return
+  }
 
   watch(
     promotionAvailable,
@@ -256,6 +265,7 @@ onBeforeUnmount(() => {
 
 watch(visible, async (isVisible) => {
   if (!import.meta.client) return
+  if (editorPreview) return
 
   if (!isVisible) {
     restoreBodyScroll()
@@ -285,6 +295,7 @@ function restoreBodyScroll() {
 }
 
 function handleDialogKeydown(event: KeyboardEvent) {
+  if (editorPreview) return
   if (event.key === 'Escape') {
     close()
     return
@@ -315,6 +326,7 @@ function handleDialogKeydown(event: KeyboardEvent) {
 }
 
 function close() {
+  if (editorPreview) return
   visible.value = false
   launcherVisible.value = promotionAvailable.value && !submitted.value
   const shouldFocusLauncher = openedFromLauncher && launcherVisible.value
@@ -334,6 +346,7 @@ function close() {
 }
 
 function open() {
+  if (editorPreview) return
   rememberCurrentFocus()
   openedFromLauncher = true
   launcherVisible.value = false
@@ -341,6 +354,7 @@ function open() {
 }
 
 async function handleSubmit() {
+  if (editorPreview) return
   submitting.value = true
   errorMsg.value = ''
 
@@ -385,6 +399,7 @@ async function handleSubmit() {
 }
 
 async function copyCode() {
+  if (editorPreview) return
   copyError.value = ''
 
   try {
@@ -400,6 +415,27 @@ async function copyCode() {
 </script>
 
 <style scoped>
+.welcome-popup-panel[data-editor-selected="true"] {
+  outline: 3px solid #7c3aed;
+  outline-offset: -3px;
+}
+.welcome-popup-panel[data-editor-selected="true"]::before {
+  content: attr(data-editor-label);
+  position: absolute;
+  z-index: 20;
+  top: .5rem;
+  left: .5rem;
+  border-radius: .5rem;
+  background: #6d28d9;
+  color: white;
+  padding: .35rem .55rem;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: .6875rem;
+  font-weight: 700;
+  line-height: 1rem;
+  box-shadow: 0 .25rem .75rem rgb(76 29 149 / .2);
+  pointer-events: none;
+}
 .popup-enter-active {
   transition: opacity 0.28s ease-out;
 }

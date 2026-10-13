@@ -65,10 +65,12 @@
 </template>
 
 <script setup lang="ts">
-import type { HomepageBestSellersProduct } from '~/composables/useSiteConfig'
+import type { HomepageBestSellersProduct, SiteConfig } from '~/composables/useSiteConfig'
 import type { Product } from '~/types/product'
 
-const { siteConfig } = useSiteConfig()
+const props = defineProps<{ siteConfig?: SiteConfig | null }>()
+const { siteConfig: sharedSiteConfig } = useSiteConfig()
+const siteConfig = computed(() => props.siteConfig ?? sharedSiteConfig.value)
 
 const bestSellers = computed(() => siteConfig.value?.homepage_best_sellers)
 

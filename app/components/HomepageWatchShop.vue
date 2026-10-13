@@ -118,9 +118,11 @@
 </template>
 
 <script setup lang="ts">
-import type { HomepageWatchShop, HomepageWatchShopCard } from '~/composables/useSiteConfig'
+import type { HomepageWatchShop, HomepageWatchShopCard, SiteConfig } from '~/composables/useSiteConfig'
 
-const { siteConfig } = useSiteConfig()
+const props = defineProps<{ siteConfig?: SiteConfig | null }>()
+const { siteConfig: sharedSiteConfig } = useSiteConfig()
+const siteConfig = computed(() => props.siteConfig ?? sharedSiteConfig.value)
 
 const watchShop = computed<HomepageWatchShop | null>(() => siteConfig.value?.homepage_watch_shop ?? null)
 

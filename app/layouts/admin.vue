@@ -11,19 +11,33 @@
 
   <template v-else>
   <!-- Admin Guide -->
-  <AdminGuide ref="guideRef" />
+  <AdminGuide v-if="!isImmersiveEditor" ref="guideRef" />
 
   <!-- AI help assistant -->
   <AdminAssistant />
 
-  <SuperAdminImpersonationBanner />
+  <!-- The website editor keeps the admin security boundary but owns the full viewport. -->
+  <div
+    v-if="isImmersiveEditor"
+    data-admin-immersive-shell
+    class="admin-shell flex h-screen flex-col overflow-hidden bg-admin-canvas text-admin-text"
+    :class="themeClass"
+  >
+    <SuperAdminImpersonationBanner />
+    <main class="min-h-0 flex-1 overflow-hidden">
+      <slot />
+    </main>
+  </div>
 
   <!-- Fixed-height shell so ONLY main content scrolls -->
-  <div
-    class="admin-shell h-screen flex overflow-hidden bg-admin-canvas text-admin-text"
-    :class="themeClass"
-    :style="{ '--admin-sidebar-offset': sidebarOpen ? '16rem' : '0rem' }"
-  >
+  <template v-else>
+    <SuperAdminImpersonationBanner />
+    <div
+      data-admin-standard-shell
+      class="admin-shell h-screen flex overflow-hidden bg-admin-canvas text-admin-text"
+      :class="themeClass"
+      :style="{ '--admin-sidebar-offset': sidebarOpen ? '16rem' : '0rem' }"
+    >
     <!-- Mobile scrim -->
     <Transition
       enter-active-class="transition-opacity duration-200 ease-out"
@@ -216,7 +230,8 @@
         </div>
       </main>
     </div>
-  </div>
+    </div>
+  </template>
   </template>
 </template>
 
@@ -225,8 +240,8 @@ const authStore = useAuthStore()
 const route = useRoute()
 const { isEnabled } = useModules()
 const guideRef = ref<{ startGuide: () => void } | null>(null)
-const runtimeConfig = useRuntimeConfig()
 const { themeClass } = useAdminAppearance({ syncBody: true })
+const { storeUrl } = useStorefrontUrl()
 
 /**
  * Auth pages live under /admin/* (so admin.vue's middleware still runs) but
@@ -234,6 +249,7 @@ const { themeClass } = useAdminAppearance({ syncBody: true })
  */
 const guestPaths = ['/admin/login', '/admin/forgot-password', '/admin/reset-password', '/admin/verify-2fa']
 const isGuestPage = computed(() => guestPaths.includes(route.path))
+const isImmersiveEditor = computed(() => route.path === '/admin/website-editor')
 
 /**
  * Gated stores see the subscription lock screen instead of the shell. Matches
@@ -246,33 +262,6 @@ const isStoreLocked = computed(() => {
   if (authStore.isSuperAdmin || !authStore.isStoreGated) return false
   if (route.path === '/admin/subscription') return false
   return true
-})
-
-/**
- * Absolute URL to the admin's own storefront. Prefers the store's custom domain
- * (e.g. nazareck.com); otherwise falls back to its subdomain under the
- * configured base domain (e.g. acme.localhost). The current port is preserved
- * so it works in local dev (:8000) and production (no port) alike. Opening the
- * apex ("/") would just bounce to the login, so "View Store" must target the
- * store's real host.
- */
-const storeUrl = computed<string>(() => {
-  if (!import.meta.client) return '/'
-
-  const store = authStore.user?.store
-  const { protocol, port, host: currentHost } = window.location
-  const portSuffix = port ? `:${port}` : ''
-  const baseDomain = (runtimeConfig.public.storefrontBaseDomain as string) || 'localhost'
-
-  // An unverified custom domain doesn't resolve a storefront yet, so fall back
-  // to the slug subdomain rather than linking somewhere that bounces to login.
-  const host = store?.domain && store.domain_verified
-    ? store.domain
-    : store?.slug
-      ? `${store.slug}.${baseDomain}`
-      : currentHost
-
-  return `${protocol}//${host}${portSuffix}`
 })
 
 interface NavItem {
@@ -313,6 +302,7 @@ const mainGroups: NavGroup[] = [
   {
     heading: 'Content',
     items: [
+      { to: '/admin/website-editor', label: 'Website Editor', icon: 'heroicons:paint-brush' },
       { to: '/admin/posts', label: 'Blog Posts', icon: 'heroicons:newspaper' },
       { to: '/admin/post-categories', label: 'Blog Categories', icon: 'heroicons:rectangle-stack' },
     ],

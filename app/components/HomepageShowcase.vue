@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import type { HomepageShowcase, HomepageShowcaseTile } from '~/composables/useSiteConfig'
+import type { HomepageShowcase, HomepageShowcaseTile, SiteConfig } from '~/composables/useSiteConfig'
 
 // The public-facing tile shape includes the resolved image URL the server adds
 // when serving /site-config — the admin form shape doesn't carry it.
@@ -85,7 +85,9 @@ interface ResolvedTile extends HomepageShowcaseTile {
   image_url: string | null
 }
 
-const { siteConfig } = useSiteConfig()
+const props = defineProps<{ siteConfig?: SiteConfig | null }>()
+const { siteConfig: sharedSiteConfig } = useSiteConfig()
+const siteConfig = computed(() => props.siteConfig ?? sharedSiteConfig.value)
 
 const showcase = computed<HomepageShowcase | null>(() => siteConfig.value?.homepage_showcase ?? null)
 

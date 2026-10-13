@@ -264,6 +264,13 @@ export type ModuleKey = 'shop' | 'blog' | 'services' | 'about' | 'contact' | 'co
 
 export type ModulesEnabled = Record<ModuleKey, boolean>
 
+export type HomepageSectionId = 'hero' | 'featured-products' | 'showcase' | 'watch-shop' | 'best-sellers' | 'how-it-works' | 'features' | 'stats' | 'statement' | 'newsletter'
+
+export interface HomepageSectionSetting {
+  id: HomepageSectionId
+  visible: boolean
+}
+
 export interface SiteConfig {
   id: number
   /**
@@ -325,6 +332,7 @@ export interface SiteConfig {
   homepage_showcase: HomepageShowcase | null
   homepage_watch_shop: HomepageWatchShop | null
   homepage_best_sellers: HomepageBestSellers | null
+  homepage_sections: HomepageSectionSetting[] | null
   about_highlights: AboutHighlights | null
   contact_page: ContactPage | null
   shop_header: ShopHeader | null

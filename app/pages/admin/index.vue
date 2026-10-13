@@ -2,6 +2,23 @@
   <div>
     <AdminPageHeader title="Dashboard" subtitle="Overview of your store's performance" />
 
+    <NuxtLink
+      to="/admin/website-editor"
+      class="mb-6 flex min-h-20 items-center gap-4 rounded-2xl border border-admin-border bg-admin-surface px-4 py-4 text-admin-text transition-colors hover:bg-admin-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent focus-visible:ring-offset-2 sm:px-5"
+    >
+      <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-admin-accent-soft text-admin-accent-strong">
+        <Icon name="heroicons:paint-brush" class="h-5 w-5" aria-hidden="true" />
+      </span>
+      <span class="min-w-0 flex-1">
+        <span class="block text-sm font-semibold">Customize your storefront</span>
+        <span class="mt-0.5 block text-xs leading-5 text-admin-muted">Review the published homepage across desktop, tablet and mobile.</span>
+      </span>
+      <span class="hidden items-center gap-1.5 text-xs font-semibold text-admin-accent-strong sm:inline-flex">
+        Open editor
+        <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
+      </span>
+    </NuxtLink>
+
     <!-- Loading -->
     <AdminSpinner v-if="loading" label="Loading dashboard…" variant="dashboard" />
 
