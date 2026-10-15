@@ -1,6 +1,6 @@
 <template>
-  <div data-website-editor-shell class="website-editor-shell flex h-full min-h-0 flex-col overflow-hidden bg-admin-canvas text-admin-text">
-    <header class="z-40 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-admin-border bg-admin-surface px-3 sm:px-4">
+  <div data-website-editor-shell class="website-editor-shell flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-admin-canvas text-admin-text">
+    <header class="z-40 flex h-14 shrink-0 items-center justify-between gap-2 border-b border-admin-border bg-admin-surface px-2 sm:px-3">
       <div class="flex min-w-0 items-center gap-2 sm:gap-3">
         <NuxtLink
           to="/admin"
@@ -23,79 +23,83 @@
         </div>
       </div>
 
-      <div class="flex min-w-0 items-center justify-end gap-2 overflow-x-auto py-1">
-          <button
-            ref="controlsTrigger"
-            type="button"
-            class="editor-focus flex min-h-11 shrink-0 items-center gap-2 rounded-xl border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft"
-            aria-controls="website-editor-controls"
-            :aria-label="controlsToggleLabel"
-            :aria-expanded="controlsVisible"
-            :title="controlsToggleLabel"
-            @click="toggleControls"
-          >
-            <Icon name="heroicons:adjustments-horizontal" class="h-4 w-4" aria-hidden="true" />
-            <span class="hidden sm:inline">{{ controlsDocked ? (controlsCollapsed ? 'Show sidebar' : 'Hide sidebar') : 'Sections' }}</span>
-          </button>
-          <div class="hidden items-center rounded-xl border border-admin-border bg-admin-surface p-1 md:flex" role="group" aria-label="Editing history">
-            <button
-              type="button"
-              class="editor-focus flex min-h-11 min-w-11 items-center justify-center rounded-lg text-admin-muted hover:bg-admin-soft hover:text-admin-text disabled:cursor-not-allowed disabled:opacity-30"
-              :disabled="!canUndo || Boolean(selectedVersionId)"
-              aria-label="Undo last edit"
-              title="Undo (Ctrl or Command + Z)"
-              @click="undoChange"
-            >
-              <Icon name="heroicons:arrow-uturn-left" class="h-4 w-4" aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              class="editor-focus flex min-h-11 min-w-11 items-center justify-center rounded-lg text-admin-muted hover:bg-admin-soft hover:text-admin-text disabled:cursor-not-allowed disabled:opacity-30"
-              :disabled="!canRedo || Boolean(selectedVersionId)"
-              aria-label="Redo last edit"
-              title="Redo (Ctrl or Command + Shift + Z)"
-              @click="redoChange"
-            >
-              <Icon name="heroicons:arrow-uturn-right" class="h-4 w-4" aria-hidden="true" />
-            </button>
-          </div>
+      <div class="flex min-w-0 items-center justify-end gap-1 overflow-x-auto">
+        <button
+          ref="controlsTrigger"
+          type="button"
+          class="editor-focus flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl border border-admin-border bg-admin-surface text-admin-text hover:bg-admin-soft"
+          aria-controls="website-editor-controls"
+          :aria-label="controlsToggleLabel"
+          :aria-expanded="controlsVisible"
+          :title="controlsToggleLabel"
+          @click="toggleControls"
+        >
+          <Icon name="heroicons:adjustments-horizontal" class="h-4 w-4" aria-hidden="true" />
+        </button>
+
+        <div class="hidden items-center gap-1 md:flex" role="group" aria-label="Editing history">
           <button
             type="button"
-            class="editor-focus inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft disabled:cursor-not-allowed disabled:opacity-50"
-            :disabled="loadingDraft || discarding || Boolean(selectedVersionId) || (!isDirty && !hasSavedDraft)"
-            aria-label="Discard changes"
-            @click="discardChanges"
+            class="editor-focus flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-admin-border bg-admin-surface text-admin-muted hover:bg-admin-soft hover:text-admin-text disabled:cursor-not-allowed disabled:opacity-30"
+            :disabled="!canUndo || Boolean(selectedVersionId)"
+            aria-label="Undo last edit"
+            title="Undo (Ctrl or Command + Z)"
+            @click="undoChange"
           >
-            <Icon name="heroicons:arrow-path" class="h-4 w-4 md:hidden" aria-hidden="true" />
-            <span class="hidden md:inline">{{ discarding ? 'Discarding…' : 'Discard' }}</span>
+            <Icon name="heroicons:arrow-uturn-left" class="h-4 w-4" aria-hidden="true" />
           </button>
           <button
             type="button"
-            class="editor-focus min-h-11 shrink-0 rounded-xl border border-admin-accent bg-admin-surface px-3 text-xs font-semibold text-admin-accent-strong hover:bg-admin-accent-soft disabled:cursor-not-allowed disabled:opacity-50"
-            :disabled="loadingDraft || saving || Boolean(selectedVersionId) || !isDirty"
-            @click="saveChanges"
+            class="editor-focus flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-admin-border bg-admin-surface text-admin-muted hover:bg-admin-soft hover:text-admin-text disabled:cursor-not-allowed disabled:opacity-30"
+            :disabled="!canRedo || Boolean(selectedVersionId)"
+            aria-label="Redo last edit"
+            title="Redo (Ctrl or Command + Shift + Z)"
+            @click="redoChange"
           >
-            <span class="sm:hidden">{{ saving ? 'Saving…' : 'Save' }}</span>
-            <span class="hidden sm:inline">{{ saving ? 'Saving…' : 'Save draft' }}</span>
+            <Icon name="heroicons:arrow-uturn-right" class="h-4 w-4" aria-hidden="true" />
           </button>
-          <button
-            type="button"
-            class="editor-focus min-h-11 shrink-0 rounded-xl bg-admin-accent px-3 text-xs font-semibold text-admin-on-accent hover:bg-admin-accent-strong disabled:cursor-not-allowed disabled:opacity-50"
-            :disabled="loadingDraft || publishing || Boolean(selectedVersionId) || isDirty || !hasSavedDraft"
-            @click="publishChanges"
-          >
-            {{ publishing ? 'Publishing…' : 'Publish' }}
-          </button>
-          <a
-            :href="activeStoreUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="editor-focus hidden min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft sm:inline-flex"
-            aria-label="Open live store"
-          >
-            <Icon name="heroicons:arrow-top-right-on-square" class="h-4 w-4" aria-hidden="true" />
-            <span class="hidden 2xl:inline">Live store</span>
-          </a>
+        </div>
+
+        <button
+          type="button"
+          class="editor-focus inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl border border-admin-border bg-admin-surface text-admin-muted hover:bg-admin-soft hover:text-admin-text disabled:cursor-not-allowed disabled:opacity-50"
+          :disabled="loadingDraft || discarding || Boolean(selectedVersionId) || (!isDirty && !hasSavedDraft)"
+          :aria-label="discarding ? 'Discarding changes' : 'Discard changes'"
+          :title="discarding ? 'Discarding changes' : 'Discard changes'"
+          @click="discardChanges"
+        >
+          <Icon name="heroicons:arrow-path" class="h-4 w-4" :class="discarding ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          class="editor-focus inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl border border-admin-accent bg-admin-surface text-admin-accent-strong hover:bg-admin-accent-soft disabled:cursor-not-allowed disabled:opacity-50"
+          :disabled="loadingDraft || saving || Boolean(selectedVersionId) || !isDirty"
+          :aria-label="saving ? 'Saving draft' : 'Save draft'"
+          :title="saving ? 'Saving draft' : 'Save draft'"
+          @click="saveChanges"
+        >
+          <Icon :name="saving ? 'heroicons:arrow-path' : 'heroicons:cloud-arrow-up'" class="h-4 w-4" :class="saving ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          class="editor-focus inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl bg-admin-accent text-admin-on-accent hover:bg-admin-accent-strong disabled:cursor-not-allowed disabled:opacity-50"
+          :disabled="loadingDraft || publishing || Boolean(selectedVersionId) || isDirty || !hasSavedDraft"
+          :aria-label="publishing ? 'Publishing website' : 'Publish'"
+          :title="publishing ? 'Publishing website' : 'Publish'"
+          @click="publishChanges"
+        >
+          <Icon :name="publishing ? 'heroicons:arrow-path' : 'heroicons:rocket-launch'" class="h-4 w-4" :class="publishing ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
+        </button>
+        <a
+          :href="activeStoreUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="editor-focus hidden min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl border border-admin-border bg-admin-surface text-admin-text hover:bg-admin-soft sm:inline-flex"
+          aria-label="Open live store"
+          title="Open live store"
+        >
+          <Icon name="heroicons:arrow-top-right-on-square" class="h-4 w-4" aria-hidden="true" />
+        </a>
       </div>
     </header>
 
@@ -366,7 +370,7 @@ const previewReady = ref(false)
 const previewVersion = ref(0)
 const controlsOpen = ref(false)
 const controlsDocked = ref(false)
-const controlsCollapsed = ref(false)
+const controlsCollapsed = ref(true)
 const controlsTrigger = ref<HTMLButtonElement | null>(null)
 const controlsClose = ref<HTMLButtonElement | null>(null)
 const undoSnapshots = ref<string[]>([])

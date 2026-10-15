@@ -14,17 +14,17 @@
   <AdminGuide v-if="!isImmersiveEditor" ref="guideRef" />
 
   <!-- AI help assistant -->
-  <AdminAssistant />
+  <AdminAssistant v-if="!isImmersiveEditor" />
 
   <!-- The website editor keeps the admin security boundary but owns the full viewport. -->
   <div
     v-if="isImmersiveEditor"
     data-admin-immersive-shell
-    class="admin-shell flex h-screen flex-col overflow-hidden bg-admin-canvas text-admin-text"
+    class="admin-immersive-shell admin-shell flex flex-col overflow-hidden bg-admin-canvas text-admin-text"
     :class="themeClass"
   >
     <SuperAdminImpersonationBanner />
-    <main class="min-h-0 flex-1 overflow-hidden">
+    <main class="flex min-h-0 flex-1 overflow-hidden">
       <slot />
     </main>
   </div>
@@ -428,6 +428,12 @@ const iconClass = (item: NavItem) => {
 </script>
 
 <style scoped>
+.admin-immersive-shell {
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
+}
+
 /* Hide scrollbar but keep scrolling */
 .sidebar-scroll {
   scrollbar-width: none;

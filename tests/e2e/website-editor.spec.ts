@@ -19,23 +19,28 @@ async function openEditor(page: Page) {
   await expect(page.getByRole('heading', { name: 'Website Editor' })).toBeVisible()
   await expect(page.locator('[data-admin-immersive-shell]')).toBeVisible()
   await expect(page.locator('[data-admin-standard-shell]')).toHaveCount(0)
+  await expect(page.getByRole('button', { name: /(?:Open|Show) help/ })).toHaveCount(0)
   const preview = page.getByTitle(/Private storefront .* preview/)
   await expect(preview).toBeVisible()
   await expect(preview).toHaveAttribute('src', /\/admin\/storefront-preview\?version=/)
   await expect(page.frameLocator('iframe[title^="Private storefront"]').locator('[data-preview-ready="true"]')).toBeAttached({ timeout: 45_000 })
   await expect(page.getByText('Preview did not load')).toBeHidden()
   await expect(page.getByText(/Private draft preview|Historical version/)).toBeVisible()
+  await expect(page.getByRole('complementary', { name: 'Website editor controls' })).toBeHidden()
+  await expect(page.getByRole('button', { name: 'Discard changes' })).toHaveAttribute('title', 'Discard changes')
+  await expect(page.getByRole('button', { name: 'Save draft' })).toHaveAttribute('title', 'Save draft')
+  await expect(page.getByRole('button', { name: 'Publish' })).toHaveAttribute('title', 'Publish')
+  await expect(page.getByRole('link', { name: 'Open live store' })).toHaveAttribute('title', 'Open live store')
   expect(previewCloneErrors).toEqual([])
 }
 
 async function openEditorControls(page: Page) {
-  const sectionsButton = page.getByRole('button', { name: 'Open sections panel' })
-  if ((page.viewportSize()?.width ?? 0) < 1280) {
-    await expect(sectionsButton).toBeVisible({ timeout: 30_000 })
-    await sectionsButton.click()
-  } else if (await sectionsButton.isVisible()) {
-    await sectionsButton.click()
-  }
+  const isDocked = (page.viewportSize()?.width ?? 0) >= 1280
+  const controlsButton = page.getByRole('button', {
+    name: isDocked ? 'Show editor sidebar' : 'Open sections panel',
+  })
+  await expect(controlsButton).toBeVisible({ timeout: 30_000 })
+  await controlsButton.click()
   await expect(page.getByRole('complementary', { name: 'Website editor controls' })).toBeVisible()
 }
 
@@ -73,13 +78,13 @@ test.describe('Store Admin website editor', () => {
     const workspace = page.getByRole('region', { name: 'Storefront preview workspace' })
     const sidebar = page.getByRole('complementary', { name: 'Website editor controls' })
     if ((page.viewportSize()?.width ?? 0) >= 1280) {
-      const widthBeforeCollapse = (await workspace.boundingBox())!.width
-      await page.getByRole('button', { name: 'Hide editor sidebar' }).first().click()
-      await expect(sidebar).toBeHidden()
-      await expect(page.getByRole('button', { name: 'Show editor sidebar' })).toBeVisible()
-      await expect.poll(async () => (await workspace.boundingBox())!.width).toBeGreaterThan(widthBeforeCollapse)
+      const widthBeforeOpen = (await workspace.boundingBox())!.width
       await page.getByRole('button', { name: 'Show editor sidebar' }).click()
       await expect(sidebar).toBeVisible()
+      await expect.poll(async () => (await workspace.boundingBox())!.width).toBeLessThan(widthBeforeOpen)
+      await page.getByRole('button', { name: 'Hide editor sidebar' }).first().click()
+      await expect(sidebar).toBeHidden()
+      await expect.poll(async () => (await workspace.boundingBox())!.width).toBeGreaterThanOrEqual(widthBeforeOpen)
     } else {
       await page.getByRole('button', { name: 'Open sections panel' }).click()
       await expect(sidebar).toBeVisible()
@@ -95,6 +100,34 @@ test.describe('Store Admin website editor', () => {
 
     await page.getByRole('button', { name: 'Desktop preview' }).click()
     await expect(page.getByRole('button', { name: 'Desktop preview' })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  test('survives a hard refresh without leaving viewport dead space', async ({ page }) => {
+    await openEditor(page)
+    await page.reload()
+    await waitForAppReady(page)
+
+    await expect(page.getByRole('heading', { name: 'Website Editor' })).toBeVisible()
+    await expect(page.frameLocator('iframe[title^="Private storefront"]').locator('[data-preview-ready="true"]')).toBeAttached({ timeout: 45_000 })
+    await expect(page.getByText('Preview did not load')).toBeHidden()
+
+    await openEditorControls(page)
+
+    const viewportFit = await page.locator('[data-website-editor-shell]').evaluate((element) => {
+      const editorBounds = element.getBoundingClientRect()
+      const immersiveBounds = element.closest<HTMLElement>('[data-admin-immersive-shell]')!.getBoundingClientRect()
+      return {
+        editorTop: editorBounds.top,
+        editorBottomGap: immersiveBounds.bottom - editorBounds.bottom,
+        shellBottomGap: window.innerHeight - immersiveBounds.bottom,
+        documentOverflow: document.documentElement.scrollHeight - window.innerHeight,
+      }
+    })
+
+    expect(viewportFit.editorTop).toBeGreaterThanOrEqual(0)
+    expect(Math.abs(viewportFit.editorBottomGap)).toBeLessThanOrEqual(1)
+    expect(Math.abs(viewportFit.shellBottomGap)).toBeLessThanOrEqual(1)
+    expect(viewportFit.documentOverflow).toBeLessThanOrEqual(1)
   })
 
   test('keeps visual page content in Website Editor instead of Site Settings', async ({ page }) => {

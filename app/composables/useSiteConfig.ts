@@ -452,8 +452,9 @@ export function useSiteConfig() {
   const error = useState<string | null>('siteConfigError', () => null)
 
   async function fetchSiteConfig(force = false) {
-    if (pending.value && !force) return
-
+    // Several mounted surfaces can request site config at the same time on a
+    // hard refresh. Wait for the in-flight request instead of returning while
+    // `siteConfig` is still null; editor initialization depends on the value.
     while (pending.value) {
       await new Promise<void>((resolve) => {
         const stop = watch(pending, (isPending) => {
