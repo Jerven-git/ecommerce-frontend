@@ -10,7 +10,7 @@ export interface UploadLimits {
 
 export interface UseMediaUploadOptions {
   collections: MediaCollection[]
-  limits: Record<MediaCollection, UploadLimits>
+  limits: Partial<Record<MediaCollection, UploadLimits>>
   apiFetch: typeof $fetch
 }
 
@@ -54,7 +54,13 @@ export function useMediaUpload(options: UseMediaUploadOptions) {
 
   function queueFile(file: File, collection: MediaCollection): string | null {
     lastError.value = null
-    const { maxMB, label, accept } = limits[collection]
+    const limit = limits[collection]
+    if (!limit || !collections.includes(collection)) {
+      lastError.value = 'Uploads are not configured for this media slot.'
+      return null
+    }
+
+    const { maxMB, label, accept } = limit
     const acceptPrefixes = accept || ['image/']
 
     if (!acceptPrefixes.some(prefix => file.type.startsWith(prefix))) {

@@ -1,7 +1,11 @@
 <template>
   <div>
     <!-- Floating launcher -->
-    <div v-if="!open && !hidden" class="assistant-launcher">
+    <div
+      v-if="!open && !hidden"
+      class="assistant-launcher"
+      :class="{ 'assistant-launcher--editor': compactLauncher }"
+    >
       <button
         type="button"
         class="assistant-launcher__open"
@@ -9,9 +13,10 @@
         @click="open = true"
       >
         <Icon name="heroicons:question-mark-circle" class="h-5 w-5" aria-hidden="true" />
-        <span>Help</span>
+        <span v-if="!compactLauncher">Help</span>
       </button>
       <button
+        v-if="!compactLauncher"
         type="button"
         class="assistant-launcher__hide"
         aria-label="Hide help button"
@@ -27,6 +32,7 @@
       v-else-if="!open && hidden"
       type="button"
       class="assistant-restore"
+      :class="{ 'assistant-restore--editor': compactLauncher }"
       aria-label="Show help button"
       title="Show help"
       @click="showLauncher"
@@ -137,12 +143,14 @@
 
 <script setup lang="ts">
 const { messages, sending, error, send, reset } = useAdminAssistant()
+const route = useRoute()
 
 const open = ref(false)
 const hidden = ref(false)
 const draft = ref('')
 const scrollRef = ref<HTMLElement | null>(null)
 const inputRef = ref<HTMLTextAreaElement | null>(null)
+const compactLauncher = computed(() => route.path === '/admin/website-editor')
 
 const suggestions = [
   'How do I add a product?',
@@ -217,6 +225,17 @@ onMounted(() => {
   font-weight: 600;
 }
 
+.assistant-launcher--editor {
+  right: 0;
+  bottom: max(8rem, calc(env(safe-area-inset-bottom) + 8rem));
+  border-radius: 0.75rem 0 0 0.75rem;
+}
+
+.assistant-launcher--editor .assistant-launcher__open {
+  width: 2.75rem;
+  padding-inline: 0;
+}
+
 .assistant-launcher__hide {
   width: 2.75rem;
   min-height: 3rem;
@@ -249,6 +268,10 @@ onMounted(() => {
   background: var(--color-primary-600);
   box-shadow: 0 10px 24px -12px rgb(15 23 42 / 45%);
   transition: background-color 140ms ease, transform 140ms ease;
+}
+
+.assistant-restore--editor {
+  bottom: max(8rem, calc(env(safe-area-inset-bottom) + 8rem));
 }
 
 .assistant-restore:hover {

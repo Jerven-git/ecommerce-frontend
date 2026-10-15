@@ -12,7 +12,30 @@
       </ul>
     </div>
 
+    <div v-if="assetError" class="mb-4 rounded-xl border border-admin-danger/20 bg-admin-danger-soft px-3 py-2.5 text-xs leading-5 text-admin-danger" role="alert">
+      {{ assetError }}
+    </div>
+
     <div v-if="section === 'hero'" class="space-y-4">
+      <div class="space-y-2.5">
+        <div>
+          <p class="text-xs font-semibold text-admin-text">Hero media</p>
+          <p class="mt-1 text-[11px] leading-5 text-admin-muted">Upload an image or short background video, then use the focus controls below to frame it.</p>
+        </div>
+        <AdminMediaUploader
+          :url="modelValue.hero_image_url || ''"
+          :uploading="assetUploading.hero"
+          :video="modelValue.hero_media_mime?.startsWith('video/')"
+          label="Hero media"
+          hint="JPG, PNG, WebP, MP4 or WebM · max 10 MB"
+          input-id="editorHeroMediaInput"
+          accept="image/*,video/mp4,video/webm"
+          overlay
+          preview-class="h-40 w-full object-cover"
+          @select="uploadAsset($event, 'hero')"
+          @remove="removeAsset('hero')"
+        />
+      </div>
       <AdminEditorField label="Heading" :error="errorFor('hero_title')">
         <input :value="modelValue.hero_title" maxlength="255" class="editor-input" @input="setRoot('hero_title', inputValue($event))" />
       </AdminEditorField>
@@ -39,7 +62,7 @@
           <input :value="modelValue.hero_focal_y" type="number" min="0" max="100" class="editor-input" @input="setRoot('hero_focal_y', numberValue($event))" />
         </AdminEditorField>
       </div>
-      <p class="text-[11px] leading-5 text-admin-muted">Hero media stays in Site Settings during this phase.</p>
+      <p class="rounded-xl bg-admin-info-soft px-3 py-2.5 text-[11px] leading-5 text-admin-muted">This upload stays private in the draft until you save and publish.</p>
     </div>
 
     <div v-else-if="section === 'how-it-works'" class="space-y-4">
@@ -75,6 +98,23 @@
     </div>
 
     <div v-else-if="section === 'statement'" class="space-y-4">
+      <div class="space-y-2.5">
+        <div>
+          <p class="text-xs font-semibold text-admin-text">Statement image</p>
+          <p class="mt-1 text-[11px] leading-5 text-admin-muted">Optional supporting image for this editorial section.</p>
+        </div>
+        <AdminMediaUploader
+          :url="modelValue.homepage_statement_image_url || ''"
+          :uploading="assetUploading.homepage_statement"
+          label="Statement image"
+          hint="JPG, PNG or WebP · max 10 MB"
+          input-id="editorStatementImageInput"
+          overlay
+          preview-class="h-36 w-full object-cover"
+          @select="uploadAsset($event, 'homepage_statement')"
+          @remove="removeAsset('homepage_statement')"
+        />
+      </div>
       <label class="flex min-h-11 items-center gap-3 rounded-xl border border-admin-border px-3 text-xs font-medium text-admin-text">
         <input :checked="modelValue.homepage_statement.enabled" type="checkbox" class="h-4 w-4 accent-admin-accent" @change="setNested('homepage_statement', 'enabled', checkedValue($event))" />
         Show statement
@@ -104,7 +144,7 @@
 </template>
 
 <script setup lang="ts">
-import type { WebsiteEditorDraftPayload } from '~/composables/useWebsiteEditorDraft'
+import type { WebsiteEditorAssetSlot, WebsiteEditorDraftPayload } from '~/composables/useWebsiteEditorDraft'
 
 const props = defineProps<{
   modelValue: WebsiteEditorDraftPayload
@@ -112,6 +152,9 @@ const props = defineProps<{
   errors?: Record<string, string[]>
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: WebsiteEditorDraftPayload] }>()
+const { uploadDraftAsset } = useWebsiteEditorDraft()
+const assetUploading = reactive<Partial<Record<WebsiteEditorAssetSlot, boolean>>>({})
+const assetError = ref('')
 
 const details: Record<string, { title: string; description: string }> = {
   hero: { title: 'Hero', description: 'Set the first message visitors see and tune how the current media is framed.' },
@@ -146,8 +189,41 @@ const inputValue = (event: Event) => (event.target as HTMLInputElement | HTMLTex
 const numberValue = (event: Event) => Number((event.target as HTMLInputElement).value)
 const checkedValue = (event: Event) => (event.target as HTMLInputElement).checked
 const errorFor = (field: string) => props.errors?.[`payload.${field}`]?.[0]
+const assetFields: Partial<Record<WebsiteEditorAssetSlot, { id: string; url: string }>> = {
+  hero: { id: 'hero_media_id', url: 'hero_image_url' },
+  homepage_statement: { id: 'homepage_statement_media_id', url: 'homepage_statement_image_url' },
+}
 
-function setRoot(field: keyof WebsiteEditorDraftPayload, value: unknown) {
+async function uploadAsset(file: File, slot: 'hero' | 'homepage_statement') {
+  if (assetUploading[slot]) return
+  assetError.value = ''
+  assetUploading[slot] = true
+  try {
+    const uploaded = await uploadDraftAsset(slot, file)
+    const fields = assetFields[slot]!
+    const next = clone() as unknown as Record<string, unknown>
+    next[fields.id] = uploaded.id
+    next[fields.url] = uploaded.url
+    if (slot === 'hero') next.hero_media_mime = uploaded.mime_type
+    emit('update:modelValue', next as unknown as WebsiteEditorDraftPayload)
+  } catch (error: any) {
+    assetError.value = error?.data?.message || error?.message || 'The media could not be uploaded. Try again.'
+  } finally {
+    assetUploading[slot] = false
+  }
+}
+
+function removeAsset(slot: 'hero' | 'homepage_statement') {
+  assetError.value = ''
+  const fields = assetFields[slot]!
+  const next = clone() as unknown as Record<string, unknown>
+  next[fields.id] = null
+  next[fields.url] = null
+  if (slot === 'hero') next.hero_media_mime = null
+  emit('update:modelValue', next as unknown as WebsiteEditorDraftPayload)
+}
+
+function setRoot(field: Extract<keyof WebsiteEditorDraftPayload, string>, value: unknown) {
   const next = clone()
   ;(next as unknown as Record<string, unknown>)[field] = value
   emit('update:modelValue', next)

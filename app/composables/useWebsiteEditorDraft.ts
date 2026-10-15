@@ -20,6 +20,39 @@ import type {
 import { normalizeHomepageSections } from '~/utils/homepageSections'
 
 export interface WebsiteEditorDraftPayload {
+  site_name: string
+  contact_email: string
+  contact_phone: string
+  contact_entries: Array<{ label: string; email: string; phone: string }>
+  social_links: Array<{ platform: string; url: string; label: string }>
+  logo_media_id: number | null
+  logo_url: string | null
+  favicon_media_id: number | null
+  favicon_url: string | null
+  cart_icon_media_id: number | null
+  cart_icon_url: string | null
+  footer_logo_media_id: number | null
+  footer_logo_url: string | null
+  hero_media_id: number | null
+  hero_image_url: string | null
+  hero_media_mime: string | null
+  homepage_statement_media_id: number | null
+  homepage_statement_image_url: string | null
+  about_media_id: number | null
+  about_image_url: string | null
+  story_image_a_media_id: number | null
+  story_image_a_url: string | null
+  story_image_b_media_id: number | null
+  story_image_b_url: string | null
+  contact_media_id: number | null
+  contact_image_url: string | null
+  blog_media_id: number | null
+  blog_image_url: string | null
+  services_media_id: number | null
+  services_image_url: string | null
+  logo_alt_text: string
+  logo_size: number
+  footer_logo_size: number
   hero_title: string
   hero_subtitle: string
   hero_overlay_color: string
@@ -66,6 +99,27 @@ export interface WebsiteEditorDraftState {
   draft_version: number | null
 }
 
+export type WebsiteEditorAssetSlot =
+  | 'logo'
+  | 'favicon'
+  | 'cart_icon'
+  | 'footer_logo'
+  | 'hero'
+  | 'homepage_statement'
+  | 'about'
+  | 'story_image_a'
+  | 'story_image_b'
+  | 'contact'
+  | 'blog'
+  | 'services'
+
+export interface WebsiteEditorAssetUpload {
+  id: number
+  collection: WebsiteEditorAssetSlot
+  url: string
+  mime_type: string | null
+}
+
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T
 
 export function normalizeWebsiteEditorDraft(
@@ -83,8 +137,61 @@ export function normalizeWebsiteEditorDraft(
   const shopPromo = payload.shop_promo ?? config.shop_promo
   const blog = payload.blog_page ?? config.blog_page
   const services = payload.services_page ?? config.services_page
+  const contactEntries = payload.contact_entries ?? config.contact_entries ?? []
+  const socialLinks = payload.social_links ?? config.social_links ?? []
+  const payloadValue = <K extends keyof WebsiteEditorDraftPayload>(key: K, fallback: WebsiteEditorDraftPayload[K]) =>
+    Object.prototype.hasOwnProperty.call(payload, key) ? payload[key] as WebsiteEditorDraftPayload[K] : fallback
+  const heroImageUrl = payloadValue('hero_image_url', config.hero_image_url ?? null)
+  const statementImageUrl = payloadValue('homepage_statement_image_url', config.homepage_statement?.image_url ?? null)
+  const aboutImageUrl = payloadValue('about_image_url', config.about_image_url ?? null)
+  const storyImageAUrl = payloadValue('story_image_a_url', config.story_page?.section_a?.image_url ?? null)
+  const storyImageBUrl = payloadValue('story_image_b_url', config.story_page?.section_b?.image_url ?? null)
+  const contactImageUrl = payloadValue('contact_image_url', config.contact_image_url ?? null)
+  const blogImageUrl = payloadValue('blog_image_url', config.blog_image_url ?? null)
+  const servicesImageUrl = payloadValue('services_image_url', config.services_image_url ?? null)
 
   return clone({
+    site_name: payload.site_name ?? config.site_name ?? '',
+    contact_email: payload.contact_email ?? config.contact_email ?? '',
+    contact_phone: payload.contact_phone ?? config.contact_phone ?? '',
+    contact_entries: contactEntries.map(entry => ({
+      label: entry?.label ?? '',
+      email: entry?.email ?? '',
+      phone: entry?.phone ?? '',
+    })),
+    social_links: socialLinks.map(link => ({
+      platform: link?.platform ?? '',
+      url: link?.url ?? '',
+      label: link?.label ?? '',
+    })),
+    logo_media_id: payloadValue('logo_media_id', null),
+    logo_url: payloadValue('logo_url', config.logo_url ?? null),
+    favicon_media_id: payloadValue('favicon_media_id', null),
+    favicon_url: payloadValue('favicon_url', config.favicon_url ?? null),
+    cart_icon_media_id: payloadValue('cart_icon_media_id', null),
+    cart_icon_url: payloadValue('cart_icon_url', config.cart_icon_url ?? null),
+    footer_logo_media_id: payloadValue('footer_logo_media_id', null),
+    footer_logo_url: payloadValue('footer_logo_url', config.footer_logo_url ?? null),
+    hero_media_id: payloadValue('hero_media_id', null),
+    hero_image_url: heroImageUrl,
+    hero_media_mime: payloadValue('hero_media_mime', config.hero_media_mime ?? null),
+    homepage_statement_media_id: payloadValue('homepage_statement_media_id', null),
+    homepage_statement_image_url: statementImageUrl,
+    about_media_id: payloadValue('about_media_id', null),
+    about_image_url: aboutImageUrl,
+    story_image_a_media_id: payloadValue('story_image_a_media_id', null),
+    story_image_a_url: storyImageAUrl,
+    story_image_b_media_id: payloadValue('story_image_b_media_id', null),
+    story_image_b_url: storyImageBUrl,
+    contact_media_id: payloadValue('contact_media_id', null),
+    contact_image_url: contactImageUrl,
+    blog_media_id: payloadValue('blog_media_id', null),
+    blog_image_url: blogImageUrl,
+    services_media_id: payloadValue('services_media_id', null),
+    services_image_url: servicesImageUrl,
+    logo_alt_text: payloadValue('logo_alt_text', config.logo_alt_text ?? ''),
+    logo_size: payloadValue('logo_size', config.logo_size ?? 36),
+    footer_logo_size: payloadValue('footer_logo_size', config.footer_logo_size ?? 128),
     hero_title: payload.hero_title ?? config.hero_title ?? '',
     hero_subtitle: payload.hero_subtitle ?? config.hero_subtitle ?? '',
     hero_overlay_color: payload.hero_overlay_color ?? config.hero_overlay_color ?? '#000000',
@@ -110,34 +217,36 @@ export function normalizeWebsiteEditorDraft(
       label: '', heading: '', subtitle: '', disclaimer: '',
     },
     homepage_sections: normalizeHomepageSections(payload.homepage_sections ?? config.homepage_sections),
-    header_cta: { enabled: false, label: '', link: '', ...headerCta },
+    header_cta: {
+      enabled: headerCta?.enabled ?? false,
+      label: headerCta?.label ?? '',
+      link: headerCta?.link ?? '',
+    },
     footer_banner: {
-      enabled: false,
-      heading: '',
-      subtitle: '',
-      button_label: '',
-      button_link: '',
-      background_color: '#111827',
-      background_color_to: '',
-      text_color: '#ffffff',
-      ...footerBanner,
+      enabled: footerBanner?.enabled ?? false,
+      heading: footerBanner?.heading ?? '',
+      subtitle: footerBanner?.subtitle ?? '',
+      button_label: footerBanner?.button_label ?? '',
+      button_link: footerBanner?.button_link ?? '',
+      background_color: footerBanner?.background_color ?? '#111827',
+      background_color_to: footerBanner?.background_color_to ?? '',
+      text_color: footerBanner?.text_color ?? '#ffffff',
     },
     footer: {
-      tagline: '',
-      copyright_text: '',
-      show_tagline: true,
-      show_quick_links: true,
-      show_contact_info: true,
-      show_social_links: true,
-      ...footer,
+      tagline: footer?.tagline ?? '',
+      copyright_text: footer?.copyright_text ?? '',
+      show_tagline: footer?.show_tagline ?? true,
+      show_quick_links: footer?.show_quick_links ?? true,
+      show_contact_info: footer?.show_contact_info ?? true,
+      show_social_links: footer?.show_social_links ?? true,
     },
     about_content: payload.about_content ?? config.about_content ?? '',
     about_highlights: { items: aboutHighlights?.items ?? [] },
     story_page: {
       enabled: story?.enabled ?? false,
       hero: { eyebrow: '', heading: '', subtitle: '', ...story?.hero },
-      section_a: { heading: '', body: '', cta_label: '', cta_link: '/shop', image_position: 'right', image_url: null, ...story?.section_a },
-      section_b: { heading: '', body: '', cta_label: '', cta_link: '/contact', image_position: 'left', image_url: null, ...story?.section_b },
+      section_a: { heading: '', body: '', cta_label: '', cta_link: '/shop', image_position: 'right', ...story?.section_a, image_url: storyImageAUrl },
+      section_b: { heading: '', body: '', cta_label: '', cta_link: '/contact', image_position: 'left', ...story?.section_b, image_url: storyImageBUrl },
     },
     contact_page: {
       info_title: '',
@@ -177,25 +286,104 @@ export function normalizeWebsiteEditorDraft(
 
 export function useWebsiteEditorDraft() {
   const { $apiFetch } = useNuxtApp()
+  const authStore = useAuthStore()
+  const preloadedDraft = useState<{ data: WebsiteEditorDraftState } | null>('websiteEditorPreloadedDraft', () => null)
+  const preloadedAt = useState<number>('websiteEditorPreloadedDraftAt', () => 0)
+  const preloadOwner = useState<string>('websiteEditorPreloadedDraftOwner', () => '')
+  const preloadPending = useState<boolean>('websiteEditorDraftPreloadPending', () => false)
 
-  const fetchDraft = () => $apiFetch<{ data: WebsiteEditorDraftState }>('/site-config/draft')
+  const preloadMaxAge = 30_000
+  const ownerKey = () => authStore.user
+    ? `${authStore.user.id}:${authStore.user.store_id ?? authStore.user.store?.id ?? ''}`
+    : ''
+  const hasFreshPreload = () => Boolean(
+    ownerKey()
+    && preloadOwner.value === ownerKey()
+    && preloadedDraft.value
+    && Date.now() - preloadedAt.value < preloadMaxAge,
+  )
+  const requestDraft = () => $apiFetch<{ data: WebsiteEditorDraftState }>('/site-config/draft')
+
+  const waitForPreload = async () => {
+    if (!preloadPending.value) return
+    await new Promise<void>((resolve) => {
+      const stop = watch(preloadPending, (isPending) => {
+        if (!isPending) {
+          stop()
+          resolve()
+        }
+      }, { flush: 'sync' })
+    })
+  }
+
+  const preloadDraft = async () => {
+    if (!import.meta.client || hasFreshPreload()) return
+    if (preloadPending.value) {
+      await waitForPreload()
+      return
+    }
+
+    preloadPending.value = true
+    try {
+      preloadedDraft.value = await requestDraft()
+      preloadedAt.value = Date.now()
+      preloadOwner.value = ownerKey()
+    } catch (error) {
+      preloadedDraft.value = null
+      preloadedAt.value = 0
+      preloadOwner.value = ''
+      throw error
+    } finally {
+      preloadPending.value = false
+    }
+  }
+
+  const invalidatePreload = () => {
+    preloadedDraft.value = null
+    preloadedAt.value = 0
+    preloadOwner.value = ''
+  }
+
+  const fetchDraft = async (options: { preferPreloaded?: boolean; force?: boolean } = {}) => {
+    if (!options.force && options.preferPreloaded) {
+      if (preloadPending.value) await waitForPreload()
+      if (hasFreshPreload() && preloadedDraft.value) return clone(preloadedDraft.value)
+    }
+
+    const response = await requestDraft()
+    preloadedDraft.value = response
+    preloadedAt.value = Date.now()
+    preloadOwner.value = ownerKey()
+    return clone(response)
+  }
   const saveDraft = (baseUpdatedAt: string, draftVersion: number | null, payload: WebsiteEditorDraftPayload) =>
     $apiFetch<{ data: WebsiteEditorDraftState }>('/site-config/draft', {
       method: 'PUT',
       body: { base_updated_at: baseUpdatedAt, draft_version: draftVersion, payload },
-    })
+    }).finally(invalidatePreload)
   const discardDraft = () => $apiFetch<{ data: WebsiteEditorDraftState }>('/site-config/draft', {
     method: 'DELETE',
-  })
+  }).finally(invalidatePreload)
   const publishDraft = () => $apiFetch<{ data: WebsiteEditorDraftState; message: string }>('/site-config/draft/publish', {
     method: 'POST',
-  })
+  }).finally(invalidatePreload)
   const fetchVersions = () => $apiFetch<{ data: WebsiteEditorVersionSummary[]; published_hash: string }>('/site-config/versions')
   const fetchVersion = (versionId: number) => $apiFetch<{ data: WebsiteEditorVersion; published_hash: string }>(`/site-config/versions/${versionId}`)
   const restoreVersion = (versionId: number, baseHash: string) => $apiFetch<{ message: string }>(`/site-config/versions/${versionId}/restore`, {
     method: 'POST',
     body: { base_hash: baseHash },
   })
+  const deleteVersion = (versionId: number) => $apiFetch<{ message: string }>(`/site-config/versions/${versionId}`, {
+    method: 'DELETE',
+  })
+  const uploadDraftAsset = (slot: WebsiteEditorAssetSlot, file: File) => {
+    const body = new FormData()
+    body.append('file', file)
+    return $apiFetch<WebsiteEditorAssetUpload>(`/site-config/draft/media/${slot}`, {
+      method: 'POST',
+      body,
+    })
+  }
 
-  return { fetchDraft, saveDraft, discardDraft, publishDraft, fetchVersions, fetchVersion, restoreVersion }
+  return { fetchDraft, preloadDraft, saveDraft, discardDraft, publishDraft, fetchVersions, fetchVersion, restoreVersion, deleteVersion, uploadDraftAsset }
 }

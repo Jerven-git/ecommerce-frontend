@@ -449,6 +449,7 @@ export function useSiteConfig() {
   const siteConfig = useState<SiteConfig | null>('siteConfig', () => null)
   const pending = useState<boolean>('siteConfigPending', () => false)
   const fetched = useState<boolean>('siteConfigFetched', () => false)
+  const error = useState<string | null>('siteConfigError', () => null)
 
   async function fetchSiteConfig(force = false) {
     if (pending.value && !force) return
@@ -466,6 +467,7 @@ export function useSiteConfig() {
 
     if (!force && fetched.value) return
     pending.value = true
+    error.value = null
     try {
       const { $apiFetch } = useNuxtApp()
       // Hint the backend with the last-known store slug so the public endpoint
@@ -484,9 +486,11 @@ export function useSiteConfig() {
       siteConfig.value = { ...DEFAULT_CONFIG, ...data } as SiteConfig
       fetched.value = true
     } catch {
-      // Use defaults on failure
+      // Keep a minimal routing-safe config, but let the public layout show a
+      // neutral recovery state instead of inventing tenant content.
       siteConfig.value = DEFAULT_CONFIG as SiteConfig
       fetched.value = false
+      error.value = 'We could not load this storefront.'
     } finally {
       pending.value = false
     }
@@ -509,5 +513,5 @@ export function useSiteConfig() {
     }
   }
 
-  return { siteConfig, pending, fetchSiteConfig, broadcastConfigUpdate }
+  return { siteConfig, pending, error, fetchSiteConfig, broadcastConfigUpdate }
 }

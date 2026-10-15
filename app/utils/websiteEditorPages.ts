@@ -18,7 +18,7 @@ export interface WebsiteEditorStaticSection {
 
 export const WEBSITE_EDITOR_PAGES: WebsiteEditorPageOption[] = [
   { id: 'home', label: 'Home page', icon: 'heroicons:home', path: '/' },
-  { id: 'global', label: 'Header & footer', icon: 'heroicons:bars-3-bottom-left', path: '/' },
+  { id: 'global', label: 'Global sections', icon: 'heroicons:bars-3-bottom-left', path: '/' },
   { id: 'about', label: 'About', icon: 'heroicons:building-storefront', path: '/about', module: 'about' },
   { id: 'story', label: 'Story', icon: 'heroicons:book-open', path: '/story' },
   { id: 'contact', label: 'Contact', icon: 'heroicons:chat-bubble-left-right', path: '/contact', module: 'contact' },
@@ -30,6 +30,8 @@ export const WEBSITE_EDITOR_PAGES: WebsiteEditorPageOption[] = [
 
 export const WEBSITE_EDITOR_STATIC_SECTIONS: Record<Exclude<WebsiteEditorPageId, 'home'>, WebsiteEditorStaticSection[]> = {
   global: [
+    { id: 'brand-assets', label: 'Brand assets', icon: 'heroicons:photo' },
+    { id: 'store-details', label: 'Store details', icon: 'heroicons:building-storefront' },
     { id: 'header', label: 'Header call-to-action', icon: 'heroicons:cursor-arrow-rays' },
     { id: 'footer-banner', label: 'Announcement banner', icon: 'heroicons:megaphone' },
     { id: 'footer', label: 'Footer', icon: 'heroicons:rectangle-stack' },

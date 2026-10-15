@@ -105,12 +105,17 @@
         <p class="shrink-0 text-xs font-semibold">The editor needs attention</p>
         <p class="truncate text-xs leading-5">{{ actionError }}</p>
       </div>
-      <button v-if="!draft && !loadingDraft" type="button" class="editor-focus min-h-11 shrink-0 rounded-lg px-3 text-xs font-semibold" @click="loadEditor">Try again</button>
+      <button v-if="!draft && !loadingDraft" type="button" class="editor-focus min-h-11 shrink-0 rounded-lg px-3 text-xs font-semibold" @click="loadEditor(true)">Try again</button>
       <button v-else type="button" class="editor-focus min-h-11 shrink-0 rounded-lg px-3 text-xs font-semibold" aria-label="Dismiss error" @click="actionError = ''">Dismiss</button>
     </div>
 
     <div class="z-20 flex shrink-0 items-center gap-2 border-b border-admin-border bg-admin-info-soft px-4 py-2 text-admin-text" role="status" aria-live="polite" aria-atomic="true">
-      <Icon :name="selectedVersionId ? 'heroicons:clock' : (hasSavedDraft || isDirty ? 'heroicons:pencil-square' : 'heroicons:check-circle')" class="h-4 w-4 shrink-0 text-admin-info" aria-hidden="true" />
+      <Icon
+        :name="loadingDraft ? 'heroicons:arrow-path' : selectedVersionId ? 'heroicons:clock' : (hasSavedDraft || isDirty ? 'heroicons:pencil-square' : 'heroicons:check-circle')"
+        class="h-4 w-4 shrink-0 text-admin-info"
+        :class="loadingDraft ? 'animate-spin motion-reduce:animate-none' : ''"
+        aria-hidden="true"
+      />
       <div class="flex min-w-0 flex-1 items-baseline gap-2">
         <p class="shrink-0 text-xs font-semibold">{{ editorStateTitle }}</p>
         <p class="hidden truncate text-[11px] text-admin-muted lg:block">{{ editorStateDescription }}</p>
@@ -118,9 +123,7 @@
       <span v-if="draftSavedAt" class="text-[11px] font-medium text-admin-muted">Saved {{ draftSavedAt }}</span>
     </div>
 
-    <div v-if="loadingDraft" class="flex min-h-0 flex-1 items-center justify-center">
-      <AdminSpinner label="Loading website editor…" variant="dashboard" />
-    </div>
+    <AdminWebsiteEditorLoading v-if="loadingDraft" />
 
     <div v-else-if="draft" class="relative flex min-h-0 flex-1 overflow-hidden">
       <button
@@ -183,6 +186,7 @@
           :open="historyOpen"
           :loading="loadingVersions"
           :restoring="restoringVersion"
+          :deleting-id="deletingVersion ? deleteVersionTargetId : null"
           :error="historyError"
           :versions="versions"
           :selected-id="selectedVersionId"
@@ -190,6 +194,7 @@
           @select="previewVersionFromHistory"
           @exit="exitVersionPreview"
           @restore="restoreSelectedVersion"
+          @delete="requestVersionDeletion"
         />
 
         <AdminWebsiteEditorInspector
@@ -236,7 +241,7 @@
                 v-for="device in devices"
                 :key="device.id"
                 type="button"
-                class="editor-focus flex min-h-9 min-w-9 items-center justify-center rounded-lg px-2 text-admin-muted transition-colors"
+                class="editor-focus flex min-h-11 min-w-11 items-center justify-center rounded-lg px-2 text-admin-muted transition-colors"
                 :class="activeDevice === device.id ? 'bg-admin-surface text-admin-accent-strong shadow-[var(--admin-shadow-quiet)]' : 'hover:text-admin-text'"
                 :aria-label="`${device.label} preview`"
                 :aria-pressed="activeDevice === device.id"
@@ -247,9 +252,9 @@
               </button>
             </div>
 
-            <button type="button" class="editor-focus inline-flex min-h-11 items-center gap-2 rounded-xl border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft" @click="refreshPreview">
+            <button type="button" class="editor-focus inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft" aria-label="Refresh preview" title="Refresh preview" @click="refreshPreview">
               <Icon name="heroicons:arrow-path" class="h-4 w-4" :class="previewLoading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
-              Refresh
+              <span class="hidden sm:inline">Refresh</span>
             </button>
           </div>
         </div>
@@ -290,6 +295,18 @@
         </div>
       </section>
     </div>
+
+    <ConfirmModal
+      :open="deleteVersionTargetId !== null"
+      title="Delete published version?"
+      message="This permanently removes this rollback point. Your live website and private draft will not change."
+      confirm-text="Delete version"
+      loading-text="Deleting…"
+      :loading="deletingVersion"
+      variant="danger"
+      @confirm="confirmVersionDeletion"
+      @cancel="cancelVersionDeletion"
+    />
   </div>
 </template>
 
@@ -310,7 +327,18 @@ type DeviceId = 'desktop' | 'tablet' | 'mobile'
 
 const { siteConfig, fetchSiteConfig, broadcastConfigUpdate } = useSiteConfig()
 const { storeUrl } = useStorefrontUrl()
-const { fetchDraft, saveDraft, discardDraft, publishDraft, fetchVersions, fetchVersion, restoreVersion } = useWebsiteEditorDraft()
+const { fetchDraft, saveDraft, discardDraft, publishDraft, fetchVersions, fetchVersion, restoreVersion, deleteVersion } = useWebsiteEditorDraft()
+const route = useRoute()
+
+const requestedPage = typeof route.query.page === 'string' ? route.query.page : ''
+const initialPage = WEBSITE_EDITOR_PAGES.some(page => page.id === requestedPage)
+  ? requestedPage as WebsiteEditorPageId
+  : 'home'
+const requestedSection = typeof route.query.section === 'string' ? route.query.section : ''
+const initialSection = requestedSection || (initialPage === 'home'
+  ? 'hero'
+  : WEBSITE_EDITOR_STATIC_SECTIONS[initialPage][0]?.id ?? 'header')
+
 const draft = ref<WebsiteEditorDraftPayload | null>(null)
 const versionPreview = ref<WebsiteEditorDraftPayload | null>(null)
 const versions = ref<WebsiteEditorVersionSummary[]>([])
@@ -319,6 +347,8 @@ const publishedHash = ref('')
 const historyOpen = ref(false)
 const loadingVersions = ref(false)
 const restoringVersion = ref(false)
+const deleteVersionTargetId = ref<number | null>(null)
+const deletingVersion = ref(false)
 const historyError = ref('')
 const baseUpdatedAt = ref('')
 const hasSavedDraft = ref(false)
@@ -331,8 +361,8 @@ const publishing = ref(false)
 const discarding = ref(false)
 const actionError = ref('')
 const validationErrors = ref<Record<string, string[]>>({})
-const activePage = ref<WebsiteEditorPageId>('home')
-const selectedSection = ref('hero')
+const activePage = ref<WebsiteEditorPageId>(initialPage)
+const selectedSection = ref(initialSection)
 const activeDevice = ref<DeviceId>('desktop')
 const previewFrame = ref<HTMLIFrameElement | null>(null)
 const previewLoading = ref(true)
@@ -350,6 +380,7 @@ let applyingUndo = false
 let undoTimer: number | null = null
 let previewTimeout: number | null = null
 let controlsMediaQuery: MediaQueryList | null = null
+let editorMounted = false
 
 const devices = [
   { id: 'desktop' as const, label: 'Desktop', icon: 'heroicons:computer-desktop', width: '100%', widthLabel: 'Responsive width' },
@@ -376,8 +407,17 @@ const previewFrameStyle = computed(() => ({ width: activeDeviceConfig.value.widt
 const draftSavedAt = computed(() => draftUpdatedAt.value
   ? new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(new Date(draftUpdatedAt.value))
   : '')
-const editorStateTitle = computed(() => selectedVersionId.value ? 'Historical website preview' : (isDirty.value ? 'Unsaved preview changes' : (hasSavedDraft.value ? 'Private draft saved' : 'Published website loaded')))
+const editorStateTitle = computed(() => loadingDraft.value
+  ? 'Preparing private preview'
+  : selectedVersionId.value
+    ? 'Historical website preview'
+    : isDirty.value
+      ? 'Unsaved preview changes'
+      : hasSavedDraft.value
+        ? 'Private draft saved'
+        : 'Published website loaded')
 const editorStateDescription = computed(() => {
+  if (loadingDraft.value) return 'Loading the latest tenant configuration and private draft.'
   if (selectedVersionId.value) return 'This is an earlier published version. Return to the draft or restore and publish this version.'
   if (isDirty.value) return 'The preview includes changes that are only in this browser. Save the draft before publishing.'
   if (hasSavedDraft.value) return 'This draft is private. Publish it when the preview is ready for customers.'
@@ -391,7 +431,18 @@ const previewConfig = computed<SiteConfig | null>(() => {
     ...workingDraft.value,
     homepage_statement: {
       ...workingDraft.value.homepage_statement,
-      image_url: siteConfig.value.homepage_statement?.image_url ?? null,
+      image_url: workingDraft.value.homepage_statement_image_url,
+    },
+    story_page: {
+      ...workingDraft.value.story_page,
+      section_a: {
+        ...workingDraft.value.story_page.section_a,
+        image_url: workingDraft.value.story_image_a_url,
+      },
+      section_b: {
+        ...workingDraft.value.story_page.section_b,
+        image_url: workingDraft.value.story_image_b_url,
+      },
     },
   }
 })
@@ -439,15 +490,29 @@ function sectionHasContent(id: HomepageSectionId) {
 function staticSectionHasContent(section: string) {
   const value = workingDraft.value
   if (!value) return false
+  if (section === 'brand-assets') return Boolean(
+    value.logo_url
+    || value.favicon_url
+    || value.cart_icon_url
+    || value.footer_logo_url
+    || value.logo_alt_text.trim(),
+  )
+  if (section === 'store-details') return Boolean(
+    value.site_name.trim()
+    || value.contact_email.trim()
+    || value.contact_phone.trim()
+    || value.contact_entries.length
+    || value.social_links.length,
+  )
   if (section === 'header') return value.header_cta.enabled && Boolean(value.header_cta.label)
   if (section === 'footer-banner') return value.footer_banner.enabled && Boolean(value.footer_banner.heading)
   if (section === 'footer') return hasContent(value.footer)
-  if (section === 'about-content') return Boolean(value.about_content.trim() || value.about_highlights.items.length)
-  if (section === 'story-content') return value.story_page.enabled && hasContent(value.story_page.hero)
-  if (section === 'contact-content') return hasContent(value.contact_page)
+  if (section === 'about-content') return Boolean(value.about_image_url || value.about_content.trim() || value.about_highlights.items.length)
+  if (section === 'story-content') return value.story_page.enabled && Boolean(hasContent(value.story_page.hero) || value.story_image_a_url || value.story_image_b_url)
+  if (section === 'contact-content') return Boolean(value.contact_image_url || hasContent(value.contact_page))
   if (section === 'shop-content') return hasContent(value.shop_header) || hasContent(value.shop_promo)
-  if (section === 'blog-content') return hasContent(value.blog_page.header)
-  if (section === 'services-content') return hasContent(value.services_page.header)
+  if (section === 'blog-content') return Boolean(value.blog_image_url || hasContent(value.blog_page.header))
+  if (section === 'services-content') return Boolean(value.services_image_url || hasContent(value.services_page.header))
   if (section === 'welcome-popup') return value.welcome_popup_enabled && Boolean(value.welcome_popup_heading)
   return false
 }
@@ -550,15 +615,28 @@ function apiMessage(error: any, fallback: string) {
 
 function focusFirstInvalidSection(errors: Record<string, string[]>) {
   const field = Object.keys(errors)[0] ?? ''
-  if (field.startsWith('payload.header_cta')) switchPage('global', 'header')
+  if (
+    field.startsWith('payload.logo_')
+    || field.startsWith('payload.favicon_')
+    || field.startsWith('payload.cart_icon_')
+    || field.startsWith('payload.footer_logo_')
+  ) switchPage('global', 'brand-assets')
+  else if (
+    field === 'payload.site_name'
+    || field === 'payload.contact_email'
+    || field === 'payload.contact_phone'
+    || field.startsWith('payload.contact_entries')
+    || field.startsWith('payload.social_links')
+  ) switchPage('global', 'store-details')
+  else if (field.startsWith('payload.header_cta')) switchPage('global', 'header')
   else if (field.startsWith('payload.footer_banner')) switchPage('global', 'footer-banner')
   else if (field.startsWith('payload.footer')) switchPage('global', 'footer')
   else if (field.startsWith('payload.about_')) switchPage('about', 'about-content')
-  else if (field.startsWith('payload.story_page')) switchPage('story', 'story-content')
-  else if (field.startsWith('payload.contact_page')) switchPage('contact', 'contact-content')
+  else if (field.startsWith('payload.story_page') || field.startsWith('payload.story_image_')) switchPage('story', 'story-content')
+  else if (field.startsWith('payload.contact_page') || field.startsWith('payload.contact_image')) switchPage('contact', 'contact-content')
   else if (field.startsWith('payload.shop_')) switchPage('shop', 'shop-content')
-  else if (field.startsWith('payload.blog_page')) switchPage('blog', 'blog-content')
-  else if (field.startsWith('payload.services_page')) switchPage('services', 'services-content')
+  else if (field.startsWith('payload.blog_page') || field.startsWith('payload.blog_image')) switchPage('blog', 'blog-content')
+  else if (field.startsWith('payload.services_page') || field.startsWith('payload.services_image')) switchPage('services', 'services-content')
   else if (field.startsWith('payload.welcome_popup_')) switchPage('popup', 'welcome-popup')
   else if (field.startsWith('payload.hero_')) switchPage('home', 'hero')
   else if (field.startsWith('payload.homepage_steps')) switchPage('home', 'how-it-works')
@@ -569,13 +647,13 @@ function focusFirstInvalidSection(errors: Record<string, string[]>) {
   else if (field.startsWith('payload.homepage_sections')) switchPage('home', draft.value?.homepage_sections[0]?.id ?? 'hero')
 }
 
-async function loadEditor() {
+async function loadEditor(force = false) {
   loadingDraft.value = true
   actionError.value = ''
   try {
-    await fetchSiteConfig(true)
+    await fetchSiteConfig(force)
     if (!siteConfig.value) throw new Error('The storefront configuration is unavailable.')
-    const response = await fetchDraft()
+    const response = await fetchDraft({ preferPreloaded: !force, force })
     draft.value = normalizeWebsiteEditorDraft(siteConfig.value, response.data.payload)
     baseUpdatedAt.value = response.data.base_updated_at
     hasSavedDraft.value = response.data.has_draft
@@ -583,6 +661,17 @@ async function loadEditor() {
     draftVersion.value = response.data.draft_version
     savedSnapshot.value = snapshot(draft.value)
     initializeUndoHistory()
+    if (activePage.value === 'home') {
+      const sectionExists = draft.value.homepage_sections.some(section => section.id === selectedSection.value)
+      if (!sectionExists) selectedSection.value = draft.value.homepage_sections[0]?.id ?? 'hero'
+    } else {
+      const sectionExists = WEBSITE_EDITOR_STATIC_SECTIONS[activePage.value].some(section => section.id === selectedSection.value)
+      if (!sectionExists) selectedSection.value = WEBSITE_EDITOR_STATIC_SECTIONS[activePage.value][0]?.id ?? 'header'
+    }
+    previewLoading.value = true
+    previewError.value = false
+    await nextTick()
+    if (editorMounted) startPreviewTimeout()
   } catch (error: any) {
     actionError.value = apiMessage(error, 'The website editor could not be loaded.')
   } finally {
@@ -736,6 +825,35 @@ async function restoreSelectedVersion() {
   }
 }
 
+function requestVersionDeletion(versionId: number) {
+  deleteVersionTargetId.value = versionId
+}
+
+function cancelVersionDeletion() {
+  if (!deletingVersion.value) deleteVersionTargetId.value = null
+}
+
+async function confirmVersionDeletion() {
+  const versionId = deleteVersionTargetId.value
+  if (!versionId || deletingVersion.value) return
+
+  deletingVersion.value = true
+  historyError.value = ''
+  try {
+    await deleteVersion(versionId)
+    versions.value = versions.value.filter(version => version.id !== versionId)
+    if (selectedVersionId.value === versionId) exitVersionPreview()
+    deleteVersionTargetId.value = null
+    await nextTick()
+    document.getElementById('version-history-title')?.closest('button')?.focus({ preventScroll: true })
+  } catch (error: any) {
+    deleteVersionTargetId.value = null
+    historyError.value = apiMessage(error, 'This published version could not be deleted.')
+  } finally {
+    deletingVersion.value = false
+  }
+}
+
 function sendToPreview(message: Record<string, unknown>) {
   if (!import.meta.client || !previewFrame.value?.contentWindow) return
   // Vue refs and computed values can contain reactive proxies, which cannot be
@@ -870,19 +988,19 @@ onBeforeRouteLeave(() => !isDirty.value || window.confirm('Leave the editor and 
 watch(previewConfig, () => sendPreviewConfig(), { deep: true })
 watch(draft, scheduleUndoSnapshot, { deep: true })
 
-await loadEditor()
-
 onMounted(() => {
+  editorMounted = true
   controlsMediaQuery = window.matchMedia('(min-width: 1280px)')
   syncControlsViewport(controlsMediaQuery)
   controlsMediaQuery.addEventListener('change', syncControlsViewport)
   window.addEventListener('message', onMessage)
   window.addEventListener('beforeunload', onBeforeUnload)
   window.addEventListener('keydown', onEditorKeydown)
-  startPreviewTimeout()
+  void loadEditor()
 })
 
 onBeforeUnmount(() => {
+  editorMounted = false
   if (previewTimeout !== null) window.clearTimeout(previewTimeout)
   if (undoTimer !== null) window.clearTimeout(undoTimer)
   controlsMediaQuery?.removeEventListener('change', syncControlsViewport)

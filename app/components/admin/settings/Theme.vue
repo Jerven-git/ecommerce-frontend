@@ -14,6 +14,7 @@
       <!-- Theme Presets -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">Theme Presets</label>
+        <p class="mb-3 text-xs leading-5 text-gray-500">Presets update colours, fonts and texture only. Storefront images stay under your control in Website Editor.</p>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           <button
             v-for="preset in themePresets"
@@ -216,24 +217,14 @@ export interface ThemeForm {
   badge_in_stock_color: string
 }
 
-interface PresetCovers {
-  about: string
-  blog: string
-  services: string
-  contact: string
-}
-
 interface Props {
   modelValue: ThemeForm
   savedTheme: ThemeForm
-  savedHero: { image: string, mime: string }
-  savedCovers: PresetCovers
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
   'update:modelValue': [value: ThemeForm]
-  'preset-applied': [value: { heroImage: string, heroMediaMime: string, covers: PresetCovers }]
 }>()
 
 const availableFonts = AVAILABLE_FONTS
@@ -292,35 +283,13 @@ function isActivePreset(preset: ThemePreset): boolean {
 function togglePreset(preset: ThemePreset) {
   if (!isActivePreset(preset)) {
     emit('update:modelValue', presetToTheme(preset))
-    emit('preset-applied', {
-      heroImage: preset.heroImage,
-      heroMediaMime: preset.heroMediaMime,
-      covers: {
-        about: preset.aboutImage,
-        blog: preset.blogImage,
-        services: preset.servicesImage,
-        contact: preset.contactImage,
-      },
-    })
     return
   }
-  // Deselect: revert to the last-saved theme + hero/covers. If the saved state
-  // IS this preset, fall back to empty so the toggle still does something visible.
+  // Deselect: revert to the last-saved theme. If the saved state is this preset,
+  // fall back to the default palette so the toggle still does something visible.
   const target = themeMatches(props.savedTheme, presetToTheme(preset))
     ? DEFAULT_THEME
     : props.savedTheme
   emit('update:modelValue', { ...target })
-
-  const heroMatchesPreset = props.savedHero.image === preset.heroImage
-  emit('preset-applied', {
-    heroImage: heroMatchesPreset ? '' : props.savedHero.image,
-    heroMediaMime: heroMatchesPreset ? '' : props.savedHero.mime,
-    covers: {
-      about: props.savedCovers.about === preset.aboutImage ? '' : props.savedCovers.about,
-      blog: props.savedCovers.blog === preset.blogImage ? '' : props.savedCovers.blog,
-      services: props.savedCovers.services === preset.servicesImage ? '' : props.savedCovers.services,
-      contact: props.savedCovers.contact === preset.contactImage ? '' : props.savedCovers.contact,
-    },
-  })
 }
 </script>

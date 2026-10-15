@@ -302,7 +302,6 @@ const mainGroups: NavGroup[] = [
   {
     heading: 'Content',
     items: [
-      { to: '/admin/website-editor', label: 'Website Editor', icon: 'heroicons:paint-brush' },
       { to: '/admin/posts', label: 'Blog Posts', icon: 'heroicons:newspaper' },
       { to: '/admin/post-categories', label: 'Blog Categories', icon: 'heroicons:rectangle-stack' },
     ],

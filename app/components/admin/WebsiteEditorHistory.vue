@@ -12,7 +12,7 @@
     </button>
 
     <div v-if="open" class="mt-2 px-1">
-      <p class="px-2 text-[11px] leading-5 text-admin-muted">Preview a previous website version before restoring it.</p>
+      <p class="px-2 text-[11px] leading-5 text-admin-muted">Preview, restore, or remove an earlier published version.</p>
 
       <div v-if="loading" class="flex min-h-24 items-center justify-center" role="status">
         <Icon name="heroicons:arrow-path" class="h-4 w-4 animate-spin text-admin-accent motion-reduce:animate-none" aria-hidden="true" />
@@ -30,22 +30,36 @@
       </div>
 
       <div v-else class="mt-3 space-y-1">
-        <button
+        <div
           v-for="version in versions"
           :key="version.id"
-          type="button"
-          class="history-focus flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-left"
+          class="flex min-h-11 w-full items-center rounded-xl"
           :class="selectedId === version.id ? 'bg-admin-accent-soft text-admin-accent-strong' : 'text-admin-muted hover:bg-admin-soft hover:text-admin-text'"
-          :aria-pressed="selectedId === version.id"
-          @click="$emit('select', version.id)"
         >
-          <Icon name="heroicons:document-duplicate" class="h-4 w-4 shrink-0" aria-hidden="true" />
-          <span class="min-w-0 flex-1">
-            <span class="block text-xs font-semibold">Saved version</span>
-            <span class="block truncate text-[10px]">{{ formatDate(version.created_at) }}</span>
-          </span>
-          <Icon name="heroicons:eye" class="h-4 w-4 shrink-0" aria-hidden="true" />
-        </button>
+          <button
+            type="button"
+            class="history-focus flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-xl px-3 text-left"
+            :aria-pressed="selectedId === version.id"
+            @click="$emit('select', version.id)"
+          >
+            <Icon name="heroicons:document-duplicate" class="h-4 w-4 shrink-0" aria-hidden="true" />
+            <span class="min-w-0 flex-1">
+              <span class="block text-xs font-semibold">Saved version</span>
+              <span class="block truncate text-[10px]">{{ formatDate(version.created_at) }}</span>
+            </span>
+            <Icon name="heroicons:eye" class="h-4 w-4 shrink-0" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            class="history-focus mr-1 flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg text-admin-muted hover:bg-admin-danger-soft hover:text-admin-danger disabled:cursor-not-allowed disabled:opacity-50"
+            :disabled="deletingId === version.id"
+            :aria-label="`Delete saved version from ${formatDate(version.created_at)}`"
+            title="Delete version"
+            @click="$emit('delete', version.id)"
+          >
+            <Icon :name="deletingId === version.id ? 'heroicons:arrow-path' : 'heroicons:trash'" class="h-4 w-4" :class="deletingId === version.id ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
+          </button>
+        </div>
       </div>
 
       <div v-if="selectedId" class="mt-3 rounded-xl border border-admin-warning/30 bg-admin-warning-soft p-3">
@@ -69,6 +83,7 @@ defineProps<{
   open: boolean
   loading: boolean
   restoring: boolean
+  deletingId: number | null
   error: string
   versions: WebsiteEditorVersionSummary[]
   selectedId: number | null
@@ -79,6 +94,7 @@ defineEmits<{
   select: [versionId: number]
   exit: []
   restore: []
+  delete: [versionId: number]
 }>()
 
 function formatDate(value: string) {

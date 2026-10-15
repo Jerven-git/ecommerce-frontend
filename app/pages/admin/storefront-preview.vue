@@ -6,8 +6,12 @@
     @submit.capture.prevent
   >
     <template v-if="receivedConfig">
-      <div :data-storefront-section="previewPage === 'global' ? 'header' : undefined" :data-editor-label="previewPage === 'global' ? 'Header call-to-action' : undefined">
-        <Header />
+      <div :data-storefront-section="previewPage === 'global' ? 'brand-assets' : undefined" :data-editor-label="previewPage === 'global' ? 'Brand assets' : undefined">
+        <div :data-storefront-section="previewPage === 'global' ? 'store-details' : undefined" :data-editor-label="previewPage === 'global' ? 'Store details' : undefined">
+          <div :data-storefront-section="previewPage === 'global' ? 'header' : undefined" :data-editor-label="previewPage === 'global' ? 'Header call-to-action' : undefined">
+            <Header />
+          </div>
+        </div>
       </div>
 
       <main>

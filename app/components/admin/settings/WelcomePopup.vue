@@ -10,7 +10,32 @@
       </div>
     </div>
 
-    <div class="p-6 space-y-5">
+    <div v-if="settingsOnly" class="p-6 space-y-5">
+      <div>
+        <label class="mb-1.5 block text-sm font-medium text-gray-700">Linked Discount</label>
+        <select
+          :value="modelValue.welcome_popup_discount_id || ''"
+          class="input-field"
+          :disabled="discountsLoading"
+          @change="update('welcome_popup_discount_id', Number(($event.target as HTMLSelectElement).value) || null)"
+        >
+          <option value="">{{ discountsLoading ? 'Loading discounts…' : 'Select a discount…' }}</option>
+          <option v-for="d in discounts" :key="d.id" :value="d.id">
+            {{ d.code }} — {{ d.type === 'percentage' ? `${d.value}%` : `$${d.value}` }}
+            <template v-if="d.min_order_amount > 0"> (min ${{ d.min_order_amount }})</template>
+          </option>
+        </select>
+        <p class="mt-1 text-xs leading-5 text-gray-500">Choose an existing discount used when a visitor subscribes through the popup. Create and manage discount rules from Discounts.</p>
+        <div v-if="discountsError" role="alert" class="mt-3 flex items-start justify-between gap-3 rounded-xl border border-red-100 bg-red-50 p-3">
+          <p class="text-xs leading-5 text-red-700">{{ discountsError }}</p>
+          <button type="button" class="shrink-0 text-xs font-semibold text-red-700 underline underline-offset-2" @click="loadDiscounts">
+            Retry
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div v-else class="p-6 space-y-5">
       <!-- Enable toggle -->
       <label class="flex items-center justify-between cursor-pointer">
         <div>
@@ -59,14 +84,21 @@
                 :value="modelValue.welcome_popup_discount_id || ''"
                 @change="update('welcome_popup_discount_id', Number(($event.target as HTMLSelectElement).value) || null)"
                 class="input-field"
+                :disabled="discountsLoading"
               >
-                <option value="">Select a discount...</option>
+                <option value="">{{ discountsLoading ? 'Loading discounts…' : 'Select a discount…' }}</option>
                 <option v-for="d in discounts" :key="d.id" :value="d.id">
                   {{ d.code }} — {{ d.type === 'percentage' ? `${d.value}%` : `$${d.value}` }}
                   <template v-if="d.min_order_amount > 0"> (min ${{ d.min_order_amount }})</template>
                 </option>
               </select>
               <p class="text-xs text-gray-400 mt-1">Each subscriber gets a unique single-use code cloned from this discount.</p>
+              <div v-if="discountsError" role="alert" class="mt-3 flex items-start justify-between gap-3 rounded-xl border border-red-100 bg-red-50 p-3">
+                <p class="text-xs leading-5 text-red-700">{{ discountsError }}</p>
+                <button type="button" class="shrink-0 text-xs font-semibold text-red-700 underline underline-offset-2" @click="loadDiscounts">
+                  Retry
+                </button>
+              </div>
             </div>
           </div>
 
@@ -116,6 +148,7 @@ export interface WelcomePopupForm {
 
 const props = defineProps<{
   modelValue: WelcomePopupForm
+  settingsOnly?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -124,20 +157,29 @@ const emit = defineEmits<{
 
 const { $apiFetch } = useNuxtApp()
 const discounts = ref<Discount[]>([])
+const discountsLoading = ref(false)
+const discountsError = ref<string | null>(null)
 
 function update(key: keyof WelcomePopupForm, value: any) {
   emit('update:modelValue', { ...props.modelValue, [key]: value })
 }
 
-// Fetch active discounts for the dropdown
-onMounted(async () => {
+async function loadDiscounts() {
+  if (discountsLoading.value) return
+  discountsLoading.value = true
+  discountsError.value = null
+
   try {
     const res = await $apiFetch<{ data: Discount[] }>('/discounts', {
       params: { is_active: true, per_page: 100 },
     })
     discounts.value = res.data || []
   } catch {
-    // Silently fail — dropdown will just be empty
+    discountsError.value = 'Discounts could not be loaded. Try again before linking this popup.'
+  } finally {
+    discountsLoading.value = false
   }
-})
+}
+
+onMounted(loadDiscounts)
 </script>
