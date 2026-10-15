@@ -7,7 +7,7 @@
 
     <div v-if="sectionErrors.length" class="mb-4 rounded-xl border border-admin-danger/20 bg-admin-danger-soft px-3 py-2.5 text-admin-danger" role="alert">
       <p class="text-xs font-semibold">Fix this section before saving</p>
-      <ul class="mt-1 list-disc space-y-1 pl-4 text-[11px] leading-5">
+      <ul class="mt-1 list-disc space-y-1 pl-4 text-xs leading-5">
         <li v-for="(message, index) in sectionErrors" :key="`${index}-${message}`">{{ message }}</li>
       </ul>
     </div>
@@ -20,9 +20,9 @@
       <div class="space-y-2.5">
         <div>
           <p class="text-xs font-semibold text-admin-text">Header logo</p>
-          <p class="mt-1 text-[11px] leading-5 text-admin-muted">The primary brand mark shown in the storefront header.</p>
+          <p class="mt-1 text-xs leading-5 text-admin-muted">The primary brand mark shown in the storefront header.</p>
         </div>
-        <AdminMediaUploader :url="modelValue.logo_url || ''" :uploading="assetUploading.logo" label="Header logo" hint="PNG, JPG, WebP, SVG or GIF · max 2 MB" input-id="editorLogoInput" preview-class="h-14 w-auto object-contain" dropzone-class="h-28" @select="uploadAsset($event, 'logo')" @remove="removeAsset('logo')" />
+        <AdminMediaUploader :url="modelValue.logo_url || ''" :uploading="assetUploading.logo" label="Header logo" hint="PNG, JPG, WebP, SVG or GIF · max 2 MB" input-id="editorLogoInput" preview-class="h-14 w-auto object-contain" dropzone-class="h-28" compact @select="uploadAsset($event, 'logo')" @remove="removeAsset('logo')" />
       </div>
 
       <AdminEditorField label="Logo accessible name" :error="errorFor('logo_alt_text')">
@@ -32,39 +32,39 @@
       <div class="space-y-2 rounded-xl border border-admin-border p-3">
         <div class="flex items-center justify-between gap-3">
           <label for="editorHeaderLogoSize" class="text-xs font-semibold text-admin-text">Header logo height</label>
-          <span class="rounded-md bg-admin-soft px-2 py-1 text-[11px] font-semibold tabular-nums text-admin-muted">{{ modelValue.logo_size }} px</span>
+          <span class="rounded-md bg-admin-soft px-2 py-1 text-xs font-semibold tabular-nums text-admin-muted">{{ modelValue.logo_size }} px</span>
         </div>
         <input id="editorHeaderLogoSize" :value="modelValue.logo_size" type="range" min="20" max="64" step="1" class="w-full cursor-pointer accent-admin-accent" @input="setPath(['logo_size'], numberValue($event))" />
       </div>
 
-      <div class="grid grid-cols-2 gap-3">
+      <div class="space-y-4">
         <div class="min-w-0 space-y-2">
           <p class="text-xs font-semibold text-admin-text">Browser icon</p>
-          <AdminMediaUploader :url="modelValue.favicon_url || ''" :uploading="assetUploading.favicon" label="Browser icon" hint="Square image · max 2 MB" input-id="editorFaviconInput" preview-class="h-12 w-12 object-contain" dropzone-class="h-28" @select="uploadAsset($event, 'favicon')" @remove="removeAsset('favicon')" />
+          <AdminMediaUploader :url="modelValue.favicon_url || ''" :uploading="assetUploading.favicon" label="Browser icon" hint="Square image · max 2 MB" input-id="editorFaviconInput" preview-class="h-12 w-12 object-contain" dropzone-class="h-28" compact @select="uploadAsset($event, 'favicon')" @remove="removeAsset('favicon')" />
         </div>
         <div class="min-w-0 space-y-2">
           <p class="text-xs font-semibold text-admin-text">Cart icon</p>
-          <AdminMediaUploader :url="modelValue.cart_icon_url || ''" :uploading="assetUploading.cart_icon" label="Cart icon" hint="24 × 24 px recommended" input-id="editorCartIconInput" preview-class="h-12 w-12 object-contain" dropzone-class="h-28" @select="uploadAsset($event, 'cart_icon')" @remove="removeAsset('cart_icon')" />
+          <AdminMediaUploader :url="modelValue.cart_icon_url || ''" :uploading="assetUploading.cart_icon" label="Cart icon" hint="Square artwork · displayed at a fixed 20 × 20 px" input-id="editorCartIconInput" preview-class="h-12 w-12 object-contain" dropzone-class="h-28" compact @select="uploadAsset($event, 'cart_icon')" @remove="removeAsset('cart_icon')" />
         </div>
       </div>
 
       <div class="space-y-2.5 border-t border-admin-border pt-5">
         <div>
           <p class="text-xs font-semibold text-admin-text">Footer logo</p>
-          <p class="mt-1 text-[11px] leading-5 text-admin-muted">Optional. Leave empty to reuse the header logo.</p>
+          <p class="mt-1 text-xs leading-5 text-admin-muted">Optional. Leave empty to reuse the header logo.</p>
         </div>
-        <AdminMediaUploader :url="modelValue.footer_logo_url || ''" :uploading="assetUploading.footer_logo" label="Footer logo" hint="PNG, JPG, WebP, SVG or GIF · max 2 MB" input-id="editorFooterLogoInput" preview-class="h-14 w-auto object-contain" dropzone-class="h-28" @select="uploadAsset($event, 'footer_logo')" @remove="removeAsset('footer_logo')" />
+        <AdminMediaUploader :url="modelValue.footer_logo_url || ''" :uploading="assetUploading.footer_logo" label="Footer logo" hint="PNG, JPG, WebP, SVG or GIF · max 2 MB" input-id="editorFooterLogoInput" preview-class="h-14 w-auto object-contain" dropzone-class="h-28" compact @select="uploadAsset($event, 'footer_logo')" @remove="removeAsset('footer_logo')" />
       </div>
 
       <div class="space-y-2 rounded-xl border border-admin-border p-3">
         <div class="flex items-center justify-between gap-3">
           <label for="editorFooterLogoSize" class="text-xs font-semibold text-admin-text">Footer logo height</label>
-          <span class="rounded-md bg-admin-soft px-2 py-1 text-[11px] font-semibold tabular-nums text-admin-muted">{{ modelValue.footer_logo_size }} px</span>
+          <span class="rounded-md bg-admin-soft px-2 py-1 text-xs font-semibold tabular-nums text-admin-muted">{{ modelValue.footer_logo_size }} px</span>
         </div>
         <input id="editorFooterLogoSize" :value="modelValue.footer_logo_size" type="range" min="40" max="240" step="2" class="w-full cursor-pointer accent-admin-accent" @input="setPath(['footer_logo_size'], numberValue($event))" />
       </div>
 
-      <p class="rounded-xl bg-admin-info-soft px-3 py-2.5 text-[11px] leading-5 text-admin-muted">Uploads stay private in this draft. Customers see them only after you save and publish.</p>
+      <p class="rounded-xl bg-admin-info-soft px-3 py-2.5 text-xs leading-5 text-admin-muted">Uploads stay private in this draft. Customers see them only after you save and publish.</p>
     </div>
 
     <div v-else-if="section === 'store-details'" class="space-y-5">
@@ -76,7 +76,7 @@
         <legend class="px-1 text-xs font-semibold text-admin-text">Primary contact</legend>
         <input :value="modelValue.contact_email" type="email" maxlength="255" placeholder="Email address" aria-label="Primary contact email" autocomplete="email" class="editor-input" @input="setPath(['contact_email'], inputValue($event))" />
         <input :value="modelValue.contact_phone" type="tel" maxlength="20" placeholder="Phone number" aria-label="Primary contact phone" autocomplete="tel" class="editor-input" @input="setPath(['contact_phone'], inputValue($event))" />
-        <p class="text-[11px] leading-5 text-admin-muted">Used when no dedicated contact channel is listed below.</p>
+        <p class="text-xs leading-5 text-admin-muted">Used when no dedicated contact channel is listed below.</p>
       </fieldset>
 
       <AdminEditorRepeater title="Contact channels" add-label="Add contact" :can-add="modelValue.contact_entries.length < 20" @add="addItem(['contact_entries'], { label: '', email: '', phone: '' })">
@@ -110,11 +110,11 @@
       <AdminEditorToggle :checked="modelValue.footer_banner.enabled" label="Show announcement banner" @change="setPath(['footer_banner', 'enabled'], $event)" />
       <AdminEditorField label="Heading"><input :value="modelValue.footer_banner.heading" maxlength="150" class="editor-input" @input="setPath(['footer_banner', 'heading'], inputValue($event))" /></AdminEditorField>
       <AdminEditorField label="Supporting text"><textarea :value="modelValue.footer_banner.subtitle" maxlength="255" rows="3" class="editor-input min-h-24 resize-y" @input="setPath(['footer_banner', 'subtitle'], inputValue($event))" /></AdminEditorField>
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <AdminEditorField label="Button label"><input :value="modelValue.footer_banner.button_label" maxlength="30" class="editor-input" @input="setPath(['footer_banner', 'button_label'], inputValue($event))" /></AdminEditorField>
         <AdminEditorField label="Button link"><input :value="modelValue.footer_banner.button_link" maxlength="500" class="editor-input" @input="setPath(['footer_banner', 'button_link'], inputValue($event))" /></AdminEditorField>
       </div>
-      <div class="grid grid-cols-3 gap-2">
+      <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <AdminEditorField label="Background"><input :value="modelValue.footer_banner.background_color" type="color" class="editor-color" @input="setPath(['footer_banner', 'background_color'], inputValue($event))" /></AdminEditorField>
         <AdminEditorField label="End colour"><input :value="modelValue.footer_banner.background_color_to || modelValue.footer_banner.background_color" type="color" class="editor-color" @input="setPath(['footer_banner', 'background_color_to'], inputValue($event))" /></AdminEditorField>
         <AdminEditorField label="Text"><input :value="modelValue.footer_banner.text_color" type="color" class="editor-color" @input="setPath(['footer_banner', 'text_color'], inputValue($event))" /></AdminEditorField>
@@ -124,7 +124,7 @@
     <div v-else-if="section === 'footer'" class="space-y-4">
       <AdminEditorField label="Tagline"><textarea :value="modelValue.footer.tagline" maxlength="255" rows="3" class="editor-input min-h-24 resize-y" @input="setPath(['footer', 'tagline'], inputValue($event))" /></AdminEditorField>
       <AdminEditorField label="Copyright"><input :value="modelValue.footer.copyright_text" maxlength="255" class="editor-input" @input="setPath(['footer', 'copyright_text'], inputValue($event))" /></AdminEditorField>
-      <p class="text-[11px] leading-5 text-admin-muted">Use <code>{year}</code> and <code>{site_name}</code> as automatic placeholders.</p>
+      <p class="text-xs leading-5 text-admin-muted">Use <code>{year}</code> and <code>{site_name}</code> as automatic placeholders.</p>
       <div class="space-y-2">
         <AdminEditorToggle :checked="modelValue.footer.show_tagline" label="Show tagline" @change="setPath(['footer', 'show_tagline'], $event)" />
         <AdminEditorToggle :checked="modelValue.footer.show_quick_links" label="Show quick links" @change="setPath(['footer', 'show_quick_links'], $event)" />
@@ -137,9 +137,9 @@
       <div class="space-y-2.5">
         <div>
           <p class="text-xs font-semibold text-admin-text">About cover image</p>
-          <p class="mt-1 text-[11px] leading-5 text-admin-muted">The primary visual shown at the top of the About page.</p>
+          <p class="mt-1 text-xs leading-5 text-admin-muted">The primary visual shown at the top of the About page.</p>
         </div>
-        <AdminMediaUploader :url="modelValue.about_image_url || ''" :uploading="assetUploading.about" label="About cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorAboutImageInput" overlay preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'about')" @remove="removeAsset('about')" />
+        <AdminMediaUploader :url="modelValue.about_image_url || ''" :uploading="assetUploading.about" label="About cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorAboutImageInput" overlay compact preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'about')" @remove="removeAsset('about')" />
       </div>
       <AdminEditorField label="Our story"><textarea :value="modelValue.about_content" maxlength="10000" rows="7" class="editor-input min-h-40 resize-y" @input="setPath(['about_content'], inputValue($event))" /></AdminEditorField>
       <AdminEditorRepeater title="Highlights" add-label="Add highlight" :can-add="modelValue.about_highlights.items.length < 12" @add="addItem(['about_highlights', 'items'], { icon: 'heroicons:check-circle', title: '', description: '' })">
@@ -160,16 +160,16 @@
         <textarea :value="modelValue.story_page.hero.subtitle" maxlength="255" rows="2" placeholder="Supporting text" aria-label="Story supporting text" class="editor-input min-h-20 resize-y" @input="setPath(['story_page', 'hero', 'subtitle'], inputValue($event))" />
       </fieldset>
       <AdminEditorStorySection label="Story section 1" :section="modelValue.story_page.section_a" @update="setPath(['story_page', 'section_a'], $event)" />
-      <AdminMediaUploader :url="modelValue.story_image_a_url || ''" :uploading="assetUploading.story_image_a" label="Story section 1 image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorStoryImageAInput" overlay preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'story_image_a')" @remove="removeAsset('story_image_a')" />
+      <AdminMediaUploader :url="modelValue.story_image_a_url || ''" :uploading="assetUploading.story_image_a" label="Story section 1 image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorStoryImageAInput" overlay compact preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'story_image_a')" @remove="removeAsset('story_image_a')" />
       <AdminEditorStorySection label="Story section 2" :section="modelValue.story_page.section_b" @update="setPath(['story_page', 'section_b'], $event)" />
-      <AdminMediaUploader :url="modelValue.story_image_b_url || ''" :uploading="assetUploading.story_image_b" label="Story section 2 image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorStoryImageBInput" overlay preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'story_image_b')" @remove="removeAsset('story_image_b')" />
-      <p class="rounded-xl bg-admin-info-soft px-3 py-2.5 text-[11px] leading-5 text-admin-muted">Story images stay private in this draft until you save and publish.</p>
+      <AdminMediaUploader :url="modelValue.story_image_b_url || ''" :uploading="assetUploading.story_image_b" label="Story section 2 image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorStoryImageBInput" overlay compact preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'story_image_b')" @remove="removeAsset('story_image_b')" />
+      <p class="rounded-xl bg-admin-info-soft px-3 py-2.5 text-xs leading-5 text-admin-muted">Story images stay private in this draft until you save and publish.</p>
     </div>
 
     <div v-else-if="section === 'contact-content'" class="space-y-4">
       <div class="space-y-2.5">
         <p class="text-xs font-semibold text-admin-text">Contact cover image</p>
-        <AdminMediaUploader :url="modelValue.contact_image_url || ''" :uploading="assetUploading.contact" label="Contact cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorContactImageInput" overlay preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'contact')" @remove="removeAsset('contact')" />
+        <AdminMediaUploader :url="modelValue.contact_image_url || ''" :uploading="assetUploading.contact" label="Contact cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorContactImageInput" overlay compact preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'contact')" @remove="removeAsset('contact')" />
       </div>
       <AdminEditorField label="Information heading"><input :value="modelValue.contact_page.info_title" maxlength="100" class="editor-input" @input="setPath(['contact_page', 'info_title'], inputValue($event))" /></AdminEditorField>
       <AdminEditorField label="Information subtitle"><input :value="modelValue.contact_page.info_subtitle" maxlength="255" class="editor-input" @input="setPath(['contact_page', 'info_subtitle'], inputValue($event))" /></AdminEditorField>
@@ -221,7 +221,7 @@
     <div v-else-if="section === 'blog-content'" class="space-y-4">
       <div class="space-y-2.5">
         <p class="text-xs font-semibold text-admin-text">Blog cover image</p>
-        <AdminMediaUploader :url="modelValue.blog_image_url || ''" :uploading="assetUploading.blog" label="Blog cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorBlogImageInput" overlay preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'blog')" @remove="removeAsset('blog')" />
+        <AdminMediaUploader :url="modelValue.blog_image_url || ''" :uploading="assetUploading.blog" label="Blog cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorBlogImageInput" overlay compact preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'blog')" @remove="removeAsset('blog')" />
       </div>
       <AdminEditorPageHeader label="Blog heading" :header="modelValue.blog_page.header" @update="setPath(['blog_page', 'header'], $event)" />
       <AdminEditorToggle :checked="Boolean(modelValue.blog_page.cta)" label="Show closing call-to-action" @change="toggleObject(['blog_page', 'cta'], $event, emptyPageCta())" />
@@ -232,7 +232,7 @@
     <div v-else-if="section === 'services-content'" class="space-y-4">
       <div class="space-y-2.5">
         <p class="text-xs font-semibold text-admin-text">Services cover image</p>
-        <AdminMediaUploader :url="modelValue.services_image_url || ''" :uploading="assetUploading.services" label="Services cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorServicesImageInput" overlay preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'services')" @remove="removeAsset('services')" />
+        <AdminMediaUploader :url="modelValue.services_image_url || ''" :uploading="assetUploading.services" label="Services cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorServicesImageInput" overlay compact preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'services')" @remove="removeAsset('services')" />
       </div>
       <AdminEditorPageHeader label="Services heading" :header="modelValue.services_page.header" @update="setPath(['services_page', 'header'], { ...modelValue.services_page.header, ...$event })" />
       <AdminEditorToggle :checked="Boolean(modelValue.services_page.header.primary_cta)" label="Show primary button" @change="toggleObject(['services_page', 'header', 'primary_cta'], $event, { label: '', link: '' })" />
@@ -249,7 +249,7 @@
       <AdminEditorToggle :checked="Boolean(modelValue.services_page.stats)" label="Show service statistics" @change="toggleObject(['services_page', 'stats'], $event, { items: [] })" />
       <AdminEditorRepeater v-if="modelValue.services_page.stats" title="Statistics" add-label="Add statistic" :can-add="modelValue.services_page.stats.items.length < 6" @add="addItem(['services_page', 'stats', 'items'], { value: '', label: '' })">
         <AdminEditorRepeaterItem v-for="(item, index) in modelValue.services_page.stats.items" :key="index" :label="`Statistic ${index + 1}`" @remove="removeItem(['services_page', 'stats', 'items'], index)">
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <input :value="item.value" maxlength="50" placeholder="Value" aria-label="Statistic value" class="editor-input" @input="setItem(['services_page', 'stats', 'items'], index, 'value', inputValue($event))" />
             <input :value="item.label" maxlength="150" placeholder="Label" aria-label="Statistic label" class="editor-input" @input="setItem(['services_page', 'stats', 'items'], index, 'label', inputValue($event))" />
           </div>

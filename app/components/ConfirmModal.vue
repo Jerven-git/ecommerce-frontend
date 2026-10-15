@@ -15,15 +15,16 @@
     </div>
 
     <!-- Text -->
-    <h2 class="text-base font-semibold text-gray-900 text-center">{{ title }}</h2>
-    <p class="text-sm text-gray-500 text-center mt-1">{{ message }}</p>
+    <h2 class="font-semibold text-gray-900 text-center" :class="compact ? 'font-sans text-sm' : 'text-base'">{{ title }}</h2>
+    <p class="text-gray-500 text-center mt-1" :class="compact ? 'font-sans text-xs leading-5' : 'text-sm'">{{ message }}</p>
 
     <template #footer>
       <div class="flex items-center gap-3">
         <button
           type="button"
           @click="$emit('cancel')"
-          class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          class="min-h-11 flex-1 px-4 py-2 font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          :class="compact ? 'font-sans text-xs' : 'text-sm'"
         >
           Cancel
         </button>
@@ -31,11 +32,14 @@
           type="button"
           :disabled="loading"
           @click="$emit('confirm')"
-          class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60 rounded-lg transition-colors"
+          class="min-h-11 flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 font-semibold text-white disabled:opacity-60 rounded-lg transition-colors"
           :class="{
             'bg-red-600 hover:bg-red-700': variant === 'danger',
             'bg-green-600 hover:bg-green-700': variant === 'success',
             'bg-amber-500 hover:bg-amber-600': variant === 'warning',
+            'font-sans': compact,
+            'text-xs': compact,
+            'text-sm': !compact,
           }"
         >
           <Icon name="heroicons:arrow-path" v-if="loading" class="w-4 h-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
@@ -55,6 +59,7 @@ withDefaults(defineProps<{
   loadingText?: string
   loading?: boolean
   variant?: 'danger' | 'success' | 'warning'
+  compact?: boolean
 }>(), {
   confirmText: 'Confirm',
   loadingText: 'Processing…',

@@ -7,7 +7,7 @@
 
     <div v-if="sectionErrors.length" class="mb-4 rounded-xl border border-admin-danger/20 bg-admin-danger-soft px-3 py-2.5 text-admin-danger" role="alert">
       <p class="text-xs font-semibold">Fix this section before saving</p>
-      <ul class="mt-1 list-disc space-y-1 pl-4 text-[11px] leading-5">
+      <ul class="mt-1 list-disc space-y-1 pl-4 text-xs leading-5">
         <li v-for="(message, index) in sectionErrors" :key="`${index}-${message}`">{{ message }}</li>
       </ul>
     </div>
@@ -20,7 +20,7 @@
       <div class="space-y-2.5">
         <div>
           <p class="text-xs font-semibold text-admin-text">Hero media</p>
-          <p class="mt-1 text-[11px] leading-5 text-admin-muted">Upload an image or short background video, then use the focus controls below to frame it.</p>
+          <p class="mt-1 text-xs leading-5 text-admin-muted">Upload an image or short background video, then use the focus controls below to frame it.</p>
         </div>
         <AdminMediaUploader
           :url="modelValue.hero_image_url || ''"
@@ -31,6 +31,7 @@
           input-id="editorHeroMediaInput"
           accept="image/*,video/mp4,video/webm"
           overlay
+          compact
           preview-class="h-40 w-full object-cover"
           @select="uploadAsset($event, 'hero')"
           @remove="removeAsset('hero')"
@@ -42,7 +43,7 @@
       <AdminEditorField label="Supporting text" :error="errorFor('hero_subtitle')">
         <textarea :value="modelValue.hero_subtitle" maxlength="255" rows="3" class="editor-input min-h-24 resize-y" @input="setRoot('hero_subtitle', inputValue($event))" />
       </AdminEditorField>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <AdminEditorField label="Overlay">
           <input :value="modelValue.hero_overlay_color" type="color" class="editor-color" @input="setRoot('hero_overlay_color', inputValue($event))" />
         </AdminEditorField>
@@ -54,7 +55,7 @@
         <input :checked="modelValue.hero_full_bleed" type="checkbox" class="h-4 w-4 accent-admin-accent" @change="setRoot('hero_full_bleed', checkedValue($event))" />
         Full-height hero
       </label>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <AdminEditorField label="Focus X">
           <input :value="modelValue.hero_focal_x" type="number" min="0" max="100" class="editor-input" @input="setRoot('hero_focal_x', numberValue($event))" />
         </AdminEditorField>
@@ -62,7 +63,7 @@
           <input :value="modelValue.hero_focal_y" type="number" min="0" max="100" class="editor-input" @input="setRoot('hero_focal_y', numberValue($event))" />
         </AdminEditorField>
       </div>
-      <p class="rounded-xl bg-admin-info-soft px-3 py-2.5 text-[11px] leading-5 text-admin-muted">This upload stays private in the draft until you save and publish.</p>
+      <p class="rounded-xl bg-admin-info-soft px-3 py-2.5 text-xs leading-5 text-admin-muted">This upload stays private in the draft until you save and publish.</p>
     </div>
 
     <div v-else-if="section === 'how-it-works'" class="space-y-4">
@@ -89,7 +90,7 @@
     <div v-else-if="section === 'stats'" class="space-y-4">
       <AdminEditorRepeater title="Statistics" add-label="Add statistic" :can-add="modelValue.homepage_stats.items.length < 8" @add="addItem('homepage_stats', { value: '', label: '' })">
         <AdminEditorRepeaterItem v-for="(item, index) in modelValue.homepage_stats.items" :key="index" :label="`Statistic ${index + 1}`" @remove="removeItem('homepage_stats', index)">
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <input :value="item.value" maxlength="50" placeholder="Value" aria-label="Statistic value" class="editor-input" @input="setItem('homepage_stats', index, 'value', inputValue($event))" />
             <input :value="item.label" maxlength="100" placeholder="Label" aria-label="Statistic label" class="editor-input" @input="setItem('homepage_stats', index, 'label', inputValue($event))" />
           </div>
@@ -101,7 +102,7 @@
       <div class="space-y-2.5">
         <div>
           <p class="text-xs font-semibold text-admin-text">Statement image</p>
-          <p class="mt-1 text-[11px] leading-5 text-admin-muted">Optional supporting image for this editorial section.</p>
+          <p class="mt-1 text-xs leading-5 text-admin-muted">Optional supporting image for this editorial section.</p>
         </div>
         <AdminMediaUploader
           :url="modelValue.homepage_statement_image_url || ''"
@@ -110,6 +111,7 @@
           hint="JPG, PNG or WebP · max 10 MB"
           input-id="editorStatementImageInput"
           overlay
+          compact
           preview-class="h-36 w-full object-cover"
           @select="uploadAsset($event, 'homepage_statement')"
           @remove="removeAsset('homepage_statement')"
@@ -123,7 +125,7 @@
       <AdminEditorField label="Statement"><textarea :value="modelValue.homepage_statement.quote" maxlength="1000" rows="5" class="editor-input min-h-32 resize-y" @input="setNested('homepage_statement', 'quote', inputValue($event))" /></AdminEditorField>
       <AdminEditorField label="Attribution"><input :value="modelValue.homepage_statement.attribution" maxlength="100" class="editor-input" @input="setNested('homepage_statement', 'attribution', inputValue($event))" /></AdminEditorField>
       <AdminEditorField label="Role"><input :value="modelValue.homepage_statement.role" maxlength="100" class="editor-input" @input="setNested('homepage_statement', 'role', inputValue($event))" /></AdminEditorField>
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <AdminEditorField label="Button label"><input :value="modelValue.homepage_statement.cta_label" maxlength="50" class="editor-input" @input="setNested('homepage_statement', 'cta_label', inputValue($event))" /></AdminEditorField>
         <AdminEditorField label="Button link"><input :value="modelValue.homepage_statement.cta_link" maxlength="500" class="editor-input" @input="setNested('homepage_statement', 'cta_link', inputValue($event))" /></AdminEditorField>
       </div>

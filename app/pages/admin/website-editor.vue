@@ -1,5 +1,5 @@
 <template>
-  <div data-website-editor-shell class="flex h-full min-h-0 flex-col overflow-hidden bg-admin-canvas text-admin-text">
+  <div data-website-editor-shell class="website-editor-shell flex h-full min-h-0 flex-col overflow-hidden bg-admin-canvas text-admin-text">
     <header class="z-40 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-admin-border bg-admin-surface px-3 sm:px-4">
       <div class="flex min-w-0 items-center gap-2 sm:gap-3">
         <NuxtLink
@@ -15,11 +15,11 @@
           <Icon name="heroicons:paint-brush" class="h-4 w-4" aria-hidden="true" />
         </span>
         <div class="min-w-0 sm:max-w-none">
-          <h1 class="truncate text-xs font-semibold text-admin-text sm:text-sm" aria-label="Website Editor">
+          <h1 class="truncate text-sm font-semibold text-admin-text" aria-label="Website Editor">
             <span class="sm:hidden">Editor</span>
             <span class="hidden sm:inline">Website Editor</span>
           </h1>
-          <p class="hidden truncate text-[11px] text-admin-muted md:block">Private storefront customizer</p>
+          <p class="hidden truncate text-xs text-admin-muted md:block">Private storefront customizer</p>
         </div>
       </div>
 
@@ -118,9 +118,9 @@
       />
       <div class="flex min-w-0 flex-1 items-baseline gap-2">
         <p class="shrink-0 text-xs font-semibold">{{ editorStateTitle }}</p>
-        <p class="hidden truncate text-[11px] text-admin-muted lg:block">{{ editorStateDescription }}</p>
+        <p class="hidden truncate text-xs text-admin-muted lg:block">{{ editorStateDescription }}</p>
       </div>
-      <span v-if="draftSavedAt" class="text-[11px] font-medium text-admin-muted">Saved {{ draftSavedAt }}</span>
+      <span v-if="draftSavedAt" class="text-xs font-medium text-admin-muted">Saved {{ draftSavedAt }}</span>
     </div>
 
     <AdminWebsiteEditorLoading v-if="loadingDraft" />
@@ -149,7 +149,7 @@
           <div class="min-w-0 flex-1">
             <h2 class="text-sm font-semibold text-admin-text">{{ activePageOption.label }} sections</h2>
           <p class="mt-1 text-xs leading-5 text-admin-muted">Choose a section, then edit its content below.</p>
-          <p v-if="activePageDisabled" class="mt-2 rounded-lg bg-admin-warning-soft px-2.5 py-2 text-[11px] leading-5 text-admin-muted">
+          <p v-if="activePageDisabled" class="mt-2 rounded-lg bg-admin-warning-soft px-2.5 py-2 text-xs leading-5 text-admin-muted">
             This page is currently disabled on the storefront. Its content can be prepared here, but navigation visibility stays in Site Settings.
           </p>
           </div>
@@ -220,22 +220,16 @@
             </span>
             <div class="min-w-0">
               <p class="truncate text-xs font-semibold text-admin-text">{{ activePageOption.label }}</p>
-              <p class="truncate text-[11px] text-admin-muted">{{ selectedVersionId ? 'Historical preview · editing paused' : 'Private preview · changes are not live' }}</p>
+              <p class="truncate text-xs text-admin-muted">{{ selectedVersionId ? 'Historical preview · editing paused' : 'Private preview · changes are not live' }}</p>
             </div>
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
-            <label class="sr-only" for="website-editor-page">Preview page</label>
-            <select
-              id="website-editor-page"
-              :value="activePage"
-              class="editor-focus min-h-11 max-w-48 rounded-xl border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text"
-              @change="switchPage(($event.target as HTMLSelectElement).value as WebsiteEditorPageId)"
-            >
-              <option v-for="page in pageOptions" :key="page.id" :value="page.id">
-                {{ page.label }}{{ isPageDisabled(page.id) ? ' — disabled' : '' }}
-              </option>
-            </select>
+            <AdminWebsiteEditorPagePicker
+              :model-value="activePage"
+              :options="pagePickerOptions"
+              @update:model-value="switchPage"
+            />
             <div class="flex items-center rounded-xl border border-admin-border bg-admin-soft p-1" role="group" aria-label="Preview size">
               <button
                 v-for="device in devices"
@@ -289,7 +283,7 @@
           </div>
         </div>
 
-        <div class="flex shrink-0 items-center justify-between gap-3 border-t border-admin-border px-4 py-2 text-[11px] text-admin-muted">
+        <div class="flex shrink-0 items-center justify-between gap-3 border-t border-admin-border px-4 py-2 text-xs text-admin-muted">
           <span>{{ activeDeviceConfig.label }} · {{ activeDeviceConfig.widthLabel }}</span>
           <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-admin-warning" aria-hidden="true" />{{ selectedVersionId ? 'Historical version' : 'Private draft preview' }}</span>
         </div>
@@ -304,6 +298,7 @@
       loading-text="Deleting…"
       :loading="deletingVersion"
       variant="danger"
+      compact
       @confirm="confirmVersionDeletion"
       @cancel="cancelVersionDeletion"
     />
@@ -453,6 +448,11 @@ function isPageDisabled(pageId: WebsiteEditorPageId) {
   if (pageId === 'popup') return workingDraft.value?.welcome_popup_enabled !== true
   return page.module ? previewConfig.value?.modules_enabled?.[page.module] === false : false
 }
+
+const pagePickerOptions = computed(() => pageOptions.map(page => ({
+  ...page,
+  storefrontDisabled: isPageDisabled(page.id),
+})))
 
 const hasContent = (value: unknown) => {
   if (!value || typeof value !== 'object') return false
@@ -1011,6 +1011,15 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.website-editor-shell,
+.website-editor-shell :deep(h1),
+.website-editor-shell :deep(h2),
+.website-editor-shell :deep(h3),
+.website-editor-shell :deep(h4),
+.website-editor-shell :deep(h5),
+.website-editor-shell :deep(h6) {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
 .editor-focus:focus-visible {
   outline: 2px solid var(--admin-accent);
   outline-offset: 2px;

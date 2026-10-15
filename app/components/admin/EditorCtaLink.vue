@@ -1,5 +1,5 @@
 <template>
-  <fieldset class="grid grid-cols-2 gap-2 rounded-xl border border-admin-border p-3">
+  <fieldset class="grid grid-cols-1 gap-2 rounded-xl border border-admin-border p-3 sm:grid-cols-2">
     <legend class="px-1 text-xs font-semibold text-admin-text">{{ label }}</legend>
     <input :value="cta.label" maxlength="100" placeholder="Button label" :aria-label="`${label} label`" class="editor-input" @input="update('label', inputValue($event))" />
     <input :value="cta.link" maxlength="500" placeholder="Button link" :aria-label="`${label} link`" class="editor-input" @input="update('link', inputValue($event))" />

@@ -192,14 +192,13 @@
 
           <!-- Shop action cluster -->
           <div
-            class="flex items-center gap-0.5 rounded-full border p-1 transition-colors"
-            :class="isTransparent ? 'border-white/20 bg-white/10' : 'border-gray-900/10 bg-white/70 shadow-sm'"
+            class="flex items-center gap-1"
           >
           <!-- Favorites (hidden when the favorites feature is off site-wide) -->
           <NuxtLink
             v-if="favoritesEnabled"
             to="/favorites"
-            class="relative p-2 rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+            class="relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
             :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
             aria-label="Favorites"
           >
@@ -216,12 +215,14 @@
           <NuxtLink
             v-if="isEnabled('shop')"
             to="/cart"
-            class="relative p-2 rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+            class="relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
             :class="isTransparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-900 hover:bg-gray-100'"
             aria-label="Cart"
           >
-            <img v-if="siteConfig?.cart_icon_url" :src="siteConfig.cart_icon_url" alt="Cart" class="w-[18px] h-[18px] object-contain" />
-            <Icon name="heroicons:shopping-cart" v-else class="w-[18px] h-[18px]" aria-hidden="true" />
+            <span class="flex h-5 w-5 shrink-0 items-center justify-center" aria-hidden="true">
+              <img v-if="siteConfig?.cart_icon_url" :src="siteConfig.cart_icon_url" alt="" class="block h-5 w-5 object-contain" />
+              <Icon name="heroicons:shopping-cart" v-else class="h-5 w-5" />
+            </span>
             <span
               v-if="cartStore.itemCount > 0"
               class="absolute top-0.5 right-0.5 min-w-[16px] h-4 bg-primary-600 text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none"

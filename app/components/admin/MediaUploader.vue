@@ -49,21 +49,21 @@
 
     <!-- Inline progress UI when an upload is in flight -->
     <template v-if="uploading">
-      <p class="max-w-full break-words text-sm font-medium text-primary-600">Uploading{{ progressPercent != null ? `… ${progressPercent}%` : '…' }}</p>
+      <p class="max-w-full break-words font-medium text-primary-600" :class="compact ? 'text-xs' : 'text-sm'">Uploading{{ progressPercent != null ? `… ${progressPercent}%` : '…' }}</p>
       <div v-if="progressPercent != null" class="mt-2 w-3/4 max-w-xs h-1.5 bg-gray-200 rounded-full overflow-hidden">
         <div
           class="h-full bg-primary-500 transition-[width] duration-100 ease-linear"
           :style="{ width: progressPercent + '%' }"
         />
       </div>
-      <p v-if="progressBytesLabel" class="text-[10px] text-gray-400 mt-1 tabular-nums">{{ progressBytesLabel }}</p>
+      <p v-if="progressBytesLabel" class="mt-1 tabular-nums text-gray-400" :class="compact ? 'text-xs' : 'text-[10px]'">{{ progressBytesLabel }}</p>
     </template>
 
-    <p v-else class="max-w-full break-words text-sm leading-5 text-gray-600">
+    <p v-else class="max-w-full break-words text-gray-600" :class="compact ? 'text-xs leading-4' : 'text-sm leading-5'">
       Drop {{ label.toLowerCase() }} here or <span class="text-primary-600 font-medium">browse</span>
     </p>
 
-    <p v-if="!uploading" class="mt-1 max-w-full break-words text-xs leading-5 text-gray-500">{{ hint }}</p>
+    <p v-if="!uploading" class="mt-1 max-w-full break-words text-xs text-gray-500" :class="compact ? 'leading-4' : 'leading-5'">{{ hint }}</p>
     <input :id="inputId" ref="fileInput" type="file" class="sr-only" :accept="accept || 'image/*'" @change="onInputChange" />
   </label>
 </template>
@@ -80,6 +80,7 @@ const props = defineProps<{
   dropzoneClass?: string
   accept?: string
   video?: boolean
+  compact?: boolean
   /** Optional upload progress (0-100). When omitted the label just shows "Uploading…". */
   progress?: { loaded: number; total: number; percent: number }
 }>()

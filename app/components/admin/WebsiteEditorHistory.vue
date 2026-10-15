@@ -12,7 +12,7 @@
     </button>
 
     <div v-if="open" class="mt-2 px-1">
-      <p class="px-2 text-[11px] leading-5 text-admin-muted">Preview, restore, or remove an earlier published version.</p>
+      <p class="px-2 text-xs leading-5 text-admin-muted">Preview, restore, or remove an earlier published version.</p>
 
       <div v-if="loading" class="flex min-h-24 items-center justify-center" role="status">
         <Icon name="heroicons:arrow-path" class="h-4 w-4 animate-spin text-admin-accent motion-reduce:animate-none" aria-hidden="true" />
@@ -26,7 +26,7 @@
       <div v-else-if="versions.length === 0" class="mt-3 rounded-xl bg-admin-soft p-4 text-center">
         <Icon name="heroicons:archive-box" class="mx-auto h-5 w-5 text-admin-muted" aria-hidden="true" />
         <p class="mt-2 text-xs font-semibold text-admin-text">No earlier versions yet</p>
-        <p class="mt-1 text-[11px] leading-5 text-admin-muted">The currently published website is archived the next time a draft is published.</p>
+        <p class="mt-1 text-xs leading-5 text-admin-muted">The currently published website is archived the next time a draft is published.</p>
       </div>
 
       <div v-else class="mt-3 space-y-1">
@@ -45,7 +45,7 @@
             <Icon name="heroicons:document-duplicate" class="h-4 w-4 shrink-0" aria-hidden="true" />
             <span class="min-w-0 flex-1">
               <span class="block text-xs font-semibold">Saved version</span>
-              <span class="block truncate text-[10px]">{{ formatDate(version.created_at) }}</span>
+              <span class="block truncate text-xs">{{ formatDate(version.created_at) }}</span>
             </span>
             <Icon name="heroicons:eye" class="h-4 w-4 shrink-0" aria-hidden="true" />
           </button>
@@ -64,7 +64,7 @@
 
       <div v-if="selectedId" class="mt-3 rounded-xl border border-admin-warning/30 bg-admin-warning-soft p-3">
         <p class="text-xs font-semibold text-admin-text">Historical preview active</p>
-        <p class="mt-1 text-[11px] leading-5 text-admin-muted">Editing is paused until you return to the draft or restore this version.</p>
+        <p class="mt-1 text-xs leading-5 text-admin-muted">Editing is paused until you return to the draft or restore this version.</p>
         <div class="mt-3 grid grid-cols-2 gap-2">
           <button type="button" class="history-focus min-h-11 rounded-xl border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft" @click="$emit('exit')">Return to draft</button>
           <button type="button" class="history-focus min-h-11 rounded-xl bg-admin-accent px-3 text-xs font-semibold text-admin-on-accent hover:bg-admin-accent-strong disabled:opacity-50" :disabled="restoring" @click="$emit('restore')">

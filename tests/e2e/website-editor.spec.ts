@@ -54,9 +54,12 @@ test.describe('Store Admin website editor', () => {
     const closePanel = page.getByRole('button', { name: 'Close sections panel' })
     if (await closePanel.isVisible()) await closePanel.click()
 
-    await page.getByLabel('Preview page').selectOption('about')
+    const pagePicker = page.getByRole('button', { name: /Preview page:/ })
+    await pagePicker.click()
+    await page.getByRole('option', { name: /^About(?: Disabled on storefront)?$/ }).click()
     await expect(page.getByTitle('Private storefront about preview')).toBeVisible()
-    await page.getByLabel('Preview page').selectOption('home')
+    await pagePicker.click()
+    await page.getByRole('option', { name: 'Home page', exact: true }).click()
     await expect(heading).toHaveValue(`${original} preview check`)
 
     await page.keyboard.press(process.platform === 'darwin' ? 'Meta+z' : 'Control+z')

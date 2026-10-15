@@ -13,7 +13,7 @@
       <Icon :name="icon" class="h-4 w-4 shrink-0" aria-hidden="true" />
       <span class="min-w-0 flex-1">
         <span class="block truncate text-xs font-semibold">{{ label }}</span>
-        <span class="mt-0.5 block text-[10px] font-medium" :class="statusClass">{{ status }}</span>
+        <span class="mt-0.5 block text-xs font-medium" :class="statusClass">{{ status }}</span>
       </span>
     </button>
 
