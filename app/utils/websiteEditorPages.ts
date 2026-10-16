@@ -16,6 +16,15 @@ export interface WebsiteEditorStaticSection {
   icon: string
 }
 
+export interface WebsiteEditorNavigationItem {
+  page: WebsiteEditorPageId
+  pageLabel: string
+  section: string
+  sectionLabel: string
+  icon: string
+  disabled: boolean
+}
+
 export const WEBSITE_EDITOR_PAGES: WebsiteEditorPageOption[] = [
   { id: 'home', label: 'Home page', icon: 'heroicons:home', path: '/' },
   { id: 'global', label: 'Global sections', icon: 'heroicons:bars-3-bottom-left', path: '/' },

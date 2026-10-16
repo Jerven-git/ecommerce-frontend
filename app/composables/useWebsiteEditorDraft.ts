@@ -20,6 +20,12 @@ import type {
 import { normalizeHomepageSections } from '~/utils/homepageSections'
 
 export interface WebsiteEditorDraftPayload {
+  default_locale: string
+  supported_locales: string[]
+  localized_content: Record<string, Record<string, string>>
+  default_seo_title: string | null
+  default_seo_description: string | null
+  pages_seo: Record<string, { seo_title?: string | null; seo_description?: string | null }>
   site_name: string
   contact_email: string
   contact_phone: string
@@ -85,6 +91,9 @@ export interface WebsiteEditorDraftPayload {
 export interface WebsiteEditorVersionSummary {
   id: number
   created_at: string
+  publisher_name: string | null
+  release_note: string | null
+  changed_areas: string[]
 }
 
 export interface WebsiteEditorVersion extends WebsiteEditorVersionSummary {
@@ -97,6 +106,22 @@ export interface WebsiteEditorDraftState {
   has_draft: boolean
   draft_updated_at: string | null
   draft_version: number | null
+  workflow: WebsiteEditorWorkflow
+}
+
+export type WebsiteEditorReviewStatus = 'draft' | 'pending' | 'approved' | 'changes_requested'
+
+export interface WebsiteEditorWorkflow {
+  status: WebsiteEditorReviewStatus
+  requested_by_name: string | null
+  requested_at: string | null
+  reviewed_by_name: string | null
+  reviewed_at: string | null
+  note: string | null
+  scheduled_publish_at: string | null
+  scheduled_by_name: string | null
+  scheduled_release_note: string | null
+  timezone: string
 }
 
 export type WebsiteEditorAssetSlot =
@@ -151,6 +176,12 @@ export function normalizeWebsiteEditorDraft(
   const servicesImageUrl = payloadValue('services_image_url', config.services_image_url ?? null)
 
   return clone({
+    default_locale: payload.default_locale ?? config.default_locale ?? 'en',
+    supported_locales: payload.supported_locales ?? config.supported_locales ?? [config.default_locale ?? 'en'],
+    localized_content: payload.localized_content ?? config.localized_content ?? {},
+    default_seo_title: payloadValue('default_seo_title', config.default_seo_title ?? null),
+    default_seo_description: payloadValue('default_seo_description', config.default_seo_description ?? null),
+    pages_seo: payload.pages_seo ?? config.pages_seo ?? {},
     site_name: payload.site_name ?? config.site_name ?? '',
     contact_email: payload.contact_email ?? config.contact_email ?? '',
     contact_phone: payload.contact_phone ?? config.contact_phone ?? '',
@@ -364,15 +395,36 @@ export function useWebsiteEditorDraft() {
   const discardDraft = () => $apiFetch<{ data: WebsiteEditorDraftState }>('/site-config/draft', {
     method: 'DELETE',
   }).finally(invalidatePreload)
-  const publishDraft = () => $apiFetch<{ data: WebsiteEditorDraftState; message: string }>('/site-config/draft/publish', {
+  const publishDraft = (releaseNote = '') => $apiFetch<{ data: WebsiteEditorDraftState; message: string }>('/site-config/draft/publish', {
     method: 'POST',
+    body: { release_note: releaseNote.trim() || null },
+  }).finally(invalidatePreload)
+  const requestDraftReview = (draftVersion: number, note = '') => $apiFetch<{ data: WebsiteEditorWorkflow; message: string }>('/site-config/draft/review/request', {
+    method: 'POST',
+    body: { draft_version: draftVersion, note: note.trim() || null },
+  }).finally(invalidatePreload)
+  const approveDraft = (draftVersion: number, note = '') => $apiFetch<{ data: WebsiteEditorWorkflow; message: string }>('/site-config/draft/review/approve', {
+    method: 'POST',
+    body: { draft_version: draftVersion, note: note.trim() || null },
+  }).finally(invalidatePreload)
+  const requestDraftChanges = (draftVersion: number, note: string) => $apiFetch<{ data: WebsiteEditorWorkflow; message: string }>('/site-config/draft/review/request-changes', {
+    method: 'POST',
+    body: { draft_version: draftVersion, note: note.trim() },
+  }).finally(invalidatePreload)
+  const scheduleDraft = (draftVersion: number, scheduledFor: string, releaseNote = '') => $apiFetch<{ data: WebsiteEditorWorkflow; message: string }>('/site-config/draft/schedule', {
+    method: 'POST',
+    body: { draft_version: draftVersion, scheduled_for: scheduledFor, release_note: releaseNote.trim() || null },
+  }).finally(invalidatePreload)
+  const cancelDraftSchedule = (draftVersion: number) => $apiFetch<{ data: WebsiteEditorWorkflow; message: string }>('/site-config/draft/schedule', {
+    method: 'DELETE',
+    body: { draft_version: draftVersion },
   }).finally(invalidatePreload)
   const fetchVersions = () => $apiFetch<{ data: WebsiteEditorVersionSummary[]; published_hash: string }>('/site-config/versions')
   const fetchVersion = (versionId: number) => $apiFetch<{ data: WebsiteEditorVersion; published_hash: string }>(`/site-config/versions/${versionId}`)
-  const restoreVersion = (versionId: number, baseHash: string) => $apiFetch<{ message: string }>(`/site-config/versions/${versionId}/restore`, {
+  const restoreVersion = (versionId: number, baseHash: string, draftVersion: number | null) => $apiFetch<{ data: WebsiteEditorDraftState; message: string }>(`/site-config/versions/${versionId}/restore`, {
     method: 'POST',
-    body: { base_hash: baseHash },
-  })
+    body: { base_hash: baseHash, draft_version: draftVersion },
+  }).finally(invalidatePreload)
   const deleteVersion = (versionId: number) => $apiFetch<{ message: string }>(`/site-config/versions/${versionId}`, {
     method: 'DELETE',
   })
@@ -385,5 +437,21 @@ export function useWebsiteEditorDraft() {
     })
   }
 
-  return { fetchDraft, preloadDraft, saveDraft, discardDraft, publishDraft, fetchVersions, fetchVersion, restoreVersion, deleteVersion, uploadDraftAsset }
+  return {
+    fetchDraft,
+    preloadDraft,
+    saveDraft,
+    discardDraft,
+    publishDraft,
+    requestDraftReview,
+    approveDraft,
+    requestDraftChanges,
+    scheduleDraft,
+    cancelDraftSchedule,
+    fetchVersions,
+    fetchVersion,
+    restoreVersion,
+    deleteVersion,
+    uploadDraftAsset,
+  }
 }

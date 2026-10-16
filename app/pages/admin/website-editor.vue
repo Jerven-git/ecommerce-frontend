@@ -37,6 +37,16 @@
           <Icon name="heroicons:adjustments-horizontal" class="h-4 w-4" aria-hidden="true" />
         </button>
 
+        <button
+          type="button"
+          class="editor-focus flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl border border-admin-border bg-admin-surface text-admin-text hover:bg-admin-soft"
+          aria-label="Find pages and sections"
+          title="Find pages and sections (Ctrl or Command + K)"
+          @click="navigatorOpen = true"
+        >
+          <Icon name="heroicons:magnifying-glass" class="h-4 w-4" aria-hidden="true" />
+        </button>
+
         <div class="hidden items-center gap-1 md:flex" role="group" aria-label="Editing history">
           <button
             type="button"
@@ -66,7 +76,7 @@
           :disabled="loadingDraft || discarding || Boolean(selectedVersionId) || (!isDirty && !hasSavedDraft)"
           :aria-label="discarding ? 'Discarding changes' : 'Discard changes'"
           :title="discarding ? 'Discarding changes' : 'Discard changes'"
-          @click="discardChanges"
+          @click="requestConfirmation('discard')"
         >
           <Icon name="heroicons:arrow-path" class="h-4 w-4" :class="discarding ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
         </button>
@@ -75,7 +85,7 @@
           class="editor-focus inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl border border-admin-accent bg-admin-surface text-admin-accent-strong hover:bg-admin-accent-soft disabled:cursor-not-allowed disabled:opacity-50"
           :disabled="loadingDraft || saving || Boolean(selectedVersionId) || !isDirty"
           :aria-label="saving ? 'Saving draft' : 'Save draft'"
-          :title="saving ? 'Saving draft' : 'Save draft'"
+          :title="saving ? 'Saving draft' : 'Save draft (Ctrl or Command + S)'"
           @click="saveChanges"
         >
           <Icon :name="saving ? 'heroicons:arrow-path' : 'heroicons:cloud-arrow-up'" class="h-4 w-4" :class="saving ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
@@ -86,7 +96,7 @@
           :disabled="loadingDraft || publishing || Boolean(selectedVersionId) || isDirty || !hasSavedDraft"
           :aria-label="publishing ? 'Publishing website' : 'Publish'"
           :title="publishing ? 'Publishing website' : 'Publish'"
-          @click="publishChanges"
+          @click="openPublishReview"
         >
           <Icon :name="publishing ? 'heroicons:arrow-path' : 'heroicons:rocket-launch'" class="h-4 w-4" :class="publishing ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
         </button>
@@ -111,6 +121,21 @@
       </div>
       <button v-if="!draft && !loadingDraft" type="button" class="editor-focus min-h-11 shrink-0 rounded-lg px-3 text-xs font-semibold" @click="loadEditor(true)">Try again</button>
       <button v-else type="button" class="editor-focus min-h-11 shrink-0 rounded-lg px-3 text-xs font-semibold" aria-label="Dismiss error" @click="actionError = ''">Dismiss</button>
+    </div>
+
+    <div v-if="recoverySnapshot" class="z-30 flex shrink-0 flex-wrap items-center gap-2 border-b border-admin-warning/30 bg-admin-warning-soft px-4 py-2 text-admin-text" role="status">
+      <Icon name="heroicons:shield-check" class="h-4 w-4 shrink-0 text-admin-warning" aria-hidden="true" />
+      <p class="min-w-48 flex-1 text-xs leading-5">A browser copy of your edits is preserved for recovery.</p>
+      <button type="button" class="editor-focus min-h-11 rounded-lg px-3 text-xs font-semibold hover:bg-admin-surface" @click="restoreRecoveryCopy">Restore my copy</button>
+      <button type="button" class="editor-focus min-h-11 rounded-lg px-3 text-xs font-semibold hover:bg-admin-surface" @click="copyRecoveryChanges">Copy changes</button>
+      <button type="button" class="editor-focus min-h-11 rounded-lg px-3 text-xs font-semibold text-admin-muted hover:bg-admin-surface" @click="dismissRecovery">Dismiss backup</button>
+    </div>
+
+    <div v-if="publishSuccess" class="z-30 flex shrink-0 flex-wrap items-center gap-2 border-b border-admin-success/30 bg-admin-success-soft px-4 py-2 text-admin-text" role="status" aria-live="polite">
+      <Icon name="heroicons:check-circle" class="h-4 w-4 shrink-0 text-admin-success" aria-hidden="true" />
+      <p class="min-w-48 flex-1 text-xs leading-5"><span class="font-semibold">Website published.</span> {{ publishSuccess.summary }}</p>
+      <a :href="activeStoreUrl" target="_blank" rel="noopener noreferrer" class="editor-focus inline-flex min-h-11 items-center rounded-lg px-3 text-xs font-semibold text-admin-success hover:bg-admin-surface">View live website</a>
+      <button type="button" class="editor-focus min-h-11 rounded-lg px-3 text-xs font-semibold text-admin-muted hover:bg-admin-surface" @click="publishSuccess = null">Dismiss</button>
     </div>
 
     <div class="z-20 flex shrink-0 items-center gap-2 border-b border-admin-border bg-admin-info-soft px-4 py-2 text-admin-text" role="status" aria-live="polite" aria-atomic="true">
@@ -166,6 +191,14 @@
         </div>
 
         <div class="editor-controls-scroll min-h-0 flex-1 overflow-y-auto p-3">
+        <AdminEditorSettingsLink
+          v-if="activePageDisabled && activePageOption.module"
+          class="mb-3"
+          label="This page is hidden because its storefront module is disabled."
+          to="/admin/settings?tab=modules"
+          action="Manage page visibility"
+          icon="heroicons:eye-slash"
+        />
         <div class="grid gap-1">
           <AdminWebsiteEditorSectionRow
             v-for="(section, index) in sections"
@@ -176,10 +209,11 @@
             :visible="section.visible"
             :editable="section.editable"
             :has-content="section.hasContent"
+            :incomplete="publishWarnings.some(warning => warning.page === activePage && warning.section === section.id)"
             :first="index === 0"
             :last="index === sections.length - 1"
-            :disabled="Boolean(selectedVersionId)"
-            :composable="activePage === 'home'"
+            :disabled="Boolean(selectedVersionId) || !localeIsDefault"
+            :composable="activePage === 'home' && localeIsDefault"
             @select="selectSection(section.id)"
             @move="moveSection(index, $event)"
             @toggle="toggleSection(index)"
@@ -197,21 +231,29 @@
           @toggle="toggleHistory"
           @select="previewVersionFromHistory"
           @exit="exitVersionPreview"
-          @restore="restoreSelectedVersion"
+          @restore="requestConfirmation('restore')"
           @delete="requestVersionDeletion"
+          @retry="loadVersions"
         />
 
         <AdminWebsiteEditorInspector
-          v-if="!selectedVersionId && activePage === 'home'"
+          v-if="!selectedVersionId && localeIsDefault && activePage === 'home'"
           v-model="draft"
           :section="selectedSection"
           :errors="validationErrors"
         />
         <AdminWebsiteEditorPageInspector
-          v-else-if="!selectedVersionId"
+          v-else-if="!selectedVersionId && localeIsDefault"
           v-model="draft"
           :section="selectedSection"
           :errors="validationErrors"
+        />
+        <AdminWebsiteEditorTranslationInspector
+          v-else-if="!selectedVersionId && draft"
+          v-model="draft"
+          :locale="activeLocale"
+          :page="activePage"
+          :section="selectedSection"
         />
         </div>
       </aside>
@@ -229,6 +271,12 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
+            <AdminWebsiteEditorLocalePicker
+              v-if="draft"
+              v-model="activeLocale"
+              :draft="draft"
+              @update:supported-locales="updateSupportedLocales"
+            />
             <AdminWebsiteEditorPagePicker
               :model-value="activePage"
               :options="pagePickerOptions"
@@ -288,11 +336,78 @@
         </div>
 
         <div class="flex shrink-0 items-center justify-between gap-3 border-t border-admin-border px-4 py-2 text-xs text-admin-muted">
-          <span>{{ activeDeviceConfig.label }} · {{ activeDeviceConfig.widthLabel }}</span>
+          <span>{{ activeDeviceConfig.label }} · {{ activeDeviceConfig.widthLabel }} · {{ activeLocaleName }}</span>
           <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-admin-warning" aria-hidden="true" />{{ selectedVersionId ? 'Historical version' : 'Private draft preview' }}</span>
         </div>
       </section>
     </div>
+
+    <AdminWebsiteEditorNavigator
+      :open="navigatorOpen"
+      :items="navigationItems"
+      :current-page="activePage"
+      :current-section="selectedSection"
+      @close="navigatorOpen = false"
+      @navigate="navigateFromNavigator"
+    />
+
+    <ConfirmModal
+      :open="pendingConfirmation !== null"
+      :title="confirmationContent.title"
+      :message="confirmationContent.message"
+      :confirm-text="confirmationContent.confirmText"
+      :loading-text="confirmationContent.loadingText"
+      :loading="confirmationLoading"
+      :variant="confirmationContent.variant"
+      compact
+      @confirm="confirmPendingAction"
+      @cancel="cancelPendingAction"
+    />
+
+    <AdminWebsiteEditorPublishReview
+      :open="publishReviewOpen"
+      :changed-areas="publishChangedAreas"
+      :warnings="publishWarnings"
+      :release-note="releaseNote"
+      :loading="publishing"
+      :workflow="workflow"
+      :workflow-loading="workflowLoading"
+      :workflow-error="workflowError"
+      :review-note="reviewNote"
+      :scheduled-for="scheduledFor"
+      @close="publishReviewOpen = false"
+      @publish="publishChanges"
+      @navigate="navigateFromPublishReview"
+      @update:release-note="releaseNote = $event"
+      @update:review-note="reviewNote = $event"
+      @update:scheduled-for="scheduledFor = $event"
+      @request-review="requestReview"
+      @approve="approveReview"
+      @request-changes="returnForChanges"
+      @schedule="schedulePublication"
+      @cancel-schedule="cancelScheduledPublication"
+    />
+
+    <BaseModal :open="conflictOpen" aria-label="Your draft changed elsewhere" size="sm" hide-close body-class="p-5" @close="closeConflict">
+      <div class="flex items-start gap-3">
+        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-admin-warning-soft text-admin-warning">
+          <Icon name="heroicons:arrows-right-left" class="h-5 w-5" aria-hidden="true" />
+        </span>
+        <div class="min-w-0">
+          <h2 class="text-sm font-semibold text-admin-text">Your draft changed elsewhere</h2>
+          <p class="mt-1 text-xs leading-5 text-admin-muted">Your browser edits are preserved. Review the latest server draft, copy your edits, or reload the latest version before continuing.</p>
+          <p v-if="conflictLatestSummary" class="mt-2 text-xs font-medium text-admin-text">{{ conflictLatestSummary }}</p>
+          <p v-if="conflictNotice" class="mt-2 text-xs font-medium text-admin-accent-strong" role="status">{{ conflictNotice }}</p>
+        </div>
+      </div>
+      <template #footer>
+        <div class="grid gap-2 sm:grid-cols-3">
+          <button type="button" class="editor-focus min-h-11 rounded-lg border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft disabled:opacity-50" :disabled="conflictLoading" @click="reviewLatestConflict">Review latest</button>
+          <button type="button" class="editor-focus min-h-11 rounded-lg border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft" @click="copyRecoveryChanges">Copy my changes</button>
+          <button type="button" class="editor-focus min-h-11 rounded-lg bg-admin-accent px-3 text-xs font-semibold text-admin-on-accent hover:bg-admin-accent-strong disabled:opacity-50" :disabled="conflictLoading" @click="reloadLatestConflict">{{ conflictLoading ? 'Loading…' : 'Reload latest' }}</button>
+        </div>
+      </template>
+    </BaseModal>
 
     <ConfirmModal
       :open="deleteVersionTargetId !== null"
@@ -311,23 +426,47 @@
 
 <script setup lang="ts">
 import type { HomepageSectionId, SiteConfig } from '~/composables/useSiteConfig'
-import type { WebsiteEditorDraftPayload, WebsiteEditorVersionSummary } from '~/composables/useWebsiteEditorDraft'
+import type { WebsiteEditorDraftPayload, WebsiteEditorDraftState, WebsiteEditorVersionSummary, WebsiteEditorWorkflow } from '~/composables/useWebsiteEditorDraft'
 import { HOMEPAGE_SECTION_LABELS } from '~/utils/homepageSections'
+import { applyWebsiteEditorLocale, websiteEditorLocaleName, websiteEditorLocaleProgress } from '~/utils/websiteEditorLocalization'
+import { websiteEditorChangedAreas, websiteEditorReadinessWarnings, type WebsiteEditorReadinessWarning } from '~/utils/websiteEditorPublishing'
 import {
   WEBSITE_EDITOR_PAGES,
   WEBSITE_EDITOR_STATIC_SECTIONS,
   websiteEditorPage,
+  type WebsiteEditorNavigationItem,
   type WebsiteEditorPageId,
 } from '~/utils/websiteEditorPages'
 
 definePageMeta({ middleware: 'auth' })
 
 type DeviceId = 'desktop' | 'tablet' | 'mobile'
+type ConfirmationKind = 'discard' | 'restore'
+type RecoverySnapshot = {
+  payload: WebsiteEditorDraftPayload
+  savedAt: string
+}
 
 const { siteConfig, fetchSiteConfig, broadcastConfigUpdate } = useSiteConfig()
 const { storeUrl } = useStorefrontUrl()
-const { fetchDraft, saveDraft, discardDraft, publishDraft, fetchVersions, fetchVersion, restoreVersion, deleteVersion } = useWebsiteEditorDraft()
+const {
+  fetchDraft,
+  saveDraft,
+  discardDraft,
+  publishDraft,
+  requestDraftReview,
+  approveDraft,
+  requestDraftChanges,
+  scheduleDraft,
+  cancelDraftSchedule,
+  fetchVersions,
+  fetchVersion,
+  restoreVersion,
+  deleteVersion,
+} = useWebsiteEditorDraft()
 const route = useRoute()
+const router = useRouter()
+const authStore = useAuthStore()
 
 const requestedPage = typeof route.query.page === 'string' ? route.query.page : ''
 const initialPage = WEBSITE_EDITOR_PAGES.some(page => page.id === requestedPage)
@@ -359,9 +498,38 @@ const saving = ref(false)
 const publishing = ref(false)
 const discarding = ref(false)
 const actionError = ref('')
+const publishReviewOpen = ref(false)
+const navigatorOpen = ref(false)
+const releaseNote = ref('')
+const reviewNote = ref('')
+const scheduledFor = ref('')
+const workflowLoading = ref(false)
+const workflowError = ref('')
+const workflow = ref<WebsiteEditorWorkflow>({
+  status: 'draft',
+  requested_by_name: null,
+  requested_at: null,
+  reviewed_by_name: null,
+  reviewed_at: null,
+  note: null,
+  scheduled_publish_at: null,
+  scheduled_by_name: null,
+  scheduled_release_note: null,
+  timezone: 'UTC',
+})
+const publishSuccess = ref<{ summary: string } | null>(null)
+const pendingConfirmation = ref<ConfirmationKind | null>(null)
+const conflictOpen = ref(false)
+const conflictLoading = ref(false)
+const conflictNotice = ref('')
+const conflictLatestSummary = ref('')
+const conflictLatest = ref<WebsiteEditorDraftState | null>(null)
+const recoverySnapshot = ref<RecoverySnapshot | null>(null)
 const validationErrors = ref<Record<string, string[]>>({})
 const activePage = ref<WebsiteEditorPageId>(initialPage)
 const selectedSection = ref(initialSection)
+const requestedLocale = typeof route.query.locale === 'string' ? route.query.locale : ''
+const activeLocale = ref(requestedLocale || 'en')
 const activeDevice = ref<DeviceId>('desktop')
 const previewFrame = ref<HTMLIFrameElement | null>(null)
 const previewLoading = ref(true)
@@ -390,7 +558,12 @@ const pageOptions = WEBSITE_EDITOR_PAGES
 
 const snapshot = (value: WebsiteEditorDraftPayload | null) => JSON.stringify(value)
 const isDirty = computed(() => Boolean(draft.value) && snapshot(draft.value) !== savedSnapshot.value)
-const workingDraft = computed(() => versionPreview.value ?? draft.value)
+const canonicalWorkingDraft = computed(() => versionPreview.value ?? draft.value)
+const workingDraft = computed(() => canonicalWorkingDraft.value
+  ? applyWebsiteEditorLocale(canonicalWorkingDraft.value, activeLocale.value)
+  : null)
+const localeIsDefault = computed(() => activeLocale.value === canonicalWorkingDraft.value?.default_locale)
+const activeLocaleName = computed(() => websiteEditorLocaleName(activeLocale.value))
 const canUndo = computed(() => undoIndex.value > 0)
 const canRedo = computed(() => undoIndex.value >= 0 && undoIndex.value < undoSnapshots.value.length - 1)
 const activeDeviceConfig = computed(() => devices.find(device => device.id === activeDevice.value) ?? devices[0]!)
@@ -400,7 +573,44 @@ const controlsVisible = computed(() => controlsDocked.value ? !controlsCollapsed
 const controlsToggleLabel = computed(() => controlsDocked.value
   ? (controlsCollapsed.value ? 'Show editor sidebar' : 'Hide editor sidebar')
   : 'Open sections panel')
+const confirmationLoading = computed(() => discarding.value || publishing.value || restoringVersion.value)
+const confirmationContent = computed(() => {
+  if (pendingConfirmation.value === 'restore') return {
+    title: 'Restore version to draft?',
+    message: 'This replaces the current private draft. The live website stays unchanged until you explicitly publish.',
+    confirmText: 'Restore to draft',
+    loadingText: 'Restoring…',
+    variant: 'warning' as const,
+  }
+  return {
+    title: 'Discard private changes?',
+    message: 'This removes the saved draft and any unsaved edits, then reloads the published website.',
+    confirmText: 'Discard changes',
+    loadingText: 'Discarding…',
+    variant: 'danger' as const,
+  }
+})
 const activeStoreUrl = computed(() => `${storeUrl.value}${activePageOption.value.path === '/' ? '' : activePageOption.value.path}`)
+const publishedDraft = computed(() => siteConfig.value ? normalizeWebsiteEditorDraft(siteConfig.value) : null)
+const publishChangedAreas = computed(() => publishedDraft.value && draft.value
+  ? websiteEditorChangedAreas(publishedDraft.value, draft.value)
+  : [])
+const publishWarnings = computed<WebsiteEditorReadinessWarning[]>(() => {
+  if (!draft.value) return []
+  const warnings = websiteEditorReadinessWarnings(draft.value)
+  for (const locale of draft.value.supported_locales) {
+    if (locale === draft.value.default_locale) continue
+    const progress = websiteEditorLocaleProgress(draft.value, locale)
+    if (progress.percent < 100) warnings.push({
+      id: `locale-${locale}`,
+      label: `${websiteEditorLocaleName(locale)} is ${progress.percent}% translated`,
+      detail: `${progress.total - progress.translated} text fields will use default-language content.`,
+      page: 'global',
+      section: 'store-details',
+    })
+  }
+  return warnings
+})
 const previewUrl = computed(() => `/admin/storefront-preview?version=${previewVersion.value}`)
 const previewFrameStyle = computed(() => ({ width: activeDeviceConfig.value.width, maxWidth: '100%', height: '100%' }))
 const draftSavedAt = computed(() => draftUpdatedAt.value
@@ -413,12 +623,24 @@ const editorStateTitle = computed(() => loadingDraft.value
     : isDirty.value
       ? 'Unsaved preview changes'
       : hasSavedDraft.value
-        ? 'Private draft saved'
+        ? workflow.value.scheduled_publish_at
+          ? 'Publication scheduled'
+          : workflow.value.status === 'pending'
+            ? 'Review requested'
+            : workflow.value.status === 'approved'
+              ? 'Draft approved'
+              : workflow.value.status === 'changes_requested'
+                ? 'Changes requested'
+                : 'Private draft saved'
         : 'Published website loaded')
 const editorStateDescription = computed(() => {
   if (loadingDraft.value) return 'Loading the latest tenant configuration and private draft.'
-  if (selectedVersionId.value) return 'This is an earlier published version. Return to the draft or restore and publish this version.'
+  if (selectedVersionId.value) return 'This is an earlier published version. Restore it to the private draft before publishing.'
   if (isDirty.value) return 'The preview includes changes that are only in this browser. Save the draft before publishing.'
+  if (hasSavedDraft.value && workflow.value.scheduled_publish_at) return `This approved draft will publish automatically in ${workflow.value.timezone}.`
+  if (hasSavedDraft.value && workflow.value.status === 'pending') return 'The saved draft is awaiting review. You can still publish it immediately if needed.'
+  if (hasSavedDraft.value && workflow.value.status === 'approved') return 'The saved draft is approved and can be scheduled or published now.'
+  if (hasSavedDraft.value && workflow.value.status === 'changes_requested') return 'Review feedback is available in the publication panel.'
   if (hasSavedDraft.value) return 'This draft is private. Publish it when the preview is ready for customers.'
   return 'Start editing a section. Nothing changes publicly until you save and publish.'
 })
@@ -428,6 +650,7 @@ const previewConfig = computed<SiteConfig | null>(() => {
   return {
     ...siteConfig.value,
     ...workingDraft.value,
+    locale: activeLocale.value,
     homepage_statement: {
       ...workingDraft.value.homepage_statement,
       image_url: workingDraft.value.homepage_statement_image_url,
@@ -534,11 +757,30 @@ const sections = computed(() => {
 
   return WEBSITE_EDITOR_STATIC_SECTIONS[activePage.value].map(section => ({
     ...section,
-    visible: true,
+    visible: !isPageDisabled(activePage.value),
     editable: true,
     hasContent: staticSectionHasContent(section.id),
   }))
 })
+
+const navigationItems = computed<WebsiteEditorNavigationItem[]>(() => WEBSITE_EDITOR_PAGES.flatMap(page => {
+  const pageSections = page.id === 'home'
+    ? (workingDraft.value?.homepage_sections ?? []).map(section => ({
+        id: section.id,
+        label: HOMEPAGE_SECTION_LABELS[section.id],
+        icon: sectionMeta[section.id].icon,
+      }))
+    : WEBSITE_EDITOR_STATIC_SECTIONS[page.id]
+
+  return pageSections.map(section => ({
+    page: page.id,
+    pageLabel: page.label,
+    section: section.id,
+    sectionLabel: section.label,
+    icon: section.icon,
+    disabled: isPageDisabled(page.id),
+  }))
+}))
 
 function initializeUndoHistory() {
   if (undoTimer !== null) window.clearTimeout(undoTimer)
@@ -592,7 +834,7 @@ function redoChange() {
 }
 
 function moveSection(index: number, direction: -1 | 1) {
-  if (!draft.value || selectedVersionId.value || activePage.value !== 'home') return
+  if (!draft.value || selectedVersionId.value || !localeIsDefault.value || activePage.value !== 'home') return
   const destination = index + direction
   if (destination < 0 || destination >= draft.value.homepage_sections.length) return
   const next = [...draft.value.homepage_sections]
@@ -604,7 +846,7 @@ function moveSection(index: number, direction: -1 | 1) {
 }
 
 function toggleSection(index: number) {
-  if (!draft.value || selectedVersionId.value || activePage.value !== 'home') return
+  if (!draft.value || selectedVersionId.value || !localeIsDefault.value || activePage.value !== 'home') return
   const next = draft.value.homepage_sections.map((section, sectionIndex) => sectionIndex === index
     ? { ...section, visible: !section.visible }
     : section)
@@ -615,6 +857,183 @@ function toggleSection(index: number) {
 
 function apiMessage(error: any, fallback: string) {
   return error?.data?.message || error?.message || fallback
+}
+
+function recoveryStorageKey() {
+  const owner = authStore.user
+    ? `${authStore.user.id}:${authStore.user.store_id ?? authStore.user.store?.id ?? ''}`
+    : 'unknown'
+  return `ssu:website-editor:recovery:${owner}`
+}
+
+function persistRecovery(payload: WebsiteEditorDraftPayload) {
+  const recovery = { payload: JSON.parse(JSON.stringify(payload)), savedAt: new Date().toISOString() } as RecoverySnapshot
+  recoverySnapshot.value = recovery
+  if (!import.meta.client) return
+  try {
+    window.sessionStorage.setItem(recoveryStorageKey(), JSON.stringify(recovery))
+  } catch {
+    // The in-memory copy remains available when browser storage is unavailable.
+  }
+}
+
+function loadRecovery() {
+  if (!import.meta.client) return
+  try {
+    const stored = window.sessionStorage.getItem(recoveryStorageKey())
+    if (stored) recoverySnapshot.value = JSON.parse(stored) as RecoverySnapshot
+  } catch {
+    recoverySnapshot.value = null
+  }
+}
+
+function dismissRecovery() {
+  recoverySnapshot.value = null
+  conflictNotice.value = ''
+  if (!import.meta.client) return
+  try {
+    window.sessionStorage.removeItem(recoveryStorageKey())
+  } catch {
+    // Nothing else is required when browser storage is unavailable.
+  }
+}
+
+function applyDraftState(state: WebsiteEditorDraftState) {
+  if (!siteConfig.value) throw new Error('The storefront configuration is unavailable.')
+  draft.value = normalizeWebsiteEditorDraft(siteConfig.value, state.payload)
+  ensureActiveLocale(draft.value)
+  baseUpdatedAt.value = state.base_updated_at
+  hasSavedDraft.value = state.has_draft
+  draftUpdatedAt.value = state.draft_updated_at
+  draftVersion.value = state.draft_version
+  workflow.value = state.workflow
+  savedSnapshot.value = snapshot(draft.value)
+  validationErrors.value = {}
+  initializeUndoHistory()
+}
+
+function openSaveConflict() {
+  if (draft.value) persistRecovery(draft.value)
+  conflictLatest.value = null
+  conflictLatestSummary.value = ''
+  conflictNotice.value = 'Your edits were not overwritten.'
+  conflictOpen.value = true
+}
+
+function closeConflict() {
+  if (!conflictLoading.value) conflictOpen.value = false
+}
+
+async function reviewLatestConflict() {
+  conflictLoading.value = true
+  conflictNotice.value = ''
+  try {
+    const response = await fetchDraft({ force: true })
+    conflictLatest.value = response.data
+    conflictLatestSummary.value = response.data.draft_updated_at
+      ? `Latest private draft saved ${new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(response.data.draft_updated_at))}.`
+      : 'The latest server version is the currently published website.'
+  } catch (error: any) {
+    conflictNotice.value = apiMessage(error, 'The latest draft could not be reviewed. Try again.')
+  } finally {
+    conflictLoading.value = false
+  }
+}
+
+async function copyRecoveryChanges() {
+  if (!recoverySnapshot.value || !import.meta.client) return
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(recoverySnapshot.value.payload, null, 2))
+    conflictNotice.value = 'Your changes were copied to the clipboard.'
+  } catch {
+    conflictNotice.value = 'The browser blocked clipboard access. Your recovery copy is still preserved.'
+  }
+}
+
+function restoreRecoveryCopy() {
+  if (!recoverySnapshot.value) return
+  draft.value = JSON.parse(JSON.stringify(recoverySnapshot.value.payload)) as WebsiteEditorDraftPayload
+  validationErrors.value = {}
+  initializeUndoHistory()
+  conflictNotice.value = 'Your browser copy is restored for editing.'
+}
+
+async function reloadLatestConflict() {
+  conflictLoading.value = true
+  conflictNotice.value = ''
+  try {
+    const state = conflictLatest.value ?? (await fetchDraft({ force: true })).data
+    applyDraftState(state)
+    conflictOpen.value = false
+    actionError.value = ''
+  } catch (error: any) {
+    conflictNotice.value = apiMessage(error, 'The latest draft could not be loaded. Try again.')
+  } finally {
+    conflictLoading.value = false
+  }
+}
+
+function requestConfirmation(kind: ConfirmationKind) {
+  pendingConfirmation.value = kind
+}
+
+function cancelPendingAction() {
+  if (!confirmationLoading.value) pendingConfirmation.value = null
+}
+
+async function confirmPendingAction() {
+  const action = pendingConfirmation.value
+  if (!action || confirmationLoading.value) return
+  if (action === 'discard') await discardChanges()
+  else await restoreSelectedVersion()
+  if (!confirmationLoading.value) pendingConfirmation.value = null
+}
+
+function openPublishReview() {
+  if (!hasSavedDraft.value || isDirty.value || publishing.value) return
+  actionError.value = ''
+  workflowError.value = ''
+  reviewNote.value = ''
+  if (workflow.value.scheduled_release_note && !releaseNote.value) releaseNote.value = workflow.value.scheduled_release_note
+  publishReviewOpen.value = true
+}
+
+async function runWorkflowAction(action: () => Promise<{ data: WebsiteEditorWorkflow }>) {
+  if (workflowLoading.value) return
+  workflowLoading.value = true
+  workflowError.value = ''
+  try {
+    const response = await action()
+    workflow.value = response.data
+    reviewNote.value = ''
+  } catch (error: any) {
+    if ((error?.statusCode ?? error?.status) === 409) {
+      publishReviewOpen.value = false
+      openSaveConflict()
+      return
+    }
+    workflowError.value = apiMessage(error, 'The editorial workflow could not be updated. Try again.')
+  } finally {
+    workflowLoading.value = false
+  }
+}
+
+const requestReview = () => draftVersion.value && runWorkflowAction(() => requestDraftReview(draftVersion.value!, reviewNote.value))
+const approveReview = () => draftVersion.value && runWorkflowAction(() => approveDraft(draftVersion.value!, reviewNote.value))
+const returnForChanges = () => draftVersion.value && runWorkflowAction(() => requestDraftChanges(draftVersion.value!, reviewNote.value))
+const schedulePublication = () => runWorkflowAction(async () => {
+  if (!draftVersion.value) throw new Error('Save the draft before scheduling publication.')
+  const response = await scheduleDraft(draftVersion.value, scheduledFor.value, releaseNote.value)
+  scheduledFor.value = ''
+  return response
+})
+const cancelScheduledPublication = () => draftVersion.value && runWorkflowAction(() => cancelDraftSchedule(draftVersion.value!))
+
+function navigateFromPublishReview(page: WebsiteEditorPageId, section: string) {
+  publishReviewOpen.value = false
+  switchPage(page, section)
+  if (controlsDocked.value) controlsCollapsed.value = false
+  else controlsOpen.value = true
 }
 
 function focusFirstInvalidSection(errors: Record<string, string[]>) {
@@ -659,10 +1078,12 @@ async function loadEditor(force = false) {
     if (!siteConfig.value) throw new Error('The storefront configuration is unavailable.')
     const response = await fetchDraft({ preferPreloaded: !force, force })
     draft.value = normalizeWebsiteEditorDraft(siteConfig.value, response.data.payload)
+    ensureActiveLocale(draft.value)
     baseUpdatedAt.value = response.data.base_updated_at
     hasSavedDraft.value = response.data.has_draft
     draftUpdatedAt.value = response.data.draft_updated_at
     draftVersion.value = response.data.draft_version
+    workflow.value = response.data.workflow
     savedSnapshot.value = snapshot(draft.value)
     initializeUndoHistory()
     if (activePage.value === 'home') {
@@ -693,8 +1114,14 @@ async function saveChanges() {
     hasSavedDraft.value = true
     draftUpdatedAt.value = response.data.draft_updated_at
     draftVersion.value = response.data.draft_version
+    workflow.value = response.data.workflow
     savedSnapshot.value = snapshot(draft.value)
+    dismissRecovery()
   } catch (error: any) {
+    if ((error?.statusCode ?? error?.status) === 409) {
+      openSaveConflict()
+      return
+    }
     validationErrors.value = error?.data?.errors ?? {}
     focusFirstInvalidSection(validationErrors.value)
     actionError.value = apiMessage(error, 'The draft could not be saved.')
@@ -704,20 +1131,22 @@ async function saveChanges() {
 }
 
 async function discardChanges() {
-  if (!window.confirm('Discard this private draft and restore the published website?')) return
   discarding.value = true
   actionError.value = ''
   try {
     const response = await discardDraft()
     if (!siteConfig.value) throw new Error('The published website is unavailable.')
     draft.value = normalizeWebsiteEditorDraft(siteConfig.value, response.data.payload)
+    ensureActiveLocale(draft.value)
     baseUpdatedAt.value = response.data.base_updated_at
     hasSavedDraft.value = false
     draftUpdatedAt.value = null
     draftVersion.value = null
+    workflow.value = response.data.workflow
     savedSnapshot.value = snapshot(draft.value)
     validationErrors.value = {}
     initializeUndoHistory()
+    dismissRecovery()
   } catch (error: any) {
     actionError.value = apiMessage(error, 'The draft could not be discarded.')
   } finally {
@@ -727,24 +1156,32 @@ async function discardChanges() {
 
 async function publishChanges() {
   if (!hasSavedDraft.value || isDirty.value) return
-  if (!window.confirm('Publish this website draft to your live store?')) return
+  const changedAreaCount = publishChangedAreas.value.length
   publishing.value = true
   actionError.value = ''
   try {
-    await publishDraft()
+    await publishDraft(releaseNote.value)
     await fetchSiteConfig(true)
     broadcastConfigUpdate()
     if (!siteConfig.value) throw new Error('The published website is unavailable.')
-    draft.value = normalizeWebsiteEditorDraft(siteConfig.value)
-    baseUpdatedAt.value = siteConfig.value.updated_at
-    hasSavedDraft.value = false
-    draftUpdatedAt.value = null
-    draftVersion.value = null
-    savedSnapshot.value = snapshot(draft.value)
-    validationErrors.value = {}
-    initializeUndoHistory()
+    const publishedState = await fetchDraft({ force: true })
+    applyDraftState(publishedState.data)
+    dismissRecovery()
+    publishReviewOpen.value = false
+    releaseNote.value = ''
+    publishSuccess.value = {
+      summary: changedAreaCount === 1
+        ? '1 changed area is now live.'
+        : `${changedAreaCount} changed areas are now live.`,
+    }
     if (historyOpen.value) await loadVersions()
   } catch (error: any) {
+    if ((error?.statusCode ?? error?.status) === 409) {
+      publishReviewOpen.value = false
+      openSaveConflict()
+      return
+    }
+    publishReviewOpen.value = false
     actionError.value = apiMessage(error, 'The website could not be published.')
   } finally {
     publishing.value = false
@@ -777,6 +1214,7 @@ async function previewVersionFromHistory(versionId: number) {
   try {
     const response = await fetchVersion(versionId)
     versionPreview.value = normalizeWebsiteEditorDraft(siteConfig.value, response.data.payload)
+    ensureActiveLocale(versionPreview.value)
     selectedVersionId.value = versionId
     publishedHash.value = response.published_hash
     if (activePage.value === 'home') {
@@ -802,27 +1240,17 @@ function exitVersionPreview() {
 
 async function restoreSelectedVersion() {
   if (!selectedVersionId.value || !publishedHash.value) return
-  if (!window.confirm('Restore and publish this version? The current private draft and any unsaved edits will be discarded.')) return
   restoringVersion.value = true
   historyError.value = ''
   actionError.value = ''
   try {
-    await restoreVersion(selectedVersionId.value, publishedHash.value)
-    await fetchSiteConfig(true)
-    broadcastConfigUpdate()
-    if (!siteConfig.value) throw new Error('The restored website is unavailable.')
-    draft.value = normalizeWebsiteEditorDraft(siteConfig.value)
-    baseUpdatedAt.value = siteConfig.value.updated_at
-    hasSavedDraft.value = false
-    draftUpdatedAt.value = null
-    draftVersion.value = null
-    savedSnapshot.value = snapshot(draft.value)
-    validationErrors.value = {}
+    const response = await restoreVersion(selectedVersionId.value, publishedHash.value, draftVersion.value)
+    applyDraftState(response.data)
     selectedVersionId.value = null
     versionPreview.value = null
-    initializeUndoHistory()
-    await loadVersions()
+    dismissRecovery()
   } catch (error: any) {
+    if ((error?.statusCode ?? error?.status) === 409) openSaveConflict()
     historyError.value = apiMessage(error, 'This website version could not be restored.')
   } finally {
     restoringVersion.value = false
@@ -874,7 +1302,31 @@ function sendPreviewConfig(force = false) {
 
 function selectSection(section: string) {
   selectedSection.value = section
+  syncEditorRoute()
   sendToPreview({ type: 'select-section', section, page: activePage.value })
+}
+
+function ensureActiveLocale(payload: WebsiteEditorDraftPayload) {
+  activeLocale.value = payload.supported_locales.includes(activeLocale.value)
+    ? activeLocale.value
+    : payload.default_locale
+}
+
+function updateSupportedLocales(locales: string[]) {
+  if (!draft.value || selectedVersionId.value) return
+  const defaultLocale = draft.value.default_locale
+  const supported = [defaultLocale, ...locales.filter(locale => locale !== defaultLocale)]
+    .filter((locale, index, values) => values.indexOf(locale) === index)
+    .slice(0, 12)
+  const localizedContent = Object.fromEntries(
+    Object.entries(draft.value.localized_content).filter(([locale]) => supported.includes(locale) && locale !== defaultLocale),
+  )
+  draft.value = {
+    ...draft.value,
+    supported_locales: supported,
+    localized_content: localizedContent,
+  }
+  ensureActiveLocale(draft.value)
 }
 
 function switchPage(page: WebsiteEditorPageId, section?: string) {
@@ -883,8 +1335,28 @@ function switchPage(page: WebsiteEditorPageId, section?: string) {
     ? workingDraft.value?.homepage_sections[0]?.id ?? 'hero'
     : WEBSITE_EDITOR_STATIC_SECTIONS[page][0]?.id ?? 'header'
   selectedSection.value = section ?? firstSection
+  syncEditorRoute()
   sendToPreview({ type: 'select-page', page })
   nextTick(() => selectSection(selectedSection.value))
+}
+
+function navigateFromNavigator(item: WebsiteEditorNavigationItem) {
+  switchPage(item.page, item.section)
+}
+
+function syncEditorRoute() {
+  const routePage = typeof route.query.page === 'string' ? route.query.page : ''
+  const routeSection = typeof route.query.section === 'string' ? route.query.section : ''
+  const routeLocale = typeof route.query.locale === 'string' ? route.query.locale : ''
+  if (routePage === activePage.value && routeSection === selectedSection.value && routeLocale === activeLocale.value) return
+  void router.replace({
+    query: {
+      ...route.query,
+      page: activePage.value,
+      section: selectedSection.value,
+      locale: activeLocale.value,
+    },
+  })
 }
 
 function refreshPreview() {
@@ -974,9 +1446,18 @@ function onEditorKeydown(event: KeyboardEvent) {
     closeControls()
     return
   }
-  if (!(event.ctrlKey || event.metaKey) || event.altKey || selectedVersionId.value) return
+  if (!(event.ctrlKey || event.metaKey) || event.altKey || event.repeat) return
   const key = event.key.toLowerCase()
-  if (key === 'z' && event.shiftKey) {
+  if (key === 'k') {
+    event.preventDefault()
+    navigatorOpen.value = true
+    return
+  }
+  if (selectedVersionId.value) return
+  if (key === 's') {
+    event.preventDefault()
+    if (isDirty.value && !loadingDraft.value && !saving.value) void saveChanges()
+  } else if (key === 'z' && event.shiftKey) {
     event.preventDefault()
     redoChange()
   } else if (key === 'z') {
@@ -991,9 +1472,14 @@ function onEditorKeydown(event: KeyboardEvent) {
 onBeforeRouteLeave(() => !isDirty.value || window.confirm('Leave the editor and lose your unsaved changes?'))
 watch(previewConfig, () => sendPreviewConfig(), { deep: true })
 watch(draft, scheduleUndoSnapshot, { deep: true })
+watch(activeLocale, () => {
+  syncEditorRoute()
+  sendPreviewConfig()
+})
 
 onMounted(() => {
   editorMounted = true
+  loadRecovery()
   controlsMediaQuery = window.matchMedia('(min-width: 1280px)')
   syncControlsViewport(controlsMediaQuery)
   controlsMediaQuery.addEventListener('change', syncControlsViewport)

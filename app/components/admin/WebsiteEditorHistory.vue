@@ -12,7 +12,7 @@
     </button>
 
     <div v-if="open" class="mt-2 px-1">
-      <p class="px-2 text-xs leading-5 text-admin-muted">Preview, restore, or remove an earlier published version.</p>
+      <p class="px-2 text-xs leading-5 text-admin-muted">Preview an earlier version or restore it to your private draft.</p>
 
       <div v-if="loading" class="flex min-h-24 items-center justify-center" role="status">
         <Icon name="heroicons:arrow-path" class="h-4 w-4 animate-spin text-admin-accent motion-reduce:animate-none" aria-hidden="true" />
@@ -20,7 +20,8 @@
       </div>
 
       <div v-else-if="error" class="mt-3 rounded-xl bg-admin-danger-soft p-3 text-xs leading-5 text-admin-danger" role="alert">
-        {{ error }}
+        <p>{{ error }}</p>
+        <button type="button" class="history-focus mt-2 min-h-11 rounded-lg px-2 font-semibold hover:bg-admin-surface" @click="$emit('retry')">Try again</button>
       </div>
 
       <div v-else-if="versions.length === 0" class="mt-3 rounded-xl bg-admin-soft p-4 text-center">
@@ -33,21 +34,23 @@
         <div
           v-for="version in versions"
           :key="version.id"
-          class="flex min-h-11 w-full items-center rounded-xl"
+          class="flex min-h-11 w-full items-start rounded-xl"
           :class="selectedId === version.id ? 'bg-admin-accent-soft text-admin-accent-strong' : 'text-admin-muted hover:bg-admin-soft hover:text-admin-text'"
         >
           <button
             type="button"
-            class="history-focus flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-xl px-3 text-left"
+            class="history-focus flex min-h-11 min-w-0 flex-1 items-start gap-3 rounded-xl px-3 py-2.5 text-left"
             :aria-pressed="selectedId === version.id"
             @click="$emit('select', version.id)"
           >
-            <Icon name="heroicons:document-duplicate" class="h-4 w-4 shrink-0" aria-hidden="true" />
+            <Icon name="heroicons:document-duplicate" class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
             <span class="min-w-0 flex-1">
               <span class="block text-xs font-semibold">Saved version</span>
-              <span class="block truncate text-xs">{{ formatDate(version.created_at) }}</span>
+              <span class="block truncate text-xs">{{ formatDate(version.created_at) }}<template v-if="version.publisher_name"> · {{ version.publisher_name }}</template></span>
+              <span v-if="version.release_note" class="mt-0.5 block truncate text-xs">Publish note: {{ version.release_note }}</span>
+              <span v-if="version.changed_areas.length" class="mt-0.5 block truncate text-xs">Changed: {{ changedAreasLabel(version.changed_areas) }}</span>
             </span>
-            <Icon name="heroicons:eye" class="h-4 w-4 shrink-0" aria-hidden="true" />
+            <Icon name="heroicons:eye" class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           </button>
           <button
             type="button"
@@ -64,11 +67,11 @@
 
       <div v-if="selectedId" class="mt-3 rounded-xl border border-admin-warning/30 bg-admin-warning-soft p-3">
         <p class="text-xs font-semibold text-admin-text">Historical preview active</p>
-        <p class="mt-1 text-xs leading-5 text-admin-muted">Editing is paused until you return to the draft or restore this version.</p>
+        <p class="mt-1 text-xs leading-5 text-admin-muted">Restoring replaces the private draft only. The live website stays unchanged until you publish.</p>
         <div class="mt-3 grid grid-cols-2 gap-2">
           <button type="button" class="history-focus min-h-11 rounded-xl border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft" @click="$emit('exit')">Return to draft</button>
           <button type="button" class="history-focus min-h-11 rounded-xl bg-admin-accent px-3 text-xs font-semibold text-admin-on-accent hover:bg-admin-accent-strong disabled:opacity-50" :disabled="restoring" @click="$emit('restore')">
-            {{ restoring ? 'Restoring…' : 'Restore & publish' }}
+            {{ restoring ? 'Restoring…' : 'Restore to draft' }}
           </button>
         </div>
       </div>
@@ -95,6 +98,7 @@ defineEmits<{
   exit: []
   restore: []
   delete: [versionId: number]
+  retry: []
 }>()
 
 function formatDate(value: string) {
@@ -103,6 +107,11 @@ function formatDate(value: string) {
     timeStyle: 'short',
     timeZone: 'Asia/Singapore',
   }).format(new Date(value))
+}
+
+function changedAreasLabel(areas: string[]) {
+  if (areas.length <= 2) return areas.join(' · ')
+  return `${areas.slice(0, 2).join(' · ')} +${areas.length - 2} more`
 }
 </script>
 

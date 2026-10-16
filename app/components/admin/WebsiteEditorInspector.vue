@@ -32,9 +32,11 @@
           accept="image/*,video/mp4,video/webm"
           overlay
           compact
+          library
           preview-class="h-40 w-full object-cover"
           @select="uploadAsset($event, 'hero')"
           @remove="removeAsset('hero')"
+          @browse="librarySlot = 'hero'"
         />
       </div>
       <AdminEditorField label="Heading" :error="errorFor('hero_title')">
@@ -112,9 +114,11 @@
           input-id="editorStatementImageInput"
           overlay
           compact
+          library
           preview-class="h-36 w-full object-cover"
           @select="uploadAsset($event, 'homepage_statement')"
           @remove="removeAsset('homepage_statement')"
+          @browse="librarySlot = 'homepage_statement'"
         />
       </div>
       <label class="flex min-h-11 items-center gap-3 rounded-xl border border-admin-border px-3 text-xs font-medium text-admin-text">
@@ -138,15 +142,27 @@
       <AdminEditorField label="Disclaimer"><input :value="modelValue.homepage_newsletter.disclaimer" maxlength="255" class="editor-input" @input="setNested('homepage_newsletter', 'disclaimer', inputValue($event))" /></AdminEditorField>
     </div>
 
-    <div v-else class="rounded-xl bg-admin-soft p-4 text-xs leading-5 text-admin-muted">
-      Product-driven sections keep their advanced controls in Site Settings for now.
-      <NuxtLink to="/admin/settings?tab=pages&sub=homepage" class="mt-3 inline-flex min-h-11 items-center font-semibold text-admin-accent-strong underline underline-offset-4">Open Site Settings</NuxtLink>
-    </div>
+    <AdminEditorSettingsLink
+      v-else
+      :label="managedSectionLink.label"
+      :to="managedSectionLink.to"
+      :action="managedSectionLink.action"
+      :icon="managedSectionLink.icon"
+    />
+
+    <AdminWebsiteEditorMediaLibrary
+      v-if="librarySlot"
+      :open="Boolean(librarySlot)"
+      :slot="librarySlot"
+      :current-id="assetId(librarySlot)"
+      @close="librarySlot = null"
+      @selected="applyLibraryAsset"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { WebsiteEditorAssetSlot, WebsiteEditorDraftPayload } from '~/composables/useWebsiteEditorDraft'
+import type { WebsiteEditorAssetSlot, WebsiteEditorAssetUpload, WebsiteEditorDraftPayload } from '~/composables/useWebsiteEditorDraft'
 
 const props = defineProps<{
   modelValue: WebsiteEditorDraftPayload
@@ -157,6 +173,7 @@ const emit = defineEmits<{ 'update:modelValue': [value: WebsiteEditorDraftPayloa
 const { uploadDraftAsset } = useWebsiteEditorDraft()
 const assetUploading = reactive<Partial<Record<WebsiteEditorAssetSlot, boolean>>>({})
 const assetError = ref('')
+const librarySlot = ref<'hero' | 'homepage_statement' | null>(null)
 
 const details: Record<string, { title: string; description: string }> = {
   hero: { title: 'Hero', description: 'Set the first message visitors see and tune how the current media is framed.' },
@@ -172,6 +189,38 @@ const details: Record<string, { title: string; description: string }> = {
 }
 const title = computed(() => details[props.section]?.title ?? 'Section')
 const description = computed(() => details[props.section]?.description ?? '')
+const managedSectionLinks: Record<string, { label: string; to: string; action: string; icon: string }> = {
+  'featured-products': {
+    label: 'This section draws from the active product catalogue.',
+    to: '/admin/products',
+    action: 'Manage products',
+    icon: 'heroicons:cube',
+  },
+  showcase: {
+    label: 'Product assignments and showcase media are managed in homepage settings.',
+    to: '/admin/settings?tab=pages&sub=homepage',
+    action: 'Edit showcase settings',
+    icon: 'heroicons:squares-2x2',
+  },
+  'watch-shop': {
+    label: 'Linked products and video cards are managed in homepage settings.',
+    to: '/admin/settings?tab=pages&sub=homepage',
+    action: 'Edit Watch & Shop',
+    icon: 'heroicons:play-circle',
+  },
+  'best-sellers': {
+    label: 'Best seller rules and curated products are managed in homepage settings.',
+    to: '/admin/settings?tab=pages&sub=homepage',
+    action: 'Edit best sellers',
+    icon: 'heroicons:fire',
+  },
+}
+const managedSectionLink = computed(() => managedSectionLinks[props.section] ?? {
+  label: 'Advanced controls for this section are managed in Site Settings.',
+  to: '/admin/settings?tab=pages&sub=homepage',
+  action: 'Open homepage settings',
+  icon: 'heroicons:cog-6-tooth',
+})
 const sectionPrefixes: Record<string, string[]> = {
   hero: ['payload.hero_'],
   'how-it-works': ['payload.homepage_steps'],
@@ -213,6 +262,22 @@ async function uploadAsset(file: File, slot: 'hero' | 'homepage_statement') {
   } finally {
     assetUploading[slot] = false
   }
+}
+
+function assetId(slot: 'hero' | 'homepage_statement') {
+  const field = assetFields[slot]!.id
+  return Number((props.modelValue as unknown as Record<string, unknown>)[field]) || null
+}
+
+function applyLibraryAsset(uploaded: WebsiteEditorAssetUpload) {
+  const slot = uploaded.collection as 'hero' | 'homepage_statement'
+  const fields = assetFields[slot]!
+  const next = clone() as unknown as Record<string, unknown>
+  next[fields.id] = uploaded.id
+  next[fields.url] = uploaded.url
+  if (slot === 'hero') next.hero_media_mime = uploaded.mime_type
+  emit('update:modelValue', next as unknown as WebsiteEditorDraftPayload)
+  assetError.value = ''
 }
 
 function removeAsset(slot: 'hero' | 'homepage_statement') {

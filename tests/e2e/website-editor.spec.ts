@@ -28,7 +28,7 @@ async function openEditor(page: Page) {
   await expect(page.getByText(/Private draft preview|Historical version/)).toBeVisible()
   await expect(page.getByRole('complementary', { name: 'Website editor controls' })).toBeHidden()
   await expect(page.getByRole('button', { name: 'Discard changes' })).toHaveAttribute('title', 'Discard changes')
-  await expect(page.getByRole('button', { name: 'Save draft' })).toHaveAttribute('title', 'Save draft')
+  await expect(page.getByRole('button', { name: 'Save draft' })).toHaveAttribute('title', 'Save draft (Ctrl or Command + S)')
   await expect(page.getByRole('button', { name: 'Publish' })).toHaveAttribute('title', 'Publish')
   await expect(page.getByRole('link', { name: 'Open live store' })).toHaveAttribute('title', 'Open live store')
   expect(previewCloneErrors).toEqual([])
@@ -63,12 +63,132 @@ test.describe('Store Admin website editor', () => {
     await pagePicker.click()
     await page.getByRole('option', { name: /^About(?: Disabled on storefront)?$/ }).click()
     await expect(page.getByTitle('Private storefront about preview')).toBeVisible()
+    await expect(page).toHaveURL(/page=about/)
+    await expect(page).toHaveURL(/section=about-content/)
     await pagePicker.click()
     await page.getByRole('option', { name: 'Home page', exact: true }).click()
     await expect(heading).toHaveValue(`${original} preview check`)
 
     await page.keyboard.press(process.platform === 'darwin' ? 'Meta+z' : 'Control+z')
     await expect(heading).toHaveValue(original)
+  })
+
+  test('returns to the same page and section after refresh', async ({ page }) => {
+    await page.goto('/admin/website-editor?page=about&section=about-content')
+    await waitForAppReady(page)
+    await expect(page.getByRole('button', { name: 'Preview page: About' })).toBeVisible()
+    await page.reload()
+    await waitForAppReady(page)
+    await expect(page.getByRole('button', { name: 'Preview page: About' })).toBeVisible()
+    await expect(page).toHaveURL(/page=about/)
+    await expect(page).toHaveURL(/section=about-content/)
+  })
+
+  test('edits a localized preview while preserving default content', async ({ page }) => {
+    await openEditor(page)
+
+    await page.getByRole('button', { name: 'Manage storefront languages' }).click()
+    const spanish = page.getByRole('checkbox', { name: /Español/ })
+    if (!(await spanish.isChecked())) await spanish.check()
+    await page.getByRole('button', { name: 'Close language settings' }).click()
+
+    await page.getByTitle(/Editing English/).click()
+    await page.getByRole('option', { name: /Spanish/ }).click()
+    await expect(page).toHaveURL(/locale=es/)
+
+    await openEditorControls(page)
+    await expect(page.getByRole('heading', { name: 'Spanish translation' })).toBeVisible()
+    const translatedHeading = page.getByLabel('Heading').first()
+    await expect(translatedHeading).toHaveAttribute('placeholder', /.+/)
+    await translatedHeading.fill('Vista previa localizada')
+    await expect(page.getByText('Unsaved preview changes')).toBeVisible()
+
+    await page.getByRole('button', { name: 'Discard changes' }).click()
+    await page.getByRole('dialog', { name: 'Discard private changes?' }).getByRole('button', { name: 'Discard changes' }).click()
+    await expect(page.getByText('Published website loaded')).toBeVisible()
+  })
+
+  test('finds pages and sections from the keyboard navigator', async ({ page }) => {
+    await openEditor(page)
+    await page.keyboard.press(process.platform === 'darwin' ? 'Meta+k' : 'Control+k')
+
+    const navigator = page.getByRole('dialog', { name: 'Find content' })
+    await expect(navigator).toBeVisible()
+    await navigator.getByRole('searchbox', { name: 'Search pages and sections' }).fill('contact')
+    await navigator.getByRole('button', { name: /Contact content/ }).click()
+
+    await expect(page).toHaveURL(/page=contact/)
+    await expect(page).toHaveURL(/section=contact-content/)
+    await expect(page.getByTitle('Private storefront contact preview')).toBeVisible()
+  })
+
+  test('keeps the exact editor location when handing content off to another screen', async ({ page }) => {
+    await page.goto('/admin/website-editor?page=shop&section=shop-content')
+    await waitForAppReady(page)
+    await openEditorControls(page)
+
+    await page.getByRole('link', { name: 'Edit Shop SEO' }).click()
+    await expect(page).toHaveURL(/\/admin\/settings\?.*tab=pages.*sub=shop/)
+    await expect(page.getByRole('link', { name: 'Back to editor' })).toBeVisible()
+    await page.getByRole('link', { name: 'Back to editor' }).click()
+
+    await expect(page).toHaveURL(/page=shop/)
+    await expect(page).toHaveURL(/section=shop-content/)
+  })
+
+  test('reuses a tenant media-library asset in the private draft', async ({ page }) => {
+    let reused = false
+    await page.route('**/api/v1/site-config/media-library**', async (route) => {
+      if (route.request().method() === 'POST' && route.request().url().includes('/use/hero')) {
+        reused = true
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            id: 77,
+            collection: 'hero',
+            url: '/storage/site-config/reused-cover.jpg',
+            mime_type: 'image/jpeg',
+          }),
+        })
+        return
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: [{
+            id: 42,
+            name: 'campaign-cover.jpg',
+            url: '/storage/site-config/campaign-cover.jpg',
+            mime_type: 'image/jpeg',
+            size: 245760,
+            alt_text: 'Packed customer orders',
+            status: 'archived',
+            usage: [],
+            can_delete: true,
+            created_at: '2026-10-16T04:00:00.000Z',
+          }],
+          meta: { current_page: 1, last_page: 1, per_page: 12, total: 1 },
+        }),
+      })
+    })
+
+    await openEditor(page)
+    await openEditorControls(page)
+    await page.getByRole('button', { name: /media library/i }).first().click()
+
+    const library = page.getByRole('dialog', { name: 'Media library' })
+    await expect(library).toBeVisible()
+    await expect(library.getByText('campaign-cover.jpg').first()).toBeVisible()
+    await library.getByRole('button', { name: 'Review campaign-cover.jpg' }).click()
+    await library.getByRole('button', { name: 'Use this asset' }).click()
+
+    await expect(library).toBeHidden()
+    expect(reused).toBe(true)
+    await expect(page.getByAltText('Hero media')).toHaveAttribute('src', '/storage/site-config/reused-cover.jpg')
+    await expect(page.getByText('Unsaved preview changes')).toBeVisible()
   })
 
   test('supports desktop, tablet, and mobile preview controls', async ({ page }) => {
@@ -194,6 +314,34 @@ test.describe('Store Admin website editor', () => {
     await expect(page.getByTitle(/Private storefront .* preview/)).toBeVisible()
   })
 
+  test('preserves browser edits when a concurrent draft save conflicts', async ({ page }) => {
+    await page.route('**/api/v1/site-config/draft', async (route) => {
+      if (route.request().method() === 'PUT') {
+        await route.fulfill({
+          status: 409,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 'draft_save_conflict', message: 'The private draft changed in another session.' }),
+        })
+        return
+      }
+      await route.continue()
+    })
+
+    await openEditor(page)
+    await openEditorControls(page)
+    const heading = page.getByLabel('Heading').first()
+    await heading.fill(`${await heading.inputValue()} conflict copy`)
+    await page.keyboard.press(process.platform === 'darwin' ? 'Meta+s' : 'Control+s')
+
+    const conflictDialog = page.getByRole('dialog', { name: 'Your draft changed elsewhere' })
+    await expect(conflictDialog).toBeVisible()
+    await expect(conflictDialog.getByRole('button', { name: 'Review latest' })).toBeVisible()
+    await expect(conflictDialog.getByRole('button', { name: 'Copy my changes' })).toBeVisible()
+    await conflictDialog.getByRole('button', { name: 'Reload latest' }).click()
+    await expect(conflictDialog).toBeHidden()
+    await expect(page.getByText('A browser copy of your edits is preserved for recovery.')).toBeVisible()
+  })
+
   test('warns before navigation would discard unsaved work', async ({ page }) => {
     await openEditor(page)
     await openEditorControls(page)
@@ -217,8 +365,28 @@ test.describe('Store Admin website editor', () => {
     await page.getByRole('button', { name: /^Save(?: draft)?$/ }).click()
     await expect(page.getByText('Private draft saved')).toBeVisible()
 
-    page.once('dialog', dialog => dialog.accept())
+    await page.getByRole('button', { name: 'Publish' }).click()
+    const publishReview = page.getByRole('dialog', { name: 'Review website publication' })
+    await expect(publishReview.getByRole('heading', { name: 'Changes in this draft' })).toBeVisible()
+    await expect(publishReview.getByRole('heading', { name: 'Content readiness' })).toBeVisible()
+
+    await publishReview.getByRole('button', { name: 'Request review', exact: true }).click()
+    await expect(publishReview.getByText('Review requested', { exact: true })).toBeVisible()
+    await publishReview.getByRole('button', { name: 'Approve draft' }).click()
+    await expect(publishReview.getByText('Approved', { exact: true })).toBeVisible()
+
+    const futureSchedule = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16)
+    await publishReview.getByLabel('Publish date and time').fill(futureSchedule)
+    await publishReview.getByRole('button', { name: 'Schedule', exact: true }).click()
+    await expect(publishReview.getByRole('button', { name: 'Cancel schedule' })).toBeVisible()
+    await publishReview.getByRole('button', { name: 'Cancel schedule' }).click()
+    await expect(publishReview.getByRole('button', { name: 'Schedule', exact: true })).toBeVisible()
+    await publishReview.getByRole('button', { name: 'Continue editing' }).click()
+
     await page.getByRole('button', { name: 'Discard' }).click()
+    const discardDialog = page.getByRole('dialog', { name: 'Discard private changes?' })
+    await expect(discardDialog).toBeVisible()
+    await discardDialog.getByRole('button', { name: 'Discard changes' }).click()
     await expect(page.getByText('Published website loaded')).toBeVisible()
     await expect(heading).toHaveValue(original)
   })
@@ -234,15 +402,18 @@ test.describe('Store Admin website editor', () => {
     await heading.fill(temporary)
     await page.getByRole('button', { name: /^Save(?: draft)?$/ }).click()
     await expect(page.getByText('Private draft saved')).toBeVisible()
-    page.once('dialog', dialog => dialog.accept())
     await page.getByRole('button', { name: 'Publish' }).click()
+    const firstReview = page.getByRole('dialog', { name: 'Review website publication' })
+    await firstReview.getByLabel('Release note').fill('Temporary browser-test publication')
+    await firstReview.getByRole('button', { name: /^Publish/ }).click()
     await expect(page.getByText('Published website loaded')).toBeVisible()
+    await expect(page.getByText('Website published.')).toBeVisible()
 
     await heading.fill(original)
     await page.getByRole('button', { name: /^Save(?: draft)?$/ }).click()
     await expect(page.getByText('Private draft saved')).toBeVisible()
-    page.once('dialog', dialog => dialog.accept())
     await page.getByRole('button', { name: 'Publish' }).click()
+    await page.getByRole('dialog', { name: 'Review website publication' }).getByRole('button', { name: /^Publish/ }).click()
     await expect(page.getByText('Published website loaded')).toBeVisible()
   })
 })

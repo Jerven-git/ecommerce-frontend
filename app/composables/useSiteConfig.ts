@@ -286,6 +286,10 @@ export interface SiteConfig {
    * redirect is a fallback for environments without that config.
    */
   canonical_host: string | null
+  default_locale: string
+  supported_locales: string[]
+  locale: string
+  localized_content?: Record<string, Record<string, string>>
   site_name: string
   theme: SiteTheme
   logo_url: string | null
@@ -425,6 +429,9 @@ const DEFAULT_CONFIG: Partial<SiteConfig> = {
   // Never redirect on a fallback config; only an explicit host from the backend
   // may move the visitor.
   canonical_host: null,
+  default_locale: 'en',
+  supported_locales: ['en'],
+  locale: 'en',
   theme: { ...DEFAULT_THEME },
   modules_enabled: { ...DEFAULT_MODULES_ENABLED },
 }
@@ -450,6 +457,7 @@ export function useSiteConfig() {
   const pending = useState<boolean>('siteConfigPending', () => false)
   const fetched = useState<boolean>('siteConfigFetched', () => false)
   const error = useState<string | null>('siteConfigError', () => null)
+  const route = useRoute()
 
   async function fetchSiteConfig(force = false) {
     // Several mounted surfaces can request site config at the same time on a
@@ -477,8 +485,14 @@ export function useSiteConfig() {
       // Backend ignores the hint when the request is authenticated — the
       // session user's store always wins.
       const lastSlug = getRememberedStoreSlug()
+      const requestedLocale = route.path.startsWith('/admin')
+        ? 'default'
+        : typeof route.query.locale === 'string' ? route.query.locale : undefined
       const res = await $apiFetch<{ data: SiteConfig }>('/site-config', {
-        params: lastSlug ? { store: lastSlug } : undefined,
+        params: {
+          ...(lastSlug ? { store: lastSlug } : {}),
+          ...(requestedLocale ? { locale: requestedLocale } : {}),
+        },
       })
       // Merge theme + module defaults so missing keys are always present
       const data = res.data

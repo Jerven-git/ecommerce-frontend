@@ -178,6 +178,7 @@
           </template>
 
           <template v-else>
+          <StorefrontLocalePicker class="hidden lg:block" :transparent="isTransparent" />
           <!-- Admin pill (desktop) -->
           <NuxtLink
             v-if="authStore.isAdmin"
@@ -334,6 +335,10 @@
               </div>
             </nav>
             <nav v-else class="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-0.5">
+              <div class="mb-2 flex items-center justify-between border-b border-gray-900/[0.08] px-3 pb-3">
+                <span class="text-xs font-semibold text-gray-500">Language</span>
+                <StorefrontLocalePicker />
+              </div>
               <template v-for="link in navLinks" :key="link.to">
                 <!-- Accordion item with categories (Shop) -->
                 <div v-if="link.categories && link.categories.length">

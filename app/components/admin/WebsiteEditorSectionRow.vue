@@ -62,6 +62,7 @@ const props = withDefaults(defineProps<{
   visible: boolean
   editable: boolean
   hasContent: boolean
+  incomplete?: boolean
   first: boolean
   last: boolean
   disabled?: boolean
@@ -69,6 +70,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   disabled: false,
   composable: true,
+  incomplete: false,
 })
 
 defineEmits<{
@@ -79,12 +81,15 @@ defineEmits<{
 
 const status = computed(() => {
   if (!props.visible) return 'Hidden'
-  if (!props.hasContent) return 'Needs content'
-  return props.editable ? 'Visible' : 'Visible · advanced'
+  if (!props.editable) return 'Managed elsewhere'
+  if (!props.hasContent) return 'Empty'
+  if (props.incomplete) return 'Incomplete'
+  return 'Ready'
 })
 const statusClass = computed(() => {
   if (!props.visible) return 'text-admin-muted'
-  if (!props.hasContent) return 'text-admin-warning'
+  if (!props.editable) return 'text-admin-info'
+  if (!props.hasContent || props.incomplete) return 'text-admin-warning'
   return 'text-admin-success'
 })
 </script>

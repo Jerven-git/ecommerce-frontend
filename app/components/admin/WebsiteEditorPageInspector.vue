@@ -22,7 +22,7 @@
           <p class="text-xs font-semibold text-admin-text">Header logo</p>
           <p class="mt-1 text-xs leading-5 text-admin-muted">The primary brand mark shown in the storefront header.</p>
         </div>
-        <AdminMediaUploader :url="modelValue.logo_url || ''" :uploading="assetUploading.logo" label="Header logo" hint="PNG, JPG, WebP, SVG or GIF · max 2 MB" input-id="editorLogoInput" preview-class="h-14 w-auto object-contain" dropzone-class="h-28" compact @select="uploadAsset($event, 'logo')" @remove="removeAsset('logo')" />
+        <AdminMediaUploader :url="modelValue.logo_url || ''" :uploading="assetUploading.logo" label="Header logo" hint="PNG, JPG, WebP, SVG or GIF · max 2 MB" input-id="editorLogoInput" preview-class="h-14 w-auto object-contain" dropzone-class="h-28" compact library @select="uploadAsset($event, 'logo')" @remove="removeAsset('logo')" @browse="librarySlot = 'logo'" />
       </div>
 
       <AdminEditorField label="Logo accessible name" :error="errorFor('logo_alt_text')">
@@ -40,11 +40,11 @@
       <div class="space-y-4">
         <div class="min-w-0 space-y-2">
           <p class="text-xs font-semibold text-admin-text">Browser icon</p>
-          <AdminMediaUploader :url="modelValue.favicon_url || ''" :uploading="assetUploading.favicon" label="Browser icon" hint="Square image · max 2 MB" input-id="editorFaviconInput" preview-class="h-12 w-12 object-contain" dropzone-class="h-28" compact @select="uploadAsset($event, 'favicon')" @remove="removeAsset('favicon')" />
+          <AdminMediaUploader :url="modelValue.favicon_url || ''" :uploading="assetUploading.favicon" label="Browser icon" hint="Square image · max 2 MB" input-id="editorFaviconInput" preview-class="h-12 w-12 object-contain" dropzone-class="h-28" compact library @select="uploadAsset($event, 'favicon')" @remove="removeAsset('favicon')" @browse="librarySlot = 'favicon'" />
         </div>
         <div class="min-w-0 space-y-2">
           <p class="text-xs font-semibold text-admin-text">Cart icon</p>
-          <AdminMediaUploader :url="modelValue.cart_icon_url || ''" :uploading="assetUploading.cart_icon" label="Cart icon" hint="Square artwork · displayed at a fixed 20 × 20 px" input-id="editorCartIconInput" preview-class="h-12 w-12 object-contain" dropzone-class="h-28" compact @select="uploadAsset($event, 'cart_icon')" @remove="removeAsset('cart_icon')" />
+          <AdminMediaUploader :url="modelValue.cart_icon_url || ''" :uploading="assetUploading.cart_icon" label="Cart icon" hint="Square artwork · displayed at a fixed 20 × 20 px" input-id="editorCartIconInput" preview-class="h-12 w-12 object-contain" dropzone-class="h-28" compact library @select="uploadAsset($event, 'cart_icon')" @remove="removeAsset('cart_icon')" @browse="librarySlot = 'cart_icon'" />
         </div>
       </div>
 
@@ -53,7 +53,7 @@
           <p class="text-xs font-semibold text-admin-text">Footer logo</p>
           <p class="mt-1 text-xs leading-5 text-admin-muted">Optional. Leave empty to reuse the header logo.</p>
         </div>
-        <AdminMediaUploader :url="modelValue.footer_logo_url || ''" :uploading="assetUploading.footer_logo" label="Footer logo" hint="PNG, JPG, WebP, SVG or GIF · max 2 MB" input-id="editorFooterLogoInput" preview-class="h-14 w-auto object-contain" dropzone-class="h-28" compact @select="uploadAsset($event, 'footer_logo')" @remove="removeAsset('footer_logo')" />
+        <AdminMediaUploader :url="modelValue.footer_logo_url || ''" :uploading="assetUploading.footer_logo" label="Footer logo" hint="PNG, JPG, WebP, SVG or GIF · max 2 MB" input-id="editorFooterLogoInput" preview-class="h-14 w-auto object-contain" dropzone-class="h-28" compact library @select="uploadAsset($event, 'footer_logo')" @remove="removeAsset('footer_logo')" @browse="librarySlot = 'footer_logo'" />
       </div>
 
       <div class="space-y-2 rounded-xl border border-admin-border p-3">
@@ -139,7 +139,7 @@
           <p class="text-xs font-semibold text-admin-text">About cover image</p>
           <p class="mt-1 text-xs leading-5 text-admin-muted">The primary visual shown at the top of the About page.</p>
         </div>
-        <AdminMediaUploader :url="modelValue.about_image_url || ''" :uploading="assetUploading.about" label="About cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorAboutImageInput" overlay compact preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'about')" @remove="removeAsset('about')" />
+        <AdminMediaUploader :url="modelValue.about_image_url || ''" :uploading="assetUploading.about" label="About cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorAboutImageInput" overlay compact library preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'about')" @remove="removeAsset('about')" @browse="librarySlot = 'about'" />
       </div>
       <AdminEditorField label="Our story"><textarea :value="modelValue.about_content" maxlength="10000" rows="7" class="editor-input min-h-40 resize-y" @input="setPath(['about_content'], inputValue($event))" /></AdminEditorField>
       <AdminEditorRepeater title="Highlights" add-label="Add highlight" :can-add="modelValue.about_highlights.items.length < 12" @add="addItem(['about_highlights', 'items'], { icon: 'heroicons:check-circle', title: '', description: '' })">
@@ -148,7 +148,7 @@
           <textarea :value="item.description" maxlength="255" rows="2" placeholder="Description" aria-label="Highlight description" class="editor-input min-h-20 resize-y" @input="setItem(['about_highlights', 'items'], index, 'description', inputValue($event))" />
         </AdminEditorRepeaterItem>
       </AdminEditorRepeater>
-      <AdminEditorSettingsLink label="About image alt text and SEO remain in Site Settings." to="/admin/settings?tab=pages&sub=about" />
+      <AdminEditorSettingsLink label="About image alt text and search metadata are managed in Site Settings." to="/admin/settings?tab=pages&sub=about" action="Edit About SEO" icon="heroicons:magnifying-glass" />
     </div>
 
     <div v-else-if="section === 'story-content'" class="space-y-4">
@@ -160,16 +160,17 @@
         <textarea :value="modelValue.story_page.hero.subtitle" maxlength="255" rows="2" placeholder="Supporting text" aria-label="Story supporting text" class="editor-input min-h-20 resize-y" @input="setPath(['story_page', 'hero', 'subtitle'], inputValue($event))" />
       </fieldset>
       <AdminEditorStorySection label="Story section 1" :section="modelValue.story_page.section_a" @update="setPath(['story_page', 'section_a'], $event)" />
-      <AdminMediaUploader :url="modelValue.story_image_a_url || ''" :uploading="assetUploading.story_image_a" label="Story section 1 image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorStoryImageAInput" overlay compact preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'story_image_a')" @remove="removeAsset('story_image_a')" />
+      <AdminMediaUploader :url="modelValue.story_image_a_url || ''" :uploading="assetUploading.story_image_a" label="Story section 1 image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorStoryImageAInput" overlay compact library preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'story_image_a')" @remove="removeAsset('story_image_a')" @browse="librarySlot = 'story_image_a'" />
       <AdminEditorStorySection label="Story section 2" :section="modelValue.story_page.section_b" @update="setPath(['story_page', 'section_b'], $event)" />
-      <AdminMediaUploader :url="modelValue.story_image_b_url || ''" :uploading="assetUploading.story_image_b" label="Story section 2 image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorStoryImageBInput" overlay compact preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'story_image_b')" @remove="removeAsset('story_image_b')" />
+      <AdminMediaUploader :url="modelValue.story_image_b_url || ''" :uploading="assetUploading.story_image_b" label="Story section 2 image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorStoryImageBInput" overlay compact library preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'story_image_b')" @remove="removeAsset('story_image_b')" @browse="librarySlot = 'story_image_b'" />
       <p class="rounded-xl bg-admin-info-soft px-3 py-2.5 text-xs leading-5 text-admin-muted">Story images stay private in this draft until you save and publish.</p>
+      <AdminEditorSettingsLink label="Story image accessibility text shares the About-page settings area." to="/admin/settings?tab=pages&sub=about" action="Edit image description" icon="heroicons:photo" />
     </div>
 
     <div v-else-if="section === 'contact-content'" class="space-y-4">
       <div class="space-y-2.5">
         <p class="text-xs font-semibold text-admin-text">Contact cover image</p>
-        <AdminMediaUploader :url="modelValue.contact_image_url || ''" :uploading="assetUploading.contact" label="Contact cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorContactImageInput" overlay compact preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'contact')" @remove="removeAsset('contact')" />
+        <AdminMediaUploader :url="modelValue.contact_image_url || ''" :uploading="assetUploading.contact" label="Contact cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorContactImageInput" overlay compact library preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'contact')" @remove="removeAsset('contact')" @browse="librarySlot = 'contact'" />
       </div>
       <AdminEditorField label="Information heading"><input :value="modelValue.contact_page.info_title" maxlength="100" class="editor-input" @input="setPath(['contact_page', 'info_title'], inputValue($event))" /></AdminEditorField>
       <AdminEditorField label="Information subtitle"><input :value="modelValue.contact_page.info_subtitle" maxlength="255" class="editor-input" @input="setPath(['contact_page', 'info_subtitle'], inputValue($event))" /></AdminEditorField>
@@ -193,7 +194,7 @@
           <textarea :value="item.answer" maxlength="1000" rows="3" placeholder="Answer" aria-label="FAQ answer" class="editor-input min-h-24 resize-y" @input="setItem(['contact_page', 'faqs'], index, 'answer', inputValue($event))" />
         </AdminEditorRepeaterItem>
       </AdminEditorRepeater>
-      <AdminEditorSettingsLink label="Contact image alt text and SEO remain in Site Settings." to="/admin/settings?tab=pages&sub=contact" />
+      <AdminEditorSettingsLink label="Contact image alt text and search metadata are managed in Site Settings." to="/admin/settings?tab=pages&sub=contact" action="Edit Contact SEO" icon="heroicons:magnifying-glass" />
     </div>
 
     <div v-else-if="section === 'shop-content'" class="space-y-4">
@@ -215,24 +216,26 @@
           <input :value="perk" maxlength="100" placeholder="Perk" :aria-label="`Promotion perk ${index + 1}`" class="editor-input" @input="setArrayValue(['shop_promo', 'perks'], index, inputValue($event))" />
         </AdminEditorRepeaterItem>
       </AdminEditorRepeater>
-      <AdminEditorSettingsLink label="Product assignments and Shop SEO remain in their existing screens." to="/admin/products" />
+      <AdminEditorSettingsLink label="The Shop catalogue draws from your product records." to="/admin/products" action="Manage products" icon="heroicons:cube" />
+      <AdminEditorSettingsLink label="Shop search metadata is managed in Site Settings." to="/admin/settings?tab=pages&sub=shop" action="Edit Shop SEO" icon="heroicons:magnifying-glass" />
     </div>
 
     <div v-else-if="section === 'blog-content'" class="space-y-4">
       <div class="space-y-2.5">
         <p class="text-xs font-semibold text-admin-text">Blog cover image</p>
-        <AdminMediaUploader :url="modelValue.blog_image_url || ''" :uploading="assetUploading.blog" label="Blog cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorBlogImageInput" overlay compact preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'blog')" @remove="removeAsset('blog')" />
+        <AdminMediaUploader :url="modelValue.blog_image_url || ''" :uploading="assetUploading.blog" label="Blog cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorBlogImageInput" overlay compact library preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'blog')" @remove="removeAsset('blog')" @browse="librarySlot = 'blog'" />
       </div>
       <AdminEditorPageHeader label="Blog heading" :header="modelValue.blog_page.header" @update="setPath(['blog_page', 'header'], $event)" />
       <AdminEditorToggle :checked="Boolean(modelValue.blog_page.cta)" label="Show closing call-to-action" @change="toggleObject(['blog_page', 'cta'], $event, emptyPageCta())" />
       <AdminEditorPageCta v-if="modelValue.blog_page.cta" label="Closing call-to-action" :cta="modelValue.blog_page.cta" @update="setPath(['blog_page', 'cta'], $event)" />
-      <AdminEditorSettingsLink label="Posts and Blog SEO remain in their existing screens." to="/admin/posts" />
+      <AdminEditorSettingsLink label="The Blog page draws its entries from Blog Posts." to="/admin/posts" action="Manage blog posts" icon="heroicons:newspaper" />
+      <AdminEditorSettingsLink label="Blog image alt text and search metadata are managed in Site Settings." to="/admin/settings?tab=pages&sub=blog" action="Edit Blog SEO" icon="heroicons:magnifying-glass" />
     </div>
 
     <div v-else-if="section === 'services-content'" class="space-y-4">
       <div class="space-y-2.5">
         <p class="text-xs font-semibold text-admin-text">Services cover image</p>
-        <AdminMediaUploader :url="modelValue.services_image_url || ''" :uploading="assetUploading.services" label="Services cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorServicesImageInput" overlay compact preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'services')" @remove="removeAsset('services')" />
+        <AdminMediaUploader :url="modelValue.services_image_url || ''" :uploading="assetUploading.services" label="Services cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorServicesImageInput" overlay compact library preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'services')" @remove="removeAsset('services')" @browse="librarySlot = 'services'" />
       </div>
       <AdminEditorPageHeader label="Services heading" :header="modelValue.services_page.header" @update="setPath(['services_page', 'header'], { ...modelValue.services_page.header, ...$event })" />
       <AdminEditorToggle :checked="Boolean(modelValue.services_page.header.primary_cta)" label="Show primary button" @change="toggleObject(['services_page', 'header', 'primary_cta'], $event, { label: '', link: '' })" />
@@ -257,21 +260,31 @@
       </AdminEditorRepeater>
       <AdminEditorToggle :checked="Boolean(modelValue.services_page.cta)" label="Show closing call-to-action" @change="toggleObject(['services_page', 'cta'], $event, emptyPageCta())" />
       <AdminEditorPageCta v-if="modelValue.services_page.cta" label="Closing call-to-action" :cta="modelValue.services_page.cta" @update="setPath(['services_page', 'cta'], $event)" />
-      <AdminEditorSettingsLink label="Service records and Services SEO remain in their existing screens." to="/admin/services" />
+      <AdminEditorSettingsLink label="The Services page draws its offerings from service records." to="/admin/services" action="Manage services" icon="heroicons:briefcase" />
+      <AdminEditorSettingsLink label="Services image alt text and search metadata are managed in Site Settings." to="/admin/settings?tab=pages&sub=services" action="Edit Services SEO" icon="heroicons:magnifying-glass" />
     </div>
 
     <div v-else-if="section === 'welcome-popup'" class="space-y-4">
       <AdminEditorToggle :checked="modelValue.welcome_popup_enabled" label="Enable welcome popup" @change="setPath(['welcome_popup_enabled'], $event)" />
       <AdminEditorField label="Heading"><input :value="modelValue.welcome_popup_heading" maxlength="255" class="editor-input" @input="setPath(['welcome_popup_heading'], inputValue($event))" /></AdminEditorField>
       <AdminEditorField label="Message"><textarea :value="modelValue.welcome_popup_body" maxlength="1000" rows="5" class="editor-input min-h-32 resize-y" @input="setPath(['welcome_popup_body'], inputValue($event))" /></AdminEditorField>
-      <AdminEditorSettingsLink label="Choose the discount connected to this popup in Popup settings." to="/admin/settings?tab=popup" />
+      <AdminEditorSettingsLink label="Choose the discount connected to this popup in Popup settings." to="/admin/settings?tab=popup" action="Edit popup offer" icon="heroicons:gift" />
     </div>
+
+    <AdminWebsiteEditorMediaLibrary
+      v-if="librarySlot"
+      :open="Boolean(librarySlot)"
+      :slot="librarySlot"
+      :current-id="assetId(librarySlot)"
+      @close="librarySlot = null"
+      @selected="applyLibraryAsset"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { BlogPageCta, ServicesPageCta } from '~/composables/useSiteConfig'
-import type { WebsiteEditorAssetSlot, WebsiteEditorDraftPayload } from '~/composables/useWebsiteEditorDraft'
+import type { WebsiteEditorAssetSlot, WebsiteEditorAssetUpload, WebsiteEditorDraftPayload } from '~/composables/useWebsiteEditorDraft'
 
 const props = defineProps<{
   modelValue: WebsiteEditorDraftPayload
@@ -282,6 +295,7 @@ const emit = defineEmits<{ 'update:modelValue': [value: WebsiteEditorDraftPayloa
 const { uploadDraftAsset } = useWebsiteEditorDraft()
 const assetUploading = reactive<Partial<Record<WebsiteEditorAssetSlot, boolean>>>({})
 const assetError = ref('')
+const librarySlot = ref<WebsiteEditorAssetSlot | null>(null)
 
 const details: Record<string, { title: string; description: string; prefixes: string[] }> = {
   'brand-assets': {
@@ -352,6 +366,22 @@ async function uploadAsset(file: File, slot: WebsiteEditorAssetSlot) {
   } finally {
     assetUploading[slot] = false
   }
+}
+
+function assetId(slot: WebsiteEditorAssetSlot) {
+  const field = assetFields[slot].id
+  return Number((props.modelValue as unknown as Record<string, unknown>)[field]) || null
+}
+
+function applyLibraryAsset(uploaded: WebsiteEditorAssetUpload) {
+  const slot = uploaded.collection
+  const fields = assetFields[slot]
+  const next = clone() as unknown as Record<string, any>
+  next[fields.id] = uploaded.id
+  next[fields.url] = uploaded.url
+  syncStoryImage(next, slot, uploaded.url)
+  emit('update:modelValue', next as unknown as WebsiteEditorDraftPayload)
+  assetError.value = ''
 }
 
 function removeAsset(slot: WebsiteEditorAssetSlot) {

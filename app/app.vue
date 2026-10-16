@@ -54,16 +54,22 @@ useRealtime({
   },
 })
 
-useHead({
-  link: computed(() => [
+useHead(() => ({
+  htmlAttrs: {
+    lang: siteConfig.value?.locale ?? siteConfig.value?.default_locale ?? 'en',
+  },
+}))
+
+useHead(() => ({
+  link: [
     ...(siteConfig.value?.favicon_url
-      ? [{ key: 'favicon', rel: 'icon', href: siteConfig.value.favicon_url }]
+      ? [{ key: 'favicon', rel: 'icon' as const, href: siteConfig.value.favicon_url }]
       : []),
     ...(siteConfig.value?.loader_logo_url
-      ? [{ key: 'loader-logo-preload', rel: 'preload', as: 'image', href: siteConfig.value.loader_logo_url }]
+      ? [{ key: 'loader-logo-preload', rel: 'preload' as const, as: 'image' as const, href: siteConfig.value.loader_logo_url }]
       : []),
-  ]),
-})
+  ],
+}))
 
 useJsonLd('organization', () => {
   if (isNonIndexablePath(route.path)) return null
