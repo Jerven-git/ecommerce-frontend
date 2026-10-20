@@ -185,6 +185,7 @@
 
 <script setup lang="ts">
 import { useGiftCardPurchase } from '~/composables/useGiftCard'
+import { paymentCompletePath, rememberPaymentAccess } from '~/utils/paymentAccess'
 
 const { $apiFetch } = useNuxtApp()
 const { format } = useCurrency()
@@ -249,7 +250,7 @@ const handleRedirectPay = async () => {
     const redirectUrl = payload?.redirect_url ?? payload?.approval_url ?? payload?.checkout_url ?? payload?.url ?? null
     if (!redirectUrl) throw new Error('No redirect URL received')
     const paymentId = payload?.payment_id ?? payload?.id ?? null
-    if (paymentId) localStorage.setItem('last_payment_id', String(paymentId))
+    if (paymentId) rememberPaymentAccess(paymentId, payload?.payment_token)
     window.location.href = redirectUrl
   } catch (err: any) {
     error.value = err?.data?.message || err?.message || 'Failed to start payment.'
@@ -267,9 +268,9 @@ const handleStripeStart = async () => {
   }
 }
 
-const handleStripeSuccess = (paymentId: string) => {
-  localStorage.setItem('last_payment_id', paymentId)
-  navigateTo(`/payment/complete?payment_id=${paymentId}`)
+const handleStripeSuccess = (paymentId: string, paymentToken?: string) => {
+  rememberPaymentAccess(paymentId, paymentToken)
+  navigateTo(paymentCompletePath(paymentId, paymentToken))
 }
 
 onMounted(() => {

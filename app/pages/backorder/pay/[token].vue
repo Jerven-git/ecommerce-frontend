@@ -149,6 +149,7 @@
                   :customer-email="backorderData.customer_email"
                   :client-secret="stripeClientSecret"
                   :payment-id="stripePaymentId"
+                  :payment-token="stripePaymentToken"
                   @success="handleStripeSuccess"
                   @error="handleStripeError"
                 />
@@ -206,6 +207,8 @@
 </template>
 
 <script setup lang="ts">
+import { paymentCompletePath, rememberPaymentAccess } from '~/utils/paymentAccess'
+
 const route = useRoute()
 const { $apiFetch } = useNuxtApp()
 const token = route.params.token as string
@@ -242,6 +245,7 @@ const confirmSuccess = ref(false)
 const stripeOrderId = ref<number | null>(null)
 const stripeClientSecret = ref('')
 const stripePaymentId = ref<string | undefined>(undefined)
+const stripePaymentToken = ref<string | undefined>(undefined)
 const stripePublishableKey = ref('')
 
 const formatDate = (dateString: string) => {
@@ -345,7 +349,7 @@ const initiatePayment = async () => {
     if (data?.order_id && data?.payment_id) {
       const redirectUrl = data?.redirect_url
       if (redirectUrl) {
-        localStorage.setItem('last_payment_id', String(data.payment_id))
+        rememberPaymentAccess(data.payment_id, data.payment_token)
         window.location.href = redirectUrl
         return
       }
@@ -379,6 +383,8 @@ const prepareStripePayment = async () => {
       stripeOrderId.value = data.order_id
       stripeClientSecret.value = data.client_secret
       stripePaymentId.value = String(data.payment_id)
+      stripePaymentToken.value = data.payment_token || undefined
+      rememberPaymentAccess(data.payment_id, data.payment_token)
     } else {
       throw new Error('Failed to prepare payment')
     }
@@ -389,9 +395,9 @@ const prepareStripePayment = async () => {
   }
 }
 
-const handleStripeSuccess = (paymentId: string) => {
-  localStorage.setItem('last_payment_id', paymentId)
-  navigateTo(`/payment/complete?payment_id=${paymentId}`)
+const handleStripeSuccess = (paymentId: string, paymentToken?: string) => {
+  rememberPaymentAccess(paymentId, paymentToken)
+  navigateTo(paymentCompletePath(paymentId, paymentToken))
 }
 
 const handleStripeError = (errorMessage: string) => {

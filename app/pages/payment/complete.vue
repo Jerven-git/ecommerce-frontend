@@ -4,7 +4,7 @@
     <!-- Error State -->
     <Transition name="card-pop" appear>
       <div v-if="error" class="max-w-md w-full">
-        <div class="bg-white rounded-2xl border border-red-100 shadow-xl p-10 text-center">
+        <div class="bg-white rounded-2xl border border-red-100 shadow-xl p-10 text-center" role="alert">
 
           <!-- Error icon with shake -->
           <div class="relative flex items-center justify-center mx-auto mb-6 w-20 h-20">
@@ -14,15 +14,17 @@
             </div>
           </div>
 
-          <h2 class="text-xl font-bold text-gray-900 mb-2">Payment Failed</h2>
+          <h2 class="text-xl font-bold text-gray-900 mb-2">
+            {{ requiresRefund ? 'Refund Required' : 'Payment Failed' }}
+          </h2>
           <p class="text-sm text-red-600 mb-8 leading-relaxed">{{ error }}</p>
 
           <NuxtLink
-            to="/checkout"
+            :to="requiresRefund ? '/' : '/checkout'"
             class="inline-flex items-center gap-2 btn-primary"
           >
             <Icon name="heroicons:arrow-left" class="w-4 h-4" aria-hidden="true" />
-            Try Again
+            {{ requiresRefund ? 'Return to Store' : 'Try Again' }}
           </NuxtLink>
         </div>
       </div>
@@ -93,6 +95,12 @@
 </template>
 
 <script setup lang="ts">
+import {
+  forgetPaymentAccess,
+  paymentAccessTokenFor,
+  rememberPaymentAccess,
+} from '~/utils/paymentAccess'
+
 const cartStore = useCartStore()
 const { $apiFetch } = useNuxtApp()
 const route = useRoute()
@@ -100,8 +108,10 @@ const route = useRoute()
 const error = ref<string | null>(null)
 const isDone = ref(false)
 const running = ref(false)
+const requiresRefund = ref(false)
 
 const paymentIdRef = ref<string>('')
+const paymentTokenRef = ref<string>('')
 
 // read query params once
 const token = computed(() => {
@@ -116,11 +126,12 @@ function normalizePaymentId(v: unknown): string {
   return String(v).trim()
 }
 
-function setPaymentId(id: unknown) {
+function setPaymentAccess(id: unknown, paymentToken?: unknown) {
   const pid = normalizePaymentId(id)
   if (!pid) return
   paymentIdRef.value = pid
-  localStorage.setItem('last_payment_id', pid)
+  paymentTokenRef.value = paymentAccessTokenFor(pid, paymentToken)
+  rememberPaymentAccess(pid, paymentTokenRef.value)
 }
 
 async function pollUntilPaid(paymentId: string) {
@@ -129,8 +140,20 @@ async function pollUntilPaid(paymentId: string) {
 
   while (!isDone.value && Date.now() - started < timeoutMs) {
     try {
-      const res = await $apiFetch<any>(`/payments/${paymentId}`, { method: 'GET' })
+      const res = await $apiFetch<any>(`/payments/${paymentId}`, {
+        method: 'GET',
+        query: paymentTokenRef.value
+          ? { payment_token: paymentTokenRef.value }
+          : undefined,
+      })
       const status = res?.status ?? res?.data?.status ?? null
+      const orderStatus = res?.order_status ?? res?.data?.order_status ?? null
+
+      if (orderStatus === 'failed_needs_refund') {
+        requiresRefund.value = true
+        error.value = 'Your payment was received, but the item became unavailable. The store can now review the order and arrange your refund. Please do not pay again.'
+        return false
+      }
 
       if (status === 'paid') return true
       if (status === 'failed') {
@@ -139,7 +162,7 @@ async function pollUntilPaid(paymentId: string) {
       }
     } catch (err: any) {
       if (err?.status === 404 || err?.response?.status === 404) {
-        error.value = 'Payment record not found. Please try checkout again.'
+        error.value = 'This payment verification link is missing or invalid. Please return to checkout and try again.'
         return false
       }
       // ignore transient errors and continue polling
@@ -155,12 +178,16 @@ const verifyAndFinish = async () => {
   if (running.value || isDone.value) return
   running.value = true
   error.value = null
+  requiresRefund.value = false
 
   try {
     // init paymentId from query/localStorage
     const q = route.query.payment_id
     const fromQuery = Array.isArray(q) ? q[0] : (q as string | undefined)
-    setPaymentId(fromQuery || localStorage.getItem('last_payment_id') || '')
+    const paymentId = normalizePaymentId(fromQuery || localStorage.getItem('last_payment_id') || '')
+    const accessQuery = route.query.payment_token
+    const accessFromQuery = Array.isArray(accessQuery) ? accessQuery[0] : accessQuery
+    setPaymentAccess(paymentId, accessFromQuery)
 
     // PayPal: capture first
     if (token.value) {
@@ -170,13 +197,23 @@ const verifyAndFinish = async () => {
           body: { token: token.value },
         })
 
-        setPaymentId(cap?.payment_id ?? cap?.data?.payment_id)
+        setPaymentAccess(
+          cap?.payment_id ?? cap?.data?.payment_id,
+          cap?.payment_token ?? cap?.data?.payment_token ?? paymentTokenRef.value,
+        )
 
         const capStatus = cap?.status ?? cap?.data?.status
+        const capOrderStatus = cap?.order_status ?? cap?.data?.order_status
+        if (capOrderStatus === 'failed_needs_refund') {
+          requiresRefund.value = true
+          error.value = 'Your payment was received, but the item became unavailable. The store can now review the order and arrange your refund. Please do not pay again.'
+          return
+        }
+
         if (capStatus === 'paid') {
           isDone.value = true
           cartStore.clearCart()
-          localStorage.removeItem('last_payment_id')
+          forgetPaymentAccess(paymentIdRef.value)
           localStorage.removeItem('last_order_id')
           sessionStorage.setItem('order_completed', '1')
           await navigateTo('/order-success')
@@ -193,25 +230,19 @@ const verifyAndFinish = async () => {
       return
     }
 
-    // fallback polling (short)
-    const ok = await (async () => {
-      for (let i = 0; i < 8; i++) {
-        const ok = await pollUntilPaid(paymentIdRef.value)
-        if (ok) return true
-        await sleep(1500)
-      }
-      return false
-    })()
+    const ok = await pollUntilPaid(paymentIdRef.value)
 
     if (!ok) {
-      error.value = 'Payment is still finalizing. Please refresh in a moment.'
+      if (!error.value) {
+        error.value = 'Payment is still finalizing. Please refresh in a moment.'
+      }
       return
     }
 
     // success
     isDone.value = true
     cartStore.clearCart()
-    localStorage.removeItem('last_payment_id')
+    forgetPaymentAccess(paymentIdRef.value)
     localStorage.removeItem('last_order_id')
     sessionStorage.setItem('order_completed', '1')
     await navigateTo('/order-success')

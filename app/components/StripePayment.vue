@@ -27,6 +27,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { paymentCompletePath, rememberPaymentAccess } from '~/utils/paymentAccess'
 
 const props = defineProps<{
   amount: number
@@ -35,10 +36,11 @@ const props = defineProps<{
   orderId: string | number
   clientSecret?: string
   paymentId?: string | number
+  paymentToken?: string
 }>()
 
 const emit = defineEmits<{
-  (e: 'success', paymentId: string): void
+  (e: 'success', paymentId: string, paymentToken?: string): void
   (e: 'error', error: string): void
 }>()
 
@@ -49,6 +51,7 @@ const processing = ref(false)
 const error = ref<string | null>(null)
 
 const backendPaymentId = ref<string | null>(null)
+const backendPaymentToken = ref<string | null>(props.paymentToken?.trim() || null)
 const paymentEl = ref<HTMLElement | null>(null)
 
 let stripe: any = null
@@ -58,10 +61,6 @@ let paymentElementInstance: any = null
 const emitError = (msg: unknown) => {
   const text = typeof msg === 'string' ? msg : 'Payment failed'
   emit('error', text)
-}
-
-const emitSuccess = (paymentId: string) => {
-  emit('success', paymentId)
 }
 
 const loadStripe = async () => {
@@ -90,6 +89,7 @@ const loadStripe = async () => {
 
     let clientSecret: string
     let paymentId: string | number
+    let paymentToken = props.paymentToken?.trim() || ''
 
     if (props.clientSecret && props.paymentId) {
       // Use pre-created intent (e.g. backorder payments)
@@ -104,6 +104,7 @@ const loadStripe = async () => {
       const payload = response?.data ?? response
       clientSecret = payload?.client_secret
       paymentId = payload?.payment_id
+      paymentToken = payload?.payment_token || ''
 
       if (!clientSecret || !paymentId) {
         throw new Error('Failed to create payment intent')
@@ -111,6 +112,8 @@ const loadStripe = async () => {
     }
 
     backendPaymentId.value = String(paymentId)
+    backendPaymentToken.value = paymentToken || null
+    rememberPaymentAccess(backendPaymentId.value, backendPaymentToken.value)
 
     elements = stripe.elements({
       clientSecret,
@@ -147,8 +150,10 @@ const handleSubmit = async () => {
   error.value = null
 
   try {
-    const returnUrl =
-      `${window.location.origin}/payment/complete?payment_id=${backendPaymentId.value}`
+    const returnUrl = `${window.location.origin}${paymentCompletePath(
+      backendPaymentId.value,
+      backendPaymentToken.value,
+    )}`
 
     const { error: submitError } = await stripe.confirmPayment({
       elements,
@@ -173,7 +178,7 @@ const handleSubmit = async () => {
     }
 
     // ✅ emit a guaranteed string
-    emit('success', backendPaymentId.value)
+    emit('success', backendPaymentId.value, backendPaymentToken.value || undefined)
   } catch (err: any) {
     const msg = err?.message || 'Payment failed'
     error.value = msg

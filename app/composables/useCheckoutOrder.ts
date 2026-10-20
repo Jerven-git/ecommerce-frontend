@@ -1,6 +1,7 @@
 import type { CheckoutFormData } from './useCheckoutForm'
 import type { AppliedDiscount } from './useCheckoutDiscount'
 import type { AppliedGiftCard } from './useGiftCard'
+import { paymentCompletePath, rememberPaymentAccess } from '~/utils/paymentAccess'
 
 interface UseCheckoutOrderOptions {
   form: Ref<CheckoutFormData>
@@ -228,6 +229,7 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
 
       const payload = payRes?.data ?? payRes
       const paymentId = payload?.payment_id ?? payload?.id ?? null
+      const paymentToken = payload?.payment_token ?? null
       const redirectUrl =
         payload?.redirect_url ??
         payload?.approval_url ??
@@ -237,7 +239,7 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
 
       if (!redirectUrl) throw new Error('redirect_url missing from /orders/{order}/pay')
 
-      if (paymentId) localStorage.setItem('last_payment_id', String(paymentId))
+      if (paymentId) rememberPaymentAccess(paymentId, paymentToken)
       window.location.href = redirectUrl
     } catch (err: any) {
       error.value = err?.data?.message || err?.message || 'Failed to start payment.'
@@ -247,10 +249,10 @@ export function useCheckoutOrder(opts: UseCheckoutOrderOptions) {
     }
   }
 
-  const handleStripeSuccess = async (paymentId: string) => {
+  const handleStripeSuccess = async (paymentId: string, paymentToken?: string) => {
     saveDetailsToStorage?.()
-    localStorage.setItem('last_payment_id', paymentId)
-    navigateTo(`/payment/complete?payment_id=${paymentId}`)
+    rememberPaymentAccess(paymentId, paymentToken)
+    navigateTo(paymentCompletePath(paymentId, paymentToken))
   }
 
   const handlePaymentError = (errorMessage: string) => {

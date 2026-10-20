@@ -97,6 +97,7 @@
                 'bg-yellow-500': order.status === 'backorder_notified',
                 'bg-red-400': order.status === 'backorder_expired',
                 'bg-red-500': order.status === 'cancelled' || order.status === 'backorder_cancelled',
+                'bg-rose-600': order.status === 'failed_needs_refund',
               }"
             />
             <div>
@@ -148,7 +149,7 @@
 
             <!-- Cancel & Refund button for paid online orders -->
             <button
-              v-if="order.payment?.status === 'paid' && ['processing', 'shipped'].includes(order.status)"
+              v-if="order.payment?.status === 'paid' && ['processing', 'shipped', 'failed_needs_refund'].includes(order.status)"
               @click="promptCancelRefund(order.id, order.customer_name, order.payment.provider)"
               :disabled="cancelRefundOrderId === order.id"
               class="text-xs font-medium px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50 transition-colors"
@@ -182,6 +183,18 @@
                 <Icon name="heroicons:chevron-down" v-else class="w-3.5 h-3.5 opacity-60" aria-hidden="true" />
               </span>
             </div>
+          </div>
+        </div>
+
+        <div
+          v-if="order.status === 'failed_needs_refund'"
+          class="mx-6 mt-4 flex items-start gap-3 rounded-xl bg-rose-50 px-4 py-3 text-rose-800"
+          role="alert"
+        >
+          <Icon name="heroicons:exclamation-triangle" class="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+          <div class="min-w-0">
+            <p class="text-sm font-semibold">Payment captured, but stock could not be allocated.</p>
+            <p class="mt-0.5 text-xs leading-relaxed">Process the refund with the payment provider, then use “Cancel & Refund” to close this order.</p>
           </div>
         </div>
 
@@ -223,7 +236,7 @@
           <div v-if="!order.shipment" class="flex items-center justify-between">
             <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tracking</p>
             <button
-              v-if="order.status !== 'cancelled' && order.status !== 'backorder_cancelled' && order.status !== 'backorder_expired'"
+              v-if="order.status !== 'cancelled' && order.status !== 'backorder_cancelled' && order.status !== 'backorder_expired' && order.status !== 'failed_needs_refund'"
               @click="promptShipOrder(order.id, order.customer_name)"
               :disabled="shippingOrderId === order.id"
               class="text-xs font-medium px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 transition-colors"
@@ -458,7 +471,7 @@ interface Order {
   shipping_amount: string | number
   discount_code?: string | null
   discount_amount: string | number
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'backorder_awaiting_stock' | 'backorder_notified' | 'backorder_expired' | 'backorder_cancelled'
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'backorder_awaiting_stock' | 'backorder_notified' | 'backorder_expired' | 'backorder_cancelled' | 'failed_needs_refund'
   created_at: string
   items?: OrderItem[]
   payment?: Payment | null
@@ -525,6 +538,7 @@ const statusFilters = [
   { value: 'shipped', label: 'Shipped', activeClass: 'border-purple-500 bg-purple-50 text-purple-700' },
   { value: 'delivered', label: 'Delivered', activeClass: 'border-green-500 bg-green-50 text-green-700' },
   { value: 'cancelled', label: 'Cancelled', activeClass: 'border-red-500 bg-red-50 text-red-700' },
+  { value: 'failed_needs_refund', label: 'Needs Refund', activeClass: 'border-rose-600 bg-rose-50 text-rose-800' },
   { value: 'backorder', label: 'Backorder', activeClass: 'border-orange-500 bg-orange-50 text-orange-700' },
 ]
 
@@ -544,7 +558,7 @@ const isBackorderStatus = (status: string) => status.startsWith('backorder_')
 
 const isLockedBackorderStatus = (status: string) => status === 'backorder_cancelled' || status === 'backorder_expired'
 
-const isLockedStatus = (status: string) => isLockedBackorderStatus(status)
+const isLockedStatus = (status: string) => isLockedBackorderStatus(status) || status === 'failed_needs_refund'
 
 const allowedTransitions: Record<string, string[]> = {
   pending: ['processing', 'cancelled'],
@@ -561,6 +575,7 @@ const statusLabel = (status: string) => {
     shipped: 'Shipped',
     delivered: 'Delivered',
     cancelled: 'Cancelled',
+    failed_needs_refund: 'Refund Required',
   }
   return labels[status] ?? status
 }
@@ -585,6 +600,7 @@ const orderStatusClass = (status: string) => ({
   'bg-yellow-50 border-yellow-200 text-yellow-800': status === 'backorder_notified',
   'bg-red-50 border-red-200 text-red-800': status === 'backorder_expired',
   'bg-red-100 border-red-300 text-red-700': status === 'backorder_cancelled',
+  'bg-rose-50 border-rose-300 text-rose-800': status === 'failed_needs_refund',
 })
 
 // filteredOrders now just returns the server-filtered results directly

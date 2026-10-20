@@ -92,7 +92,7 @@
           :amount="finalTotal"
           :publishable-key="stripePublishableKey ?? ''"
           :customer-email="customerEmail"
-          @success="$emit('stripeSuccess', $event)"
+          @success="forwardStripeSuccess"
           @error="$emit('paymentError', $event)"
         />
       </div>
@@ -130,14 +130,18 @@ defineProps<{
   customerEmail: string
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   'update:selectedMethod': [value: string]
   'createOrder': []
   'placeRedirect': []
   'placeDeferredBackorder': []
-  'stripeSuccess': [paymentId: string]
+  'stripeSuccess': [paymentId: string, paymentToken?: string]
   'paymentError': [error: string]
 }>()
+
+const forwardStripeSuccess = (paymentId: string, paymentToken?: string) => {
+  emit('stripeSuccess', paymentId, paymentToken)
+}
 
 // Inline error alert sub-component
 const ErrorAlert = defineComponent({
