@@ -1,4 +1,10 @@
 import { getRememberedStoreSlug } from '~/stores/auth'
+import type { LocationQuery } from 'vue-router'
+
+export interface SiteConfigRouteContext {
+  path: string
+  query: LocationQuery
+}
 
 export interface SiteTheme {
   primary_color: string
@@ -452,12 +458,14 @@ function getChannel(): BroadcastChannel | null {
   return _channel
 }
 
-export function useSiteConfig() {
+export function useSiteConfig(routeContext?: SiteConfigRouteContext) {
   const siteConfig = useState<SiteConfig | null>('siteConfig', () => null)
   const pending = useState<boolean>('siteConfigPending', () => false)
   const fetched = useState<boolean>('siteConfigFetched', () => false)
   const error = useState<string | null>('siteConfigError', () => null)
-  const route = useRoute()
+  // Route middleware must supply its `to` route because `useRoute()` still
+  // points at the previous route while navigation is being resolved.
+  const route = routeContext ?? useRoute()
 
   async function fetchSiteConfig(force = false) {
     // Several mounted surfaces can request site config at the same time on a

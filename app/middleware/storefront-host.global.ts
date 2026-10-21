@@ -46,7 +46,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return
   }
 
-  const { siteConfig, fetchSiteConfig } = useSiteConfig()
+  const { siteConfig, fetchSiteConfig } = useSiteConfig(to)
   // Ensure config is loaded before deciding — matters on the first navigation
   // (hard refresh) before app.vue's onMounted fetch has run.
   if (!siteConfig.value) {

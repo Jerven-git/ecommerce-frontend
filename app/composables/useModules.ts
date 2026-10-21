@@ -1,4 +1,4 @@
-import type { ModuleKey } from '~/composables/useSiteConfig'
+import type { ModuleKey, SiteConfigRouteContext } from '~/composables/useSiteConfig'
 import { DEFAULT_MODULES_ENABLED } from '~/composables/useSiteConfig'
 
 /**
@@ -49,8 +49,8 @@ export const MODULE_LIST: ModuleDescriptor[] = [
   { key: 'gift_cards', label: 'Gift Cards', description: 'Gift card purchase page at /gift-cards. Customers buy a code, recipient gets it by email, redeemable at checkout.' },
 ]
 
-export function useModules() {
-  const { siteConfig } = useSiteConfig()
+export function useModules(routeContext?: SiteConfigRouteContext) {
+  const { siteConfig } = useSiteConfig(routeContext)
 
   const modules = computed(() => siteConfig.value?.modules_enabled ?? DEFAULT_MODULES_ENABLED)
 

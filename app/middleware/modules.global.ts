@@ -17,14 +17,14 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return
   }
 
-  const { siteConfig, fetchSiteConfig } = useSiteConfig()
+  const { siteConfig, fetchSiteConfig } = useSiteConfig(to)
   // Ensure config is loaded before we decide — matters for the first request
   // (SSR or hard refresh) when the module state hasn't been fetched yet.
   if (!siteConfig.value) {
     await fetchSiteConfig()
   }
 
-  const { isPathEnabled } = useModules()
+  const { isPathEnabled } = useModules(to)
   if (!isPathEnabled(to.path)) {
     return navigateTo('/', { redirectCode: 302 })
   }
