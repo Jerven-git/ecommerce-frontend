@@ -1,5 +1,7 @@
 <template>
   <div>
+    <!-- Keep the SSR loader before page markup so it covers the first paint. -->
+    <ApexEntryLoader />
     <UpdateBanner />
     <NuxtRouteAnnouncer />
     <NuxtLayout>
@@ -8,7 +10,6 @@
     <AuthLoginProgress />
     <SuperAdminImpersonationProgress />
     <StorefrontPageLoader />
-    <ApexEntryLoader />
   </div>
 </template>
 
