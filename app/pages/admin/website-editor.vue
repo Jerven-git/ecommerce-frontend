@@ -426,7 +426,7 @@
 
 <script setup lang="ts">
 import type { HomepageSectionId, SiteConfig } from '~/composables/useSiteConfig'
-import type { WebsiteEditorDraftPayload, WebsiteEditorDraftState, WebsiteEditorVersionSummary, WebsiteEditorWorkflow } from '~/composables/useWebsiteEditorDraft'
+import type { WebsiteEditorDraftPayload } from '~/composables/useWebsiteEditorDraft'
 import { HOMEPAGE_SECTION_LABELS } from '~/utils/homepageSections'
 import { applyWebsiteEditorLocale, websiteEditorLocaleName, websiteEditorLocaleProgress } from '~/utils/websiteEditorLocalization'
 import { websiteEditorChangedAreas, websiteEditorReadinessWarnings, type WebsiteEditorReadinessWarning } from '~/utils/websiteEditorPublishing'
@@ -442,28 +442,10 @@ definePageMeta({ middleware: 'auth' })
 
 type DeviceId = 'desktop' | 'tablet' | 'mobile'
 type ConfirmationKind = 'discard' | 'restore'
-type RecoverySnapshot = {
-  payload: WebsiteEditorDraftPayload
-  savedAt: string
-}
 
 const { siteConfig, fetchSiteConfig, broadcastConfigUpdate } = useSiteConfig()
 const { storeUrl } = useStorefrontUrl()
-const {
-  fetchDraft,
-  saveDraft,
-  discardDraft,
-  publishDraft,
-  requestDraftReview,
-  approveDraft,
-  requestDraftChanges,
-  scheduleDraft,
-  cancelDraftSchedule,
-  fetchVersions,
-  fetchVersion,
-  restoreVersion,
-  deleteVersion,
-} = useWebsiteEditorDraft()
+const draftApi = useWebsiteEditorDraft()
 const authStore = useAuthStore()
 const {
   activePage,
@@ -475,55 +457,8 @@ const {
   ensureActiveLocale,
 } = useWebsiteEditorRoute()
 
-const draft = ref<WebsiteEditorDraftPayload | null>(null)
-const versionPreview = ref<WebsiteEditorDraftPayload | null>(null)
-const versions = ref<WebsiteEditorVersionSummary[]>([])
-const selectedVersionId = ref<number | null>(null)
-const publishedHash = ref('')
-const historyOpen = ref(false)
-const loadingVersions = ref(false)
-const restoringVersion = ref(false)
-const deleteVersionTargetId = ref<number | null>(null)
-const deletingVersion = ref(false)
-const historyError = ref('')
-const baseUpdatedAt = ref('')
-const hasSavedDraft = ref(false)
-const draftUpdatedAt = ref<string | null>(null)
-const draftVersion = ref<number | null>(null)
-const savedSnapshot = ref('')
-const loadingDraft = ref(true)
-const saving = ref(false)
-const publishing = ref(false)
-const discarding = ref(false)
-const actionError = ref('')
-const publishReviewOpen = ref(false)
 const navigatorOpen = ref(false)
-const releaseNote = ref('')
-const reviewNote = ref('')
-const scheduledFor = ref('')
-const workflowLoading = ref(false)
-const workflowError = ref('')
-const workflow = ref<WebsiteEditorWorkflow>({
-  status: 'draft',
-  requested_by_name: null,
-  requested_at: null,
-  reviewed_by_name: null,
-  reviewed_at: null,
-  note: null,
-  scheduled_publish_at: null,
-  scheduled_by_name: null,
-  scheduled_release_note: null,
-  timezone: 'UTC',
-})
-const publishSuccess = ref<{ summary: string } | null>(null)
 const pendingConfirmation = ref<ConfirmationKind | null>(null)
-const conflictOpen = ref(false)
-const conflictLoading = ref(false)
-const conflictNotice = ref('')
-const conflictLatestSummary = ref('')
-const conflictLatest = ref<WebsiteEditorDraftState | null>(null)
-const recoverySnapshot = ref<RecoverySnapshot | null>(null)
-const validationErrors = ref<Record<string, string[]>>({})
 const activeDevice = ref<DeviceId>('desktop')
 const controlsOpen = ref(false)
 const controlsDocked = ref(false)
@@ -532,6 +467,96 @@ const controlsTrigger = ref<HTMLButtonElement | null>(null)
 const controlsClose = ref<HTMLButtonElement | null>(null)
 let controlsMediaQuery: MediaQueryList | null = null
 let editorMounted = false
+
+const {
+  draft,
+  hasSavedDraft,
+  draftUpdatedAt,
+  draftVersion,
+  loadingDraft,
+  saving,
+  publishing,
+  discarding,
+  actionError,
+  validationErrors,
+  isDirty,
+  publishReviewOpen,
+  releaseNote,
+  reviewNote,
+  scheduledFor,
+  workflowLoading,
+  workflowError,
+  workflow,
+  publishSuccess,
+  conflictOpen,
+  conflictLoading,
+  conflictNotice,
+  conflictLatestSummary,
+  recoverySnapshot,
+  loadRecovery,
+  dismissRecovery,
+  restoreRecoveryCopy,
+  copyRecoveryChanges,
+  reviewLatestConflict,
+  reloadLatestConflict,
+  closeConflict,
+  openSaveConflict,
+  applyDraftState,
+  openPublishReview,
+  requestReview,
+  approveReview,
+  returnForChanges,
+  schedulePublication,
+  cancelScheduledPublication,
+  loadEditor,
+  saveChanges,
+  discardChanges,
+  publishChanges: publishDraftChanges,
+} = useWebsiteEditorSession({
+  siteConfig,
+  fetchSiteConfig,
+  broadcastConfigUpdate,
+  draftApi,
+  recoveryOwner: () => authStore.user
+    ? `${authStore.user.id}:${authStore.user.store_id ?? authStore.user.store?.id ?? ''}`
+    : 'unknown',
+  onDraftApplied: handleDraftApplied,
+  onDraftLoaded: handleDraftLoaded,
+  onValidationError: focusFirstInvalidSection,
+  onPublished: refreshPublishedHistory,
+})
+
+const {
+  versionPreview,
+  versions,
+  selectedVersionId,
+  historyOpen,
+  loadingVersions,
+  restoringVersion,
+  deleteVersionTargetId,
+  deletingVersion,
+  historyError,
+  loadVersions,
+  refreshIfOpen: refreshHistoryIfOpen,
+  toggleHistory,
+  previewVersionFromHistory,
+  exitVersionPreview,
+  restoreSelectedVersion,
+  requestVersionDeletion,
+  cancelVersionDeletion,
+  confirmVersionDeletion,
+} = useWebsiteEditorVersionHistory({
+  siteConfig,
+  draftVersion,
+  actionError,
+  draftApi,
+  applyDraftState,
+  dismissRecovery,
+  openSaveConflict,
+  onPreviewSelected: handleVersionPreviewSelected,
+  onPreviewExited: handleVersionPreviewExited,
+  onDeleteFocus: () => document.getElementById('version-history-title')?.closest('button')?.focus({ preventScroll: true }),
+})
 
 const {
   canUndo,
@@ -550,8 +575,6 @@ const devices = [
 ]
 const pageOptions = WEBSITE_EDITOR_PAGES
 
-const snapshot = (value: WebsiteEditorDraftPayload | null) => JSON.stringify(value)
-const isDirty = computed(() => Boolean(draft.value) && snapshot(draft.value) !== savedSnapshot.value)
 const canonicalWorkingDraft = computed(() => versionPreview.value ?? draft.value)
 const workingDraft = computed(() => canonicalWorkingDraft.value
   ? applyWebsiteEditorLocale(canonicalWorkingDraft.value, activeLocale.value)
@@ -815,124 +838,6 @@ function toggleSection(index: number) {
   if (changed) nextTick(() => selectSection(changed.id))
 }
 
-function apiMessage(error: any, fallback: string) {
-  return error?.data?.message || error?.message || fallback
-}
-
-function recoveryStorageKey() {
-  const owner = authStore.user
-    ? `${authStore.user.id}:${authStore.user.store_id ?? authStore.user.store?.id ?? ''}`
-    : 'unknown'
-  return `ssu:website-editor:recovery:${owner}`
-}
-
-function persistRecovery(payload: WebsiteEditorDraftPayload) {
-  const recovery = { payload: JSON.parse(JSON.stringify(payload)), savedAt: new Date().toISOString() } as RecoverySnapshot
-  recoverySnapshot.value = recovery
-  if (!import.meta.client) return
-  try {
-    window.sessionStorage.setItem(recoveryStorageKey(), JSON.stringify(recovery))
-  } catch {
-    // The in-memory copy remains available when browser storage is unavailable.
-  }
-}
-
-function loadRecovery() {
-  if (!import.meta.client) return
-  try {
-    const stored = window.sessionStorage.getItem(recoveryStorageKey())
-    if (stored) recoverySnapshot.value = JSON.parse(stored) as RecoverySnapshot
-  } catch {
-    recoverySnapshot.value = null
-  }
-}
-
-function dismissRecovery() {
-  recoverySnapshot.value = null
-  conflictNotice.value = ''
-  if (!import.meta.client) return
-  try {
-    window.sessionStorage.removeItem(recoveryStorageKey())
-  } catch {
-    // Nothing else is required when browser storage is unavailable.
-  }
-}
-
-function applyDraftState(state: WebsiteEditorDraftState) {
-  if (!siteConfig.value) throw new Error('The storefront configuration is unavailable.')
-  draft.value = normalizeWebsiteEditorDraft(siteConfig.value, state.payload)
-  ensureActiveLocale(draft.value)
-  baseUpdatedAt.value = state.base_updated_at
-  hasSavedDraft.value = state.has_draft
-  draftUpdatedAt.value = state.draft_updated_at
-  draftVersion.value = state.draft_version
-  workflow.value = state.workflow
-  savedSnapshot.value = snapshot(draft.value)
-  validationErrors.value = {}
-  initializeUndoHistory()
-}
-
-function openSaveConflict() {
-  if (draft.value) persistRecovery(draft.value)
-  conflictLatest.value = null
-  conflictLatestSummary.value = ''
-  conflictNotice.value = 'Your edits were not overwritten.'
-  conflictOpen.value = true
-}
-
-function closeConflict() {
-  if (!conflictLoading.value) conflictOpen.value = false
-}
-
-async function reviewLatestConflict() {
-  conflictLoading.value = true
-  conflictNotice.value = ''
-  try {
-    const response = await fetchDraft({ force: true })
-    conflictLatest.value = response.data
-    conflictLatestSummary.value = response.data.draft_updated_at
-      ? `Latest private draft saved ${new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(response.data.draft_updated_at))}.`
-      : 'The latest server version is the currently published website.'
-  } catch (error: any) {
-    conflictNotice.value = apiMessage(error, 'The latest draft could not be reviewed. Try again.')
-  } finally {
-    conflictLoading.value = false
-  }
-}
-
-async function copyRecoveryChanges() {
-  if (!recoverySnapshot.value || !import.meta.client) return
-  try {
-    await navigator.clipboard.writeText(JSON.stringify(recoverySnapshot.value.payload, null, 2))
-    conflictNotice.value = 'Your changes were copied to the clipboard.'
-  } catch {
-    conflictNotice.value = 'The browser blocked clipboard access. Your recovery copy is still preserved.'
-  }
-}
-
-function restoreRecoveryCopy() {
-  if (!recoverySnapshot.value) return
-  draft.value = JSON.parse(JSON.stringify(recoverySnapshot.value.payload)) as WebsiteEditorDraftPayload
-  validationErrors.value = {}
-  initializeUndoHistory()
-  conflictNotice.value = 'Your browser copy is restored for editing.'
-}
-
-async function reloadLatestConflict() {
-  conflictLoading.value = true
-  conflictNotice.value = ''
-  try {
-    const state = conflictLatest.value ?? (await fetchDraft({ force: true })).data
-    applyDraftState(state)
-    conflictOpen.value = false
-    actionError.value = ''
-  } catch (error: any) {
-    conflictNotice.value = apiMessage(error, 'The latest draft could not be loaded. Try again.')
-  } finally {
-    conflictLoading.value = false
-  }
-}
-
 function requestConfirmation(kind: ConfirmationKind) {
   pendingConfirmation.value = kind
 }
@@ -948,46 +853,6 @@ async function confirmPendingAction() {
   else await restoreSelectedVersion()
   if (!confirmationLoading.value) pendingConfirmation.value = null
 }
-
-function openPublishReview() {
-  if (!hasSavedDraft.value || isDirty.value || publishing.value) return
-  actionError.value = ''
-  workflowError.value = ''
-  reviewNote.value = ''
-  if (workflow.value.scheduled_release_note && !releaseNote.value) releaseNote.value = workflow.value.scheduled_release_note
-  publishReviewOpen.value = true
-}
-
-async function runWorkflowAction(action: () => Promise<{ data: WebsiteEditorWorkflow }>) {
-  if (workflowLoading.value) return
-  workflowLoading.value = true
-  workflowError.value = ''
-  try {
-    const response = await action()
-    workflow.value = response.data
-    reviewNote.value = ''
-  } catch (error: any) {
-    if ((error?.statusCode ?? error?.status) === 409) {
-      publishReviewOpen.value = false
-      openSaveConflict()
-      return
-    }
-    workflowError.value = apiMessage(error, 'The editorial workflow could not be updated. Try again.')
-  } finally {
-    workflowLoading.value = false
-  }
-}
-
-const requestReview = () => draftVersion.value && runWorkflowAction(() => requestDraftReview(draftVersion.value!, reviewNote.value))
-const approveReview = () => draftVersion.value && runWorkflowAction(() => approveDraft(draftVersion.value!, reviewNote.value))
-const returnForChanges = () => draftVersion.value && runWorkflowAction(() => requestDraftChanges(draftVersion.value!, reviewNote.value))
-const schedulePublication = () => runWorkflowAction(async () => {
-  if (!draftVersion.value) throw new Error('Save the draft before scheduling publication.')
-  const response = await scheduleDraft(draftVersion.value, scheduledFor.value, releaseNote.value)
-  scheduledFor.value = ''
-  return response
-})
-const cancelScheduledPublication = () => draftVersion.value && runWorkflowAction(() => cancelDraftSchedule(draftVersion.value!))
 
 function navigateFromPublishReview(page: WebsiteEditorPageId, section: string) {
   publishReviewOpen.value = false
@@ -1030,219 +895,45 @@ function focusFirstInvalidSection(errors: Record<string, string[]>) {
   else if (field.startsWith('payload.homepage_sections')) switchPage('home', draft.value?.homepage_sections[0]?.id ?? 'hero')
 }
 
-async function loadEditor(force = false) {
-  loadingDraft.value = true
-  actionError.value = ''
-  try {
-    await fetchSiteConfig(force)
-    if (!siteConfig.value) throw new Error('The storefront configuration is unavailable.')
-    const response = await fetchDraft({ preferPreloaded: !force, force })
-    draft.value = normalizeWebsiteEditorDraft(siteConfig.value, response.data.payload)
-    ensureActiveLocale(draft.value)
-    baseUpdatedAt.value = response.data.base_updated_at
-    hasSavedDraft.value = response.data.has_draft
-    draftUpdatedAt.value = response.data.draft_updated_at
-    draftVersion.value = response.data.draft_version
-    workflow.value = response.data.workflow
-    savedSnapshot.value = snapshot(draft.value)
-    initializeUndoHistory()
-    if (activePage.value === 'home') {
-      const sectionExists = draft.value.homepage_sections.some(section => section.id === selectedSection.value)
-      if (!sectionExists) selectedSection.value = draft.value.homepage_sections[0]?.id ?? 'hero'
-    } else {
-      const sectionExists = WEBSITE_EDITOR_STATIC_SECTIONS[activePage.value].some(section => section.id === selectedSection.value)
-      if (!sectionExists) selectedSection.value = WEBSITE_EDITOR_STATIC_SECTIONS[activePage.value][0]?.id ?? 'header'
-    }
-    preparePreview()
-    await nextTick()
-    if (editorMounted) startPreviewTimeout()
-  } catch (error: any) {
-    actionError.value = apiMessage(error, 'The website editor could not be loaded.')
-  } finally {
-    loadingDraft.value = false
-  }
+function handleDraftApplied(payload: WebsiteEditorDraftPayload) {
+  ensureActiveLocale(payload)
+  initializeUndoHistory()
 }
 
-async function saveChanges() {
-  if (!draft.value || !isDirty.value) return
-  saving.value = true
-  actionError.value = ''
-  validationErrors.value = {}
-  try {
-    const response = await saveDraft(baseUpdatedAt.value, draftVersion.value, draft.value)
-    hasSavedDraft.value = true
-    draftUpdatedAt.value = response.data.draft_updated_at
-    draftVersion.value = response.data.draft_version
-    workflow.value = response.data.workflow
-    savedSnapshot.value = snapshot(draft.value)
-    dismissRecovery()
-  } catch (error: any) {
-    if ((error?.statusCode ?? error?.status) === 409) {
-      openSaveConflict()
-      return
-    }
-    validationErrors.value = error?.data?.errors ?? {}
-    focusFirstInvalidSection(validationErrors.value)
-    actionError.value = apiMessage(error, 'The draft could not be saved.')
-  } finally {
-    saving.value = false
-  }
+async function handleDraftLoaded(payload: WebsiteEditorDraftPayload) {
+  ensureSelectedSection(payload)
+  preparePreview()
+  await nextTick()
+  if (editorMounted) startPreviewTimeout()
 }
 
-async function discardChanges() {
-  discarding.value = true
-  actionError.value = ''
-  try {
-    const response = await discardDraft()
-    if (!siteConfig.value) throw new Error('The published website is unavailable.')
-    draft.value = normalizeWebsiteEditorDraft(siteConfig.value, response.data.payload)
-    ensureActiveLocale(draft.value)
-    baseUpdatedAt.value = response.data.base_updated_at
-    hasSavedDraft.value = false
-    draftUpdatedAt.value = null
-    draftVersion.value = null
-    workflow.value = response.data.workflow
-    savedSnapshot.value = snapshot(draft.value)
-    validationErrors.value = {}
-    initializeUndoHistory()
-    dismissRecovery()
-  } catch (error: any) {
-    actionError.value = apiMessage(error, 'The draft could not be discarded.')
-  } finally {
-    discarding.value = false
-  }
+function refreshPublishedHistory() {
+  return refreshHistoryIfOpen()
 }
 
-async function publishChanges() {
-  if (!hasSavedDraft.value || isDirty.value) return
-  const changedAreaCount = publishChangedAreas.value.length
-  publishing.value = true
-  actionError.value = ''
-  try {
-    await publishDraft(releaseNote.value)
-    await fetchSiteConfig(true)
-    broadcastConfigUpdate()
-    if (!siteConfig.value) throw new Error('The published website is unavailable.')
-    const publishedState = await fetchDraft({ force: true })
-    applyDraftState(publishedState.data)
-    dismissRecovery()
-    publishReviewOpen.value = false
-    releaseNote.value = ''
-    publishSuccess.value = {
-      summary: changedAreaCount === 1
-        ? '1 changed area is now live.'
-        : `${changedAreaCount} changed areas are now live.`,
-    }
-    if (historyOpen.value) await loadVersions()
-  } catch (error: any) {
-    if ((error?.statusCode ?? error?.status) === 409) {
-      publishReviewOpen.value = false
-      openSaveConflict()
-      return
-    }
-    publishReviewOpen.value = false
-    actionError.value = apiMessage(error, 'The website could not be published.')
-  } finally {
-    publishing.value = false
-  }
-}
-
-async function loadVersions() {
-  loadingVersions.value = true
-  historyError.value = ''
-  try {
-    const response = await fetchVersions()
-    versions.value = response.data
-    publishedHash.value = response.published_hash
-  } catch (error: any) {
-    historyError.value = apiMessage(error, 'Published versions could not be loaded.')
-  } finally {
-    loadingVersions.value = false
-  }
-}
-
-async function toggleHistory() {
-  historyOpen.value = !historyOpen.value
-  if (historyOpen.value && versions.value.length === 0) await loadVersions()
-}
-
-async function previewVersionFromHistory(versionId: number) {
-  if (!siteConfig.value) return
-  loadingVersions.value = true
-  historyError.value = ''
-  try {
-    const response = await fetchVersion(versionId)
-    versionPreview.value = normalizeWebsiteEditorDraft(siteConfig.value, response.data.payload)
-    ensureActiveLocale(versionPreview.value)
-    selectedVersionId.value = versionId
-    publishedHash.value = response.published_hash
-    if (activePage.value === 'home') {
-      const selectedStillExists = versionPreview.value.homepage_sections.some(section => section.id === selectedSection.value)
-      if (!selectedStillExists) selectedSection.value = versionPreview.value.homepage_sections[0]?.id ?? 'hero'
-    } else {
-      const selectedStillExists = WEBSITE_EDITOR_STATIC_SECTIONS[activePage.value].some(section => section.id === selectedSection.value)
-      if (!selectedStillExists) selectedSection.value = WEBSITE_EDITOR_STATIC_SECTIONS[activePage.value][0]?.id ?? 'header'
-    }
-    nextTick(() => selectSection(selectedSection.value))
-  } catch (error: any) {
-    historyError.value = apiMessage(error, 'This published version could not be previewed.')
-  } finally {
-    loadingVersions.value = false
-  }
-}
-
-function exitVersionPreview() {
-  selectedVersionId.value = null
-  versionPreview.value = null
+function handleVersionPreviewSelected(payload: WebsiteEditorDraftPayload) {
+  ensureActiveLocale(payload)
+  ensureSelectedSection(payload)
   nextTick(() => selectSection(selectedSection.value))
 }
 
-async function restoreSelectedVersion() {
-  if (!selectedVersionId.value || !publishedHash.value) return
-  restoringVersion.value = true
-  historyError.value = ''
-  actionError.value = ''
-  try {
-    const response = await restoreVersion(selectedVersionId.value, publishedHash.value, draftVersion.value)
-    applyDraftState(response.data)
-    selectedVersionId.value = null
-    versionPreview.value = null
-    dismissRecovery()
-  } catch (error: any) {
-    if ((error?.statusCode ?? error?.status) === 409) openSaveConflict()
-    historyError.value = apiMessage(error, 'This website version could not be restored.')
-  } finally {
-    restoringVersion.value = false
+function handleVersionPreviewExited() {
+  nextTick(() => selectSection(selectedSection.value))
+}
+
+function ensureSelectedSection(payload: WebsiteEditorDraftPayload) {
+  if (activePage.value === 'home') {
+    const sectionExists = payload.homepage_sections.some(section => section.id === selectedSection.value)
+    if (!sectionExists) selectedSection.value = payload.homepage_sections[0]?.id ?? 'hero'
+    return
   }
+
+  const sectionExists = WEBSITE_EDITOR_STATIC_SECTIONS[activePage.value].some(section => section.id === selectedSection.value)
+  if (!sectionExists) selectedSection.value = WEBSITE_EDITOR_STATIC_SECTIONS[activePage.value][0]?.id ?? 'header'
 }
 
-function requestVersionDeletion(versionId: number) {
-  deleteVersionTargetId.value = versionId
-}
-
-function cancelVersionDeletion() {
-  if (!deletingVersion.value) deleteVersionTargetId.value = null
-}
-
-async function confirmVersionDeletion() {
-  const versionId = deleteVersionTargetId.value
-  if (!versionId || deletingVersion.value) return
-
-  deletingVersion.value = true
-  historyError.value = ''
-  try {
-    await deleteVersion(versionId)
-    versions.value = versions.value.filter(version => version.id !== versionId)
-    if (selectedVersionId.value === versionId) exitVersionPreview()
-    deleteVersionTargetId.value = null
-    await nextTick()
-    document.getElementById('version-history-title')?.closest('button')?.focus({ preventScroll: true })
-  } catch (error: any) {
-    deleteVersionTargetId.value = null
-    historyError.value = apiMessage(error, 'This published version could not be deleted.')
-  } finally {
-    deletingVersion.value = false
-  }
+function publishChanges() {
+  return publishDraftChanges(publishChangedAreas.value.length)
 }
 
 function selectSection(section: string) {
