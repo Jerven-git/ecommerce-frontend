@@ -425,18 +425,14 @@
 </template>
 
 <script setup lang="ts">
-import type { HomepageSectionId, SiteConfig } from '~/composables/useSiteConfig'
 import type { WebsiteEditorDraftPayload } from '~/composables/useWebsiteEditorDraft'
-import { HOMEPAGE_SECTION_LABELS } from '~/utils/homepageSections'
-import { applyWebsiteEditorLocale, websiteEditorLocaleName, websiteEditorLocaleProgress } from '~/utils/websiteEditorLocalization'
-import { websiteEditorChangedAreas, websiteEditorReadinessWarnings, type WebsiteEditorReadinessWarning } from '~/utils/websiteEditorPublishing'
+import { withWebsiteEditorSupportedLocales } from '~/utils/websiteEditorDraftMutations'
 import {
-  WEBSITE_EDITOR_PAGES,
   WEBSITE_EDITOR_STATIC_SECTIONS,
-  websiteEditorPage,
   type WebsiteEditorNavigationItem,
   type WebsiteEditorPageId,
 } from '~/utils/websiteEditorPages'
+import { websiteEditorValidationTarget } from '~/utils/websiteEditorValidation'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -573,17 +569,27 @@ const devices = [
   { id: 'tablet' as const, label: 'Tablet', icon: 'heroicons:device-tablet', width: '768px', widthLabel: '768 px' },
   { id: 'mobile' as const, label: 'Mobile', icon: 'heroicons:device-phone-mobile', width: '390px', widthLabel: '390 px' },
 ]
-const pageOptions = WEBSITE_EDITOR_PAGES
+const {
+  workingDraft,
+  localeIsDefault,
+  activeLocaleName,
+  activePageOption,
+  activePageDisabled,
+  previewConfig,
+  pagePickerOptions,
+  sections,
+  navigationItems,
+  publishChangedAreas,
+  publishWarnings,
+} = useWebsiteEditorContentModel({
+  siteConfig,
+  draft,
+  versionPreview,
+  activeLocale,
+  activePage,
+})
 
-const canonicalWorkingDraft = computed(() => versionPreview.value ?? draft.value)
-const workingDraft = computed(() => canonicalWorkingDraft.value
-  ? applyWebsiteEditorLocale(canonicalWorkingDraft.value, activeLocale.value)
-  : null)
-const localeIsDefault = computed(() => activeLocale.value === canonicalWorkingDraft.value?.default_locale)
-const activeLocaleName = computed(() => websiteEditorLocaleName(activeLocale.value))
 const activeDeviceConfig = computed(() => devices.find(device => device.id === activeDevice.value) ?? devices[0]!)
-const activePageOption = computed(() => websiteEditorPage(activePage.value))
-const activePageDisabled = computed(() => isPageDisabled(activePage.value))
 const controlsVisible = computed(() => controlsDocked.value ? !controlsCollapsed.value : controlsOpen.value)
 const controlsToggleLabel = computed(() => controlsDocked.value
   ? (controlsCollapsed.value ? 'Show editor sidebar' : 'Hide editor sidebar')
@@ -606,26 +612,6 @@ const confirmationContent = computed(() => {
   }
 })
 const activeStoreUrl = computed(() => `${storeUrl.value}${activePageOption.value.path === '/' ? '' : activePageOption.value.path}`)
-const publishedDraft = computed(() => siteConfig.value ? normalizeWebsiteEditorDraft(siteConfig.value) : null)
-const publishChangedAreas = computed(() => publishedDraft.value && draft.value
-  ? websiteEditorChangedAreas(publishedDraft.value, draft.value)
-  : [])
-const publishWarnings = computed<WebsiteEditorReadinessWarning[]>(() => {
-  if (!draft.value) return []
-  const warnings = websiteEditorReadinessWarnings(draft.value)
-  for (const locale of draft.value.supported_locales) {
-    if (locale === draft.value.default_locale) continue
-    const progress = websiteEditorLocaleProgress(draft.value, locale)
-    if (progress.percent < 100) warnings.push({
-      id: `locale-${locale}`,
-      label: `${websiteEditorLocaleName(locale)} is ${progress.percent}% translated`,
-      detail: `${progress.total - progress.translated} text fields will use default-language content.`,
-      page: 'global',
-      section: 'store-details',
-    })
-  }
-  return warnings
-})
 const previewFrameStyle = computed(() => ({ width: activeDeviceConfig.value.width, maxWidth: '100%', height: '100%' }))
 const draftSavedAt = computed(() => draftUpdatedAt.value
   ? new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(new Date(draftUpdatedAt.value))
@@ -659,30 +645,6 @@ const editorStateDescription = computed(() => {
   return 'Start editing a section. Nothing changes publicly until you save and publish.'
 })
 
-const previewConfig = computed<SiteConfig | null>(() => {
-  if (!siteConfig.value || !workingDraft.value) return siteConfig.value
-  return {
-    ...siteConfig.value,
-    ...workingDraft.value,
-    locale: activeLocale.value,
-    homepage_statement: {
-      ...workingDraft.value.homepage_statement,
-      image_url: workingDraft.value.homepage_statement_image_url,
-    },
-    story_page: {
-      ...workingDraft.value.story_page,
-      section_a: {
-        ...workingDraft.value.story_page.section_a,
-        image_url: workingDraft.value.story_image_a_url,
-      },
-      section_b: {
-        ...workingDraft.value.story_page.section_b,
-        image_url: workingDraft.value.story_image_b_url,
-      },
-    },
-  }
-})
-
 const {
   previewFrame,
   previewLoading,
@@ -702,119 +664,6 @@ const {
   selectedSection,
   onRendered: () => selectSection(selectedSection.value),
 })
-
-function isPageDisabled(pageId: WebsiteEditorPageId) {
-  const page = websiteEditorPage(pageId)
-  if (pageId === 'story') return workingDraft.value?.story_page.enabled !== true
-  if (pageId === 'popup') return workingDraft.value?.welcome_popup_enabled !== true
-  return page.module ? previewConfig.value?.modules_enabled?.[page.module] === false : false
-}
-
-const pagePickerOptions = computed(() => pageOptions.map(page => ({
-  ...page,
-  storefrontDisabled: isPageDisabled(page.id),
-})))
-
-const hasContent = (value: unknown) => {
-  if (!value || typeof value !== 'object') return false
-  return Object.values(value as Record<string, unknown>).some(entry => Array.isArray(entry) ? entry.length > 0 : (typeof entry === 'string' ? entry.trim().length > 0 : Boolean(entry)))
-}
-
-const sectionMeta: Record<HomepageSectionId, { icon: string; editable: boolean }> = {
-  hero: { icon: 'heroicons:photo', editable: true },
-  'featured-products': { icon: 'heroicons:cube', editable: false },
-  showcase: { icon: 'heroicons:squares-2x2', editable: false },
-  'watch-shop': { icon: 'heroicons:play-circle', editable: false },
-  'best-sellers': { icon: 'heroicons:fire', editable: false },
-  'how-it-works': { icon: 'heroicons:list-bullet', editable: true },
-  features: { icon: 'heroicons:sparkles', editable: true },
-  stats: { icon: 'heroicons:chart-bar', editable: true },
-  statement: { icon: 'heroicons:chat-bubble-bottom-center-text', editable: true },
-  newsletter: { icon: 'heroicons:envelope', editable: true },
-}
-
-function sectionHasContent(id: HomepageSectionId) {
-  const config = previewConfig.value
-  if (!config) return false
-  if (id === 'hero' || id === 'featured-products') return true
-  if (id === 'showcase') return Boolean(config.homepage_showcase?.enabled)
-  if (id === 'watch-shop') return Boolean(config.homepage_watch_shop?.enabled && config.homepage_watch_shop.cards?.length)
-  if (id === 'best-sellers') return Boolean(config.homepage_best_sellers?.enabled && config.homepage_best_sellers.products?.length)
-  if (id === 'how-it-works') return hasContent(workingDraft.value?.homepage_steps)
-  if (id === 'features') return hasContent(workingDraft.value?.homepage_features)
-  if (id === 'stats') return hasContent(workingDraft.value?.homepage_stats)
-  if (id === 'statement') return Boolean(workingDraft.value?.homepage_statement.enabled && workingDraft.value.homepage_statement.quote)
-  if (id === 'newsletter') return hasContent(workingDraft.value?.homepage_newsletter)
-  return false
-}
-
-function staticSectionHasContent(section: string) {
-  const value = workingDraft.value
-  if (!value) return false
-  if (section === 'brand-assets') return Boolean(
-    value.logo_url
-    || value.favicon_url
-    || value.cart_icon_url
-    || value.footer_logo_url
-    || value.logo_alt_text.trim(),
-  )
-  if (section === 'store-details') return Boolean(
-    value.site_name.trim()
-    || value.contact_email.trim()
-    || value.contact_phone.trim()
-    || value.contact_entries.length
-    || value.social_links.length,
-  )
-  if (section === 'header') return value.header_cta.enabled && Boolean(value.header_cta.label)
-  if (section === 'footer-banner') return value.footer_banner.enabled && Boolean(value.footer_banner.heading)
-  if (section === 'footer') return hasContent(value.footer)
-  if (section === 'about-content') return Boolean(value.about_image_url || value.about_content.trim() || value.about_highlights.items.length)
-  if (section === 'story-content') return value.story_page.enabled && Boolean(hasContent(value.story_page.hero) || value.story_image_a_url || value.story_image_b_url)
-  if (section === 'contact-content') return Boolean(value.contact_image_url || hasContent(value.contact_page))
-  if (section === 'shop-content') return hasContent(value.shop_header) || hasContent(value.shop_promo)
-  if (section === 'blog-content') return Boolean(value.blog_image_url || hasContent(value.blog_page.header))
-  if (section === 'services-content') return Boolean(value.services_image_url || hasContent(value.services_page.header))
-  if (section === 'welcome-popup') return value.welcome_popup_enabled && Boolean(value.welcome_popup_heading)
-  return false
-}
-
-const sections = computed(() => {
-  if (activePage.value === 'home') {
-    return (workingDraft.value?.homepage_sections ?? []).map(section => ({
-      ...section,
-      label: HOMEPAGE_SECTION_LABELS[section.id],
-      icon: sectionMeta[section.id].icon,
-      editable: sectionMeta[section.id].editable,
-      hasContent: sectionHasContent(section.id),
-    }))
-  }
-
-  return WEBSITE_EDITOR_STATIC_SECTIONS[activePage.value].map(section => ({
-    ...section,
-    visible: !isPageDisabled(activePage.value),
-    editable: true,
-    hasContent: staticSectionHasContent(section.id),
-  }))
-})
-
-const navigationItems = computed<WebsiteEditorNavigationItem[]>(() => WEBSITE_EDITOR_PAGES.flatMap(page => {
-  const pageSections = page.id === 'home'
-    ? (workingDraft.value?.homepage_sections ?? []).map(section => ({
-        id: section.id,
-        label: HOMEPAGE_SECTION_LABELS[section.id],
-        icon: sectionMeta[section.id].icon,
-      }))
-    : WEBSITE_EDITOR_STATIC_SECTIONS[page.id]
-
-  return pageSections.map(section => ({
-    page: page.id,
-    pageLabel: page.label,
-    section: section.id,
-    sectionLabel: section.label,
-    icon: section.icon,
-    disabled: isPageDisabled(page.id),
-  }))
-}))
 
 function moveSection(index: number, direction: -1 | 1) {
   if (!draft.value || selectedVersionId.value || !localeIsDefault.value || activePage.value !== 'home') return
@@ -862,37 +711,8 @@ function navigateFromPublishReview(page: WebsiteEditorPageId, section: string) {
 }
 
 function focusFirstInvalidSection(errors: Record<string, string[]>) {
-  const field = Object.keys(errors)[0] ?? ''
-  if (
-    field.startsWith('payload.logo_')
-    || field.startsWith('payload.favicon_')
-    || field.startsWith('payload.cart_icon_')
-    || field.startsWith('payload.footer_logo_')
-  ) switchPage('global', 'brand-assets')
-  else if (
-    field === 'payload.site_name'
-    || field === 'payload.contact_email'
-    || field === 'payload.contact_phone'
-    || field.startsWith('payload.contact_entries')
-    || field.startsWith('payload.social_links')
-  ) switchPage('global', 'store-details')
-  else if (field.startsWith('payload.header_cta')) switchPage('global', 'header')
-  else if (field.startsWith('payload.footer_banner')) switchPage('global', 'footer-banner')
-  else if (field.startsWith('payload.footer')) switchPage('global', 'footer')
-  else if (field.startsWith('payload.about_')) switchPage('about', 'about-content')
-  else if (field.startsWith('payload.story_page') || field.startsWith('payload.story_image_')) switchPage('story', 'story-content')
-  else if (field.startsWith('payload.contact_page') || field.startsWith('payload.contact_image')) switchPage('contact', 'contact-content')
-  else if (field.startsWith('payload.shop_')) switchPage('shop', 'shop-content')
-  else if (field.startsWith('payload.blog_page') || field.startsWith('payload.blog_image')) switchPage('blog', 'blog-content')
-  else if (field.startsWith('payload.services_page') || field.startsWith('payload.services_image')) switchPage('services', 'services-content')
-  else if (field.startsWith('payload.welcome_popup_')) switchPage('popup', 'welcome-popup')
-  else if (field.startsWith('payload.hero_')) switchPage('home', 'hero')
-  else if (field.startsWith('payload.homepage_steps')) switchPage('home', 'how-it-works')
-  else if (field.startsWith('payload.homepage_features')) switchPage('home', 'features')
-  else if (field.startsWith('payload.homepage_stats')) switchPage('home', 'stats')
-  else if (field.startsWith('payload.homepage_statement')) switchPage('home', 'statement')
-  else if (field.startsWith('payload.homepage_newsletter')) switchPage('home', 'newsletter')
-  else if (field.startsWith('payload.homepage_sections')) switchPage('home', draft.value?.homepage_sections[0]?.id ?? 'hero')
+  const target = websiteEditorValidationTarget(errors, draft.value?.homepage_sections[0]?.id)
+  if (target) switchPage(target.page, target.section)
 }
 
 function handleDraftApplied(payload: WebsiteEditorDraftPayload) {
@@ -943,18 +763,7 @@ function selectSection(section: string) {
 
 function updateSupportedLocales(locales: string[]) {
   if (!draft.value || selectedVersionId.value) return
-  const defaultLocale = draft.value.default_locale
-  const supported = [defaultLocale, ...locales.filter(locale => locale !== defaultLocale)]
-    .filter((locale, index, values) => values.indexOf(locale) === index)
-    .slice(0, 12)
-  const localizedContent = Object.fromEntries(
-    Object.entries(draft.value.localized_content).filter(([locale]) => supported.includes(locale) && locale !== defaultLocale),
-  )
-  draft.value = {
-    ...draft.value,
-    supported_locales: supported,
-    localized_content: localizedContent,
-  }
+  draft.value = withWebsiteEditorSupportedLocales(draft.value, locales)
   ensureActiveLocale(draft.value)
 }
 
