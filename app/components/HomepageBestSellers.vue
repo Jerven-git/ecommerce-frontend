@@ -8,19 +8,19 @@
       <div class="flex items-end justify-between gap-4 mb-6 md:mb-8">
         <div>
           <p
-            v-if="bestSellers.label"
+            v-if="bestSellers?.label"
             class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1"
           >
-            {{ bestSellers.label }}
+            {{ bestSellers?.label }}
           </p>
-          <h2 v-if="bestSellers.heading" class="text-2xl sm:text-3xl font-extrabold tracking-tight uppercase text-[var(--color-secondary,#4B5979)]">
-            {{ bestSellers.heading }}
+          <h2 v-if="bestSellers?.heading" class="text-2xl sm:text-3xl font-extrabold tracking-tight uppercase text-[var(--color-secondary,#4B5979)]">
+            {{ bestSellers?.heading }}
           </h2>
           <p
-            v-if="bestSellers.subtitle"
+            v-if="bestSellers?.subtitle"
             class="text-sm text-gray-500 mt-1 max-w-xl"
           >
-            {{ bestSellers.subtitle }}
+            {{ bestSellers?.subtitle }}
           </p>
         </div>
 
@@ -53,7 +53,7 @@
         class="flex gap-5 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 best-sellers-track"
       >
         <div
-          v-for="product in bestSellers.products"
+          v-for="product in bestSellers?.products ?? []"
           :key="product.id"
           class="snap-start shrink-0 w-[78%] sm:w-[46%] md:w-[31%] lg:w-[23%] xl:w-[19%]"
         >

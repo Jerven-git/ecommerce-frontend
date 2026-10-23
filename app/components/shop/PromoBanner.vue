@@ -23,7 +23,7 @@
           class="flex items-center gap-2 text-sm text-white/85"
         >
           <Icon
-            :name="perkIcons[i % perkIcons.length]"
+            :name="perkIcons[i % perkIcons.length]!"
             class="h-4 w-4 shrink-0"
             :style="{ color: 'var(--color-primary-300)' }"
             aria-hidden="true"

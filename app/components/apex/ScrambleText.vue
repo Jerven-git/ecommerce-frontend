@@ -70,8 +70,8 @@ function scrambleNext() {
   const nextIndex = props.autoplay
     ? (activeWordIndex + 1) % props.words.length
     : activeWordIndex
-  const source = props.words[activeWordIndex]
-  const target = props.words[nextIndex]
+  const source = props.words[activeWordIndex] ?? ''
+  const target = props.words[nextIndex] ?? ''
   const characterCount = Math.max(source.length, target.length)
   const duration = compactMotionQuery?.matches ? Math.min(props.duration, 0.55) : props.duration
   const glyphSteps = Math.ceil(duration / glyphInterval)
@@ -105,7 +105,7 @@ function scrambleNext() {
 
         if (progress < scrambleAt) return sourceCharacter
         if (progress >= settleAt) return targetCharacter
-        return scrambledCharacters[index]
+        return scrambledCharacters[index] ?? ''
       })
         .join('')
     },
@@ -137,7 +137,7 @@ watch(prefersReducedMotion, (reduceMotion) => {
   if (reduceMotion) {
     stop()
     activeWordIndex = 0
-    if (valueElement.value) valueElement.value.textContent = props.words[0]
+    if (valueElement.value) valueElement.value.textContent = props.words[0] ?? ''
   } else {
     scheduleNext()
   }

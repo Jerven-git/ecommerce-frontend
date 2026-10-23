@@ -122,15 +122,15 @@
 </template>
 
 <script setup lang="ts">
-import type { Product } from '~/composables/useProducts'
+import type { AdminProduct } from '~/types/product'
 import { getProductCategoryNames } from '~/utils/product'
 
 defineProps<{
-  products: Product[]
+  products: AdminProduct[]
 }>()
 
 defineEmits<{
-  edit: [product: Product]
+  edit: [product: AdminProduct]
   delete: [id: number]
 }>()
 

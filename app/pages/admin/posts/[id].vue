@@ -612,9 +612,9 @@ async function save() {
           if (v !== null && v !== undefined) fd.append(k, String(v))
         })
         fd.append('cover_image', coverFile.value)
-        saved = await $apiFetch('/admin/posts', { method: 'POST', body: fd })
+        saved = await $apiFetch<{ data: PostDetail }>('/admin/posts', { method: 'POST', body: fd })
       } else {
-        saved = await $apiFetch('/admin/posts', { method: 'POST', body: payload })
+        saved = await $apiFetch<{ data: PostDetail }>('/admin/posts', { method: 'POST', body: payload })
       }
     } else {
       if (coverFile.value) {
@@ -624,9 +624,9 @@ async function save() {
         })
         fd.append('cover_image', coverFile.value)
         fd.append('_method', 'PATCH')
-        saved = await $apiFetch(`/admin/posts/${idParam.value}`, { method: 'POST', body: fd })
+        saved = await $apiFetch<{ data: PostDetail }>(`/admin/posts/${idParam.value}`, { method: 'POST', body: fd })
       } else {
-        saved = await $apiFetch(`/admin/posts/${idParam.value}`, { method: 'PATCH', body: payload })
+        saved = await $apiFetch<{ data: PostDetail }>(`/admin/posts/${idParam.value}`, { method: 'PATCH', body: payload })
       }
     }
 

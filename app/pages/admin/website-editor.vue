@@ -464,18 +464,16 @@ const {
   restoreVersion,
   deleteVersion,
 } = useWebsiteEditorDraft()
-const route = useRoute()
-const router = useRouter()
 const authStore = useAuthStore()
-
-const requestedPage = typeof route.query.page === 'string' ? route.query.page : ''
-const initialPage = WEBSITE_EDITOR_PAGES.some(page => page.id === requestedPage)
-  ? requestedPage as WebsiteEditorPageId
-  : 'home'
-const requestedSection = typeof route.query.section === 'string' ? route.query.section : ''
-const initialSection = requestedSection || (initialPage === 'home'
-  ? 'hero'
-  : WEBSITE_EDITOR_STATIC_SECTIONS[initialPage][0]?.id ?? 'header')
+const {
+  activePage,
+  selectedSection,
+  activeLocale,
+  sync: syncEditorRoute,
+  selectSection: selectRouteSection,
+  selectPage: selectRoutePage,
+  ensureActiveLocale,
+} = useWebsiteEditorRoute()
 
 const draft = ref<WebsiteEditorDraftPayload | null>(null)
 const versionPreview = ref<WebsiteEditorDraftPayload | null>(null)
@@ -526,28 +524,24 @@ const conflictLatestSummary = ref('')
 const conflictLatest = ref<WebsiteEditorDraftState | null>(null)
 const recoverySnapshot = ref<RecoverySnapshot | null>(null)
 const validationErrors = ref<Record<string, string[]>>({})
-const activePage = ref<WebsiteEditorPageId>(initialPage)
-const selectedSection = ref(initialSection)
-const requestedLocale = typeof route.query.locale === 'string' ? route.query.locale : ''
-const activeLocale = ref(requestedLocale || 'en')
 const activeDevice = ref<DeviceId>('desktop')
-const previewFrame = ref<HTMLIFrameElement | null>(null)
-const previewLoading = ref(true)
-const previewError = ref(false)
-const previewReady = ref(false)
-const previewVersion = ref(0)
 const controlsOpen = ref(false)
 const controlsDocked = ref(false)
 const controlsCollapsed = ref(true)
 const controlsTrigger = ref<HTMLButtonElement | null>(null)
 const controlsClose = ref<HTMLButtonElement | null>(null)
-const undoSnapshots = ref<string[]>([])
-const undoIndex = ref(-1)
-let applyingUndo = false
-let undoTimer: number | null = null
-let previewTimeout: number | null = null
 let controlsMediaQuery: MediaQueryList | null = null
 let editorMounted = false
+
+const {
+  canUndo,
+  canRedo,
+  initialize: initializeUndoHistory,
+  undo: undoChange,
+  redo: redoChange,
+} = useWebsiteEditorUndoHistory(draft, {
+  disabled: computed(() => Boolean(selectedVersionId.value)),
+})
 
 const devices = [
   { id: 'desktop' as const, label: 'Desktop', icon: 'heroicons:computer-desktop', width: '100%', widthLabel: 'Responsive width' },
@@ -564,8 +558,6 @@ const workingDraft = computed(() => canonicalWorkingDraft.value
   : null)
 const localeIsDefault = computed(() => activeLocale.value === canonicalWorkingDraft.value?.default_locale)
 const activeLocaleName = computed(() => websiteEditorLocaleName(activeLocale.value))
-const canUndo = computed(() => undoIndex.value > 0)
-const canRedo = computed(() => undoIndex.value >= 0 && undoIndex.value < undoSnapshots.value.length - 1)
 const activeDeviceConfig = computed(() => devices.find(device => device.id === activeDevice.value) ?? devices[0]!)
 const activePageOption = computed(() => websiteEditorPage(activePage.value))
 const activePageDisabled = computed(() => isPageDisabled(activePage.value))
@@ -611,7 +603,6 @@ const publishWarnings = computed<WebsiteEditorReadinessWarning[]>(() => {
   }
   return warnings
 })
-const previewUrl = computed(() => `/admin/storefront-preview?version=${previewVersion.value}`)
 const previewFrameStyle = computed(() => ({ width: activeDeviceConfig.value.width, maxWidth: '100%', height: '100%' }))
 const draftSavedAt = computed(() => draftUpdatedAt.value
   ? new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(new Date(draftUpdatedAt.value))
@@ -667,6 +658,26 @@ const previewConfig = computed<SiteConfig | null>(() => {
       },
     },
   }
+})
+
+const {
+  previewFrame,
+  previewLoading,
+  previewError,
+  previewVersion,
+  previewUrl,
+  sendConfig: sendPreviewConfig,
+  selectPage: selectPreviewPage,
+  selectSection: selectPreviewSection,
+  startTimeout: startPreviewTimeout,
+  prepare: preparePreview,
+  refresh: refreshPreview,
+  onLoad: onPreviewLoad,
+} = useWebsiteEditorPreview({
+  config: previewConfig,
+  activePage,
+  selectedSection,
+  onRendered: () => selectSection(selectedSection.value),
 })
 
 function isPageDisabled(pageId: WebsiteEditorPageId) {
@@ -781,57 +792,6 @@ const navigationItems = computed<WebsiteEditorNavigationItem[]>(() => WEBSITE_ED
     disabled: isPageDisabled(page.id),
   }))
 }))
-
-function initializeUndoHistory() {
-  if (undoTimer !== null) window.clearTimeout(undoTimer)
-  undoTimer = null
-  undoSnapshots.value = draft.value ? [snapshot(draft.value)] : []
-  undoIndex.value = draft.value ? 0 : -1
-}
-
-function commitUndoSnapshot() {
-  undoTimer = null
-  if (!draft.value || applyingUndo || selectedVersionId.value) return
-  const current = snapshot(draft.value)
-  if (undoSnapshots.value[undoIndex.value] === current) return
-  undoSnapshots.value = undoSnapshots.value.slice(0, undoIndex.value + 1)
-  undoSnapshots.value.push(current)
-  if (undoSnapshots.value.length > 60) undoSnapshots.value.shift()
-  undoIndex.value = undoSnapshots.value.length - 1
-}
-
-function scheduleUndoSnapshot() {
-  if (!import.meta.client || applyingUndo || selectedVersionId.value) return
-  if (undoTimer !== null) window.clearTimeout(undoTimer)
-  undoTimer = window.setTimeout(commitUndoSnapshot, 300)
-}
-
-function applyUndoSnapshot(index: number) {
-  const value = undoSnapshots.value[index]
-  if (!value) return
-  applyingUndo = true
-  draft.value = JSON.parse(value) as WebsiteEditorDraftPayload
-  undoIndex.value = index
-  nextTick(() => { applyingUndo = false })
-}
-
-function undoChange() {
-  if (!draft.value || selectedVersionId.value) return
-  if (undoTimer !== null) window.clearTimeout(undoTimer)
-  undoTimer = null
-  const current = snapshot(draft.value)
-  if (undoSnapshots.value[undoIndex.value] !== current) {
-    undoSnapshots.value = undoSnapshots.value.slice(0, undoIndex.value + 1)
-    undoSnapshots.value.push(current)
-    undoIndex.value = undoSnapshots.value.length - 1
-  }
-  if (undoIndex.value > 0) applyUndoSnapshot(undoIndex.value - 1)
-}
-
-function redoChange() {
-  if (!canRedo.value || selectedVersionId.value) return
-  applyUndoSnapshot(undoIndex.value + 1)
-}
 
 function moveSection(index: number, direction: -1 | 1) {
   if (!draft.value || selectedVersionId.value || !localeIsDefault.value || activePage.value !== 'home') return
@@ -1093,8 +1053,7 @@ async function loadEditor(force = false) {
       const sectionExists = WEBSITE_EDITOR_STATIC_SECTIONS[activePage.value].some(section => section.id === selectedSection.value)
       if (!sectionExists) selectedSection.value = WEBSITE_EDITOR_STATIC_SECTIONS[activePage.value][0]?.id ?? 'header'
     }
-    previewLoading.value = true
-    previewError.value = false
+    preparePreview()
     await nextTick()
     if (editorMounted) startPreviewTimeout()
   } catch (error: any) {
@@ -1286,30 +1245,9 @@ async function confirmVersionDeletion() {
   }
 }
 
-function sendToPreview(message: Record<string, unknown>) {
-  if (!import.meta.client || !previewFrame.value?.contentWindow) return
-  // Vue refs and computed values can contain reactive proxies, which cannot be
-  // transferred through postMessage. The preview contract is JSON-only, so
-  // serialize it into plain data before crossing the iframe boundary.
-  const payload = JSON.parse(JSON.stringify({ source: 'ssu-website-editor', ...message })) as Record<string, unknown>
-  previewFrame.value.contentWindow.postMessage(payload, window.location.origin)
-}
-
-function sendPreviewConfig(force = false) {
-  if ((!previewReady.value && !force) || !previewConfig.value) return
-  sendToPreview({ type: 'preview-config', config: previewConfig.value, page: activePage.value })
-}
-
 function selectSection(section: string) {
-  selectedSection.value = section
-  syncEditorRoute()
-  sendToPreview({ type: 'select-section', section, page: activePage.value })
-}
-
-function ensureActiveLocale(payload: WebsiteEditorDraftPayload) {
-  activeLocale.value = payload.supported_locales.includes(activeLocale.value)
-    ? activeLocale.value
-    : payload.default_locale
+  selectRouteSection(section)
+  selectPreviewSection(section)
 }
 
 function updateSupportedLocales(locales: string[]) {
@@ -1330,41 +1268,16 @@ function updateSupportedLocales(locales: string[]) {
 }
 
 function switchPage(page: WebsiteEditorPageId, section?: string) {
-  activePage.value = page
   const firstSection = page === 'home'
     ? workingDraft.value?.homepage_sections[0]?.id ?? 'hero'
     : WEBSITE_EDITOR_STATIC_SECTIONS[page][0]?.id ?? 'header'
-  selectedSection.value = section ?? firstSection
-  syncEditorRoute()
-  sendToPreview({ type: 'select-page', page })
+  selectRoutePage(page, section ?? firstSection)
+  selectPreviewPage(page)
   nextTick(() => selectSection(selectedSection.value))
 }
 
 function navigateFromNavigator(item: WebsiteEditorNavigationItem) {
   switchPage(item.page, item.section)
-}
-
-function syncEditorRoute() {
-  const routePage = typeof route.query.page === 'string' ? route.query.page : ''
-  const routeSection = typeof route.query.section === 'string' ? route.query.section : ''
-  const routeLocale = typeof route.query.locale === 'string' ? route.query.locale : ''
-  if (routePage === activePage.value && routeSection === selectedSection.value && routeLocale === activeLocale.value) return
-  void router.replace({
-    query: {
-      ...route.query,
-      page: activePage.value,
-      section: selectedSection.value,
-      locale: activeLocale.value,
-    },
-  })
-}
-
-function refreshPreview() {
-  previewReady.value = false
-  previewLoading.value = true
-  previewError.value = false
-  previewVersion.value += 1
-  nextTick(startPreviewTimeout)
 }
 
 function openControls() {
@@ -1395,44 +1308,6 @@ function closeControls() {
 function syncControlsViewport(event: MediaQueryList | MediaQueryListEvent) {
   controlsDocked.value = event.matches
   if (event.matches) controlsOpen.value = false
-}
-
-function onPreviewLoad() {
-  sendToPreview({ type: 'preview-ping' })
-  window.setTimeout(() => {
-    sendPreviewConfig(true)
-    sendToPreview({ type: 'select-page', page: activePage.value })
-    sendToPreview({ type: 'select-section', section: selectedSection.value, page: activePage.value })
-  }, 0)
-}
-
-function startPreviewTimeout() {
-  if (previewTimeout !== null) window.clearTimeout(previewTimeout)
-  previewTimeout = window.setTimeout(() => {
-    if (!previewLoading.value) return
-    previewLoading.value = false
-    previewError.value = true
-  }, 10000)
-}
-
-function onMessage(event: MessageEvent) {
-  if (event.origin !== window.location.origin || event.source !== previewFrame.value?.contentWindow) return
-  if (event.data?.source !== 'ssu-storefront-preview') return
-
-  if (event.data?.type === 'ready') {
-    previewReady.value = true
-    sendPreviewConfig(true)
-    return
-  }
-
-  if (event.data?.type === 'rendered') {
-    if (previewTimeout !== null) window.clearTimeout(previewTimeout)
-    previewReady.value = true
-    previewError.value = false
-    previewLoading.value = false
-    sendToPreview({ type: 'select-page', page: activePage.value })
-    nextTick(() => selectSection(selectedSection.value))
-  }
 }
 
 function onBeforeUnload(event: BeforeUnloadEvent) {
@@ -1471,7 +1346,6 @@ function onEditorKeydown(event: KeyboardEvent) {
 
 onBeforeRouteLeave(() => !isDirty.value || window.confirm('Leave the editor and lose your unsaved changes?'))
 watch(previewConfig, () => sendPreviewConfig(), { deep: true })
-watch(draft, scheduleUndoSnapshot, { deep: true })
 watch(activeLocale, () => {
   syncEditorRoute()
   sendPreviewConfig()
@@ -1483,7 +1357,6 @@ onMounted(() => {
   controlsMediaQuery = window.matchMedia('(min-width: 1280px)')
   syncControlsViewport(controlsMediaQuery)
   controlsMediaQuery.addEventListener('change', syncControlsViewport)
-  window.addEventListener('message', onMessage)
   window.addEventListener('beforeunload', onBeforeUnload)
   window.addEventListener('keydown', onEditorKeydown)
   void loadEditor()
@@ -1491,10 +1364,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   editorMounted = false
-  if (previewTimeout !== null) window.clearTimeout(previewTimeout)
-  if (undoTimer !== null) window.clearTimeout(undoTimer)
   controlsMediaQuery?.removeEventListener('change', syncControlsViewport)
-  window.removeEventListener('message', onMessage)
   window.removeEventListener('beforeunload', onBeforeUnload)
   window.removeEventListener('keydown', onEditorKeydown)
 })

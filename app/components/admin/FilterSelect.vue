@@ -203,9 +203,8 @@ function handleListboxKeydown(event: KeyboardEvent) {
     case 'Enter':
     case ' ':
       event.preventDefault()
-      if (props.options[highlightedIndex.value]) {
-        selectOption(props.options[highlightedIndex.value])
-      }
+      const highlightedOption = props.options[highlightedIndex.value]
+      if (highlightedOption) selectOption(highlightedOption)
       break
     case 'Escape':
       event.preventDefault()

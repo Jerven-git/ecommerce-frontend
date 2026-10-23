@@ -356,40 +356,16 @@
     </div>
 
     <!-- Pagination -->
-    <div v-if="!loading && !error && totalPages > 1" class="mt-6 flex items-center justify-between">
-      <p class="text-sm text-gray-500">
-        Showing {{ ((currentPage - 1) * perPage) + 1 }}–{{ Math.min(currentPage * perPage, totalItems) }} of {{ totalItems }} orders
-      </p>
-      <div class="flex items-center gap-1">
-        <button
-          @click="goToPage(currentPage - 1)"
-          :disabled="currentPage <= 1"
-          class="px-3 py-1.5 text-sm font-medium rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          Previous
-        </button>
-        <template v-for="page in visiblePages" :key="page">
-          <span v-if="page === '...'" class="px-2 text-gray-500 text-sm">...</span>
-          <button
-            v-else
-            @click="goToPage(page as number)"
-            class="px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-            :class="page === currentPage
-              ? 'bg-primary-600 text-white border-primary-600'
-              : 'border-gray-200 text-gray-600 hover:bg-gray-50'"
-          >
-            {{ page }}
-          </button>
-        </template>
-        <button
-          @click="goToPage(currentPage + 1)"
-          :disabled="currentPage >= totalPages"
-          class="px-3 py-1.5 text-sm font-medium rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          Next
-        </button>
-      </div>
-    </div>
+    <AdminPagination
+      v-if="!loading && !error"
+      class="mt-6"
+      :current-page="currentPage"
+      :total-pages="totalPages"
+      :total-items="totalItems"
+      :per-page="perPage"
+      item-label="orders"
+      @go-to-page="goToPage"
+    />
 
     </div><!-- /order-list wrapper -->
 
@@ -509,21 +485,6 @@ const toggleExpanded = (orderId: number) => {
     : [...expandedOrders.value, orderId]
 }
 const itemCount = (order: Order) => (order.items ?? []).reduce((sum, item) => sum + item.quantity, 0)
-
-const visiblePages = computed(() => {
-  const total = totalPages.value
-  const current = currentPage.value
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
-
-  const pages: (number | string)[] = [1]
-  if (current > 3) pages.push('...')
-  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
-    pages.push(i)
-  }
-  if (current < total - 2) pages.push('...')
-  pages.push(total)
-  return pages
-})
 
 const goToPage = (page: number) => {
   if (page < 1 || page > totalPages.value) return

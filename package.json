@@ -6,6 +6,7 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "audit:runtime": "node scripts/audit-runtime.mjs",
+    "typecheck": "NUXT_BUILD_DIR=.nuxt-typecheck nuxt prepare && vue-tsc --noEmit -p .nuxt-typecheck/tsconfig.app.json",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:e2e": "playwright test",
@@ -31,7 +32,7 @@
     "reka-ui": "^2.10.5",
     "three": "^0.186.1",
     "vue": "^3.5.43",
-    "vue-router": "^4.6.4",
+    "vue-router": "^5.4.0",
     "vue3-apexcharts": "^1.11.1"
   },
   "devDependencies": {

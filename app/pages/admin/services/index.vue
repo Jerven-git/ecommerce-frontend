@@ -39,7 +39,7 @@
         <AdminFilterSelect
           v-model="statusFilter"
           :options="statusFilterOptions"
-          aria-label="Filter services by status"
+          ariaLabel="Filter services by status"
           list-label="Service status filters"
           class="sm:w-44"
         />
@@ -47,7 +47,7 @@
         <AdminFilterSelect
           v-model="categoryFilter"
           :options="categoryFilterOptions"
-          aria-label="Filter services by category"
+          ariaLabel="Filter services by category"
           list-label="Service category filters"
           class="sm:w-52"
         />

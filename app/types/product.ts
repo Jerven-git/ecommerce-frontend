@@ -47,6 +47,7 @@ export interface Product {
   dimensions?: string | null
   stock: number
   can_backorder: boolean
+  backorder_charge_policy?: 'charged_now' | 'charged_later'
   category?: string
   categories?: { id: number; name: string }[]
   is_active?: boolean
@@ -60,7 +61,6 @@ export interface Product {
  */
 export interface ProductDetail extends Product {
   category_id?: number | null
-  backorder_charge_policy?: 'charged_now' | 'charged_later'
   hover_zoom_enabled?: boolean
   seo_title?: string | null
   seo_description?: string | null
@@ -69,4 +69,38 @@ export interface ProductDetail extends Product {
   media?: ProductMedia[]
   options?: ProductOption[]
   variants?: ProductVariant[]
+}
+
+/**
+ * Store Admin listing/editing shape returned by `/products`.
+ *
+ * Admin inventory fields intentionally live beside the public product model so
+ * Nuxt has one canonical `Product` export instead of discovering a competing
+ * auto-import from the products composable.
+ */
+export interface AdminProduct extends ProductDetail {
+  image_url: string
+  weight: number | string
+  length_cm: number | string
+  width_cm: number | string
+  height_cm: number | string
+  shipping_calc_type: 'weight' | 'dimensions'
+  volume_cbm: number
+  category: string
+  category_id: number | null
+  is_active: boolean
+  allow_backorder: boolean
+  backorder_charge_policy: 'charged_now' | 'charged_later'
+  created_at: string
+  updated_at: string
+  variants_count: number
+  active_variants_sum_stock?: number | null
+}
+
+export interface PaginatedProducts {
+  data: AdminProduct[]
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
 }

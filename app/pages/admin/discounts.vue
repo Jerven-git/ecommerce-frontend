@@ -177,40 +177,16 @@
     </div>
 
     <!-- Pagination -->
-    <div v-if="!loading && !error && totalPages > 1" class="mt-6 flex items-center justify-between">
-      <p class="text-sm text-gray-500">
-        Showing {{ ((currentPage - 1) * perPage) + 1 }}–{{ Math.min(currentPage * perPage, totalItems) }} of {{ totalItems }} discounts
-      </p>
-      <div class="flex items-center gap-1">
-        <button
-          @click="goToPage(currentPage - 1)"
-          :disabled="currentPage <= 1"
-          class="px-3 py-1.5 text-sm font-medium rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          Previous
-        </button>
-        <template v-for="page in visiblePages" :key="page">
-          <span v-if="page === '...'" class="px-2 text-gray-400 text-sm">...</span>
-          <button
-            v-else
-            @click="goToPage(page as number)"
-            class="px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-            :class="page === currentPage
-              ? 'bg-primary-600 text-white border-primary-600'
-              : 'border-gray-200 text-gray-600 hover:bg-gray-50'"
-          >
-            {{ page }}
-          </button>
-        </template>
-        <button
-          @click="goToPage(currentPage + 1)"
-          :disabled="currentPage >= totalPages"
-          class="px-3 py-1.5 text-sm font-medium rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          Next
-        </button>
-      </div>
-    </div>
+    <AdminPagination
+      v-if="!loading && !error"
+      class="mt-6"
+      :current-page="currentPage"
+      :total-pages="totalPages"
+      :total-items="totalItems"
+      :per-page="perPage"
+      item-label="discounts"
+      @go-to-page="goToPage"
+    />
 
     <!-- Delete Confirmation Modal -->
     <ConfirmDeleteModal
@@ -423,20 +399,6 @@ const statusFilters = [
   { label: 'Active', value: 'active', activeClass: 'bg-green-600 text-white border-green-600' },
   { label: 'Inactive', value: 'inactive', activeClass: 'bg-gray-600 text-white border-gray-600' },
 ]
-
-const visiblePages = computed(() => {
-  const total = totalPages.value
-  const current = currentPage.value
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
-  const pages: (number | string)[] = [1]
-  if (current > 3) pages.push('...')
-  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
-    pages.push(i)
-  }
-  if (current < total - 2) pages.push('...')
-  pages.push(total)
-  return pages
-})
 
 const goToPage = (page: number) => {
   if (page < 1 || page > totalPages.value) return

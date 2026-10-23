@@ -63,19 +63,19 @@
           <AdminFilterSelect
             v-model="status"
             :options="storeStatusOptions"
-            aria-label="Filter by store status"
+            ariaLabel="Filter by store status"
             list-label="Store status filters"
           />
           <AdminFilterSelect
             v-model="subscriptionStatus"
             :options="subscriptionStatusOptions"
-            aria-label="Filter by subscription access"
+            ariaLabel="Filter by subscription access"
             list-label="Subscription access filters"
           />
           <AdminFilterSelect
             v-model="domainStatus"
             :options="domainStatusOptions"
-            aria-label="Filter by custom domain status"
+            ariaLabel="Filter by custom domain status"
             list-label="Custom domain status filters"
           />
           <div class="flex gap-2 sm:col-span-2 xl:col-span-1">

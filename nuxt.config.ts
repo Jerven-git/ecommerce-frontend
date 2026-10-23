@@ -140,7 +140,7 @@ export default defineNuxtConfig({
   // Keep generated Nuxt artifacts in the project-owned directory. Nuxt 4's
   // node_modules cache default can be owned by the container user, which makes
   // local production builds fail before compilation begins.
-  buildDir: '.nuxt',
+  buildDir: process.env.NUXT_BUILD_DIR || '.nuxt',
   // DevTools exposes development-only RPC and project metadata endpoints.
   // Never include it in preview or production server builds.
   devtools: { enabled: process.env.NODE_ENV === 'development' },

@@ -1,4 +1,4 @@
-import type { Product } from './useProducts'
+import type { AdminProduct } from '~/types/product'
 
 export interface OptionValueDraft {
   id: number | null
@@ -84,7 +84,7 @@ export function useProductForm() {
   const backdropMouseDown = ref(false)
   const submitting = ref(false)
   const formError = ref<string | null>(null)
-  const editingProduct = ref<Product | null>(null)
+  const editingProduct = ref<AdminProduct | null>(null)
   const form = ref<ProductFormData>(defaultFormData())
 
   // Secondary "hover" image — a single staged file. `hoverImageUrl` holds the
@@ -506,7 +506,7 @@ export function useProductForm() {
     showModal.value = true
   }
 
-  const openEditModal = async (product: Product) => {
+  const openEditModal = async (product: AdminProduct) => {
     editingProduct.value = product
     form.value = {
       name: product.name,

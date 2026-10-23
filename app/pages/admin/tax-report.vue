@@ -18,7 +18,7 @@
           <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">From</label>
           <AdminDatePicker
             v-model="filters.date_from"
-            aria-label="Report start date"
+            ariaLabel="Report start date"
             placeholder="Start date"
             :max="filters.date_to"
             class="w-full sm:w-52"
@@ -28,7 +28,7 @@
           <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">To</label>
           <AdminDatePicker
             v-model="filters.date_to"
-            aria-label="Report end date"
+            ariaLabel="Report end date"
             placeholder="End date"
             :min="filters.date_from"
             class="w-full sm:w-52"
@@ -39,7 +39,7 @@
           <AdminFilterSelect
             v-model="filters.status"
             :options="statusFilterOptions"
-            aria-label="Filter tax report by order status"
+            ariaLabel="Filter tax report by order status"
             list-label="Tax report order status filters"
             class="w-full sm:w-52"
           />
@@ -217,7 +217,7 @@ onMounted(() => {
   // Default: current month
   const now = new Date()
   filters.value.date_from = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
-  filters.value.date_to = now.toISOString().split('T')[0]
+  filters.value.date_to = now.toISOString().split('T')[0] ?? ''
   loadReport()
 })
 </script>

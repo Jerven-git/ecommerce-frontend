@@ -1,45 +1,9 @@
-interface Product {
-  id: number
-  slug: string
-  name: string
-  description: string
-  price: number | string
-  stock: number
-  weight: number | string
-  length_cm: number | string
-  width_cm: number | string
-  height_cm: number | string
-  shipping_calc_type: 'weight' | 'dimensions'
-  volume_cbm: number
-  category: string
-  category_id: number | null
-  categories?: { id: number; name: string }[]
-  image_url: string
-  is_active: boolean
-  allow_backorder: boolean
-  backorder_charge_policy: 'charged_now' | 'charged_later'
-  seo_title?: string | null
-  seo_description?: string | null
-  og_image_url?: string | null
-  noindex?: boolean
-  created_at: string
-  updated_at: string
-}
-
-interface PaginatedResponse {
-  data: Product[]
-  current_page: number
-  last_page: number
-  per_page: number
-  total: number
-}
-
-export type { Product, PaginatedResponse }
+import type { AdminProduct, PaginatedProducts } from '~/types/product'
 
 export function useProducts() {
   const { $apiFetch } = useNuxtApp()
 
-  const products = ref<Product[]>([])
+  const products = ref<AdminProduct[]>([])
   const loading = ref(true)
   const error = ref<string | null>(null)
   const searchQuery = ref('')
@@ -60,21 +24,6 @@ export function useProducts() {
     { value: 'inactive', label: 'Inactive', activeClass: 'border-gray-500 bg-gray-100 text-gray-700' },
   ]
 
-  const visiblePages = computed(() => {
-    const total = totalPages.value
-    const current = currentPage.value
-    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
-
-    const pages: (number | string)[] = [1]
-    if (current > 3) pages.push('...')
-    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
-      pages.push(i)
-    }
-    if (current < total - 2) pages.push('...')
-    pages.push(total)
-    return pages
-  })
-
   const loadProducts = async () => {
     loading.value = true
     error.value = null
@@ -94,7 +43,7 @@ export function useProducts() {
       if (q) query.search = q
       if (selectedCategoryId.value !== null) query.category_id = selectedCategoryId.value
 
-      const response = await $apiFetch<PaginatedResponse>('/products', {
+      const response = await $apiFetch<PaginatedProducts>('/products', {
         method: 'GET',
         query,
       })
@@ -175,7 +124,6 @@ export function useProducts() {
     totalItems,
     perPage,
     statusFilters,
-    visiblePages,
     showDeleteModal,
     deleting,
     loadProducts,

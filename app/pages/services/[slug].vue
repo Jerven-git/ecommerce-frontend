@@ -129,6 +129,7 @@
 
 <script setup lang="ts">
 import type { Service, ServiceDetail } from '~/types/service'
+import type { SiteConfig } from '~/composables/useSiteConfig'
 import { renderMarkdown } from '~/utils/markdown'
 
 const route = useRoute()
@@ -175,7 +176,7 @@ useJsonLd('service', () => {
   const value = service.value
   if (!value) return null
 
-  const config = siteConfig.value ?? {}
+  const config: Partial<SiteConfig> = siteConfig.value ?? {}
   const baseUrl = seoBaseUrl(config, requestUrl)
   const url = seoUrl(baseUrl, route.path)
 

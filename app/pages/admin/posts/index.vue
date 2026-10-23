@@ -39,7 +39,7 @@
         <AdminFilterSelect
           v-model="statusFilter"
           :options="statusFilterOptions"
-          aria-label="Filter posts by status"
+          ariaLabel="Filter posts by status"
           list-label="Blog post status filters"
           class="sm:w-44"
         />
@@ -47,7 +47,7 @@
         <AdminFilterSelect
           v-model="categoryFilter"
           :options="categoryFilterOptions"
-          aria-label="Filter posts by category"
+          ariaLabel="Filter posts by category"
           list-label="Blog post category filters"
           class="sm:w-52"
         />

@@ -13,21 +13,6 @@ export function useServices() {
   const totalItems = ref(0)
   const perPage = 12
 
-  const visiblePages = computed(() => {
-    const total = totalPages.value
-    const current = currentPage.value
-    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
-
-    const pages: (number | string)[] = [1]
-    if (current > 3) pages.push('...')
-    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
-      pages.push(i)
-    }
-    if (current < total - 2) pages.push('...')
-    pages.push(total)
-    return pages
-  })
-
   const loadServices = async () => {
     loading.value = true
     error.value = null
@@ -94,7 +79,6 @@ export function useServices() {
     totalPages,
     totalItems,
     perPage,
-    visiblePages,
     loadServices,
     goToPage,
   }

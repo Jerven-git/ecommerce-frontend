@@ -141,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Product } from '~/composables/useProducts'
+import type { AdminProduct } from '~/types/product'
 
 definePageMeta({
   middleware: 'auth'
@@ -181,7 +181,7 @@ const categoryFilterOptions = computed<CategoryFilterOption[]>(() => {
 })
 
 
-const handleEdit = async (product: Product) => {
+const handleEdit = async (product: AdminProduct) => {
   await productForm.openEditModal(product)
   const ids = product.categories?.map((c: any) => c.id) || (product.category_id ? [Number(product.category_id)] : [])
   categories.initCategoryForProduct(ids)

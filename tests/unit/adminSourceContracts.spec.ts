@@ -12,8 +12,9 @@ describe('admin API source contracts', () => {
   ])('keeps %s create, update, upload, and delete endpoints stable', (resource, path) => {
     const contents = source(path)
 
-    expect(contents).toContain(`$apiFetch('/admin/${resource}', { method: 'POST'`)
-    expect(contents).toContain(`$apiFetch(\`/admin/${resource}/\${idParam.value}\`, { method: 'PATCH'`)
+    expect(contents).toMatch(new RegExp(`\\$apiFetch(?:<[^>]+>)?\\('/admin/${resource}', \\{ method: 'POST'`))
+    expect(contents).toContain(`/admin/${resource}/\${idParam.value}`)
+    expect(contents).toContain("method: 'PATCH'")
     expect(contents).toContain("fd.append('_method', 'PATCH')")
     expect(contents).toContain(`$apiFetch(\`/admin/${resource}/\${idParam.value}\`, { method: 'DELETE'`)
   })

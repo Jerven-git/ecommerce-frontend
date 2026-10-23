@@ -433,7 +433,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Product } from '~/composables/useProducts'
+import type { AdminProduct } from '~/types/product'
 import type { ProductFormData, OptionDraft, VariantDraft } from '~/composables/useProductForm'
 import type { Category } from '~/composables/useProductCategories'
 
@@ -441,7 +441,7 @@ const props = defineProps<{
   showModal: boolean
   submitting: boolean
   formError: string | null
-  editingProduct: Product | null
+  editingProduct: AdminProduct | null
   form: ProductFormData
   computedVolumeCbm: number
   galleryImages: { id: number; url: string; alt_text?: string | null; legacy?: boolean }[]

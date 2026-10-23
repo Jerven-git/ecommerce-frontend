@@ -313,8 +313,8 @@ function handleDialogKeydown(event: KeyboardEvent) {
     return
   }
 
-  const firstElement = focusableElements[0]
-  const lastElement = focusableElements[focusableElements.length - 1]
+  const firstElement = focusableElements[0]!
+  const lastElement = focusableElements[focusableElements.length - 1]!
 
   if (event.shiftKey && document.activeElement === firstElement) {
     event.preventDefault()

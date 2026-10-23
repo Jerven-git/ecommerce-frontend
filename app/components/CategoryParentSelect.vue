@@ -12,7 +12,7 @@
       @click.stop="toggle"
       @keydown.down.prevent="openPicker"
       @keydown.up.prevent="openPicker"
-      @keydown.escape.prevent="closePicker"
+      @keydown.escape.prevent="closePicker()"
     >
       <span class="flex min-w-0 items-center gap-2">
         <Icon :name="triggerIcon" class="h-4 w-4 shrink-0 text-gray-400" aria-hidden="true" />

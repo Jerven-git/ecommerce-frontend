@@ -347,6 +347,7 @@
 
 <script setup lang="ts">
 import type { Product, ProductDetail, ProductVariant } from '~/types/product'
+import type { SiteConfig } from '~/composables/useSiteConfig'
 
 const route = useRoute()
 const { $apiFetch } = useNuxtApp()
@@ -590,7 +591,7 @@ const productJsonLd = computed(() => {
   const value = product.value
   if (!value) return null
 
-  const config = siteConfig.value ?? {}
+  const config: Partial<SiteConfig> = siteConfig.value ?? {}
   const baseUrl = seoBaseUrl(config, requestUrl)
   const activeVariants = (value.variants ?? []).filter(variant => variant.is_active)
   const stock = activeVariants.length

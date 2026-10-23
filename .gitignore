@@ -2,6 +2,7 @@
 .output
 .data
 .nuxt
+.nuxt-*
 .nuxt.root-owned.bak
 .nuxt_root_bak
 .nitro

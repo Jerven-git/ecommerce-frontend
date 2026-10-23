@@ -89,6 +89,7 @@
 
 <script setup lang="ts">
 import type { Post, PostDetail } from '~/types/post'
+import type { SiteConfig } from '~/composables/useSiteConfig'
 import { renderMarkdown } from '~/utils/markdown'
 import { formatPostDate } from '~/utils/formatPostDate'
 
@@ -136,7 +137,7 @@ useJsonLd('article', () => {
   const value = post.value
   if (!value) return null
 
-  const config = siteConfig.value ?? {}
+  const config: Partial<SiteConfig> = siteConfig.value ?? {}
   const baseUrl = seoBaseUrl(config, requestUrl)
   const url = seoUrl(baseUrl, route.path)
 
