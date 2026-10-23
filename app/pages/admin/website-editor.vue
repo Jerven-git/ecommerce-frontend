@@ -427,17 +427,10 @@
 <script setup lang="ts">
 import type { WebsiteEditorDraftPayload } from '~/composables/useWebsiteEditorDraft'
 import { withWebsiteEditorSupportedLocales } from '~/utils/websiteEditorDraftMutations'
-import {
-  WEBSITE_EDITOR_STATIC_SECTIONS,
-  type WebsiteEditorNavigationItem,
-  type WebsiteEditorPageId,
-} from '~/utils/websiteEditorPages'
+import type { WebsiteEditorPageId } from '~/utils/websiteEditorPages'
 import { websiteEditorValidationTarget } from '~/utils/websiteEditorValidation'
 
 definePageMeta({ middleware: 'auth' })
-
-type DeviceId = 'desktop' | 'tablet' | 'mobile'
-type ConfirmationKind = 'discard' | 'restore'
 
 const { siteConfig, fetchSiteConfig, broadcastConfigUpdate } = useSiteConfig()
 const { storeUrl } = useStorefrontUrl()
@@ -453,15 +446,6 @@ const {
   ensureActiveLocale,
 } = useWebsiteEditorRoute()
 
-const navigatorOpen = ref(false)
-const pendingConfirmation = ref<ConfirmationKind | null>(null)
-const activeDevice = ref<DeviceId>('desktop')
-const controlsOpen = ref(false)
-const controlsDocked = ref(false)
-const controlsCollapsed = ref(true)
-const controlsTrigger = ref<HTMLButtonElement | null>(null)
-const controlsClose = ref<HTMLButtonElement | null>(null)
-let controlsMediaQuery: MediaQueryList | null = null
 let editorMounted = false
 
 const {
@@ -564,11 +548,6 @@ const {
   disabled: computed(() => Boolean(selectedVersionId.value)),
 })
 
-const devices = [
-  { id: 'desktop' as const, label: 'Desktop', icon: 'heroicons:computer-desktop', width: '100%', widthLabel: 'Responsive width' },
-  { id: 'tablet' as const, label: 'Tablet', icon: 'heroicons:device-tablet', width: '768px', widthLabel: '768 px' },
-  { id: 'mobile' as const, label: 'Mobile', icon: 'heroicons:device-phone-mobile', width: '390px', widthLabel: '390 px' },
-]
 const {
   workingDraft,
   localeIsDefault,
@@ -589,61 +568,57 @@ const {
   activePage,
 })
 
-const activeDeviceConfig = computed(() => devices.find(device => device.id === activeDevice.value) ?? devices[0]!)
-const controlsVisible = computed(() => controlsDocked.value ? !controlsCollapsed.value : controlsOpen.value)
-const controlsToggleLabel = computed(() => controlsDocked.value
-  ? (controlsCollapsed.value ? 'Show editor sidebar' : 'Hide editor sidebar')
-  : 'Open sections panel')
-const confirmationLoading = computed(() => discarding.value || publishing.value || restoringVersion.value)
-const confirmationContent = computed(() => {
-  if (pendingConfirmation.value === 'restore') return {
-    title: 'Restore version to draft?',
-    message: 'This replaces the current private draft. The live website stays unchanged until you explicitly publish.',
-    confirmText: 'Restore to draft',
-    loadingText: 'Restoring…',
-    variant: 'warning' as const,
-  }
-  return {
-    title: 'Discard private changes?',
-    message: 'This removes the saved draft and any unsaved edits, then reloads the published website.',
-    confirmText: 'Discard changes',
-    loadingText: 'Discarding…',
-    variant: 'danger' as const,
-  }
+const {
+  devices,
+  navigatorOpen,
+  activeDevice,
+  activeDeviceConfig,
+  previewFrameStyle,
+  controlsOpen,
+  controlsDocked,
+  controlsCollapsed,
+  controlsVisible,
+  controlsToggleLabel,
+  controlsTrigger,
+  controlsClose,
+  toggleControls,
+  collapseControls,
+  closeControls,
+} = useWebsiteEditorShell({
+  isDirty,
+  selectedVersionId,
+  loadingDraft,
+  saving,
+  saveChanges,
+  undoChange,
+  redoChange,
 })
+
+const {
+  pendingConfirmation,
+  confirmationLoading,
+  confirmationContent,
+  draftSavedAt,
+  editorStateTitle,
+  editorStateDescription,
+  requestConfirmation,
+  cancelPendingAction,
+  confirmPendingAction,
+} = useWebsiteEditorFeedback({
+  draftUpdatedAt,
+  loadingDraft,
+  selectedVersionId,
+  isDirty,
+  hasSavedDraft,
+  workflow,
+  discarding,
+  publishing,
+  restoringVersion,
+  discardChanges,
+  restoreSelectedVersion,
+})
+
 const activeStoreUrl = computed(() => `${storeUrl.value}${activePageOption.value.path === '/' ? '' : activePageOption.value.path}`)
-const previewFrameStyle = computed(() => ({ width: activeDeviceConfig.value.width, maxWidth: '100%', height: '100%' }))
-const draftSavedAt = computed(() => draftUpdatedAt.value
-  ? new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(new Date(draftUpdatedAt.value))
-  : '')
-const editorStateTitle = computed(() => loadingDraft.value
-  ? 'Preparing private preview'
-  : selectedVersionId.value
-    ? 'Historical website preview'
-    : isDirty.value
-      ? 'Unsaved preview changes'
-      : hasSavedDraft.value
-        ? workflow.value.scheduled_publish_at
-          ? 'Publication scheduled'
-          : workflow.value.status === 'pending'
-            ? 'Review requested'
-            : workflow.value.status === 'approved'
-              ? 'Draft approved'
-              : workflow.value.status === 'changes_requested'
-                ? 'Changes requested'
-                : 'Private draft saved'
-        : 'Published website loaded')
-const editorStateDescription = computed(() => {
-  if (loadingDraft.value) return 'Loading the latest tenant configuration and private draft.'
-  if (selectedVersionId.value) return 'This is an earlier published version. Restore it to the private draft before publishing.'
-  if (isDirty.value) return 'The preview includes changes that are only in this browser. Save the draft before publishing.'
-  if (hasSavedDraft.value && workflow.value.scheduled_publish_at) return `This approved draft will publish automatically in ${workflow.value.timezone}.`
-  if (hasSavedDraft.value && workflow.value.status === 'pending') return 'The saved draft is awaiting review. You can still publish it immediately if needed.'
-  if (hasSavedDraft.value && workflow.value.status === 'approved') return 'The saved draft is approved and can be scheduled or published now.'
-  if (hasSavedDraft.value && workflow.value.status === 'changes_requested') return 'Review feedback is available in the publication panel.'
-  if (hasSavedDraft.value) return 'This draft is private. Publish it when the preview is ready for customers.'
-  return 'Start editing a section. Nothing changes publicly until you save and publish.'
-})
 
 const {
   previewFrame,
@@ -665,43 +640,25 @@ const {
   onRendered: () => selectSection(selectedSection.value),
 })
 
-function moveSection(index: number, direction: -1 | 1) {
-  if (!draft.value || selectedVersionId.value || !localeIsDefault.value || activePage.value !== 'home') return
-  const destination = index + direction
-  if (destination < 0 || destination >= draft.value.homepage_sections.length) return
-  const next = [...draft.value.homepage_sections]
-  const [moved] = next.splice(index, 1)
-  if (!moved) return
-  next.splice(destination, 0, moved)
-  draft.value = { ...draft.value, homepage_sections: next }
-  nextTick(() => selectSection(moved.id))
-}
-
-function toggleSection(index: number) {
-  if (!draft.value || selectedVersionId.value || !localeIsDefault.value || activePage.value !== 'home') return
-  const next = draft.value.homepage_sections.map((section, sectionIndex) => sectionIndex === index
-    ? { ...section, visible: !section.visible }
-    : section)
-  draft.value = { ...draft.value, homepage_sections: next }
-  const changed = next[index]
-  if (changed) nextTick(() => selectSection(changed.id))
-}
-
-function requestConfirmation(kind: ConfirmationKind) {
-  pendingConfirmation.value = kind
-}
-
-function cancelPendingAction() {
-  if (!confirmationLoading.value) pendingConfirmation.value = null
-}
-
-async function confirmPendingAction() {
-  const action = pendingConfirmation.value
-  if (!action || confirmationLoading.value) return
-  if (action === 'discard') await discardChanges()
-  else await restoreSelectedVersion()
-  if (!confirmationLoading.value) pendingConfirmation.value = null
-}
+const {
+  moveSection,
+  toggleSection,
+  ensureSelectedSection,
+  selectSection,
+  switchPage,
+  navigateFromNavigator,
+} = useWebsiteEditorSectionNavigation({
+  draft,
+  workingDraft,
+  selectedVersionId,
+  localeIsDefault,
+  activePage,
+  selectedSection,
+  selectRouteSection,
+  selectRoutePage,
+  selectPreviewPage,
+  selectPreviewSection,
+})
 
 function navigateFromPublishReview(page: WebsiteEditorPageId, section: string) {
   publishReviewOpen.value = false
@@ -741,107 +698,14 @@ function handleVersionPreviewExited() {
   nextTick(() => selectSection(selectedSection.value))
 }
 
-function ensureSelectedSection(payload: WebsiteEditorDraftPayload) {
-  if (activePage.value === 'home') {
-    const sectionExists = payload.homepage_sections.some(section => section.id === selectedSection.value)
-    if (!sectionExists) selectedSection.value = payload.homepage_sections[0]?.id ?? 'hero'
-    return
-  }
-
-  const sectionExists = WEBSITE_EDITOR_STATIC_SECTIONS[activePage.value].some(section => section.id === selectedSection.value)
-  if (!sectionExists) selectedSection.value = WEBSITE_EDITOR_STATIC_SECTIONS[activePage.value][0]?.id ?? 'header'
-}
-
 function publishChanges() {
   return publishDraftChanges(publishChangedAreas.value.length)
-}
-
-function selectSection(section: string) {
-  selectRouteSection(section)
-  selectPreviewSection(section)
 }
 
 function updateSupportedLocales(locales: string[]) {
   if (!draft.value || selectedVersionId.value) return
   draft.value = withWebsiteEditorSupportedLocales(draft.value, locales)
   ensureActiveLocale(draft.value)
-}
-
-function switchPage(page: WebsiteEditorPageId, section?: string) {
-  const firstSection = page === 'home'
-    ? workingDraft.value?.homepage_sections[0]?.id ?? 'hero'
-    : WEBSITE_EDITOR_STATIC_SECTIONS[page][0]?.id ?? 'header'
-  selectRoutePage(page, section ?? firstSection)
-  selectPreviewPage(page)
-  nextTick(() => selectSection(selectedSection.value))
-}
-
-function navigateFromNavigator(item: WebsiteEditorNavigationItem) {
-  switchPage(item.page, item.section)
-}
-
-function openControls() {
-  controlsOpen.value = true
-  nextTick(() => controlsClose.value?.focus())
-}
-
-function toggleControls() {
-  if (controlsDocked.value) {
-    controlsCollapsed.value = !controlsCollapsed.value
-    return
-  }
-  if (controlsOpen.value) closeControls()
-  else openControls()
-}
-
-function collapseControls() {
-  controlsCollapsed.value = true
-  nextTick(() => controlsTrigger.value?.focus())
-}
-
-function closeControls() {
-  if (!controlsOpen.value) return
-  controlsOpen.value = false
-  nextTick(() => controlsTrigger.value?.focus())
-}
-
-function syncControlsViewport(event: MediaQueryList | MediaQueryListEvent) {
-  controlsDocked.value = event.matches
-  if (event.matches) controlsOpen.value = false
-}
-
-function onBeforeUnload(event: BeforeUnloadEvent) {
-  if (!isDirty.value) return
-  event.preventDefault()
-  event.returnValue = ''
-}
-
-function onEditorKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape' && controlsOpen.value) {
-    closeControls()
-    return
-  }
-  if (!(event.ctrlKey || event.metaKey) || event.altKey || event.repeat) return
-  const key = event.key.toLowerCase()
-  if (key === 'k') {
-    event.preventDefault()
-    navigatorOpen.value = true
-    return
-  }
-  if (selectedVersionId.value) return
-  if (key === 's') {
-    event.preventDefault()
-    if (isDirty.value && !loadingDraft.value && !saving.value) void saveChanges()
-  } else if (key === 'z' && event.shiftKey) {
-    event.preventDefault()
-    redoChange()
-  } else if (key === 'z') {
-    event.preventDefault()
-    undoChange()
-  } else if (key === 'y') {
-    event.preventDefault()
-    redoChange()
-  }
 }
 
 onBeforeRouteLeave(() => !isDirty.value || window.confirm('Leave the editor and lose your unsaved changes?'))
@@ -854,19 +718,11 @@ watch(activeLocale, () => {
 onMounted(() => {
   editorMounted = true
   loadRecovery()
-  controlsMediaQuery = window.matchMedia('(min-width: 1280px)')
-  syncControlsViewport(controlsMediaQuery)
-  controlsMediaQuery.addEventListener('change', syncControlsViewport)
-  window.addEventListener('beforeunload', onBeforeUnload)
-  window.addEventListener('keydown', onEditorKeydown)
   void loadEditor()
 })
 
 onBeforeUnmount(() => {
   editorMounted = false
-  controlsMediaQuery?.removeEventListener('change', syncControlsViewport)
-  window.removeEventListener('beforeunload', onBeforeUnload)
-  window.removeEventListener('keydown', onEditorKeydown)
 })
 </script>
 
