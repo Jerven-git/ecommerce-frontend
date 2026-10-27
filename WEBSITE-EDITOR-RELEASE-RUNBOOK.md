@@ -1,13 +1,16 @@
 # Website Editor Release Runbook
 
-This runbook releases the Store Admin Website Editor introduced in Phases 1–5. It does not authorize a deployment by itself. Run every command against the actual target environment and compose file, and record the result separately from code validation.
+This runbook releases the current Store Admin Website Editor and its SiteConfig
+document dependencies. It does not authorize a deployment by itself. Run every
+command against the actual target environment and compose file, and record the
+result separately from code validation.
 
 ## Release boundary
 
 - The editor is available only to authenticated Store Admin users and resolves `user.store_id` through the existing admin tenant middleware.
 - Drafts, published versions, audit records, and health-monitor output are tenant-scoped.
 - The public storefront reads only published `SiteConfig` data.
-- The editor does not own private media uploads yet. Existing Site Settings and product media workflows remain authoritative.
+- Website presentation media uploaded through the editor is tenant-scoped and follows the draft/publish lifecycle. Product, catalogue, and operational media retain their existing owners.
 - Do not roll back the additive editor migrations merely to roll back application code. Dropping them deletes private drafts and version history.
 
 ## Required pre-release evidence
@@ -16,7 +19,10 @@ From `ssu-backend`:
 
 ```bash
 php artisan test tests/Feature/SiteConfigDraftApiTest.php \
+  tests/Feature/WebsiteDocumentStorageTest.php \
   tests/Feature/WebsiteEditorHardeningTest.php \
+  tests/Feature/WebsiteEditorLocalizationTest.php \
+  tests/Feature/WebsiteEditorMediaLibraryApiTest.php \
   tests/Feature/SuperAdmin/ActivityLogTest.php
 vendor/bin/pint --dirty --test
 ```
@@ -25,17 +31,25 @@ From `ssu-frontend`:
 
 ```bash
 npm ci
-npm run build
-npm run audit:runtime
+npm run typecheck
+npm run test:unit
+npm run generate
+test -f .output/public/200.html
 npm run test:e2e:list
 npm audit --omit=dev
 ```
 
-The release image is multi-stage: Nuxt and its build/dev tooling are installed only in the build stage, while the runtime stage receives `.output` only. `npm run audit:runtime` resolves and audits the exact package versions declared by the generated `.output/server/package.json`; this is the production runtime release gate.
+Production has no frontend container or Nuxt server runtime. Generate the static
+artifact outside the production stack, publish `.output/public` to the path
+mounted by nginx, and verify `200.html` before reloading nginx. The generated
+`.output/server/package.json` is not deployed, so `audit:runtime` is not a
+production runtime gate for this topology.
 
-Keep the workspace audit as a separate build-tooling report. As of 13 October 2026, `npm audit --omit=dev` reports 14 advisories (7 high and 7 critical) through Nuxt build/dev dependencies. The affected `simple-git`, argv parser, glob, and local-listener packages are absent from the generated runtime manifest, and the generated runtime audit reports 0 vulnerabilities. Several upstream paths have no stable patched release; npm's proposed automatic remediation downgrades Nuxt to the end-of-life 3.x line. Do not run `npm audit fix --force`, suppress the findings, or treat the workspace report as proof that the final runtime image contains those packages.
-
-Re-run both audits for every release. Stop the release if `audit:runtime` reports a vulnerability, if one of the currently build-only packages becomes part of `.output`, or if an advisory is reachable from untrusted build inputs. Continue tracking the workspace advisories and upgrade the stable Nuxt dependency chain when compatible fixes are published.
+Treat `npm audit --omit=dev` as a fresh build-tooling report for each release;
+do not reuse a dated advisory count. Do not run `npm audit fix --force` as part
+of a release. Review whether an advisory is reachable from untrusted build
+inputs, upgrade through a compatible Nuxt dependency chain, and record any
+accepted build-only exposure separately from the static artifact checks.
 
 Run the browser suite against a disposable staging store. The storage-state file contains an authenticated session and must remain inside the ignored `tests/e2e/.auth` directory.
 
@@ -70,7 +84,8 @@ npm run test:e2e
    docker compose -f docker-compose-prod.yml exec backend php artisan queue:restart
    ```
 
-5. Verify the `site_config_drafts` and `site_config_versions` migrations are marked as run.
+5. Verify the `site_config_drafts`, `site_config_versions`, and
+   `site_config_documents` migrations are marked as run.
 6. Build and deploy the frontend through the existing production artifact process. Verify that nginx is serving the newly generated `.output/public`, not a stale mounted directory.
 7. Confirm the scheduler is running so `website-editor:monitor` executes every fifteen minutes.
 8. Run the staging browser suite and the production smoke checks below before widening access.
@@ -114,4 +129,6 @@ Route these log messages through the production log collector:
 5. Verify the public storefront and checkout using existing published `SiteConfig` values.
 6. If a publish changed public content incorrectly, use version restore before rolling application code back.
 
-Published storefront data remains in `site_config`; application rollback must not replace it with a draft or delete it.
+Published website content remains in `site_config_documents`; operational
+settings remain in `site_config`. Application rollback must not replace the
+published document with a draft or delete either data owner.
