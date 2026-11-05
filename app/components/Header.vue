@@ -12,12 +12,14 @@
   >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div
+        ref="headerToolbar"
         class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 transition-[height] duration-300"
         :class="isScrolled && !isTransparent ? 'h-14' : 'h-16'"
       >
 
         <!-- Logo -->
         <NuxtLink
+          ref="headerLogo"
           :to="marketingHome"
           class="flex min-h-11 items-center shrink-0 justify-self-start rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
           :aria-label="isApexMarketing ? 'DATABASY home' : undefined"
@@ -57,8 +59,8 @@
               : 'text-gray-700 hover:text-gray-950 focus-visible:outline-[var(--apex-focus-on-light)]'"
           >{{ link.label }}</a>
         </nav>
-        <nav v-else class="hidden lg:flex items-center gap-7 justify-self-center">
-          <template v-for="link in navLinks" :key="link.to">
+        <nav v-else ref="desktopNavigation" class="hidden w-max items-center gap-7 justify-self-center" :class="desktopNavFits ? 'lg:flex' : 'lg:absolute lg:w-0 lg:overflow-hidden lg:invisible lg:flex lg:pointer-events-none'" :aria-hidden="!desktopNavFits ? true : undefined" :inert="!desktopNavFits">
+          <template v-for="link in navLinks" :key="link.id">
             <!-- Item with category dropdown (Shop) -->
             <div
               v-if="link.categories && link.categories.length"
@@ -145,7 +147,7 @@
         </nav>
 
         <!-- Right actions -->
-        <div class="flex items-center gap-2 justify-self-end col-start-3 -mr-2 md:mr-0">
+        <div ref="headerActions" class="flex items-center gap-2 justify-self-end col-start-3 -mr-2 md:mr-0">
 
           <!-- Apex marketing: account actions -->
           <template v-if="isApexMarketing">
@@ -251,8 +253,9 @@
             ref="mobileMenuTrigger"
             type="button"
             @click="mobileMenuOpen = true"
-            class="lg:hidden inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             :class="[
+              desktopNavFits ? (isApexMarketing ? 'lg:hidden' : 'lg:invisible lg:pointer-events-none') : '',
               isTransparent ? 'border-white/20 text-white/85 hover:bg-white/10' : 'border-gray-900/10 bg-white/70 text-gray-900 shadow-sm hover:bg-gray-50',
               isApexMarketing
                 ? (isTransparent ? 'focus-visible:outline-[var(--apex-focus-on-dark)]' : 'focus-visible:outline-[var(--apex-focus-on-light)]')
@@ -279,7 +282,8 @@
         >
           <div
             v-if="mobileMenuOpen"
-            class="lg:hidden fixed inset-0 z-[60] bg-gray-900/40 backdrop-blur-sm"
+            :class="desktopNavFits ? 'lg:hidden' : ''"
+            class=" fixed inset-0 z-[60] bg-gray-900/40 backdrop-blur-sm"
             aria-hidden="true"
             @click="closeMobile"
           />
@@ -297,7 +301,8 @@
             id="mobile-menu-dialog"
             ref="mobileMenuDialog"
             tabindex="-1"
-            class="lg:hidden fixed top-0 right-0 z-[61] h-full w-[85vw] max-w-sm bg-white shadow-2xl flex flex-col"
+            :class="desktopNavFits ? 'lg:hidden' : ''"
+            class=" fixed top-0 right-0 z-[61] h-full w-[85vw] max-w-sm bg-white shadow-2xl flex flex-col"
             role="dialog"
             aria-modal="true"
             aria-label="Menu"
@@ -339,7 +344,7 @@
                 <span class="text-xs font-semibold text-gray-500">Language</span>
                 <StorefrontLocalePicker />
               </div>
-              <template v-for="link in navLinks" :key="link.to">
+              <template v-for="link in navLinks" :key="link.id">
                 <!-- Accordion item with categories (Shop) -->
                 <div v-if="link.categories && link.categories.length">
                   <button
@@ -405,6 +410,7 @@
 </template>
 
 <script setup lang="ts">
+import { storefrontNavigationLinks } from '~/utils/websiteNavigation'
 const route = useRoute()
 const { $apiFetch } = useNuxtApp()
 const cartStore = useCartStore()
@@ -412,6 +418,28 @@ const authStore = useAuthStore()
 const favoritesStore = useFavoritesStore()
 const { siteConfig } = useSiteConfig()
 const { isEnabled } = useModules()
+const headerToolbar = ref<HTMLElement | null>(null)
+const headerLogo = ref<{ $el: HTMLElement } | HTMLElement | null>(null)
+const headerActions = ref<HTMLElement | null>(null)
+const desktopNavigation = ref<HTMLElement | null>(null)
+const desktopNavFits = ref(false)
+let navigationObserver: ResizeObserver | null = null
+function fitDesktopNavigation() {
+  if (isApexMarketing.value || window.innerWidth < 1024) {
+    desktopNavFits.value = true
+    return
+  }
+  const toolbar = headerToolbar.value
+  const navigation = desktopNavigation.value
+  const logo = headerLogo.value && ('$el' in headerLogo.value ? headerLogo.value.$el : headerLogo.value)
+  const actions = headerActions.value
+  if (!toolbar || !navigation || !logo || !actions) return
+  // The centered grid gives equal space to both sides of the navigation.
+  const sideWidth = Math.max(logo.scrollWidth, actions.scrollWidth)
+  const fits = navigation.scrollWidth + sideWidth * 2 + 32 <= toolbar.clientWidth
+  desktopNavFits.value = fits
+  if (fits) mobileMenuOpen.value = false
+}
 const mobileMenuOpen = ref(false)
 const mobileShopOpen = ref(false)
 const mobileMenuTrigger = ref<HTMLButtonElement | null>(null)
@@ -490,14 +518,17 @@ const allNavLinks: NavItem[] = [
   { to: '/contact', label: 'Contact', module: 'contact' },
 ]
 
-const navLinks = computed(() =>
-  allNavLinks
-    .filter(l => l.module === null || isEnabled(l.module))
-    .map(l => ({
-      ...l,
-      categories: l.hasDropdown ? (shopCategories.value ?? []) : [],
-    }))
-)
+const navLinks = computed(() => {
+  const links = Array.isArray(siteConfig.value?.navigation)
+    ? storefrontNavigationLinks(siteConfig.value.navigation)
+    : allNavLinks.map(link => ({ ...link, id: link.to }))
+  return links
+    .filter(link => {
+      const standard = allNavLinks.find(item => item.to === link.to)
+      return !standard?.module || isEnabled(standard.module)
+    })
+    .map(link => ({ ...link, categories: link.to === '/shop' ? (shopCategories.value ?? []) : [] }))
+})
 
 // Active-state matching: Home only on exact `/`, everything else on its own
 // section (so `/shop/…` keeps Shop lit but `/` doesn't light every link).
@@ -613,13 +644,23 @@ function onKeydown(e: KeyboardEvent) {
     first.focus()
   }
 }
+watch(navLinks, () => nextTick(fitDesktopNavigation))
+watch(desktopNavigation, element => { if (element) navigationObserver?.observe(element) })
 onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
+  window.addEventListener('resize', fitDesktopNavigation)
+  navigationObserver = new ResizeObserver(fitDesktopNavigation)
+  for (const element of [headerToolbar.value, desktopNavigation.value, headerActions.value]) {
+    if (element) navigationObserver.observe(element)
+  }
+  nextTick(fitDesktopNavigation)
   window.addEventListener('keydown', onKeydown)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll)
+  window.removeEventListener('resize', fitDesktopNavigation)
+  navigationObserver?.disconnect()
   window.removeEventListener('keydown', onKeydown)
   if (import.meta.client) {
     document.body.style.overflow = previousBodyOverflow
@@ -638,6 +679,7 @@ onBeforeUnmount(() => {
    so it works in both the solid and transparent (over-hero) header states. */
 .nav-link {
   position: relative;
+  white-space: nowrap;
   padding: 0.5rem 0.15rem;
   font-size: 0.875rem;
   font-weight: 500;

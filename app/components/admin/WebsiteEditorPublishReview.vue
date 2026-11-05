@@ -18,10 +18,21 @@
           <li v-for="area in changedAreas" :key="area.id" class="flex items-center gap-3 py-2.5">
             <Icon :name="pageIcon(area.page)" class="h-4 w-4 shrink-0 text-admin-accent-strong" aria-hidden="true" />
             <span class="min-w-0 flex-1 truncate text-xs font-medium text-admin-text">{{ area.label }}</span>
-            <button type="button" class="publish-review-focus min-h-11 rounded-lg px-2 text-xs font-semibold text-admin-accent-strong hover:bg-admin-accent-soft" @click="$emit('navigate', area.page, area.section)">Review</button>
+            <button type="button" class="publish-review-focus min-h-11 rounded-lg px-2 text-xs font-semibold text-admin-accent-strong hover:bg-admin-accent-soft" :disabled="loading || workflowLoading" @click="$emit('navigate', area.page, area.section)">Review</button>
           </li>
         </ul>
         <p v-else class="mt-3 rounded-xl bg-admin-soft px-3 py-4 text-xs leading-5 text-admin-muted">No differences were found between this draft and the published website.</p>
+
+        <div v-if="pageDrafts.length" class="mt-5">
+          <div class="flex items-center justify-between gap-3"><h4 class="text-xs font-semibold text-admin-text">Custom pages</h4><span class="text-xs tabular-nums text-admin-muted">{{ selectedPageUuids.length }} selected</span></div>
+          <ul class="mt-2 divide-y divide-admin-border border-y border-admin-border">
+            <li v-for="page in pageDrafts" :key="page.uuid" class="flex items-center gap-3 py-2.5">
+              <input :id="`publish-page-${page.uuid}`" type="checkbox" :disabled="loading || workflowLoading" class="h-4 w-4 rounded border-admin-border text-admin-accent focus:ring-admin-accent" :checked="selectedPageUuids.includes(page.uuid)" @change="$emit('togglePage', page.uuid)" />
+              <label :for="`publish-page-${page.uuid}`" class="min-w-0 flex-1 cursor-pointer"><span class="block truncate text-xs font-semibold text-admin-text">{{ page.title }}</span><span class="block truncate text-[11px] text-admin-muted">{{ page.path }}</span></label>
+              <NuxtLink :aria-disabled="loading || workflowLoading" :tabindex="loading || workflowLoading ? -1 : undefined" @click="guardNavigation" :to="`/admin/website-editor?customPage=${encodeURIComponent(page.uuid)}`" class="publish-review-focus inline-flex min-h-11 items-center rounded-lg px-2 text-xs font-semibold text-admin-accent-strong hover:bg-admin-accent-soft">Review</NuxtLink>
+            </li>
+          </ul>
+        </div>
       </section>
 
       <section aria-labelledby="publish-readiness-heading">
@@ -40,7 +51,7 @@
                 <p class="text-xs font-semibold text-admin-text">{{ warning.label }}</p>
                 <p class="mt-0.5 text-xs leading-5 text-admin-muted">{{ warning.detail }}</p>
               </div>
-              <button type="button" class="publish-review-focus min-h-11 shrink-0 rounded-lg px-2 text-xs font-semibold text-admin-accent-strong hover:bg-admin-accent-soft" @click="$emit('navigate', warning.page, warning.section)">Fix</button>
+              <button type="button" class="publish-review-focus min-h-11 shrink-0 rounded-lg px-2 text-xs font-semibold text-admin-accent-strong hover:bg-admin-accent-soft" :disabled="loading || workflowLoading" @click="$emit('navigate', warning.page, warning.section)">Fix</button>
             </div>
           </li>
         </ul>
@@ -118,17 +129,17 @@
           Scheduled for <span class="font-semibold">{{ formatDate(workflow.scheduled_publish_at, workflow.timezone) }}</span>
           <span v-if="workflow.scheduled_by_name" class="text-admin-muted"> by {{ workflow.scheduled_by_name }}</span>
         </p>
-        <button type="button" class="publish-review-focus min-h-11 rounded-lg px-3 text-xs font-semibold text-admin-muted hover:bg-admin-soft disabled:opacity-50" :disabled="workflowLoading" @click="$emit('cancelSchedule')">Cancel schedule</button>
+        <button type="button" class="publish-review-focus min-h-11 rounded-lg px-3 text-xs font-semibold text-admin-muted hover:bg-admin-soft disabled:opacity-50" :disabled="workflowLoading || loading" @click="$emit('cancelSchedule')">Cancel schedule</button>
         <p v-if="workflow.scheduled_release_note" class="w-full break-words ps-6 text-xs leading-5 text-admin-muted">Release note: {{ workflow.scheduled_release_note }}</p>
       </div>
 
       <div v-if="workflow.status !== 'approved'" class="mt-4 flex flex-wrap justify-end gap-2">
         <button v-if="workflow.status === 'pending'" type="button" class="publish-review-focus min-h-11 rounded-xl border border-admin-border bg-admin-surface px-4 text-xs font-semibold text-admin-text hover:bg-admin-soft disabled:opacity-50" :disabled="workflowLoading || !reviewNote.trim()" @click="$emit('requestChanges')">Request changes</button>
-        <button v-if="workflow.status === 'pending'" type="button" class="publish-review-focus inline-flex min-h-11 items-center gap-2 rounded-xl border border-admin-accent bg-admin-surface px-4 text-xs font-semibold text-admin-accent-strong hover:bg-admin-accent-soft disabled:opacity-50" :disabled="workflowLoading" @click="$emit('approve')">
+        <button v-if="workflow.status === 'pending'" type="button" class="publish-review-focus inline-flex min-h-11 items-center gap-2 rounded-xl border border-admin-accent bg-admin-surface px-4 text-xs font-semibold text-admin-accent-strong hover:bg-admin-accent-soft disabled:opacity-50" :disabled="workflowLoading || loading" @click="$emit('approve')">
           <Icon name="heroicons:check" class="h-4 w-4" aria-hidden="true" />
           Approve draft
         </button>
-        <button v-else type="button" class="publish-review-focus inline-flex min-h-11 items-center gap-2 rounded-xl border border-admin-accent bg-admin-surface px-4 text-xs font-semibold text-admin-accent-strong hover:bg-admin-accent-soft disabled:opacity-50" :disabled="workflowLoading" @click="$emit('requestReview')">
+        <button v-else type="button" class="publish-review-focus inline-flex min-h-11 items-center gap-2 rounded-xl border border-admin-accent bg-admin-surface px-4 text-xs font-semibold text-admin-accent-strong hover:bg-admin-accent-soft disabled:opacity-50" :disabled="workflowLoading || loading" @click="$emit('requestReview')">
           <Icon :name="workflowLoading ? 'heroicons:arrow-path' : 'heroicons:paper-airplane'" class="h-4 w-4" :class="workflowLoading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
           {{ workflow.status === 'changes_requested' ? 'Request review again' : 'Request review' }}
         </button>
@@ -153,7 +164,7 @@
     <template #footer>
       <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <button type="button" class="publish-review-focus min-h-11 rounded-xl border border-admin-border bg-admin-surface px-4 text-xs font-semibold text-admin-text hover:bg-admin-soft disabled:opacity-50" :disabled="loading || workflowLoading" @click="requestClose">Continue editing</button>
-        <button type="button" class="publish-review-focus inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-admin-accent px-4 text-xs font-semibold text-admin-on-accent hover:bg-admin-accent-strong disabled:opacity-50" :disabled="loading || changedAreas.length === 0" @click="$emit('publish')">
+        <button type="button" class="publish-review-focus inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-admin-accent px-4 text-xs font-semibold text-admin-on-accent hover:bg-admin-accent-strong disabled:opacity-50" :disabled="loading || workflowLoading || (changedAreas.length === 0 && selectedPageUuids.length === 0)" @click="$emit('publish')">
           <Icon :name="loading ? 'heroicons:arrow-path' : 'heroicons:rocket-launch'" class="h-4 w-4" :class="loading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
           {{ loading ? 'Publishing…' : (warnings.length ? 'Publish with warnings' : 'Publish website') }}
         </button>
@@ -164,6 +175,7 @@
 
 <script setup lang="ts">
 import type { WebsiteEditorWorkflow } from '~/composables/useWebsiteEditorDraft'
+import type { WebsitePageSummary } from '~/types/websitePage'
 import type { WebsiteEditorChangedArea, WebsiteEditorReadinessWarning } from '~/utils/websiteEditorPublishing'
 import { websiteEditorPage, type WebsiteEditorPageId } from '~/utils/websiteEditorPages'
 
@@ -178,6 +190,8 @@ const props = defineProps<{
   workflowError: string
   reviewNote: string
   scheduledFor: string
+  pageDrafts: WebsitePageSummary[]
+  selectedPageUuids: string[]
 }>()
 
 const emit = defineEmits<{
@@ -192,6 +206,7 @@ const emit = defineEmits<{
   requestChanges: []
   schedule: []
   cancelSchedule: []
+  togglePage: [uuid: string]
 }>()
 
 const pageIcon = (page: WebsiteEditorPageId) => websiteEditorPage(page).icon
@@ -223,6 +238,10 @@ function formatDate(value: string, timeZone?: string) {
   } catch {
     return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date)
   }
+}
+function guardNavigation(event: MouseEvent) {
+  if (props.loading || props.workflowLoading) { event.preventDefault(); return }
+  if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey && event.button === 0) emit('close')
 }
 const requestClose = () => {
   if (!props.loading && !props.workflowLoading) emit('close')

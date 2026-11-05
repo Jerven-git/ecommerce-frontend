@@ -50,6 +50,39 @@ describe('useWebsiteEditorPreview', () => {
     wrapper.unmount()
   })
 
+  it('accepts navigation only from its own same-origin preview frame', () => {
+    const onNavigate = vi.fn()
+    const contentWindow = markRaw({ postMessage: vi.fn() }) as unknown as Window
+    let preview!: ReturnType<typeof useWebsiteEditorPreview>
+    const wrapper = mount(defineComponent({
+      setup() {
+        preview = useWebsiteEditorPreview({
+          config: ref(null), activePage: ref('home'), selectedSection: ref('hero'),
+          onRendered: vi.fn(), onNavigate,
+        })
+        return () => h('div')
+      },
+    }))
+    preview.previewFrame.value = markRaw({ contentWindow }) as HTMLIFrameElement
+    function send(origin: string, source: Window, href: unknown) {
+      const event = new Event('message')
+      Object.defineProperties(event, {
+        origin: { value: origin }, source: { value: source },
+        data: { value: { source: 'ssu-storefront-preview', type: 'navigate', href } },
+      })
+      window.dispatchEvent(event)
+    }
+    send('https://foreign.test', contentWindow, '/contact')
+    send(window.location.origin, window, '/contact')
+    send(window.location.origin, contentWindow, { path: '/contact' })
+    expect(onNavigate).not.toHaveBeenCalled()
+    send(window.location.origin, contentWindow, '/contact')
+    expect(onNavigate).toHaveBeenCalledExactlyOnceWith('/contact')
+    wrapper.unmount()
+    send(window.location.origin, contentWindow, '/about')
+    expect(onNavigate).toHaveBeenCalledTimes(1)
+  })
+
   it('moves from loading to an actionable error when rendering times out', () => {
     vi.useFakeTimers()
     const config = ref({ site_name: 'Tenant Store' } as SiteConfig)

@@ -127,13 +127,13 @@
               </button>
 
               <template v-if="deleteConfirm">
-                <p class="text-xs leading-5 text-admin-danger">Delete this archived file permanently?</p>
+                <p class="text-xs leading-5 text-admin-danger">Delete this unused file permanently?</p>
                 <div class="grid grid-cols-2 gap-2">
                   <button type="button" class="min-h-11 rounded-xl border border-admin-border text-xs font-semibold text-admin-text hover:bg-admin-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-admin-accent" :disabled="deletingAsset" @click="deleteConfirm = false">Cancel</button>
                   <button type="button" class="min-h-11 rounded-xl bg-admin-danger px-2 text-xs font-semibold text-white hover:opacity-90 disabled:cursor-wait disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-admin-danger" :disabled="deletingAsset" @click="deleteSelectedAsset">{{ deletingAsset ? 'Deleting…' : 'Delete' }}</button>
                 </div>
               </template>
-              <button v-else-if="selectedAsset.can_delete && currentId !== selectedAsset.id" type="button" class="min-h-11 w-full rounded-xl px-3 text-xs font-semibold text-admin-danger hover:bg-admin-danger-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-admin-danger" @click="deleteConfirm = true">Delete archived asset</button>
+              <button v-else-if="selectedAsset.can_delete && currentId !== selectedAsset.id" type="button" class="min-h-11 w-full rounded-xl px-3 text-xs font-semibold text-admin-danger hover:bg-admin-danger-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-admin-danger" @click="deleteConfirm = true">Delete asset</button>
               <p v-else class="text-xs leading-5 text-admin-muted">{{ deleteHelp }}</p>
             </div>
           </div>
@@ -200,7 +200,7 @@ const deleteHelp = computed(() => {
   if (!selectedAsset.value) return ''
   if (props.currentId === selectedAsset.value.id) return 'This asset is selected in the current draft.'
   if (selectedAsset.value.usage.length) return 'Remove its website and version-history references before deleting it.'
-  if (selectedAsset.value.status !== 'archived') return 'Live and private-draft assets are protected from direct deletion.'
+  if (!selectedAsset.value.can_delete) return 'Live and private-draft assets are protected from direct deletion.'
   return ''
 })
 
@@ -334,12 +334,16 @@ function mediaKind(asset: WebsiteEditorMediaAsset) {
 }
 
 function statusLabel(status: WebsiteEditorMediaAsset['status']) {
-  return status === 'live' ? 'Live' : status === 'draft' ? 'Private' : 'Archived'
+  if (status === 'live') return 'Live'
+  if (status === 'draft') return 'Private'
+  if (status === 'page') return 'Page'
+  return 'Archived'
 }
 
 function statusClass(status: WebsiteEditorMediaAsset['status']) {
   if (status === 'live') return 'text-admin-success'
   if (status === 'draft') return 'text-admin-warning'
+  if (status === 'page') return 'text-admin-accent-strong'
   return 'text-admin-muted'
 }
 </script>

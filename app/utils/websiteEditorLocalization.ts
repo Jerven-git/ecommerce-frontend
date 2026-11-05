@@ -126,8 +126,8 @@ export function websiteEditorTranslationFields(
   else if (section === 'store-details') fields = [
     scalar(payload, 'site_name', 'Store name', 255),
     ...indexed(payload, 'contact_entries', [{ key: 'label', label: 'Contact label', maxlength: 100 }]),
-    ...indexed(payload, 'social_links', [{ key: 'label', label: 'Social link label', maxlength: 100 }]),
   ]
+  else if (section === 'social-media') fields = indexed(payload, 'social_links', [{ key: 'label', label: 'Social link label', maxlength: 100 }])
   else if (section === 'header') fields = [scalar(payload, 'header_cta.label', 'Button label', 30)]
   else if (section === 'footer-banner') fields = [scalar(payload, 'footer_banner.heading', 'Heading', 150), scalar(payload, 'footer_banner.subtitle', 'Supporting text', 255, true), scalar(payload, 'footer_banner.button_label', 'Button label', 30)]
   else if (section === 'footer') fields = [scalar(payload, 'footer.tagline', 'Tagline', 255, true), scalar(payload, 'footer.copyright_text', 'Copyright', 255)]
@@ -169,7 +169,7 @@ export function websiteEditorLocaleProgress(payload: WebsiteEditorDraftPayload, 
   const requiredPaths = new Set<string>()
   const pages: Array<[WebsiteEditorPageId, string]> = [
     ['home', 'hero'], ['home', 'how-it-works'], ['home', 'features'], ['home', 'stats'], ['home', 'statement'], ['home', 'newsletter'],
-    ['global', 'brand-assets'], ['global', 'store-details'], ['global', 'header'], ['global', 'footer-banner'], ['global', 'footer'],
+    ['global', 'brand-assets'], ['global', 'store-details'], ['global', 'social-media'], ['global', 'header'], ['global', 'footer-banner'], ['global', 'footer'],
     ['about', 'about-content'], ['story', 'story-content'], ['contact', 'contact-content'], ['shop', 'shop-content'], ['blog', 'blog-content'], ['services', 'services-content'], ['popup', 'welcome-popup'],
   ]
   for (const [page, section] of pages) {

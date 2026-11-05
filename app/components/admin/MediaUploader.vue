@@ -3,6 +3,17 @@
   <div v-if="url && !overlay" class="group relative flex h-36 w-full min-w-0 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-gray-50 p-5 pr-20">
     <img :src="url" :alt="label" :class="[previewClass || 'h-16 w-auto rounded-lg object-contain', 'max-h-full max-w-full']" />
     <button
+      v-if="replaceUpload"
+      type="button"
+      class="absolute left-2 top-2 flex h-11 w-11 items-center justify-center rounded-lg bg-white text-gray-500 shadow-sm transition-colors hover:bg-gray-100 hover:text-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-wait disabled:opacity-60"
+      :disabled="uploading"
+      :aria-label="'Upload a replacement for ' + label"
+      :title="'Upload a replacement for ' + label"
+      @click="fileInput?.click()"
+    >
+      <Icon :name="uploading ? 'heroicons:arrow-path' : 'heroicons:arrow-up-tray'" class="h-4 w-4" :class="uploading ? 'animate-spin' : ''" aria-hidden="true" />
+    </button>
+    <button
       v-if="library"
       @click="$emit('browse')"
       type="button"
@@ -28,6 +39,17 @@
     <video v-if="video" :src="url" :class="previewClass || 'w-full h-44 object-cover'" muted autoplay loop playsinline />
     <img v-else :src="url" :alt="label" :class="previewClass || 'w-full h-44 object-cover'" />
     <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+    <button
+      v-if="replaceUpload"
+      type="button"
+      class="absolute left-3 top-3 flex h-11 w-11 items-center justify-center rounded-lg bg-white/90 text-gray-600 shadow-sm transition-colors hover:bg-white hover:text-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-wait disabled:opacity-60"
+      :disabled="uploading"
+      :aria-label="'Upload a replacement for ' + label"
+      :title="'Upload a replacement for ' + label"
+      @click="fileInput?.click()"
+    >
+      <Icon :name="uploading ? 'heroicons:arrow-path' : 'heroicons:arrow-up-tray'" class="h-4 w-4" :class="uploading ? 'animate-spin' : ''" aria-hidden="true" />
+    </button>
     <button
       v-if="library"
       @click="$emit('browse')"
@@ -76,7 +98,7 @@
           :style="{ width: progressPercent + '%' }"
         />
       </div>
-      <p v-if="progressBytesLabel" class="mt-1 tabular-nums text-gray-400" :class="compact ? 'text-xs' : 'text-[10px]'">{{ progressBytesLabel }}</p>
+      <p v-if="progressBytesLabel" class="mt-1 tabular-nums text-xs text-gray-400">{{ progressBytesLabel }}</p>
     </template>
 
     <p v-else class="max-w-full break-words text-gray-600" :class="compact ? 'text-xs leading-4' : 'text-sm leading-5'">
@@ -84,7 +106,6 @@
     </p>
 
     <p v-if="!uploading" class="mt-1 max-w-full break-words text-xs text-gray-500" :class="compact ? 'leading-4' : 'leading-5'">{{ hint }}</p>
-      <input :id="inputId" ref="fileInput" type="file" class="sr-only" :accept="accept || 'image/*'" @change="onInputChange" />
     </label>
     <button
       v-if="library && !uploading"
@@ -96,6 +117,7 @@
       Choose from media library
     </button>
   </div>
+  <input :id="inputId" ref="fileInput" type="file" class="sr-only" :accept="accept || 'image/*'" @change="onInputChange" />
 </template>
 
 <script setup lang="ts">
@@ -112,6 +134,7 @@ const props = defineProps<{
   video?: boolean
   compact?: boolean
   library?: boolean
+  replaceUpload?: boolean
   /** Optional upload progress (0-100). When omitted the label just shows "Uploading…". */
   progress?: { loaded: number; total: number; percent: number }
 }>()

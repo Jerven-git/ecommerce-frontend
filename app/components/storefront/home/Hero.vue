@@ -55,11 +55,15 @@
           {{ heroSubtitle }}
         </p>
         <div class="hero-stagger mt-8 flex flex-wrap items-center gap-3 md:mt-10 md:gap-4" style="animation-delay: 0.55s">
-          <NuxtLink to="/shop" class="hero-cta-primary">
-            Shop Now
+          <NuxtLink :to="primaryAction.to" class="hero-cta-primary">
+            {{ primaryAction.label }}
             <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
           </NuxtLink>
-          <button type="button" class="hero-cta-ghost" @click="scrollToFeatured">
+          <NuxtLink v-if="secondaryAction" :to="secondaryAction.to" class="hero-cta-ghost">
+            {{ secondaryAction.label }}
+            <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
+          </NuxtLink>
+          <button v-else type="button" class="hero-cta-ghost" @click="scrollToFeatured">
             Discover more
             <Icon name="heroicons:arrow-down" class="h-4 w-4" aria-hidden="true" />
           </button>
@@ -95,6 +99,33 @@ const heroSubtitle = computed(() => props.siteConfig ? (props.siteConfig.hero_su
 const heroAltText = computed(() => props.siteConfig?.pages_seo?.home?.cover_alt_text ?? '')
 const isHeroVideo = computed(() => props.siteConfig?.hero_media_mime?.startsWith('video/'))
 const isFullBleed = computed(() => props.siteConfig?.hero_full_bleed ?? false)
+const isServiceStudio = computed(() => props.siteConfig?.theme_layout?.id === 'service-studio')
+const isInformationalEditorial = computed(() => props.siteConfig?.theme_layout?.id === 'informational-editorial')
+const primaryAction = computed(() => {
+  if (isServiceStudio.value) {
+    return {
+      to: props.siteConfig?.modules_enabled?.services === false ? '/contact' : '/services',
+      label: props.siteConfig?.modules_enabled?.services === false ? 'Start a conversation' : 'Explore services',
+    }
+  }
+
+  if (isInformationalEditorial.value) {
+    if (props.siteConfig?.modules_enabled?.blog !== false) return { to: '/blog', label: 'Explore articles' }
+    if (props.siteConfig?.modules_enabled?.about !== false) return { to: '/about', label: 'Learn more' }
+    return { to: '/', label: 'Explore this website' }
+  }
+
+  return { to: '/shop', label: 'Shop now' }
+})
+const secondaryAction = computed(() => {
+  if (isServiceStudio.value && props.siteConfig?.modules_enabled?.contact !== false) {
+    return { to: '/contact', label: 'Contact us' }
+  }
+  if (isInformationalEditorial.value && props.siteConfig?.modules_enabled?.contact !== false) {
+    return { to: '/contact', label: 'Contact' }
+  }
+  return null
+})
 const heroFocalPosition = computed(
   () => `${props.siteConfig?.hero_focal_x ?? 50}% ${props.siteConfig?.hero_focal_y ?? 50}%`,
 )

@@ -250,7 +250,7 @@ const { storeUrl } = useStorefrontUrl()
  */
 const guestPaths = ['/admin/login', '/admin/forgot-password', '/admin/reset-password', '/admin/verify-2fa']
 const isGuestPage = computed(() => guestPaths.includes(route.path))
-const isImmersiveEditor = computed(() => route.path === '/admin/website-editor')
+const isImmersiveEditor = computed(() => route.path.replace(/\/$/, '') === '/admin/website-editor' || /^\/admin\/website-pages\/[^/]+\/?$/.test(route.path))
 
 /**
  * Gated stores see the subscription lock screen instead of the shell. Matches
@@ -331,6 +331,7 @@ const settingsGroups: NavGroup[] = [
     heading: 'Settings',
     items: [
       { to: '/admin/settings', label: 'Site Settings', title: 'Settings', icon: 'heroicons:cog-6-tooth' },
+      { to: '/admin/website-editor', label: 'Website Editor', icon: 'heroicons:paint-brush' },
       { to: '/admin/shipping', label: 'Shipping', icon: 'heroicons:truck' },
       { to: '/admin/tax-settings', label: 'Tax', icon: 'heroicons:calculator' },
       { to: '/admin/payment-settings', label: 'Payments', icon: 'heroicons:credit-card' },
@@ -402,6 +403,7 @@ const handleLogout = async () => {
 }
 
 const isActivePath = (path: string) => {
+  if (path === '/admin/website-editor' && /^\/admin\/website-pages(?:\/|$)/.test(route.path)) return true
   if (path === '/admin') return route.path === '/admin' || route.path === '/admin/'
   return route.path === path || route.path.startsWith(path + '/')
 }

@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-28T16:13:47+08:00",
+  "title": "Design System: SSU Service Studio Theme",
+  "extensions": {
+    "colorMeta": {
+      "mineral-paper": {
+        "role": "neutral",
+        "displayName": "Mineral Paper",
+        "canonical": "#f3f0e7",
+        "tonalRamp": ["#25241f", "#46443c", "#68665b", "#8c897b", "#b2aea0", "#d3d0c5", "#e9e6dc", "#f7f5ef"]
+      },
+      "raised-paper": {
+        "role": "neutral",
+        "displayName": "Raised Paper",
+        "canonical": "#fbfaf6",
+        "tonalRamp": ["#272623", "#484742", "#6b6962", "#8f8d85", "#b6b3ac", "#d8d6d0", "#eeece7", "#fdfcf9"]
+      },
+      "deep-ink": {
+        "role": "neutral",
+        "displayName": "Deep Ink",
+        "canonical": "#17201d",
+        "tonalRamp": ["#101614", "#17201d", "#29332f", "#46504c", "#69736e", "#929b96", "#c1c8c4", "#eef1ef"]
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "#59655f",
+        "tonalRamp": ["#141a17", "#27302c", "#3e4944", "#59655f", "#78847e", "#9da7a2", "#c6cdc9", "#eff2f0"]
+      },
+      "hairline-rule": {
+        "role": "neutral",
+        "displayName": "Hairline Rule",
+        "canonical": "#c9cec7",
+        "tonalRamp": ["#1f241f", "#3d443d", "#5e665e", "#818981", "#a5aca4", "#c9cec7", "#e1e5df", "#f4f6f2"]
+      },
+      "wayfinding-accent": {
+        "role": "primary",
+        "displayName": "Merchant Wayfinding Accent",
+        "canonical": "var(--color-primary-700, #355f55)",
+        "tonalRamp": ["#12201d", "#1d342e", "#294940", "#355f55", "#568075", "#7fa69a", "#b1c9c2", "#e8f1ee"]
+      },
+      "on-ink": {
+        "role": "neutral",
+        "displayName": "On Ink",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#262626", "#474747", "#6a6a6a", "#8f8f8f", "#b5b5b5", "#d7d7d7", "#eeeeee", "#ffffff"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Merchant proposition and service introductions." },
+      "headline": { "displayName": "Headline", "purpose": "Section and service titles." },
+      "body": { "displayName": "Body", "purpose": "General storefront content." },
+      "longform": { "displayName": "Long-form", "purpose": "Service details and editorial reading." },
+      "label": { "displayName": "Wayfinding Label", "purpose": "Route markers and compact navigation labels." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "reduced-motion", "value": "none", "purpose": "Removes reveal animation, opacity transitions, and transforms when reduced motion is requested." }
+    ],
+    "breakpoints": [
+      { "name": "mobile-layout", "value": "767px" },
+      { "name": "wide-wayfinding", "value": "1024px" }
+    ],
+    "components": [
+      {
+        "name": "Primary Action",
+        "kind": "button",
+        "refersTo": "button-primary",
+        "description": "The dark, compact primary action used for enquiry and retry paths.",
+        "html": "<button class=\"ds-primary-action\">CONTACT US</button>",
+        "css": ".ds-primary-action { min-height: 2.75rem; border: 0; border-radius: 0.75rem; background: #17201d; color: #fff; padding: 0.75rem 1.25rem; font: 700 0.875rem/1.25 var(--font-body, sans-serif); cursor: pointer; } .ds-primary-action:hover { background: #29332f; } .ds-primary-action:focus-visible { outline: 2px solid var(--color-primary-700, #355f55); outline-offset: 3px; }"
+      },
+      {
+        "name": "Route Wayfinding",
+        "kind": "nav",
+        "description": "A slim tenant and route marker between the shared header and page content.",
+        "html": "<nav class=\"ds-wayfinding\"><span>STUDIO NAME</span><span class=\"ds-wayfinding-line\"></span><span>SERVICES</span></nav>",
+        "css": ".ds-wayfinding { display: grid; grid-template-columns: auto minmax(2rem, 1fr) auto; align-items: center; gap: 1rem; min-height: 2.75rem; padding: 0 1.5rem; border-bottom: 1px solid #c9cec7; background: #f3f0e7; color: #59655f; font: 700 0.6875rem/1.2 var(--font-body, sans-serif); letter-spacing: 0.14em; text-transform: uppercase; } .ds-wayfinding-line { height: 1px; background: #c9cec7; }"
+      },
+      {
+        "name": "Service Row",
+        "kind": "card",
+        "refersTo": "card",
+        "description": "A flat editorial service entry organized by rule and space rather than shadow.",
+        "html": "<article class=\"ds-service-row\"><h3>Service name</h3><p>A factual description supplied by the merchant.</p></article>",
+        "css": ".ds-service-row { border-top: 1px solid #c9cec7; background: transparent; color: #17201d; padding: 2.5rem 0; } .ds-service-row h3 { margin: 0; font: 600 1.5rem/1.2 var(--font-heading, sans-serif); letter-spacing: -0.025em; } .ds-service-row p { max-width: 60ch; margin: 0.75rem 0 0; color: #59655f; font: 400 1rem/1.5 var(--font-body, sans-serif); } .ds-service-row:focus-within { outline: 2px solid var(--color-primary-700, #355f55); outline-offset: 3px; }"
+      },
+      {
+        "name": "Text Field",
+        "kind": "input",
+        "refersTo": "input",
+        "description": "A raised-paper field that retains strong focus and tenant accent behavior.",
+        "html": "<input class=\"ds-text-field\" aria-label=\"Your email\" placeholder=\"Your email\">",
+        "css": ".ds-text-field { min-height: 2.75rem; border: 1px solid #c9cec7; border-radius: 0.75rem; background: #fbfaf6; color: #17201d; caret-color: var(--color-primary-700, #355f55); padding: 0.75rem 1rem; font: 400 1rem/1.5 var(--font-body, sans-serif); } .ds-text-field:focus-visible { outline: 2px solid var(--color-primary-700, #355f55); outline-offset: 3px; } .ds-text-field::placeholder { color: #59655f; }"
+      },
+      {
+        "name": "Dark Introduction",
+        "kind": "custom",
+        "description": "A strong arrival surface for service catalogue and service detail introductions.",
+        "html": "<section class=\"ds-dark-intro\"><h1>Services built around your needs.</h1></section>",
+        "css": ".ds-dark-intro { min-height: 24rem; display: flex; align-items: end; background: #17201d; color: #fff; padding: clamp(3rem, 8vw, 7rem) 1.5rem; } .ds-dark-intro h1 { max-width: 13ch; margin: 0; font: 600 clamp(2.5rem, 7vw, 5rem)/1 var(--font-heading, sans-serif); letter-spacing: -0.03em; }"
+      }
+    ],
+    "narrative": {
+      "northStar": "The Contemporary Exhibition Guide",
+      "overview": "Service Studio is a storefront world within SSU, not a replacement for the Calm Control Room admin system or the Classic storefront. It gives service providers quiet authority through warm material surfaces, editorial pacing, factual wayfinding, and disciplined hierarchy. Merchant content and appearance tokens remain the evidence and identity; the theme supplies composition, not claims. The system is restrained and legible rather than ornamental. Deep ink establishes strong arrival moments, mineral paper supports reading, hairline rules organize the journey, and the merchant's primary color appears as a controlled navigation and focus accent.",
+      "keyCharacteristics": [
+        "Warm paper surfaces with deep-ink anchors.",
+        "Hairline rules and spacing create structure without shadow.",
+        "Merchant typography and primary color remain authoritative.",
+        "Editorial measures support service details and supporting material.",
+        "Honest empty and missing-media states never fabricate evidence."
+      ],
+      "rules": [
+        { "name": "The Merchant Accent Rule", "body": "The theme may guide where the tenant's primary color appears, but it must not replace that color with a theme-owned brand accent.", "section": "colors" },
+        { "name": "The Evidence Rule", "body": "Missing media or proof becomes structured space or an honest empty state, never invented photography, logos, metrics, or testimonials.", "section": "colors" },
+        { "name": "The Merchant Type Rule", "body": "Preserve the configured heading and body families; theme hierarchy is created with weight, spacing, scale, and measure.", "section": "typography" },
+        { "name": "The Flat Exhibition Rule", "body": "Persistent surfaces do not float; separate them through tone, rule, or space rather than box shadow.", "section": "elevation" }
+      ],
+      "dos": [
+        "Do preserve real tenant content, appearance tokens, module gates, and shared storefront behavior.",
+        "Do use hairline rules, tonal surfaces, and spacing to organize long service journeys.",
+        "Do keep service discovery and a contact action obvious at desktop and mobile sizes.",
+        "Do honor visible focus and reduced-motion preferences."
+      ],
+      "donts": [
+        "Don't introduce persistent card shadows into Service Studio.",
+        "Don't override the merchant's configured type families or primary color with a fixed theme identity.",
+        "Don't fabricate photography, testimonials, statistics, clients, credentials, services, discounts, or urgency.",
+        "Don't move API, tenant, cart, checkout, form, SEO, localization, or module logic into the theme renderer."
+      ]
+    }
+  }
+}

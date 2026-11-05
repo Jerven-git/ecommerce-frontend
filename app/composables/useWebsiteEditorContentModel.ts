@@ -1,4 +1,5 @@
 import { computed, type Ref } from 'vue'
+import { resolveNavigationPages } from '~/utils/websiteNavigation'
 import type { HomepageSectionId, SiteConfig } from '~/composables/useSiteConfig'
 import { normalizeWebsiteEditorDraft, type WebsiteEditorDraftPayload } from '~/composables/useWebsiteEditorDraft'
 import { HOMEPAGE_SECTION_LABELS } from '~/utils/homepageSections'
@@ -18,6 +19,7 @@ interface WebsiteEditorContentModelOptions {
   versionPreview: Readonly<Ref<WebsiteEditorDraftPayload | null>>
   activeLocale: Readonly<Ref<string>>
   activePage: Readonly<Ref<WebsiteEditorPageId>>
+  navigationPages?: Readonly<Ref<readonly { uuid: string; path: string }[]>>
 }
 
 const sectionMeta: Record<HomepageSectionId, { icon: string; editable: boolean }> = {
@@ -54,6 +56,7 @@ export function useWebsiteEditorContentModel(options: WebsiteEditorContentModelO
     return {
       ...options.siteConfig.value,
       ...workingDraft.value,
+      navigation: resolveNavigationPages(workingDraft.value.navigation, options.navigationPages?.value ?? []),
       locale: options.activeLocale.value,
       homepage_statement: {
         ...workingDraft.value.homepage_statement,
@@ -115,10 +118,10 @@ export function useWebsiteEditorContentModel(options: WebsiteEditorContentModelO
       value.site_name.trim()
       || value.contact_email.trim()
       || value.contact_phone.trim()
-      || value.contact_entries.length
-      || value.social_links.length,
+      || value.contact_entries.length,
     )
-    if (section === 'header') return value.header_cta.enabled && Boolean(value.header_cta.label)
+    if (section === 'social-media') return value.social_links.length > 0
+    if (section === 'header') return value.navigation.some(item => item.visible) || (value.header_cta.enabled && Boolean(value.header_cta.label))
     if (section === 'footer-banner') return value.footer_banner.enabled && Boolean(value.footer_banner.heading)
     if (section === 'footer') return hasContent(value.footer)
     if (section === 'about-content') return Boolean(value.about_image_url || value.about_content.trim() || value.about_highlights.items.length)

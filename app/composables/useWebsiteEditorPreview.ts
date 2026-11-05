@@ -6,6 +6,7 @@ interface WebsiteEditorPreviewOptions {
   config: Readonly<Ref<SiteConfig | null>>
   activePage: Readonly<Ref<WebsiteEditorPageId>>
   selectedSection: Readonly<Ref<string>>
+  onNavigate?: (href: string) => void
   onRendered: () => void
   timeout?: number
 }
@@ -77,6 +78,11 @@ export function useWebsiteEditorPreview(options: WebsiteEditorPreviewOptions) {
   function onMessage(event: MessageEvent) {
     if (event.origin !== window.location.origin || event.source !== previewFrame.value?.contentWindow) return
     if (event.data?.source !== 'ssu-storefront-preview') return
+
+    if (event.data?.type === 'navigate' && typeof event.data.href === 'string') {
+      options.onNavigate?.(event.data.href)
+      return
+    }
 
     if (event.data?.type === 'ready') {
       previewReady.value = true

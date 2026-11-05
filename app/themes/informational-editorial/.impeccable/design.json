@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-28T19:40:06+08:00",
+  "title": "Design System: SSU Informational Editorial Theme",
+  "extensions": {
+    "colorMeta": {
+      "reading-paper": { "role": "neutral", "displayName": "Reading Paper", "canonical": "#f7f8f4", "tonalRamp": ["#252622", "#464742", "#686a64", "#8c8e88", "#b2b4ae", "#d5d7d1", "#eceee9", "#fafbf8"] },
+      "raised-paper": { "role": "neutral", "displayName": "Raised Paper", "canonical": "#ffffff", "tonalRamp": ["#262626", "#474747", "#6a6a6a", "#8f8f8f", "#b5b5b5", "#d7d7d7", "#eeeeee", "#ffffff"] },
+      "folio-ink": { "role": "neutral", "displayName": "Folio Ink", "canonical": "#12263f", "tonalRamp": ["#0b1726", "#12263f", "#203c5b", "#3b5875", "#607890", "#8da0b2", "#bcc8d2", "#edf1f4"] },
+      "reading-ink": { "role": "neutral", "displayName": "Reading Ink", "canonical": "#172431", "tonalRamp": ["#0e161e", "#172431", "#2c3a47", "#485764", "#6d7b86", "#97a2aa", "#c3cbd0", "#eff2f4"] },
+      "supporting-ink": { "role": "neutral", "displayName": "Supporting Ink", "canonical": "#526273", "tonalRamp": ["#121920", "#25313c", "#3a4957", "#526273", "#728291", "#9aa7b2", "#c5cdd3", "#eff2f4"] },
+      "index-rule": { "role": "neutral", "displayName": "Index Rule", "canonical": "#b8c5d0", "tonalRamp": ["#18202a", "#313d49", "#4d5b68", "#6d7b88", "#91a0ad", "#b8c5d0", "#d9e0e6", "#f2f5f7"] },
+      "position-marker": { "role": "secondary", "displayName": "Position Marker", "canonical": "#f2c14e", "tonalRamp": ["#2a210b", "#4d3a0f", "#755616", "#9e751f", "#c79a2f", "#e5b642", "#f2d583", "#fbf1d0"] },
+      "merchant-accent": { "role": "primary", "displayName": "Merchant Accent", "canonical": "var(--color-primary-700, #315f9a)", "tonalRamp": ["#101d2c", "#192e45", "#234261", "#315f9a", "#537fb1", "#7ca2c9", "#afc7dc", "#e8f0f7"] },
+      "on-ink": { "role": "neutral", "displayName": "On Ink", "canonical": "#ffffff", "tonalRamp": ["#262626", "#474747", "#6a6a6a", "#8f8f8f", "#b5b5b5", "#d7d7d7", "#eeeeee", "#ffffff"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Page and article arrivals." },
+      "headline": { "displayName": "Headline", "purpose": "Major informational sections." },
+      "body": { "displayName": "Body", "purpose": "General content, navigation, and controls." },
+      "longform": { "displayName": "Long-form", "purpose": "Articles and structured information." },
+      "index": { "displayName": "Index", "purpose": "Destination labels." },
+      "running-head": { "displayName": "Running Head", "purpose": "Tenant, folio, and route context." },
+      "folio-number": { "displayName": "Folio Number", "purpose": "Compact tabular index numbers." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "reduced-motion", "value": "none", "purpose": "Removes hero, category, and content reveals when reduced motion is requested." }
+    ],
+    "breakpoints": [
+      { "name": "running-head-collapse", "value": "640px" },
+      { "name": "reading-mobile", "value": "767px" },
+      { "name": "wide-frame", "value": "1024px" }
+    ],
+    "components": [
+      {
+        "name": "Primary Action",
+        "kind": "button",
+        "refersTo": "button-primary",
+        "description": "The ink-blue primary action used for valid tenant-supplied destinations and recovery.",
+        "html": "<button class=\"ds-editorial-action\">EXPLORE ARTICLES</button>",
+        "css": ".ds-editorial-action { min-height: 2.75rem; border: 1px solid #12263f; border-radius: 0.25rem; background: #12263f; color: #fff; padding: 0.75rem 1.25rem; font: 700 0.875rem/1.25 var(--font-body, sans-serif); cursor: pointer; } .ds-editorial-action:hover { background: #203c5b; } .ds-editorial-action:focus-visible { outline: 2px solid var(--color-primary-700, #315f9a); outline-offset: 3px; }"
+      },
+      {
+        "name": "Running Head",
+        "kind": "nav",
+        "description": "A compact tenant, folio, and route context band.",
+        "html": "<div class=\"ds-running-head\"><span>ORGANISATION</span><span>FOLIO 02</span><span>ARTICLES</span></div>",
+        "css": ".ds-running-head { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; min-height: 2.5rem; border-bottom: 1px solid #b8c5d0; background: #f7f8f4; color: #526273; padding: 0 1.5rem; font: 700 0.6875rem/1.2 var(--font-body, sans-serif); letter-spacing: 0.11em; text-transform: uppercase; } .ds-running-head span:nth-child(2) { border-inline: 1px solid #b8c5d0; padding-inline: 1rem; } .ds-running-head span:last-child { text-align: right; }"
+      },
+      {
+        "name": "Information Index",
+        "kind": "nav",
+        "refersTo": "index-link",
+        "description": "Visible tenant destinations in a horizontally resilient index.",
+        "html": "<nav class=\"ds-info-index\"><a class=\"ds-info-index-active\" href=\"#\"><small>01</small>Overview</a><a href=\"#\"><small>02</small>Articles</a><a href=\"#\"><small>03</small>Contact</a></nav>",
+        "css": ".ds-info-index { display: flex; overflow-x: auto; border-bottom: 1px solid #b8c5d0; background: #fff; } .ds-info-index a { display: flex; min-height: 3.25rem; align-items: center; gap: 0.5rem; border-right: 1px solid #b8c5d0; color: #12263f; padding: 0.75rem 1rem; font: 650 0.8125rem/1.2 var(--font-body, sans-serif); text-decoration: none; } .ds-info-index small { color: #526273; font-size: 0.625rem; font-variant-numeric: tabular-nums; } .ds-info-index a:hover, .ds-info-index a:focus-visible, .ds-info-index-active { background: #f8e7b4; } .ds-info-index a:focus-visible { outline: 2px solid var(--color-primary-700, #315f9a); outline-offset: -2px; }"
+      },
+      {
+        "name": "Long-form Article",
+        "kind": "custom",
+        "description": "A calm reading column with familiar document structures.",
+        "html": "<article class=\"ds-article\"><h2>Section heading</h2><p>Published tenant information remains readable at a familiar measure.</p><blockquote>A tenant-supplied quotation or note.</blockquote></article>",
+        "css": ".ds-article { max-width: 72ch; background: #fff; color: #172431; padding: 2rem; font: 400 1.0625rem/1.85 var(--font-body, sans-serif); } .ds-article h2 { margin: 2.5rem 0 0.75rem; color: #12263f; font: 650 1.75rem/1.2 var(--font-heading, sans-serif); letter-spacing: -0.025em; } .ds-article blockquote { margin: 1.5rem 0; border-left: 1px solid #12263f; background: #fbf3dc; color: #12263f; padding: 1rem 1.25rem; }"
+      },
+      {
+        "name": "Text Field",
+        "kind": "input",
+        "refersTo": "input",
+        "description": "A precise raised-paper field with a tenant-controlled focus accent.",
+        "html": "<input class=\"ds-editorial-field\" aria-label=\"Search articles\" placeholder=\"Search articles\">",
+        "css": ".ds-editorial-field { min-height: 2.75rem; border: 1px solid #b8c5d0; border-radius: 0.25rem; background: #fff; color: #172431; caret-color: var(--color-primary-700, #315f9a); padding: 0.75rem 1rem; font: 400 1rem/1.5 var(--font-body, sans-serif); } .ds-editorial-field:focus-visible { outline: 2px solid var(--color-primary-700, #315f9a); outline-offset: 3px; } .ds-editorial-field::placeholder { color: #526273; }"
+      }
+    ],
+    "narrative": {
+      "northStar": "The Civic Reference Folio",
+      "overview": "Informational Editorial is a distinct public storefront world within SSU. It makes an organisation's pages, articles, and structured information feel dependable and findable through an ink-blue frame, cool reading paper, indexed navigation, running heads, and calm text measures. The theme supplies visual organisation while the merchant supplies every topic, claim, author, image, and action. The frame commits strongly without competing with the reading column. Folio markers and saffron position bands help visitors understand where they are, while conventional links, hierarchy, article patterns, tables, and forms remain recognizable.",
+      "keyCharacteristics": [
+        "Ink-blue information frame around cool reading paper.",
+        "Saffron position markers used with text and structure, never alone.",
+        "Indexed wayfinding and tabular folio numbers.",
+        "Reading columns constrained to roughly 72 characters.",
+        "Flat panels separated by rules, tone, and spacing rather than shadows."
+      ],
+      "rules": [
+        { "name": "The Position Has Two Signals Rule", "body": "Saffron may reinforce the current location, but a label, underline, route, or structural placement must communicate it independently.", "section": "colors" },
+        { "name": "The Tenant Truth Rule", "body": "Theme color and structure may organize supplied information; they never imply authority, authorship, publication history, or institutional proof the tenant did not provide.", "section": "colors" },
+        { "name": "The Reading Column Rule", "body": "World-building belongs to the masthead, navigation, rules, and openers; running text stays at a familiar size, contrast, and measure.", "section": "typography" },
+        { "name": "The Merchant Type Rule", "body": "Preserve configured heading and body families; do not impose a fixed magazine serif or technical monospace identity.", "section": "typography" },
+        { "name": "The Flat Reference Rule", "body": "A persistent informational surface uses a rule, tone, or spacing change instead of a box shadow.", "section": "elevation" }
+      ],
+      "dos": [
+        "Do keep the reader's current location and next destinations visible.",
+        "Do constrain long-form content to a readable measure and preserve familiar document structures.",
+        "Do use real tenant navigation, articles, pages, images, metadata, and contact actions.",
+        "Do preserve keyboard focus, reduced motion, localization, and transaction behavior on every route."
+      ],
+      "donts": [
+        "Don't turn the reading column into a poster, magazine cover, or decorative interface.",
+        "Don't use saffron or the merchant accent as the only indication of state.",
+        "Don't fabricate authors, publication dates, topics, statistics, institutional claims, media, or calls to action.",
+        "Don't move API, tenant, cart, checkout, form, SEO, localization, or module logic into the theme renderer."
+      ]
+    }
+  }
+}

@@ -19,5 +19,10 @@ export function useStorefrontUrl() {
     return `${protocol}//${host}${portSuffix}`
   })
 
-  return { storeUrl }
+  // Admin routes may be opened on the platform host. Public page links must
+  // use the authenticated store's storefront origin instead of that host.
+  const storefrontPageUrl = (path: string) =>
+    `${storeUrl.value.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}`
+
+  return { storeUrl, storefrontPageUrl }
 }

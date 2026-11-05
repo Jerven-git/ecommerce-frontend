@@ -1,3 +1,5 @@
+import { isApexHostname } from '~/utils/storefrontHost'
+
 /**
  * On the bare apex — or any host not bound to a store — there is no storefront
  * to render, so visitors are sent to the admin login. The apex is detected two
@@ -29,10 +31,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
   // front door while still supporting per-store subdomains / custom domains
   // for real storefronts. The check is purely client-side host-based so it
   // works even when `/site-config` hasn't loaded yet.
-  const baseDomain = String(useRuntimeConfig().public.storefrontBaseDomain || '').toLowerCase()
+  const baseDomain = String(useRuntimeConfig().public.storefrontBaseDomain || 'localhost')
   const requestUrl = useRequestURL()
   const host = requestUrl.hostname.toLowerCase()
-  const isApex = !!baseDomain && (host === baseDomain || host === `www.${baseDomain}`)
+  const isApex = isApexHostname(host, baseDomain)
   if (isApex) {
     const allowedApexPrefixes = ['/admin', '/super-admin', '/register', '/subscribe']
     const isAllowedApex = to.path === '/' || allowedApexPrefixes.some((p) => to.path === p || to.path.startsWith(p + '/'))

@@ -1,5 +1,5 @@
 <template>
-  <div ref="wrapperRef" class="relative shrink-0">
+  <div ref="wrapperRef" class="relative shrink-0" @focusout="handleFocusOut">
     <button
       ref="triggerRef"
       type="button"
@@ -7,7 +7,7 @@
       :aria-label="`Preview page: ${selectedOption.label}`"
       :aria-expanded="open"
       :aria-controls="listboxId"
-      aria-haspopup="listbox"
+      aria-haspopup="dialog"
       @click="toggle"
       @keydown.down.prevent="openPicker(1)"
       @keydown.up.prevent="openPicker(-1)"
@@ -36,19 +36,22 @@
       leave-from-class="translate-y-0 opacity-100"
       leave-to-class="-translate-y-1 opacity-0 motion-reduce:transform-none"
     >
+      <div v-if="open" :id="listboxId" role="dialog" aria-label="Choose a website page" class="page-picker-list absolute right-0 top-[calc(100%+0.5rem)] z-50 max-h-[min(32rem,calc(100dvh-18rem))] w-80 max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-lg border border-admin-border bg-admin-surface p-1.5 shadow-lg" @keydown.esc.prevent.stop="closePicker({ restoreFocus: true })">
+        <input ref="searchRef" v-model="search" type="search" aria-label="Search website pages" placeholder="Search pages…" class="page-picker-focus mb-1 min-h-11 w-full rounded-md border border-admin-border bg-admin-surface px-3 text-base text-admin-text" @keydown.down.prevent="focusOptions" />
+        <p class="px-2.5 py-2 text-xs font-semibold text-admin-muted">Built-in pages</p>
+        <p v-if="!filteredOptions.length" class="px-2.5 py-2 text-xs text-admin-muted">No matching built-in pages.</p>
       <div
-        v-if="open"
-        :id="listboxId"
+        :id="`${listboxId}-options`"
         ref="listboxRef"
         role="listbox"
-        tabindex="-1"
+        :tabindex="filteredOptions.length ? 0 : -1"
         aria-label="Preview page"
         :aria-activedescendant="activeOptionId"
-        class="page-picker-list absolute right-0 top-[calc(100%+0.5rem)] z-50 max-h-[min(24rem,calc(100dvh-8rem))] w-64 max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-xl border border-admin-border bg-admin-surface p-1.5 shadow-lg outline-none"
+        class="page-picker-focus outline-none"
         @keydown="handleListboxKeydown"
       >
         <button
-          v-for="(option, index) in options"
+          v-for="(option, index) in filteredOptions"
           :id="optionId(index)"
           :key="option.id"
           type="button"
@@ -58,14 +61,14 @@
           :class="index === highlightedIndex
             ? 'bg-admin-accent-soft text-admin-accent-strong'
             : 'text-admin-text hover:bg-admin-soft'"
-          :aria-selected="option.id === modelValue"
+          :aria-selected="!selectedCustomPage && option.id === modelValue"
           :data-option-index="index"
           @click="selectOption(option.id)"
           @mouseenter="highlightedIndex = index"
         >
           <span
             class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-            :class="option.id === modelValue ? 'bg-admin-surface text-admin-accent-strong' : 'bg-admin-soft text-admin-muted'"
+            :class="!selectedCustomPage && option.id === modelValue ? 'bg-admin-surface text-admin-accent-strong' : 'bg-admin-soft text-admin-muted'"
           >
             <Icon :name="option.icon" class="h-4 w-4" aria-hidden="true" />
           </span>
@@ -73,25 +76,52 @@
             <span class="block truncate text-xs font-semibold">{{ option.label }}</span>
             <span v-if="option.storefrontDisabled" class="block truncate text-xs text-admin-warning">Disabled on storefront</span>
           </span>
-          <Icon v-if="option.id === modelValue" name="heroicons:check" class="h-4 w-4 shrink-0 text-admin-accent-strong" aria-hidden="true" />
+          <Icon v-if="!selectedCustomPage && option.id === modelValue" name="heroicons:check" class="h-4 w-4 shrink-0 text-admin-accent-strong" aria-hidden="true" />
         </button>
+      </div>
+      <div class="mt-2 border-t border-admin-border pt-2">
+        <div class="flex items-center justify-between gap-2 px-2.5">
+          <h3 class="text-xs font-semibold text-admin-muted">Custom pages</h3>
+          <NuxtLink to="/admin/website-pages?create=1" class="page-picker-focus inline-flex min-h-11 items-center gap-1 rounded px-1 text-xs font-semibold text-admin-accent-strong" @click="closePicker({ restoreFocus: true })"><Icon name="heroicons:plus" class="h-4 w-4" aria-hidden="true" />Create page</NuxtLink>
+        </div>
+        <p v-if="customPagesLoading" class="px-2.5 py-3 text-xs text-admin-muted" role="status">Loading custom pages…</p>
+        <div v-else-if="customPagesError" class="px-2.5 py-2">
+          <p class="text-xs text-admin-danger" role="alert">{{ customPagesError }}</p>
+          <button type="button" class="page-picker-focus mt-1 min-h-11 rounded px-2 text-xs font-semibold text-admin-text hover:bg-admin-soft" @click="$emit('retry')">Try again</button>
+        </div>
+        <p v-else-if="!customPages.length" class="px-2.5 py-3 text-xs text-admin-muted">No custom pages yet.</p>
+        <nav v-else aria-label="Custom pages">
+          <p v-if="!filteredCustomPages.length" class="px-2.5 py-3 text-xs text-admin-muted">No matching custom pages.</p>
+          <NuxtLink v-for="page in filteredCustomPages" :key="page.uuid" :aria-current="selectedCustomPage?.uuid === page.uuid ? 'page' : undefined" :to="`/admin/website-editor?customPage=${encodeURIComponent(page.uuid)}`" class="page-picker-focus flex min-h-11 items-start gap-2.5 rounded-md px-2.5 py-2 text-admin-text hover:bg-admin-soft" @click="closePicker({ restoreFocus: true })">
+            <Icon name="heroicons:document-text" class="mt-0.5 h-4 w-4 shrink-0 text-admin-muted" aria-hidden="true" />
+            <span class="min-w-0 flex-1"><span class="block truncate text-xs font-semibold">{{ page.title }}</span><span class="block truncate text-xs text-admin-muted">{{ page.path }}</span><span class="block text-xs text-admin-muted">{{ page.is_published ? (page.has_unpublished_changes ? 'Live · Unpublished changes' : 'Live') : 'Private draft' }}</span></span>
+          </NuxtLink>
+        </nav>
+        <NuxtLink to="/admin/website-pages" class="page-picker-focus flex min-h-11 items-center rounded-md px-2.5 text-xs font-semibold text-admin-text hover:bg-admin-soft" @click="closePicker({ restoreFocus: true })">Manage all pages</NuxtLink>
+      </div>
       </div>
     </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { WebsitePageSummary } from '~/types/websitePage'
 import type { WebsiteEditorPageId, WebsiteEditorPageOption } from '~/utils/websiteEditorPages'
 
 type PagePickerOption = WebsiteEditorPageOption & { storefrontDisabled: boolean }
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: WebsiteEditorPageId
   options: PagePickerOption[]
-}>()
+  selectedCustomPage?: Pick<WebsitePageSummary, 'uuid' | 'title'> | null
+  customPages?: WebsitePageSummary[]
+  customPagesLoading?: boolean
+  customPagesError?: string
+}>(), { selectedCustomPage: null, customPages: () => [], customPagesLoading: false, customPagesError: '' })
 
 const emit = defineEmits<{
   'update:modelValue': [value: WebsiteEditorPageId]
+  retry: []
 }>()
 
 const instanceId = useId()
@@ -101,15 +131,23 @@ const triggerRef = ref<HTMLButtonElement | null>(null)
 const listboxRef = ref<HTMLElement | null>(null)
 const open = ref(false)
 const highlightedIndex = ref(0)
+const search = ref('')
+const searchRef = ref<HTMLInputElement | null>(null)
+const matchesSearch = (label: string) => label.toLocaleLowerCase().includes(search.value.trim().toLocaleLowerCase())
+const filteredOptions = computed(() => props.options.filter(option => matchesSearch(option.label)))
+const filteredCustomPages = computed(() => props.customPages.filter(page => matchesSearch(`${page.title} ${page.path}`)))
+function focusOptions() { if (filteredOptions.value.length) listboxRef.value?.focus() }
 
 const selectedOption = computed(() =>
-  props.options.find(option => option.id === props.modelValue)
+  props.selectedCustomPage
+    ? { id: 'custom', label: props.selectedCustomPage.title, icon: 'heroicons:document-text', storefrontDisabled: false }
+    : props.options.find(option => option.id === props.modelValue)
     ?? props.options[0]
     ?? { id: 'home' as const, label: 'Home page', icon: 'heroicons:home', path: '/', storefrontDisabled: false },
 )
 
 const activeOptionId = computed(() =>
-  open.value && props.options[highlightedIndex.value]
+  open.value && filteredOptions.value[highlightedIndex.value]
     ? optionId(highlightedIndex.value)
     : undefined,
 )
@@ -119,12 +157,13 @@ function optionId(index: number) {
 }
 
 async function openPicker(direction = 0) {
-  if (open.value || props.options.length === 0) return
-  const selectedIndex = Math.max(props.options.findIndex(option => option.id === props.modelValue), 0)
-  highlightedIndex.value = Math.min(Math.max(selectedIndex + direction, 0), props.options.length - 1)
+  if (open.value) return
+  search.value = ''
+  const selectedIndex = Math.max(filteredOptions.value.findIndex(option => option.id === props.modelValue), 0)
+  highlightedIndex.value = Math.min(Math.max(selectedIndex + direction, 0), filteredOptions.value.length - 1)
   open.value = true
   await nextTick()
-  listboxRef.value?.focus()
+  searchRef.value?.focus()
   scrollToHighlighted()
 }
 
@@ -145,8 +184,8 @@ function selectOption(pageId: WebsiteEditorPageId) {
 }
 
 function moveHighlight(amount: number) {
-  if (props.options.length === 0) return
-  highlightedIndex.value = (highlightedIndex.value + amount + props.options.length) % props.options.length
+  if (filteredOptions.value.length === 0) return
+  highlightedIndex.value = (highlightedIndex.value + amount + filteredOptions.value.length) % filteredOptions.value.length
   scrollToHighlighted()
 }
 
@@ -167,20 +206,17 @@ function handleListboxKeydown(event: KeyboardEvent) {
       break
     case 'End':
       event.preventDefault()
-      highlightedIndex.value = Math.max(props.options.length - 1, 0)
+      highlightedIndex.value = Math.max(filteredOptions.value.length - 1, 0)
       scrollToHighlighted()
       break
     case 'Enter':
     case ' ':
       event.preventDefault()
-      if (props.options[highlightedIndex.value]) selectOption(props.options[highlightedIndex.value]!.id)
+      if (filteredOptions.value[highlightedIndex.value]) selectOption(filteredOptions.value[highlightedIndex.value]!.id)
       break
     case 'Escape':
       event.preventDefault()
       closePicker({ restoreFocus: true })
-      break
-    case 'Tab':
-      closePicker()
       break
   }
 }
@@ -193,12 +229,16 @@ function scrollToHighlighted() {
   })
 }
 
+function handleFocusOut(event: FocusEvent) {
+  if (event.relatedTarget && !wrapperRef.value?.contains(event.relatedTarget as Node)) closePicker()
+}
+
 function handleOutsidePointer(event: PointerEvent) {
   if (!wrapperRef.value?.contains(event.target as Node)) closePicker()
 }
 
-watch(() => props.options.length, () => {
-  highlightedIndex.value = Math.min(highlightedIndex.value, Math.max(props.options.length - 1, 0))
+watch(() => filteredOptions.value.length, () => {
+  highlightedIndex.value = Math.min(highlightedIndex.value, Math.max(filteredOptions.value.length - 1, 0))
 })
 
 onMounted(() => document.addEventListener('pointerdown', handleOutsidePointer))

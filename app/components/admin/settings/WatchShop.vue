@@ -294,7 +294,7 @@ onMounted(loadProducts)
 
 // --- Status polling ---
 //
-// While any card is in 'processing', re-fetch /site-config every 3s and merge
+// While any card is in 'processing', re-fetch the admin config every 3s and merge
 // the resulting media_status / poster_url / media_url back into local state.
 // We stop polling the moment no card is processing — so this is idle in the
 // common case and active for the seconds it takes ffmpeg to finish.
@@ -307,7 +307,7 @@ function hasProcessing(value: HomepageWatchShop): boolean {
 
 async function pollOnce() {
   try {
-    const res = await $apiFetch<SiteConfigResponse>('/site-config', { method: 'GET' })
+    const res = await $apiFetch<SiteConfigResponse>('/admin/site-config', { method: 'GET' })
     const serverCards = res?.data?.homepage_watch_shop?.cards ?? []
     if (serverCards.length === 0) return
 

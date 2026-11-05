@@ -20,8 +20,9 @@ export interface WebsiteEditorReadinessWarning {
 const areas: WebsiteEditorChangedArea[] = [
   { id: 'languages', label: 'Languages and translations', page: 'global', section: 'store-details', fields: ['default_locale', 'supported_locales', 'localized_content', 'default_seo_title', 'default_seo_description', 'pages_seo'] },
   { id: 'brand-assets', label: 'Brand assets', page: 'global', section: 'brand-assets', fields: ['logo_media_id', 'logo_url', 'favicon_media_id', 'favicon_url', 'cart_icon_media_id', 'cart_icon_url', 'footer_logo_media_id', 'footer_logo_url', 'logo_alt_text', 'logo_size', 'footer_logo_size'] },
-  { id: 'store-details', label: 'Store details', page: 'global', section: 'store-details', fields: ['site_name', 'contact_email', 'contact_phone', 'contact_entries', 'social_links'] },
-  { id: 'header', label: 'Header', page: 'global', section: 'header', fields: ['header_cta'] },
+  { id: 'store-details', label: 'Store & contact', page: 'global', section: 'store-details', fields: ['site_name', 'contact_email', 'contact_phone', 'contact_entries'] },
+  { id: 'social-media', label: 'Social media', page: 'global', section: 'social-media', fields: ['social_links'] },
+  { id: 'header', label: 'Header', page: 'global', section: 'header', fields: ['header_cta', 'navigation'] },
   { id: 'announcement-banner', label: 'Announcement banner', page: 'global', section: 'footer-banner', fields: ['footer_banner'] },
   { id: 'footer', label: 'Footer', page: 'global', section: 'footer', fields: ['footer'] },
   { id: 'home-hero', label: 'Home hero', page: 'home', section: 'hero', fields: ['hero_media_id', 'hero_image_url', 'hero_media_mime', 'hero_title', 'hero_subtitle', 'hero_overlay_color', 'hero_overlay_opacity', 'hero_full_bleed', 'hero_focal_x', 'hero_focal_y'] },

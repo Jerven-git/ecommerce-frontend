@@ -144,6 +144,30 @@
         ],
         "createdAt": "2026-10-08T02:15:42.264Z",
         "reason": "Domain value inside the loader animation allowlist, not a CSS easing declaration"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "playfair display",
+        "createdAt": "2026-10-28T11:33:14.904Z",
+        "reason": "Agent: pre-existing Apex marketing, authentication, and entry-loader display type outside the Service Studio DESIGN.md scope"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "space grotesk",
+        "createdAt": "2026-10-28T11:33:24.322Z",
+        "reason": "Agent: pre-existing Apex marketing, authentication, and entry-loader type system outside the Service Studio DESIGN.md scope"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "bounce",
+        "createdAt": "2026-11-02T07:36:48.087Z",
+        "reason": "Domain value for a supported loader animation option, not a CSS easing curve."
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "['bounce",
+        "createdAt": "2026-11-02T07:36:48.097Z",
+        "reason": "Source list of supported loader animation names, not a CSS easing curve."
       }
     ]
   }

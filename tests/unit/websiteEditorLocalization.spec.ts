@@ -49,6 +49,14 @@ function localizedDraft() {
 }
 
 describe('Website Editor localization contracts', () => {
+  it('keeps social label translations in their dedicated section', () => {
+    const draft = localizedDraft()
+    draft.social_links = [{ platform: 'facebook', url: 'https://facebook.com/store', label: 'Facebook' }]
+    const social = websiteEditorTranslationFields(draft, 'global', 'social-media')
+    expect(social.map(field => field.path)).toEqual(['social_links.0.label'])
+    expect(websiteEditorTranslationFields(draft, 'global', 'store-details').some(field => field.path.startsWith('social_links'))).toBe(false)
+  })
+
   it('applies nested and indexed translations without mutating the default draft', () => {
     const draft = localizedDraft()
     const translated = applyWebsiteEditorLocale(draft, 'fil')

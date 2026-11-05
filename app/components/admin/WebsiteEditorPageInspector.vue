@@ -86,7 +86,9 @@
           <input :value="entry.phone" type="tel" maxlength="30" placeholder="Phone number" aria-label="Contact phone" class="editor-input" @input="setItem(['contact_entries'], index, 'phone', inputValue($event))" />
         </AdminEditorRepeaterItem>
       </AdminEditorRepeater>
+    </div>
 
+    <div v-else-if="section === 'social-media'" class="space-y-5">
       <AdminEditorRepeater title="Social links" add-label="Add social link" :can-add="modelValue.social_links.length < 20" @add="addItem(['social_links'], { platform: '', url: '', label: '' })">
         <AdminEditorRepeaterItem v-for="(link, index) in modelValue.social_links" :key="index" :label="link.label || socialPlatformLabel(link.platform) || `Social link ${index + 1}`" @remove="removeItem(['social_links'], index)">
           <select :value="link.platform" aria-label="Social platform" class="editor-input" @change="setItem(['social_links'], index, 'platform', inputValue($event))">
@@ -97,10 +99,12 @@
           <input :value="link.label" maxlength="100" placeholder="Accessible label (optional)" aria-label="Social link label" class="editor-input" @input="setItem(['social_links'], index, 'label', inputValue($event))" />
         </AdminEditorRepeaterItem>
       </AdminEditorRepeater>
-
+      <p class="text-xs leading-5 text-admin-muted">These profiles appear in your storefront footer. Control their visibility under Footer → Show social links.</p>
     </div>
 
-    <div v-else-if="section === 'header'" class="space-y-4">
+    <div v-else-if="section === 'header'" class="space-y-5">
+      <AdminWebsiteNavigationEditor :model-value="modelValue.navigation" :pages="navigationPages" :requested-page-uuid="navigationTargetPage" :loading="navigationLoading" :error="navigationError" @update:model-value="setPath(['navigation'], $event)" @retry="$emit('retry-navigation')" />
+      <h3 class="border-t border-admin-border pt-5 text-sm font-semibold text-admin-text">Header button</h3>
       <AdminEditorToggle :checked="modelValue.header_cta.enabled" label="Show header button" @change="setPath(['header_cta', 'enabled'], $event)" />
       <AdminEditorField label="Button label"><input :value="modelValue.header_cta.label" maxlength="30" class="editor-input" @input="setPath(['header_cta', 'label'], inputValue($event))" /></AdminEditorField>
       <AdminEditorField label="Button link"><input :value="modelValue.header_cta.link" maxlength="500" class="editor-input" @input="setPath(['header_cta', 'link'], inputValue($event))" /></AdminEditorField>
@@ -130,6 +134,7 @@
         <AdminEditorToggle :checked="modelValue.footer.show_quick_links" label="Show quick links" @change="setPath(['footer', 'show_quick_links'], $event)" />
         <AdminEditorToggle :checked="modelValue.footer.show_contact_info" label="Show contact details" @change="setPath(['footer', 'show_contact_info'], $event)" />
         <AdminEditorToggle :checked="modelValue.footer.show_social_links" label="Show social links" @change="setPath(['footer', 'show_social_links'], $event)" />
+        <p class="text-xs leading-5 text-admin-muted">Add or edit your profile URLs under Global sections → Social media.</p>
       </div>
     </div>
 
@@ -283,15 +288,20 @@
 </template>
 
 <script setup lang="ts">
+import type { WebsitePageSummary } from '~/types/websitePage'
 import type { BlogPageCta, ServicesPageCta } from '~/composables/useSiteConfig'
 import type { WebsiteEditorAssetSlot, WebsiteEditorAssetUpload, WebsiteEditorDraftPayload } from '~/composables/useWebsiteEditorDraft'
 
 const props = defineProps<{
   modelValue: WebsiteEditorDraftPayload
   section: string
+  navigationPages: WebsitePageSummary[]
+  navigationTargetPage?: string
+  navigationLoading?: boolean
+  navigationError?: string
   errors?: Record<string, string[]>
 }>()
-const emit = defineEmits<{ 'update:modelValue': [value: WebsiteEditorDraftPayload] }>()
+const emit = defineEmits<{ 'update:modelValue': [value: WebsiteEditorDraftPayload]; 'retry-navigation': [] }>()
 const { uploadDraftAsset } = useWebsiteEditorDraft()
 const assetUploading = reactive<Partial<Record<WebsiteEditorAssetSlot, boolean>>>({})
 const assetError = ref('')
@@ -304,11 +314,16 @@ const details: Record<string, { title: string; description: string; prefixes: st
     prefixes: ['payload.logo_', 'payload.favicon_', 'payload.cart_icon_', 'payload.footer_logo_'],
   },
   'store-details': {
-    title: 'Store details',
-    description: 'Set the public store identity, contact channels, and social profiles used across the storefront.',
-    prefixes: ['payload.site_name', 'payload.contact_email', 'payload.contact_phone', 'payload.contact_entries', 'payload.social_links'],
+    title: 'Store & contact',
+    description: 'Set your store name and the email addresses and phone numbers customers can use to reach you.',
+    prefixes: ['payload.site_name', 'payload.contact_email', 'payload.contact_phone', 'payload.contact_entries'],
   },
-  header: { title: 'Header call-to-action', description: 'Set the optional action shown in the storefront header.', prefixes: ['payload.header_cta'] },
+  'social-media': {
+    title: 'Social media',
+    description: 'Add your Facebook, Instagram, TikTok, X and other social profiles.',
+    prefixes: ['payload.social_links'],
+  },
+  header: { title: 'Header', description: 'Manage your store’s menu links and optional header button.', prefixes: ['payload.navigation', 'payload.header_cta'] },
   'footer-banner': { title: 'Announcement banner', description: 'Create a shared message immediately above the footer.', prefixes: ['payload.footer_banner'] },
   footer: { title: 'Footer', description: 'Control the shared footer message and visible information groups.', prefixes: ['payload.footer'] },
   'about-content': { title: 'About page', description: 'Tell the store story and add concise customer-facing highlights.', prefixes: ['payload.about_'] },

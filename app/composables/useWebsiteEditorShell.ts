@@ -47,7 +47,7 @@ export function useWebsiteEditorShell(options: WebsiteEditorShellOptions) {
   const activeDevice = ref<WebsiteEditorDeviceId>('desktop')
   const controlsOpen = ref(false)
   const controlsDocked = ref(false)
-  const controlsCollapsed = ref(true)
+  const controlsCollapsed = ref(false)
   const controlsTrigger = ref<HTMLButtonElement | null>(null)
   const controlsClose = ref<HTMLButtonElement | null>(null)
   let controlsMediaQuery: MediaQueryList | null = null

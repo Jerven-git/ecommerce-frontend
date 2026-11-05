@@ -6,6 +6,7 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "audit:runtime": "node scripts/audit-runtime.mjs",
+    "check:theme-bundles": "node scripts/check-theme-bundle-budget.mjs",
     "typecheck": "NUXT_BUILD_DIR=.nuxt-typecheck nuxt prepare && vue-tsc --noEmit -p .nuxt-typecheck/tsconfig.app.json",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",

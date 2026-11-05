@@ -12,6 +12,7 @@ import { websiteEditorApiMessage } from '~/utils/websiteEditorError'
 interface WebsiteEditorSessionOptions {
   siteConfig: Ref<SiteConfig | null>
   fetchSiteConfig: (force?: boolean) => Promise<unknown>
+  invalidateSiteConfig: (context: 'public' | 'admin') => void
   broadcastConfigUpdate: () => void
   draftApi: ReturnType<typeof useWebsiteEditorDraft>
   recoveryOwner: () => string
@@ -97,8 +98,26 @@ export function useWebsiteEditorSession(options: WebsiteEditorSessionOptions) {
     recoveryOwner: options.recoveryOwner,
   })
 
-  function openPublishReview() {
-    if (!hasSavedDraft.value || isDirty.value || publishing.value) return
+  async function openPublishReview(additionalChangeCount = 0) {
+    if (isDirty.value || publishing.value || saving.value || discarding.value || workflowLoading.value || !draft.value) return
+    if (!hasSavedDraft.value && additionalChangeCount > 0) {
+      saving.value = true
+      actionError.value = ''
+      try {
+        const response = await saveDraft(baseUpdatedAt.value, draftVersion.value, draft.value)
+        applyDraftState(response.data)
+      } catch (error: any) {
+        if ((error?.statusCode ?? error?.status) === 409) {
+          recovery.openSaveConflict()
+          return
+        }
+        actionError.value = websiteEditorApiMessage(error, 'A publication draft could not be prepared for the selected pages.')
+        return
+      } finally {
+        saving.value = false
+      }
+    }
+    if (!hasSavedDraft.value) return
     actionError.value = ''
     workflowError.value = ''
     reviewNote.value = ''
@@ -107,7 +126,7 @@ export function useWebsiteEditorSession(options: WebsiteEditorSessionOptions) {
   }
 
   async function runWorkflowAction(action: () => Promise<{ data: WebsiteEditorWorkflow }>) {
-    if (workflowLoading.value) return
+    if (workflowLoading.value || publishing.value || saving.value || discarding.value) return
     workflowLoading.value = true
     workflowError.value = ''
     try {
@@ -129,9 +148,9 @@ export function useWebsiteEditorSession(options: WebsiteEditorSessionOptions) {
   const requestReview = () => draftVersion.value && runWorkflowAction(() => requestDraftReview(draftVersion.value!, reviewNote.value))
   const approveReview = () => draftVersion.value && runWorkflowAction(() => approveDraft(draftVersion.value!, reviewNote.value))
   const returnForChanges = () => draftVersion.value && runWorkflowAction(() => requestDraftChanges(draftVersion.value!, reviewNote.value))
-  const schedulePublication = () => runWorkflowAction(async () => {
+  const schedulePublication = (pageDrafts: Array<{ page_uuid: string, draft_version: number }> = []) => runWorkflowAction(async () => {
     if (!draftVersion.value) throw new Error('Save the draft before scheduling publication.')
-    const response = await scheduleDraft(draftVersion.value, scheduledFor.value, releaseNote.value)
+    const response = await scheduleDraft(draftVersion.value, scheduledFor.value, releaseNote.value, pageDrafts)
     scheduledFor.value = ''
     return response
   })
@@ -154,18 +173,19 @@ export function useWebsiteEditorSession(options: WebsiteEditorSessionOptions) {
   }
 
   async function saveChanges() {
-    if (!draft.value || !isDirty.value) return
+    if (!draft.value || !isDirty.value || saving.value || publishing.value || discarding.value || workflowLoading.value) return
+    const submitted = JSON.parse(JSON.stringify(draft.value)) as WebsiteEditorDraftPayload
     saving.value = true
     actionError.value = ''
     validationErrors.value = {}
     try {
-      const response = await saveDraft(baseUpdatedAt.value, draftVersion.value, draft.value)
+      const response = await saveDraft(baseUpdatedAt.value, draftVersion.value, submitted)
       hasSavedDraft.value = true
       draftUpdatedAt.value = response.data.draft_updated_at
       draftVersion.value = response.data.draft_version
       workflow.value = response.data.workflow
-      savedSnapshot.value = snapshot(draft.value)
-      recovery.dismissRecovery()
+      savedSnapshot.value = snapshot(submitted)
+      if (!isDirty.value) recovery.dismissRecovery()
     } catch (error: any) {
       if ((error?.statusCode ?? error?.status) === 409) {
         recovery.openSaveConflict()
@@ -180,6 +200,7 @@ export function useWebsiteEditorSession(options: WebsiteEditorSessionOptions) {
   }
 
   async function discardChanges() {
+    if (discarding.value || saving.value || publishing.value || workflowLoading.value) return
     discarding.value = true
     actionError.value = ''
     try {
@@ -196,13 +217,14 @@ export function useWebsiteEditorSession(options: WebsiteEditorSessionOptions) {
     }
   }
 
-  async function publishChanges(changedAreaCount: number) {
-    if (!hasSavedDraft.value || isDirty.value) return
+  async function publishChanges(changedAreaCount: number, pageDrafts: Array<{ page_uuid: string, draft_version: number }> = []) {
+    if (!hasSavedDraft.value || isDirty.value || publishing.value || saving.value || discarding.value || workflowLoading.value) return
     publishing.value = true
     actionError.value = ''
     try {
-      await publishDraft(releaseNote.value)
+      await publishDraft(releaseNote.value, pageDrafts)
       await options.fetchSiteConfig(true)
+      options.invalidateSiteConfig('public')
       options.broadcastConfigUpdate()
       if (!options.siteConfig.value) throw new Error('The published website is unavailable.')
       const publishedState = await fetchDraft({ force: true })
@@ -210,11 +232,8 @@ export function useWebsiteEditorSession(options: WebsiteEditorSessionOptions) {
       recovery.dismissRecovery()
       publishReviewOpen.value = false
       releaseNote.value = ''
-      publishSuccess.value = {
-        summary: changedAreaCount === 1
-          ? '1 changed area is now live.'
-          : `${changedAreaCount} changed areas are now live.`,
-      }
+      const publishedCount = changedAreaCount + pageDrafts.length
+      publishSuccess.value = { summary: publishedCount === 1 ? '1 change is now live.' : `${publishedCount} changes are now live.` }
       await options.onPublished()
     } catch (error: any) {
       if ((error?.statusCode ?? error?.status) === 409) {

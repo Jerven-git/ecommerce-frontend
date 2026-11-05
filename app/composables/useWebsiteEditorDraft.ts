@@ -16,10 +16,16 @@ import type {
   ShopPromo,
   SiteConfig,
   StoryPage,
+  ThemeLayoutReference,
+  WebsiteNavigationItem,
+  WebsiteProfileId,
 } from '~/composables/useSiteConfig'
 import { normalizeHomepageSections } from '~/utils/homepageSections'
 
 export interface WebsiteEditorDraftPayload {
+  website_profile: WebsiteProfileId
+  navigation: WebsiteNavigationItem[]
+  theme_layout: ThemeLayoutReference
   default_locale: string
   supported_locales: string[]
   localized_content: Record<string, Record<string, string>>
@@ -176,6 +182,9 @@ export function normalizeWebsiteEditorDraft(
   const servicesImageUrl = payloadValue('services_image_url', config.services_image_url ?? null)
 
   return clone({
+    website_profile: payload.website_profile ?? config.website_profile ?? 'hybrid',
+    navigation: payload.navigation ?? config.navigation ?? [],
+    theme_layout: payload.theme_layout ?? config.theme_layout ?? { id: 'classic', version: '1.0.0', settings: {}, saved_settings: {} },
     default_locale: payload.default_locale ?? config.default_locale ?? 'en',
     supported_locales: payload.supported_locales ?? config.supported_locales ?? [config.default_locale ?? 'en'],
     localized_content: payload.localized_content ?? config.localized_content ?? {},
@@ -395,9 +404,9 @@ export function useWebsiteEditorDraft() {
   const discardDraft = () => $apiFetch<{ data: WebsiteEditorDraftState }>('/site-config/draft', {
     method: 'DELETE',
   }).finally(invalidatePreload)
-  const publishDraft = (releaseNote = '') => $apiFetch<{ data: WebsiteEditorDraftState; message: string }>('/site-config/draft/publish', {
+  const publishDraft = (releaseNote = '', pageDrafts: Array<{ page_uuid: string, draft_version: number }> = []) => $apiFetch<{ data: WebsiteEditorDraftState; message: string }>('/site-config/draft/publish', {
     method: 'POST',
-    body: { release_note: releaseNote.trim() || null },
+    body: { release_note: releaseNote.trim() || null, page_drafts: pageDrafts },
   }).finally(invalidatePreload)
   const requestDraftReview = (draftVersion: number, note = '') => $apiFetch<{ data: WebsiteEditorWorkflow; message: string }>('/site-config/draft/review/request', {
     method: 'POST',
@@ -411,9 +420,9 @@ export function useWebsiteEditorDraft() {
     method: 'POST',
     body: { draft_version: draftVersion, note: note.trim() },
   }).finally(invalidatePreload)
-  const scheduleDraft = (draftVersion: number, scheduledFor: string, releaseNote = '') => $apiFetch<{ data: WebsiteEditorWorkflow; message: string }>('/site-config/draft/schedule', {
+  const scheduleDraft = (draftVersion: number, scheduledFor: string, releaseNote = '', pageDrafts: Array<{ page_uuid: string, draft_version: number }> = []) => $apiFetch<{ data: WebsiteEditorWorkflow; message: string }>('/site-config/draft/schedule', {
     method: 'POST',
-    body: { draft_version: draftVersion, scheduled_for: scheduledFor, release_note: releaseNote.trim() || null },
+    body: { draft_version: draftVersion, scheduled_for: scheduledFor, release_note: releaseNote.trim() || null, page_drafts: pageDrafts },
   }).finally(invalidatePreload)
   const cancelDraftSchedule = (draftVersion: number) => $apiFetch<{ data: WebsiteEditorWorkflow; message: string }>('/site-config/draft/schedule', {
     method: 'DELETE',

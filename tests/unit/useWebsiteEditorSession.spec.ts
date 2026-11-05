@@ -84,6 +84,7 @@ function draftApi(fetchDraft = vi.fn().mockResolvedValue({ data: draftState() })
 function createSession(api = draftApi()) {
   const config = ref<SiteConfig | null>(siteConfig())
   const broadcastConfigUpdate = vi.fn()
+  const invalidateSiteConfig = vi.fn()
   const onDraftApplied = vi.fn()
   const onPublished = vi.fn()
   const onValidationError = vi.fn()
@@ -91,6 +92,7 @@ function createSession(api = draftApi()) {
   const session = useWebsiteEditorSession({
     siteConfig: config,
     fetchSiteConfig,
+    invalidateSiteConfig,
     broadcastConfigUpdate,
     draftApi: api,
     recoveryOwner: () => '7:11',
@@ -100,11 +102,31 @@ function createSession(api = draftApi()) {
     onPublished,
   })
 
-  return { session, api, broadcastConfigUpdate, onDraftApplied, onPublished, onValidationError, fetchSiteConfig }
+  return { session, api, broadcastConfigUpdate, invalidateSiteConfig, onDraftApplied, onPublished, onValidationError, fetchSiteConfig }
 }
 
 describe('useWebsiteEditorSession', () => {
   beforeEach(() => window.sessionStorage.clear())
+
+  it('does not mark edits made during a save as saved or start a second save', async () => {
+    const api = draftApi()
+    let finish!: (value: any) => void
+    vi.mocked(api.saveDraft).mockReturnValue(new Promise(resolve => { finish = resolve }))
+    const { session } = createSession(api)
+    await session.loadEditor()
+    session.draft.value!.site_name = 'Submitted'
+    const pending = session.saveChanges()
+    session.draft.value!.site_name = 'Newer edit'
+    await session.saveChanges()
+    await session.discardChanges()
+    expect(api.discardDraft).not.toHaveBeenCalled()
+    finish({ data: draftState({ draft_version: 4 }) })
+    await pending
+    expect(api.saveDraft).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(api.saveDraft).mock.calls[0]?.[2].site_name).toBe('Submitted')
+    expect(session.draft.value!.site_name).toBe('Newer edit')
+    expect(session.isDirty.value).toBe(true)
+  })
 
   it('preserves the browser draft when a concurrent save conflicts', async () => {
     const api = draftApi()
@@ -143,15 +165,35 @@ describe('useWebsiteEditorSession', () => {
       .mockResolvedValueOnce({ data: draftState() })
       .mockResolvedValueOnce({ data: draftState({ has_draft: false, draft_updated_at: null, draft_version: null }) })
     const api = draftApi(fetchDraft)
-    const { session, broadcastConfigUpdate, fetchSiteConfig, onPublished } = createSession(api)
+    const { session, broadcastConfigUpdate, invalidateSiteConfig, fetchSiteConfig, onPublished } = createSession(api)
     await session.loadEditor()
 
     await session.publishChanges(2)
 
-    expect(api.publishDraft).toHaveBeenCalledWith('')
+    expect(api.publishDraft).toHaveBeenCalledWith('', [])
     expect(fetchSiteConfig).toHaveBeenLastCalledWith(true)
+    expect(invalidateSiteConfig).toHaveBeenCalledWith('public')
     expect(broadcastConfigUpdate).toHaveBeenCalledOnce()
     expect(onPublished).toHaveBeenCalledOnce()
-    expect(session.publishSuccess.value?.summary).toBe('2 changed areas are now live.')
+    expect(session.publishSuccess.value?.summary).toBe('2 changes are now live.')
+  })
+
+  it('prepares an atomic website draft before publishing page-only changes', async () => {
+    const fetchDraft = vi.fn()
+      .mockResolvedValueOnce({ data: draftState({ has_draft: false, draft_updated_at: null, draft_version: null }) })
+      .mockResolvedValueOnce({ data: draftState({ has_draft: false, draft_updated_at: null, draft_version: null }) })
+    const api = draftApi(fetchDraft)
+    const { session } = createSession(api)
+    await session.loadEditor()
+
+    await session.openPublishReview(1)
+    await session.publishChanges(0, [{ page_uuid: '27b56cab-6082-4746-a912-bb19df778861', draft_version: 4 }])
+
+    expect(api.saveDraft).toHaveBeenCalledOnce()
+    expect(api.publishDraft).toHaveBeenCalledWith('', [{
+      page_uuid: '27b56cab-6082-4746-a912-bb19df778861',
+      draft_version: 4,
+    }])
+    expect(session.publishSuccess.value?.summary).toBe('1 change is now live.')
   })
 })

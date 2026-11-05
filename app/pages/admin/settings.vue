@@ -424,7 +424,7 @@ async function loadSettings(allowWhileSaving = false) {
   error.value = null
 
   try {
-    const response = await $apiFetch<SiteConfigResponse>('/site-config', { method: 'GET' })
+    const response = await $apiFetch<SiteConfigResponse>('/admin/site-config', { method: 'GET' })
     if (!response?.data) throw new Error('Settings response did not include store configuration.')
 
     const data = response.data
@@ -554,8 +554,9 @@ async function saveSettings() {
     settingsSaved = true
 
     await media.deleteAllMarked()
-    const { fetchSiteConfig, broadcastConfigUpdate } = useSiteConfig()
+    const { fetchSiteConfig, invalidateSiteConfig, broadcastConfigUpdate } = useSiteConfig()
     await fetchSiteConfig(true)
+    invalidateSiteConfig('public')
     broadcastConfigUpdate()
     await loadSettings(true)
     showToast('All settings saved', 'success')

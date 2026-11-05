@@ -22,7 +22,7 @@ describe('admin API source contracts', () => {
   it('keeps the Site Settings request method and persisted top-level keys stable', () => {
     const contents = source('app/pages/admin/settings.vue')
 
-    expect(contents).toMatch(/\$apiFetch<SiteConfigResponse>\('\/site-config', \{ method: 'GET' \}\)/)
+    expect(contents).toMatch(/\$apiFetch<SiteConfigResponse>\('\/admin\/site-config', \{ method: 'GET' \}\)/)
     expect(contents).toContain("$apiFetch('/site-config', {\n      method: 'PATCH'")
     for (const key of [
       'theme',
@@ -44,5 +44,17 @@ describe('admin API source contracts', () => {
     expect(contents).toContain("$apiFetch<{ data: WebsiteEditorDraftState }>('/site-config/draft', {\n      method: 'PUT'")
     expect(contents).toContain("$apiFetch<{ data: WebsiteEditorDraftState }>('/site-config/draft', {\n    method: 'DELETE'")
     expect(contents).toContain("$apiFetch<{ data: WebsiteEditorDraftState; message: string }>('/site-config/draft/publish', {")
+  })
+
+  it('keeps Theme Library focus and filtered state accessible', () => {
+    const editor = source('app/components/admin/WebsiteBuiltinEditorWorkspace.vue')
+    const library = source('app/components/admin/WebsiteThemeLibrary.vue')
+    const trigger = editor.match(/<button\s+ref="themeLibraryTrigger"[\s\S]*?aria-label="([^"]+)"/)
+
+    expect(trigger?.[1]).toBe('Open Theme Library')
+    expect(editor.match(/ref="themeLibraryTrigger"/g)).toHaveLength(1)
+    expect(library).toContain('aria-describedby="theme-library-results-status"')
+    expect(library).toContain('role="status" aria-live="polite"')
+    expect(library).toContain(':aria-pressed="selected?.id === theme.id"')
   })
 })

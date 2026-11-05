@@ -141,6 +141,11 @@ export default defineNuxtConfig({
   // node_modules cache default can be owned by the container user, which makes
   // local production builds fail before compilation begins.
   buildDir: process.env.NUXT_BUILD_DIR || '.nuxt',
+  nitro: {
+    output: {
+      dir: process.env.NITRO_OUTPUT_DIR || '.output',
+    },
+  },
   // DevTools exposes development-only RPC and project metadata endpoints.
   // Never include it in preview or production server builds.
   devtools: { enabled: process.env.NODE_ENV === 'development' },
@@ -306,6 +311,8 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    buildRevision: process.env.SSU_BUILD_REVISION || 'unknown',
+    deploymentMode: process.env.SSU_DEPLOYMENT_MODE || 'runtime-ssr',
     // Used only by Nitro during SSR. In Docker this points to nginx on the
     // internal network; a local non-Docker dev server falls back to the public
     // API origin.

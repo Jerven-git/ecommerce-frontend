@@ -1,0 +1,102 @@
+.editor-workspace {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--admin-text);
+  background: var(--admin-canvas);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+.workspace-toolbar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 4rem;
+  padding: .5rem 1rem;
+  border-bottom: 1px solid var(--admin-border);
+  background: var(--admin-surface);
+}
+.workspace-identity, .workspace-actions { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.workspace-identity { flex: 1; }
+.workspace-actions { flex-shrink: 0; }
+.workspace-divider { height: 1.5rem; width: 1px; flex-shrink: 0; background: var(--admin-border); }
+.workspace-button, .workspace-icon-button, .workspace-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: .5rem;
+  min-height: 2.75rem;
+  border-radius: .5rem;
+  font-size: .8125rem;
+  font-weight: 600;
+}
+.workspace-button { padding: 0 .875rem; border: 1px solid var(--admin-border); background: var(--admin-surface); }
+.workspace-icon-button { width: 2.75rem; color: var(--admin-muted); }
+.workspace-back { justify-content: flex-start; color: var(--admin-muted); }
+.workspace-button:hover, .workspace-icon-button:hover, .workspace-back:hover { background: var(--admin-soft); }
+.workspace-button-primary { background: var(--admin-accent); border-color: transparent; color: var(--admin-on-accent); }
+.workspace-button-primary:hover { background: var(--admin-accent-strong); }
+.workspace-button:disabled { opacity: .5; cursor: not-allowed; }
+.workspace-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+.workspace-panel { display: flex; flex-direction: column; flex-shrink: 0; width: 20rem; min-height: 0; background: var(--admin-surface); border-right: 1px solid var(--admin-border); }
+/* Keep absolutely positioned upload inputs inside the panel's scroll area. */
+.workspace-panel-scroll { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.workspace-panel-footer { flex-shrink: 0; padding: .875rem 1.25rem; border-top: 1px solid var(--admin-border); }
+.workspace-tabs { display: flex; flex-shrink: 0; gap: .25rem; padding: .5rem .75rem; border-bottom: 1px solid var(--admin-border); }
+.workspace-tabs button { flex: 1; min-height: 2.75rem; padding: 0 .5rem; border-radius: .5rem; font-size: .8125rem; color: var(--admin-muted); font-weight: 600; }
+.workspace-tabs button:hover { background: var(--admin-soft); }
+.workspace-tabs button[aria-pressed="true"] { background: var(--admin-accent-soft); color: var(--admin-accent-strong); }
+.workspace-preview { display: flex; flex: 1; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
+.workspace-preview-toolbar { display: flex; flex-shrink: 0; align-items: center; justify-content: space-between; gap: .75rem; min-height: 3.75rem; padding: .5rem 1.25rem; background: var(--admin-surface); border-bottom: 1px solid var(--admin-border); }
+.workspace-locale { min-height: 2.75rem; width: 9rem; max-width: 100%; padding: 0 .5rem; border: 1px solid var(--admin-border); border-radius: .5rem; background: var(--admin-surface); color: var(--admin-text); font-size: .75rem; }
+.workspace-devices { display: flex; align-items: center; border-radius: .5rem; background: var(--admin-soft); padding: .125rem; }
+.workspace-devices button { display: flex; align-items: center; justify-content: center; width: 2.75rem; min-height: 2.75rem; border-radius: .375rem; color: var(--admin-muted); }
+.workspace-devices button[aria-pressed="true"] { background: var(--admin-surface); color: var(--admin-accent-strong); }
+.workspace-canvas { display: flex; justify-content: center; flex: 1; min-height: 0; padding: 1.5rem; overflow: auto; background: var(--admin-soft); }
+.workspace-preview-frame { flex-shrink: 0; max-width: 100%; height: 100%; border-radius: .5rem; box-shadow: var(--admin-shadow-quiet); }
+.workspace-preview-footer { display: flex; flex-shrink: 0; align-items: center; justify-content: space-between; gap: 1rem; min-height: 2.25rem; padding: .5rem 1.25rem; border-top: 1px solid var(--admin-border); background: var(--admin-surface); color: var(--admin-muted); font-size: .6875rem; }
+.workspace-mobile-switch, .workspace-mobile-publication { display: none; }
+.editor-workspace :is(button, a, input, textarea, select):focus-visible { outline: 2px solid var(--admin-accent); outline-offset: 2px; }
+.workspace-panel :is(input, textarea, select) { caret-color: var(--admin-accent); }
+.workspace-panel ::selection { background: var(--admin-accent-soft); color: var(--admin-accent-strong); }
+.workspace-panel :deep(.rounded-xl) { border-radius: .5rem; }
+.workspace-panel :deep(input:not([type="checkbox"]):not([type="color"])), .workspace-panel :deep(textarea), .workspace-panel :deep(select) { font-size: .8125rem; }
+@media (max-width: 767px) {
+  .workspace-toolbar { gap: .5rem; padding: .5rem; }
+  .workspace-identity, .workspace-actions { gap: .375rem; }
+  .workspace-actions > .hidden { display: none; }
+  .workspace-mobile-publication { display: inline-flex; }
+  .workspace-mobile-switch { display: flex; flex-shrink: 0; padding: .375rem .75rem; gap: .5rem; background: var(--admin-surface); border-bottom: 1px solid var(--admin-border); }
+  .workspace-mobile-switch button { display: flex; justify-content: center; align-items: center; gap: .5rem; flex: 1; min-height: 2.75rem; border-radius: .5rem; color: var(--admin-muted); font-size: .8125rem; font-weight: 600; }
+  .workspace-mobile-switch button[aria-pressed="true"] { color: var(--admin-accent-strong); background: var(--admin-accent-soft); }
+  .workspace-panel { width: 100%; border-right: 0; }
+  .workspace-body[data-mobile-view="preview"] > .workspace-panel, .workspace-body[data-mobile-view="tools"] > .workspace-preview { display: none; }
+  .workspace-canvas { padding: .75rem; }
+  .workspace-preview-toolbar { flex-wrap: wrap; padding: .5rem .75rem; }
+  .workspace-panel :deep(input:not([type="checkbox"]):not([type="color"])), .workspace-panel :deep(textarea), .workspace-panel :deep(select) { font-size: 1rem; }
+}
+@media (prefers-reduced-motion: reduce) { .workspace-preview-frame { transition: none; } }
+
+.workspace-add-section { display: flex; align-items: center; justify-content: center; gap: .5rem; width: 100%; min-height: 2.75rem; margin-top: 1rem; padding: .5rem .75rem; border: 1px dashed var(--admin-border); border-radius: .5rem; color: var(--admin-accent-strong); font-size: .8125rem; font-weight: 600; }
+.workspace-add-section:hover { background: var(--admin-accent-soft); border-color: var(--admin-accent); }
+.workspace-add-section:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Compact section navigation shared by both editor workspaces. */
+.section-tree-title { padding: .875rem 1rem; border-bottom: 1px solid var(--admin-border); font-size: .9375rem; font-weight: 600; overflow-wrap: anywhere; }
+.section-tree-group { padding: .5rem .5rem 1rem; }
+.section-tree-heading { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .5rem; }
+.section-tree-heading h3 { font-size: .8125rem; font-weight: 600; color: var(--admin-text); }
+.section-tree-heading > span { font-size: .6875rem; color: var(--admin-muted); font-variant-numeric: tabular-nums; }
+.section-tree-add, .section-tree-item { display: flex; align-items: center; gap: .5rem; width: 100%; min-height: 2.5rem; padding: .375rem .5rem; border-radius: .375rem; text-align: left; font-size: .8125rem; }
+.section-tree-add { color: var(--admin-accent-strong); }
+.section-tree-add-root { padding-left: 1.75rem; }
+.section-tree-item { color: var(--admin-muted); }
+.section-tree-add:hover, .section-tree-item:hover { background: var(--admin-soft); }
+.section-tree-add:focus-visible, .section-tree-item:focus-visible { outline: 2px solid var(--admin-accent); outline-offset: -2px; }
+.section-tree-add:disabled { opacity: .4; cursor: not-allowed; }
+@media (pointer: coarse) { .section-tree-add, .section-tree-item { min-height: 2.75rem; } }

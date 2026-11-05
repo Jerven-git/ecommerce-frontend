@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 const { siteConfig, pending: siteConfigPending } = useSiteConfig()
-const isApexMarketing = computed(() => siteConfig.value?.is_storefront_host === false)
+const isApexMarketing = useApexMarketing()
 const apexBrandName = computed(() => isApexMarketing.value ? 'DATABASY' : undefined)
 
 useStaticPageSeo('home', undefined, {

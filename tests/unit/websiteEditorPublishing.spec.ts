@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { SiteConfig } from '~/composables/useSiteConfig'
+import { websiteEditorValidationTarget } from '~/utils/websiteEditorValidation'
 import { normalizeWebsiteEditorDraft } from '~/composables/useWebsiteEditorDraft'
 import {
   websiteEditorChangedAreas,
@@ -39,6 +40,15 @@ const baseDraft = () => normalizeWebsiteEditorDraft({
 } as SiteConfig)
 
 describe('Website Editor publication contracts', () => {
+  it('reviews social profile edits separately and sends errors to Social media', () => {
+    const published = baseDraft()
+    const draft = structuredClone(published)
+    draft.social_links = [{ platform: 'tiktok', url: 'https://www.tiktok.com/@store', label: 'Our TikTok' }]
+    expect(websiteEditorChangedAreas(published, draft).map(area => area.section)).toEqual(['social-media'])
+    expect(websiteEditorValidationTarget({ 'payload.social_links.0.url': ['Invalid URL'] }))
+      .toEqual({ page: 'global', section: 'social-media' })
+  })
+
   it('reports only the areas whose persisted fields changed', () => {
     const published = baseDraft()
     const draft = structuredClone(published)
@@ -49,6 +59,15 @@ describe('Website Editor publication contracts', () => {
       'store-details',
       'home-hero',
     ])
+  })
+
+  it('includes menu edits in publication review and targets header validation errors', () => {
+    const published = baseDraft()
+    const draft = structuredClone(published)
+    draft.navigation.push({ id: 'story-link', label: 'Our story', kind: 'page', value: '9674fb74-0e46-4012-b865-939417d45a19', visible: true, children: [] })
+    expect(websiteEditorChangedAreas(published, draft).map(area => area.id)).toEqual(['header'])
+    expect(websiteEditorValidationTarget({ 'payload.navigation.0.value': ['Choose a page owned by this store.'] }))
+      .toEqual({ page: 'global', section: 'header' })
   })
 
   it('warns about visible empty sections and incomplete enabled controls', () => {

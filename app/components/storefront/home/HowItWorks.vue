@@ -27,8 +27,8 @@
       </ol>
 
       <div :ref="addRevealRef" class="reveal mt-14" style="transition-delay: 0.5s">
-        <NuxtLink to="/shop" class="btn-primary inline-flex text-white items-center gap-2">
-          Start Shopping
+        <NuxtLink :to="primaryAction.to" class="btn-primary inline-flex text-white items-center gap-2">
+          {{ primaryAction.label }}
           <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
         </NuxtLink>
       </div>
@@ -43,20 +43,37 @@ const props = defineProps<{
   config: HomepageSteps | null
 }>()
 
+const { siteConfig } = useSiteConfig()
+const isInformationalEditorial = computed(() => siteConfig.value?.theme_layout?.id === 'informational-editorial')
+
 const defaultSteps: HomepageStep[] = [
   { icon: 'heroicons:magnifying-glass', title: 'Browse Products', description: 'Explore our wide selection of quality items across all categories.' },
   { icon: 'heroicons:shopping-cart', title: 'Add to Cart', description: 'Pick your favourites and add them to your cart with one click.' },
   { icon: 'heroicons:shield-check', title: 'Fast Checkout', description: 'Secure payment and fast delivery straight to your doorstep.' },
 ]
 
-const label = computed(() => props.config ? (props.config.label ?? '') : 'Simple & Easy')
-const heading = computed(() => props.config ? (props.config.heading ?? '') : 'How It Works')
-const subtitle = computed(() => props.config ? (props.config.subtitle ?? '') : 'Start shopping in just three easy steps — no hassle, no confusion.')
+const label = computed(() => props.config ? (props.config.label ?? '') : isInformationalEditorial.value ? '' : 'Simple & Easy')
+const heading = computed(() => props.config ? (props.config.heading ?? '') : isInformationalEditorial.value ? '' : 'How It Works')
+const subtitle = computed(() => props.config ? (props.config.subtitle ?? '') : isInformationalEditorial.value ? '' : 'Start shopping in just three easy steps — no hassle, no confusion.')
 const steps = computed(() => props.config
   ? (props.config.items ?? []).filter(step => step.title || step.description)
-  : defaultSteps,
+  : isInformationalEditorial.value ? [] : defaultSteps,
 )
 const visible = computed(() => !!(label.value || heading.value || subtitle.value || steps.value.length))
+const primaryAction = computed(() => {
+  if (siteConfig.value?.theme_layout?.id === 'service-studio') {
+    return {
+      to: siteConfig.value?.modules_enabled?.contact === false ? '/services' : '/contact',
+      label: siteConfig.value?.modules_enabled?.contact === false ? 'Explore services' : 'Start a conversation',
+    }
+  }
+  if (isInformationalEditorial.value) {
+    return siteConfig.value?.modules_enabled?.blog === false
+      ? { to: '/about', label: 'Learn more' }
+      : { to: '/blog', label: 'Explore articles' }
+  }
+  return { to: '/shop', label: 'Start shopping' }
+})
 const { revealRef: headingRef } = useScrollReveal()
 const { addRevealRef } = useScrollRevealAll()
 </script>

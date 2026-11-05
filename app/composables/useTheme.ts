@@ -195,14 +195,24 @@ export const THEME_PRESETS: ThemePreset[] = [
   },
 ]
 
+export const PLATFORM_THEME = Object.freeze({
+  primary_color: '#3B6EC2',
+  secondary_color: DEFAULT_THEME.secondary_color,
+  accent_color: DEFAULT_THEME.accent_color,
+  heading_font: 'Inter',
+  body_font: 'Inter',
+  texture: 'none',
+})
+
 export function useTheme() {
   const { siteConfig } = useSiteConfig()
+  const isApexMarketing = useApexMarketing()
 
   function applyTheme() {
     if (!import.meta.client) return
 
     const config = siteConfig.value
-    const theme = config?.theme ?? DEFAULT_THEME
+    const theme = isApexMarketing.value ? PLATFORM_THEME : (config?.theme ?? DEFAULT_THEME)
     const primary = theme.primary_color || DEFAULT_THEME.primary_color
     const secondary = theme.secondary_color || DEFAULT_THEME.secondary_color
     const accent = theme.accent_color || DEFAULT_THEME.accent_color
@@ -231,7 +241,9 @@ export function useTheme() {
     root.setProperty('--color-accent', accent)
 
     // Badge colors
-    const badgeInStockColor = config?.badge_in_stock_color || DEFAULT_IN_STOCK_COLOR
+    const badgeInStockColor = isApexMarketing.value
+      ? DEFAULT_IN_STOCK_COLOR
+      : (config?.badge_in_stock_color || DEFAULT_IN_STOCK_COLOR)
     root.setProperty('--color-badge-in-stock', badgeInStockColor)
 
     // Texture
@@ -266,7 +278,7 @@ export function useTheme() {
   }
 
   // Watch for siteConfig changes and re-apply
-  watch(siteConfig, () => {
+  watch([siteConfig, isApexMarketing], () => {
     applyTheme()
   }, { immediate: true })
 

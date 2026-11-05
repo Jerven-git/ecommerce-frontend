@@ -1,5 +1,10 @@
-import { getRememberedStoreSlug } from '~/stores/auth'
 import type { LocationQuery } from 'vue-router'
+import {
+  siteConfigContextForPath,
+  siteConfigEndpoint,
+  siteConfigStateKey,
+  type SiteConfigContext,
+} from '~/utils/siteConfigContext'
 
 export interface SiteConfigRouteContext {
   path: string
@@ -13,6 +18,26 @@ export interface SiteTheme {
   heading_font: string
   body_font: string
   texture: string
+}
+
+export type WebsiteProfileId = 'ecommerce' | 'services' | 'informational' | 'hybrid'
+
+export type WebsiteNavigationKind = 'link' | 'page' | 'group'
+
+export interface WebsiteNavigationItem {
+  id: string
+  label: string
+  kind: WebsiteNavigationKind
+  value: string | null
+  visible: boolean
+  children: WebsiteNavigationItem[]
+}
+
+export interface ThemeLayoutReference {
+  id: string
+  version: string
+  settings?: Record<string, unknown>
+  saved_settings?: Record<string, { version: string; settings: Record<string, unknown> }>
 }
 
 export interface HomepageStep {
@@ -292,6 +317,11 @@ export interface SiteConfig {
    * redirect is a fallback for environments without that config.
    */
   canonical_host: string | null
+  website_profile: WebsiteProfileId
+  navigation: WebsiteNavigationItem[]
+  theme_layout: ThemeLayoutReference
+  published_release_id: string | null
+  published_release_sequence: number | null
   default_locale: string
   supported_locales: string[]
   locale: string
@@ -435,6 +465,11 @@ const DEFAULT_CONFIG: Partial<SiteConfig> = {
   // Never redirect on a fallback config; only an explicit host from the backend
   // may move the visitor.
   canonical_host: null,
+  website_profile: 'hybrid',
+  navigation: [],
+  theme_layout: { id: 'classic', version: '1.0.0' },
+  published_release_id: null,
+  published_release_sequence: null,
   default_locale: 'en',
   supported_locales: ['en'],
   locale: 'en',
@@ -444,13 +479,16 @@ const DEFAULT_CONFIG: Partial<SiteConfig> = {
 
 // BroadcastChannel for cross-tab config sync
 let _channel: BroadcastChannel | null = null
-let _listening = false
+let _refreshFromBroadcast: (() => void | Promise<void>) | null = null
 
 function getChannel(): BroadcastChannel | null {
   if (!import.meta.client) return null
   if (!_channel) {
     try {
       _channel = new BroadcastChannel('ssu-site-config')
+      _channel.onmessage = () => {
+        void _refreshFromBroadcast?.()
+      }
     } catch {
       // BroadcastChannel not supported
     }
@@ -459,21 +497,44 @@ function getChannel(): BroadcastChannel | null {
 }
 
 export function useSiteConfig(routeContext?: SiteConfigRouteContext) {
-  const siteConfig = useState<SiteConfig | null>('siteConfig', () => null)
-  const pending = useState<boolean>('siteConfigPending', () => false)
-  const fetched = useState<boolean>('siteConfigFetched', () => false)
-  const error = useState<string | null>('siteConfigError', () => null)
   // Route middleware must supply its `to` route because `useRoute()` still
   // points at the previous route while navigation is being resolved.
   const route = routeContext ?? useRoute()
+  const hostname = useRequestURL().hostname.toLowerCase()
+  const context = computed(() => siteConfigContextForPath(route.path))
 
-  async function fetchSiteConfig(force = false) {
+  function createBucket(bucketContext: SiteConfigContext) {
+    const key = siteConfigStateKey(bucketContext, hostname)
+
+    return {
+      siteConfig: useState<SiteConfig | null>(`${key}:data`, () => null),
+      pending: useState<boolean>(`${key}:pending`, () => false),
+      fetched: useState<boolean>(`${key}:fetched`, () => false),
+      error: useState<string | null>(`${key}:error`, () => null),
+    }
+  }
+
+  const buckets = {
+    public: createBucket('public'),
+    admin: createBucket('admin'),
+  }
+  const activeBucket = () => buckets[context.value]
+  const siteConfig = computed<SiteConfig | null>({
+    get: () => activeBucket().siteConfig.value,
+    set: value => { activeBucket().siteConfig.value = value },
+  })
+  const pending = computed(() => activeBucket().pending.value)
+  const error = computed(() => activeBucket().error.value)
+
+  async function fetchSiteConfig(force = false, targetContext: SiteConfigContext = context.value) {
+    const requestContext = targetContext
+    const bucket = buckets[requestContext]
     // Several mounted surfaces can request site config at the same time on a
     // hard refresh. Wait for the in-flight request instead of returning while
     // `siteConfig` is still null; editor initialization depends on the value.
-    while (pending.value) {
+    while (bucket.pending.value) {
       await new Promise<void>((resolve) => {
-        const stop = watch(pending, (isPending) => {
+        const stop = watch(bucket.pending, (isPending) => {
           if (!isPending) {
             stop()
             resolve()
@@ -482,41 +543,45 @@ export function useSiteConfig(routeContext?: SiteConfigRouteContext) {
       })
     }
 
-    if (!force && fetched.value) return
-    pending.value = true
-    error.value = null
+    if (!force && bucket.fetched.value) return
+    bucket.pending.value = true
+    bucket.error.value = null
     try {
       const { $apiFetch } = useNuxtApp()
-      // Hint the backend with the last-known store slug so the public endpoint
-      // can return the right theme for unauthenticated visitors (e.g. the
-      // admin login page after logout, before per-store routing exists).
-      // Backend ignores the hint when the request is authenticated — the
-      // session user's store always wins.
-      const lastSlug = getRememberedStoreSlug()
-      const requestedLocale = route.path.startsWith('/admin')
+      const requestedLocale = requestContext === 'admin'
         ? 'default'
         : typeof route.query.locale === 'string' ? route.query.locale : undefined
-      const res = await $apiFetch<{ data: SiteConfig }>('/site-config', {
+      const res = await $apiFetch<{ data: SiteConfig }>(siteConfigEndpoint(requestContext), {
         params: {
-          ...(lastSlug ? { store: lastSlug } : {}),
           ...(requestedLocale ? { locale: requestedLocale } : {}),
         },
       })
       // Merge theme + module defaults so missing keys are always present
-      const data = res.data
-      data.theme = { ...DEFAULT_THEME, ...(data.theme ?? {}) }
-      data.modules_enabled = { ...DEFAULT_MODULES_ENABLED, ...(data.modules_enabled ?? {}) }
-      siteConfig.value = { ...DEFAULT_CONFIG, ...data } as SiteConfig
-      fetched.value = true
+      const data = {
+        ...res.data,
+        theme: { ...DEFAULT_THEME, ...(res.data.theme ?? {}) },
+        modules_enabled: { ...DEFAULT_MODULES_ENABLED, ...(res.data.modules_enabled ?? {}) },
+      }
+      bucket.siteConfig.value = { ...DEFAULT_CONFIG, ...data } as SiteConfig
+      bucket.fetched.value = true
     } catch {
       // Keep a minimal routing-safe config, but let the public layout show a
       // neutral recovery state instead of inventing tenant content.
-      siteConfig.value = DEFAULT_CONFIG as SiteConfig
-      fetched.value = false
-      error.value = 'We could not load this storefront.'
+      bucket.siteConfig.value = { ...DEFAULT_CONFIG, theme: { ...DEFAULT_THEME } } as SiteConfig
+      bucket.fetched.value = false
+      bucket.error.value = requestContext === 'admin'
+        ? 'We could not load this store configuration.'
+        : 'We could not load this storefront.'
     } finally {
-      pending.value = false
+      bucket.pending.value = false
     }
+  }
+
+  function invalidateSiteConfig(targetContext: SiteConfigContext = context.value) {
+    const bucket = buckets[targetContext]
+    bucket.siteConfig.value = null
+    bucket.fetched.value = false
+    bucket.error.value = null
   }
 
   /** Notify other tabs to re-fetch site config */
@@ -524,17 +589,23 @@ export function useSiteConfig(routeContext?: SiteConfigRouteContext) {
     getChannel()?.postMessage('config-updated')
   }
 
-  // Listen for updates from other tabs (register once)
-  if (import.meta.client && !_listening) {
-    _listening = true
-    const ch = getChannel()
-    if (ch) {
-      ch.onmessage = () => {
-        // Force re-fetch in this tab
-        fetchSiteConfig(true)
-      }
+  if (import.meta.client) {
+    getChannel()
+    // Keep the shared listener independent from whichever component happened
+    // to initialize the channel. The latest active composable supplies a
+    // route-aware refresh and clears the separately cached public payload.
+    _refreshFromBroadcast = async () => {
+      invalidateSiteConfig('public')
+      await fetchSiteConfig(true)
     }
   }
 
-  return { siteConfig, pending, error, fetchSiteConfig, broadcastConfigUpdate }
+  return {
+    siteConfig,
+    pending,
+    error,
+    fetchSiteConfig,
+    invalidateSiteConfig,
+    broadcastConfigUpdate,
+  }
 }

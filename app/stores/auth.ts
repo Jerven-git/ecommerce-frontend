@@ -20,9 +20,9 @@ export interface User {
 
 /**
  * localStorage key used to remember the last logged-in admin's store slug.
- * Used by useSiteConfig to ask the public /site-config endpoint for the
- * right store's theme even when the visitor is logged out — handy in dev
- * where there is no per-store domain.
+ * Used only as a local convenience for remembering the last admin account.
+ * Public storefront configuration is resolved from the request host and must
+ * never use this browser value as a tenant selector.
  */
 const LAST_STORE_SLUG_KEY = 'ssu:last_store_slug'
 
@@ -159,6 +159,9 @@ export const useAuthStore = defineStore('auth', {
         // Fallback for any non-2FA response
         if (response.user) {
           this.adoptAuthenticatedUser(response.user)
+          const { fetchSiteConfig, invalidateSiteConfig } = useSiteConfig()
+          invalidateSiteConfig('admin')
+          await fetchSiteConfig(true, 'admin')
         }
 
         return response
@@ -190,8 +193,9 @@ export const useAuthStore = defineStore('auth', {
           // The site config cache is keyed in Nuxt useState, so it survives
           // logout/login of different admins. Force-refresh so the new admin's
           // theme replaces whoever was logged in before.
-          const { fetchSiteConfig } = useSiteConfig()
-          await fetchSiteConfig(true)
+          const { fetchSiteConfig, invalidateSiteConfig } = useSiteConfig()
+          invalidateSiteConfig('admin')
+          await fetchSiteConfig(true, 'admin')
         }
 
         return response
@@ -269,8 +273,8 @@ export const useAuthStore = defineStore('auth', {
 
         // Drop the previous admin's cached theme so the login page (and any
         // next admin who logs in) doesn't render with the wrong store's data.
-        const { fetchSiteConfig } = useSiteConfig()
-        await fetchSiteConfig(true)
+        const { invalidateSiteConfig } = useSiteConfig()
+        invalidateSiteConfig('admin')
       } catch (error: any) {
         this.error = error?.data?.message || 'Logout failed'
         throw error

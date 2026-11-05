@@ -40,8 +40,9 @@ export const WEBSITE_EDITOR_PAGES: WebsiteEditorPageOption[] = [
 export const WEBSITE_EDITOR_STATIC_SECTIONS: Record<Exclude<WebsiteEditorPageId, 'home'>, WebsiteEditorStaticSection[]> = {
   global: [
     { id: 'brand-assets', label: 'Brand assets', icon: 'heroicons:photo' },
-    { id: 'store-details', label: 'Store details', icon: 'heroicons:building-storefront' },
-    { id: 'header', label: 'Header call-to-action', icon: 'heroicons:cursor-arrow-rays' },
+    { id: 'store-details', label: 'Store & contact', icon: 'heroicons:building-storefront' },
+    { id: 'social-media', label: 'Social media', icon: 'heroicons:share' },
+    { id: 'header', label: 'Header navigation and button', icon: 'heroicons:cursor-arrow-rays' },
     { id: 'footer-banner', label: 'Announcement banner', icon: 'heroicons:megaphone' },
     { id: 'footer', label: 'Footer', icon: 'heroicons:rectangle-stack' },
   ],

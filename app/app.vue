@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-const { siteConfig, fetchSiteConfig } = useSiteConfig()
+const { siteConfig, fetchSiteConfig, invalidateSiteConfig } = useSiteConfig()
 const { fetchCatalog: fetchCurrencyCatalog } = useCurrency()
 const route = useRoute()
 const runtimeConfig = useRuntimeConfig()
@@ -50,6 +50,7 @@ useSeoMeta({
 useRealtime({
   onModelChanged(data) {
     if (data.model === 'SiteConfig') {
+      invalidateSiteConfig('public')
       fetchSiteConfig(true)
     }
   },
@@ -83,5 +84,9 @@ onMounted(() => {
   fetchSiteConfig()
   fetchCurrencyCatalog()
   useFavoritesStore().load()
+})
+
+watch(() => route.path, () => {
+  fetchSiteConfig()
 })
 </script>

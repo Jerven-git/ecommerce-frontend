@@ -6,41 +6,53 @@
     @submit.capture.prevent
   >
     <template v-if="receivedConfig">
-      <div :data-storefront-section="previewPage === 'global' ? 'brand-assets' : undefined" :data-editor-label="previewPage === 'global' ? 'Brand assets' : undefined">
-        <div :data-storefront-section="previewPage === 'global' ? 'store-details' : undefined" :data-editor-label="previewPage === 'global' ? 'Store details' : undefined">
-          <div :data-storefront-section="previewPage === 'global' ? 'header' : undefined" :data-editor-label="previewPage === 'global' ? 'Header call-to-action' : undefined">
-            <Header />
+      <StorefrontThemeHost :theme="themeReference" :view-model="shellViewModel">
+        <template #header>
+          <div :data-storefront-section="previewPage === 'global' ? 'brand-assets' : undefined" :data-editor-label="previewPage === 'global' ? 'Brand assets' : undefined">
+            <div :data-storefront-section="previewPage === 'global' ? 'store-details' : undefined" :data-editor-label="previewPage === 'global' ? 'Store & contact' : undefined">
+              <div :data-storefront-section="previewPage === 'global' ? 'header' : undefined" :data-editor-label="previewPage === 'global' ? 'Header call-to-action' : undefined">
+                <Header />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </template>
 
-      <main>
-        <StorefrontHomepage v-if="previewPage === 'home' || previewPage === 'global' || previewPage === 'popup'" :site-config-override="previewConfig" editor-preview />
+        <StorefrontThemePageHost :theme="themeReference" :view-model="pageViewModel">
+          <StorefrontHomepage v-if="previewPage === 'home' || previewPage === 'global' || previewPage === 'popup'" :site-config-override="previewConfig" editor-preview />
 
-        <section v-else-if="pageDisabled" :data-storefront-section="activeStaticSection.id" :data-editor-label="activeStaticSection.label" class="flex min-h-[34rem] items-center justify-center bg-white px-6 py-20">
-          <div class="max-w-md text-center">
-            <Icon name="heroicons:eye-slash" class="mx-auto h-8 w-8 text-gray-400" aria-hidden="true" />
-            <h1 class="mt-5 text-2xl font-semibold text-gray-900">{{ activePageOption.label }} is disabled</h1>
-            <p class="mt-3 text-sm leading-6 text-gray-600">Enable this storefront page in Site Settings to render its full preview. Your private content can still be edited and saved.</p>
+          <section v-else-if="pageDisabled" :data-storefront-section="activeStaticSection.id" :data-editor-label="activeStaticSection.label" class="flex min-h-[34rem] items-center justify-center bg-white px-6 py-20">
+            <div class="max-w-md text-center">
+              <Icon name="heroicons:eye-slash" class="mx-auto h-8 w-8 text-gray-400" aria-hidden="true" />
+              <h1 class="mt-5 text-2xl font-semibold text-gray-900">{{ activePageOption.label }} is disabled</h1>
+              <p class="mt-3 text-sm leading-6 text-gray-600">Enable this storefront page in Site Settings to render its full preview. Your private content can still be edited and saved.</p>
+            </div>
+          </section>
+
+          <div v-else :data-storefront-section="activeStaticSection.id" :data-editor-label="activeStaticSection.label">
+            <component :is="pageComponent" />
           </div>
-        </section>
+        </StorefrontThemePageHost>
 
-        <div v-else :data-storefront-section="activeStaticSection.id" :data-editor-label="activeStaticSection.label">
-          <component :is="pageComponent" />
-        </div>
-      </main>
+        <template #footer-banner>
+          <div :data-storefront-section="previewPage === 'global' ? 'footer-banner' : undefined" :data-editor-label="previewPage === 'global' ? 'Announcement banner' : undefined">
+            <FooterBanner />
+            <div v-if="previewPage === 'global' && (!previewConfig?.footer_banner?.enabled || !previewConfig.footer_banner.heading)" class="border-y border-dashed border-gray-300 bg-gray-50 px-6 py-8 text-center text-sm text-gray-500">
+              Announcement banner is hidden. Add a heading and enable it to publish this surface.
+            </div>
+          </div>
+        </template>
+        <template #footer>
+          <div :data-storefront-section="previewPage === 'global' ? 'footer' : undefined" :data-editor-label="previewPage === 'global' ? 'Footer' : undefined">
+            <div :data-storefront-section="previewPage === 'global' ? 'social-media' : undefined" :data-editor-label="previewPage === 'global' ? 'Social media' : undefined">
+              <Footer />
+            </div>
+          </div>
+        </template>
 
-      <div :data-storefront-section="previewPage === 'global' ? 'footer-banner' : undefined" :data-editor-label="previewPage === 'global' ? 'Announcement banner' : undefined">
-        <FooterBanner />
-        <div v-if="previewPage === 'global' && (!previewConfig?.footer_banner?.enabled || !previewConfig.footer_banner.heading)" class="border-y border-dashed border-gray-300 bg-gray-50 px-6 py-8 text-center text-sm text-gray-500">
-          Announcement banner is hidden. Add a heading and enable it to publish this surface.
-        </div>
-      </div>
-      <div :data-storefront-section="previewPage === 'global' ? 'footer' : undefined" :data-editor-label="previewPage === 'global' ? 'Footer' : undefined">
-        <Footer />
-      </div>
-
-      <WelcomePopup v-if="previewPage === 'popup'" editor-preview />
+        <template #popup>
+          <WelcomePopup editor-preview />
+        </template>
+      </StorefrontThemeHost>
     </template>
 
     <div class="sr-only" role="status" aria-live="polite">Storefront editor preview</div>
@@ -55,6 +67,11 @@ import ServicesStorefrontPage from '~/pages/services/index.vue'
 import ShopStorefrontPage from '~/pages/shop.vue'
 import StoryStorefrontPage from '~/pages/story.vue'
 import type { SiteConfig } from '~/composables/useSiteConfig'
+import {
+  createStorefrontPageViewModel,
+  createStorefrontShellViewModel,
+  storefrontThemeReference,
+} from '~/themes/viewModels'
 import { HOMEPAGE_SECTION_IDS } from '~/utils/homepageSections'
 import { WEBSITE_EDITOR_PAGES, WEBSITE_EDITOR_STATIC_SECTIONS, websiteEditorPage, type WebsiteEditorPageId } from '~/utils/websiteEditorPages'
 
@@ -86,6 +103,21 @@ const pageDisabled = computed(() => {
   const module = activePageOption.value.module
   return module ? previewConfig.value?.modules_enabled?.[module] === false : false
 })
+const themeReference = computed(() => storefrontThemeReference(previewConfig.value))
+const shellViewModel = computed(() => createStorefrontShellViewModel({
+  siteConfig: previewConfig.value,
+  preview: true,
+  showWelcomePopup: previewPage.value === 'popup',
+}))
+const previewPagePath = computed(() => {
+  if (previewPage.value === 'global' || previewPage.value === 'popup') return '/'
+  return `/${previewPage.value}`
+})
+const pageViewModel = computed(() => createStorefrontPageViewModel({
+  path: previewPagePath.value,
+  locale: previewConfig.value?.locale,
+  preview: true,
+}))
 
 const sectionIds = new Set([
   ...HOMEPAGE_SECTION_IDS,
@@ -97,6 +129,11 @@ function blockInteractiveAction(event: Event) {
   if (!target?.closest('a, button, input, select, textarea, [role="button"]')) return
   event.preventDefault()
   event.stopPropagation()
+  const link = target.closest('a[href]')
+  const href = link?.getAttribute('href')
+  if (href) window.parent.postMessage({
+    source: 'ssu-storefront-preview', type: 'navigate', href,
+  }, window.location.origin)
 }
 
 function postPreviewMessage(type: 'ready' | 'rendered') {

@@ -71,8 +71,9 @@ export const useImpersonationStore = defineStore('impersonation', {
         // the theme matches the new effective user's store. This refresh is
         // presentational: a failure must not misreport a successful identity
         // switch as a failed impersonation.
-        const { fetchSiteConfig } = useSiteConfig()
-        await fetchSiteConfig(true).catch(() => undefined)
+        const { fetchSiteConfig, invalidateSiteConfig } = useSiteConfig()
+        invalidateSiteConfig('admin')
+        await fetchSiteConfig(true, 'admin').catch(() => undefined)
 
         return response
       } catch (err: any) {
@@ -128,8 +129,8 @@ export const useImpersonationStore = defineStore('impersonation', {
         // The session user just changed — refresh the cached site config so
         // the theme matches the restored operator. Keep it non-blocking for
         // the same reason as the enter flow above.
-        const { fetchSiteConfig } = useSiteConfig()
-        await fetchSiteConfig(true).catch(() => undefined)
+        const { invalidateSiteConfig } = useSiteConfig()
+        invalidateSiteConfig('admin')
 
         return response
       } catch (err: any) {

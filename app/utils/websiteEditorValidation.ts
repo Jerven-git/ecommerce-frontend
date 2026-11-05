@@ -10,6 +10,7 @@ export function websiteEditorValidationTarget(
   firstHomepageSection = 'hero',
 ): WebsiteEditorValidationTarget | null {
   const field = Object.keys(errors)[0] ?? ''
+  if (field.startsWith('payload.social_links')) return { page: 'global', section: 'social-media' }
   if (
     field.startsWith('payload.logo_')
     || field.startsWith('payload.favicon_')
@@ -21,9 +22,8 @@ export function websiteEditorValidationTarget(
     || field === 'payload.contact_email'
     || field === 'payload.contact_phone'
     || field.startsWith('payload.contact_entries')
-    || field.startsWith('payload.social_links')
   ) return { page: 'global', section: 'store-details' }
-  if (field.startsWith('payload.header_cta')) return { page: 'global', section: 'header' }
+  if (field.startsWith('payload.header_cta') || field.startsWith('payload.navigation')) return { page: 'global', section: 'header' }
   if (field.startsWith('payload.footer_banner')) return { page: 'global', section: 'footer-banner' }
   if (field.startsWith('payload.footer')) return { page: 'global', section: 'footer' }
   if (field.startsWith('payload.about_')) return { page: 'about', section: 'about-content' }

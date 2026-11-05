@@ -7,7 +7,7 @@ export interface WebsiteEditorMediaAsset {
   mime_type: string
   size: number
   alt_text: string | null
-  status: 'live' | 'draft' | 'archived'
+  status: 'live' | 'draft' | 'archived' | 'page'
   usage: string[]
   can_delete: boolean
   created_at: string | null
@@ -49,5 +49,15 @@ export function useWebsiteEditorMediaLibrary() {
       method: 'DELETE',
     })
 
-  return { fetchAssets, reuseAsset, updateAsset, deleteAsset }
+  const uploadPageAsset = (file: File) => {
+    const body = new FormData()
+    body.append('file', file)
+
+    return $apiFetch<{ data: WebsiteEditorMediaAsset }>('/admin/website-pages/media', {
+      method: 'POST',
+      body,
+    })
+  }
+
+  return { fetchAssets, reuseAsset, updateAsset, deleteAsset, uploadPageAsset }
 }
