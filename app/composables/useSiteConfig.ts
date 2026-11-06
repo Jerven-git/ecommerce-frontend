@@ -1,3 +1,5 @@
+import { getCurrentInstance, inject } from 'vue'
+import { SITE_CONFIG_PREVIEW } from '~/utils/siteConfigPreview'
 import type { LocationQuery } from 'vue-router'
 import {
   siteConfigContextForPath,
@@ -499,6 +501,7 @@ function getChannel(): BroadcastChannel | null {
 export function useSiteConfig(routeContext?: SiteConfigRouteContext) {
   // Route middleware must supply its `to` route because `useRoute()` still
   // points at the previous route while navigation is being resolved.
+  const previewConfig = getCurrentInstance() ? inject(SITE_CONFIG_PREVIEW, null) : null
   const route = routeContext ?? useRoute()
   const hostname = useRequestURL().hostname.toLowerCase()
   const context = computed(() => siteConfigContextForPath(route.path))
@@ -520,8 +523,11 @@ export function useSiteConfig(routeContext?: SiteConfigRouteContext) {
   }
   const activeBucket = () => buckets[context.value]
   const siteConfig = computed<SiteConfig | null>({
-    get: () => activeBucket().siteConfig.value,
-    set: value => { activeBucket().siteConfig.value = value },
+    get: () => previewConfig ? previewConfig.value : activeBucket().siteConfig.value,
+    set: value => {
+      if (previewConfig) previewConfig.value = value
+      else activeBucket().siteConfig.value = value
+    },
   })
   const pending = computed(() => activeBucket().pending.value)
   const error = computed(() => activeBucket().error.value)

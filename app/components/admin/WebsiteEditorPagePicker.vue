@@ -3,7 +3,7 @@
     <button
       ref="triggerRef"
       type="button"
-      class="page-picker-focus group flex min-h-11 w-48 items-center gap-2 rounded-xl border border-admin-border bg-admin-surface px-2 text-left transition-[border-color,box-shadow] hover:border-admin-accent/40 focus-visible:border-admin-accent sm:w-52"
+      class="page-picker-trigger page-picker-focus group flex min-h-11 w-48 items-center gap-2 rounded-xl border border-admin-border bg-admin-surface px-2 text-left transition-[border-color,box-shadow] hover:border-admin-accent/40 focus-visible:border-admin-accent sm:w-52"
       :aria-label="`Preview page: ${selectedOption.label}`"
       :aria-expanded="open"
       :aria-controls="listboxId"
@@ -36,7 +36,7 @@
       leave-from-class="translate-y-0 opacity-100"
       leave-to-class="-translate-y-1 opacity-0 motion-reduce:transform-none"
     >
-      <div v-if="open" :id="listboxId" role="dialog" aria-label="Choose a website page" class="page-picker-list absolute right-0 top-[calc(100%+0.5rem)] z-50 max-h-[min(32rem,calc(100dvh-18rem))] w-80 max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-lg border border-admin-border bg-admin-surface p-1.5 shadow-lg" @keydown.esc.prevent.stop="closePicker({ restoreFocus: true })">
+      <div v-if="open" :id="listboxId" role="dialog" aria-label="Choose a website page" :style="popoverStyle" class="page-picker-list fixed z-50 overflow-y-auto rounded-lg border border-admin-border bg-admin-surface p-1.5 shadow-lg" @keydown.esc.prevent.stop="closePicker({ restoreFocus: true })">
         <input ref="searchRef" v-model="search" type="search" aria-label="Search website pages" placeholder="Search pages…" class="page-picker-focus mb-1 min-h-11 w-full rounded-md border border-admin-border bg-admin-surface px-3 text-base text-admin-text" @keydown.down.prevent="focusOptions" />
         <p class="px-2.5 py-2 text-xs font-semibold text-admin-muted">Built-in pages</p>
         <p v-if="!filteredOptions.length" class="px-2.5 py-2 text-xs text-admin-muted">No matching built-in pages.</p>
@@ -105,6 +105,7 @@
 </template>
 
 <script setup lang="ts">
+import { useEditorPopoverPosition } from '~/composables/useEditorPopoverPosition'
 import type { WebsitePageSummary } from '~/types/websitePage'
 import type { WebsiteEditorPageId, WebsiteEditorPageOption } from '~/utils/websiteEditorPages'
 
@@ -130,6 +131,7 @@ const wrapperRef = ref<HTMLElement | null>(null)
 const triggerRef = ref<HTMLButtonElement | null>(null)
 const listboxRef = ref<HTMLElement | null>(null)
 const open = ref(false)
+const { popoverStyle, positionPopover } = useEditorPopoverPosition(triggerRef, () => open.value, () => 320)
 const highlightedIndex = ref(0)
 const search = ref('')
 const searchRef = ref<HTMLInputElement | null>(null)
@@ -161,6 +163,7 @@ async function openPicker(direction = 0) {
   search.value = ''
   const selectedIndex = Math.max(filteredOptions.value.findIndex(option => option.id === props.modelValue), 0)
   highlightedIndex.value = Math.min(Math.max(selectedIndex + direction, 0), filteredOptions.value.length - 1)
+  positionPopover()
   open.value = true
   await nextTick()
   searchRef.value?.focus()
@@ -241,8 +244,12 @@ watch(() => filteredOptions.value.length, () => {
   highlightedIndex.value = Math.min(highlightedIndex.value, Math.max(filteredOptions.value.length - 1, 0))
 })
 
-onMounted(() => document.addEventListener('pointerdown', handleOutsidePointer))
-onBeforeUnmount(() => document.removeEventListener('pointerdown', handleOutsidePointer))
+onMounted(() => {
+  document.addEventListener('pointerdown', handleOutsidePointer)
+})
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', handleOutsidePointer)
+})
 </script>
 
 <style scoped>

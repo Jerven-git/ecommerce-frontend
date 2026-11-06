@@ -34,7 +34,7 @@
       role="listbox"
       tabindex="-1"
       aria-label="Content language"
-      class="locale-menu absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 rounded-xl border border-admin-border bg-admin-surface p-1.5 shadow-lg outline-none"
+      :style="popoverStyle" class="locale-menu fixed z-50 overflow-y-auto rounded-xl border border-admin-border bg-admin-surface p-1.5 shadow-lg outline-none"
       @keydown="handleListboxKeydown"
     >
       <button
@@ -61,7 +61,7 @@
 
     <section
       v-if="managerOpen"
-      class="locale-menu absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[min(22rem,calc(100vw-1.5rem))] rounded-xl border border-admin-border bg-admin-surface shadow-lg"
+      :style="popoverStyle" class="locale-menu fixed z-50 overflow-y-auto rounded-xl border border-admin-border bg-admin-surface shadow-lg"
       aria-label="Manage storefront languages"
     >
       <div class="flex items-start justify-between gap-3 border-b border-admin-border px-3 py-3">
@@ -98,6 +98,7 @@
 </template>
 
 <script setup lang="ts">
+import { useEditorPopoverPosition } from '~/composables/useEditorPopoverPosition'
 import type { WebsiteEditorDraftPayload } from '~/composables/useWebsiteEditorDraft'
 import { WEBSITE_EDITOR_LOCALES, websiteEditorLocaleName, websiteEditorLocaleProgress } from '~/utils/websiteEditorLocalization'
 
@@ -118,6 +119,7 @@ const trigger = ref<HTMLButtonElement | null>(null)
 const listbox = ref<HTMLElement | null>(null)
 const pickerOpen = ref(false)
 const managerOpen = ref(false)
+const { popoverStyle, positionPopover } = useEditorPopoverPosition(root, () => pickerOpen.value || managerOpen.value, () => managerOpen.value ? 352 : 256)
 const highlightedIndex = ref(0)
 const localeOptions = WEBSITE_EDITOR_LOCALES
 const defaultLocale = computed(() => props.draft.default_locale)
@@ -135,6 +137,7 @@ const optionId = (index: number) => `${listboxId}-option-${index}`
 async function openPicker() {
   managerOpen.value = false
   highlightedIndex.value = Math.max(supportedLocales.value.indexOf(props.modelValue), 0)
+  positionPopover()
   pickerOpen.value = true
   await nextTick()
   listbox.value?.focus()
@@ -146,6 +149,7 @@ function togglePicker() {
 function toggleManager() {
   pickerOpen.value = false
   managerOpen.value = !managerOpen.value
+  if (managerOpen.value) positionPopover()
 }
 function selectLocale(locale: string) {
   emit('update:modelValue', locale)

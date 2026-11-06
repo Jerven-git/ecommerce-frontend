@@ -160,3 +160,17 @@ Seventeen focused tests passed for destination resolution, message-source protec
 On 2026-11-05, Global sections gained a dedicated Social media item for social profile URLs and labels. Store details is now labelled Store & contact and retains its existing route ID. Brand assets, header navigation, announcement banner and footer remain grouped by purpose. Footer keeps the social visibility toggle, with reciprocal guidance identifying where profiles and display settings belong. Existing draft fields, platform options, limits and publication APIs are unchanged.
 
 Social validation errors, changed-area review, translation fields/progress and content indicators now target the dedicated section. Selecting it highlights the preview footer. Thirty focused tests passed for publication, localization, validation and section/route navigation. The shared controls and visual system were retained; live browser verification remains pending.
+
+## Preview configuration isolation
+
+On 2026-11-05, a read-only local diagnosis confirmed that Information was published and its saved menu entry was visible. The preview wrote resolved page links into the shared admin configuration cache; background app refreshes could replace that cache with UUID-based private navigation, which the storefront header does not render directly. The preview now provides a subtree-scoped configuration ref consumed by useSiteConfig. Background requests retain their normal cache without replacing the editor preview. No saved navigation or page records were modified.
+
+Twenty-eight focused tests passed, including a mounted regression proving that Information remains linked after shared-cache replacement and invalidation. The regression was also rerun after adding render-flush assertions. Authenticated full-browser confirmation remains pending.
+
+## Page picker viewport bounds
+
+On 2026-11-05, fixed the shared page chooser opening beyond the left edge when its trigger sits near the left of the custom-page toolbar. Replaced right-aligned absolute positioning with trigger-anchored fixed positioning clamped to viewport gutters. Available height is bounded below the trigger, with updates on scrolling, resizing and visual viewport changes. Search, keyboard selection, focus restoration and existing page links are retained.
+
+Five picker tests, Vue type checking and whitespace checks passed. A browser fixture using the actual picker and application CSS verified 743px, 393px and 1440px widths, left/right anchors, a short resized viewport, access to the final management link and Escape focus restoration. The phone capture was inspected; fixture icons were stubbed. Captures are `/tmp/ssu-picker-review/picker-{743,393,1440}.png`. No live data changed.
+
+The language selector and language settings panel now share the page picker's viewport positioning through `useEditorPopoverPosition`, fixing the same left-edge clipping when the section sidebar is closed. Browser checks of the actual picker components passed at 1917px, 743px and 393px: all three panels remain within viewport bounds, and Escape restores language-trigger focus. The phone capture was inspected. Five page-picker regression tests passed; no settings data changed.

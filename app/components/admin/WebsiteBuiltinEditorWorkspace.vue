@@ -923,6 +923,7 @@ onBeforeUnmount(() => {
   .website-editor-shell .workspace-tabs button,
   .editor-controls-scroll .workspace-back { min-height: 2rem; min-width: 2rem; border-radius: .375rem; }
   .website-editor-shell .workspace-tabs button { min-height: 2.5rem; border-radius: 0; }
+  .editor-preview-selectors :deep(.page-picker-trigger) { min-height: 2.375rem; }
   .editor-preview-tools :deep(.rounded-xl) { border-radius: .375rem; }
   .editor-preview-tools :deep([role="group"]), .editor-preview-tools :deep(.p-1) { padding: .125rem; }
   .editor-controls-scroll :deep(.section-menu-row),
@@ -933,6 +934,7 @@ onBeforeUnmount(() => {
 }
 @media (max-width: 767px), (pointer: coarse) {
   .editor-preview-tools :deep(button) { min-height: 2.75rem; }
+  .editor-preview-selectors :deep(.page-picker-trigger) { min-height: 3.375rem; }
   .editor-preview-actions { margin-left: auto; }
   .editor-controls-scroll :deep(.editor-input) { font-size: 1rem; }
 }

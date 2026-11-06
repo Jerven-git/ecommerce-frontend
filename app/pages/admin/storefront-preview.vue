@@ -60,6 +60,7 @@
 </template>
 
 <script setup lang="ts">
+import { SITE_CONFIG_PREVIEW } from '~/utils/siteConfigPreview'
 import AboutStorefrontPage from '~/pages/about.vue'
 import BlogStorefrontPage from '~/pages/blog/index.vue'
 import ContactStorefrontPage from '~/pages/contact.vue'
@@ -81,6 +82,7 @@ useSeoMeta({ robots: 'noindex,nofollow,noarchive' })
 const { siteConfig } = useSiteConfig()
 const activeSection = ref<string | null>(null)
 const previewConfig = ref<SiteConfig | null>(null)
+provide(SITE_CONFIG_PREVIEW, previewConfig)
 const previewPage = ref<WebsiteEditorPageId>('home')
 const receivedConfig = ref(false)
 
@@ -173,7 +175,6 @@ async function onMessage(event: MessageEvent) {
     if (event.data.page) await setPreviewPage(event.data.page)
     const merged = { ...(siteConfig.value ?? {}), ...event.data.config } as SiteConfig
     previewConfig.value = merged
-    siteConfig.value = merged
     receivedConfig.value = true
     await nextTick()
     postPreviewMessage('rendered')
