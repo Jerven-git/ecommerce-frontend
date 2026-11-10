@@ -82,7 +82,7 @@
                 v-for="s in suggestions"
                 :key="s"
                 @click="submit(s)"
-                class="block w-full text-left text-[13px] text-gray-700 bg-white border border-gray-200 rounded-lg px-3 py-2 hover:border-primary-300 hover:bg-primary-50 transition-colors"
+                class="admin-focus block w-full text-left text-[13px] text-admin-text bg-admin-surface border border-admin-border rounded-lg px-3 py-2 hover:border-admin-accent-strong hover:bg-admin-accent-soft transition-colors"
               >
                 {{ s }}
               </button>

@@ -161,7 +161,9 @@ export const useAuthStore = defineStore('auth', {
           this.adoptAuthenticatedUser(response.user)
           const { fetchSiteConfig, invalidateSiteConfig } = useSiteConfig()
           invalidateSiteConfig('admin')
-          await fetchSiteConfig(true, 'admin')
+          if (!this.isSuperAdmin || this.isImpersonating) {
+            await fetchSiteConfig(true, 'admin')
+          }
         }
 
         return response
@@ -191,11 +193,13 @@ export const useAuthStore = defineStore('auth', {
           this.twoFactorEmail = null
 
           // The site config cache is keyed in Nuxt useState, so it survives
-          // logout/login of different admins. Force-refresh so the new admin's
-          // theme replaces whoever was logged in before.
+          // logout/login of different admins. Clear the previous store even
+          // when returning to a Super Admin who has no store configuration.
           const { fetchSiteConfig, invalidateSiteConfig } = useSiteConfig()
           invalidateSiteConfig('admin')
-          await fetchSiteConfig(true, 'admin')
+          if (!this.isSuperAdmin || this.isImpersonating) {
+            await fetchSiteConfig(true, 'admin')
+          }
         }
 
         return response

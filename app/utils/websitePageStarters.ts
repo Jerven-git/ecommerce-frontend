@@ -22,7 +22,7 @@ export function websitePageStarterContent(definition: WebsitePageBlockDefinition
   }
   if (Object.hasOwn(content, 'heading')) content.heading = headings[type] ?? definition.label
   if (Object.hasOwn(content, 'body')) content.body = type === 'rich-text'
-    ? 'Use this space to tell your story. Share what matters to you, introduce an idea, or give visitors the details they need. Replace this starter text with your own words.'
+    ? 'Use this space to tell your story.\n\nShare what matters to you, introduce an idea, or give visitors the details they need.\n\nReplace this starter text with your own words.'
     : 'Add your own words here. Tell visitors what this section is about and what they can do next.'
   if (Object.hasOwn(content, 'subtitle')) content.subtitle = 'Introduce this section in your own words.'
   for (const action of definition.editor.actions ?? []) content[action.key] = { label: 'Button label', link: '#' }
@@ -45,5 +45,6 @@ export function websitePageExampleCollections(block: WebsitePageBlock): Record<s
   if (!block.type.endsWith('-list')) return {}
   const nouns: Record<string, string> = { 'product-list': 'Product', 'collection-list': 'Collection', 'service-list': 'Service', 'blog-post-list': 'Article' }
   const noun = nouns[block.type] ?? 'Item'
-  return { [block.id]: Array.from({ length: 3 }, (_, index) => ({ id: index + 1, title: `${noun} title`, summary: 'Your published content appears here.', url: '#', image_url: null })) }
+  const count = ['product-list', 'service-list'].includes(block.type) && block.variant === 'feature' ? 1 : 3
+  return { [block.id]: Array.from({ length: count }, (_, index) => ({ id: index + 1, title: `${noun} title`, summary: 'Your published content appears here.', url: '#', image_url: null })) }
 }

@@ -15,6 +15,7 @@ import type { WebsitePageCollectionItem, WebsitePageDocument, WebsitePageMedia }
 const props = defineProps<{
   iframeTitle?: string
   fitCanvas?: boolean
+  canvasWidth?: number
   selectedBlockId?: string | null
   title: string
   document: WebsitePageDocument
@@ -31,9 +32,12 @@ function selectFromPreview(event: MouseEvent) {
 const frame = ref<HTMLIFrameElement | null>(null)
 const container = ref<HTMLElement | null>(null)
 const canvasScale = ref(1)
+const canvasHeight = ref(760)
+const viewportWidth = computed(() => props.canvasWidth === 390 ? 390 : 1100)
+let contentObserver: ResizeObserver | null = null
 let sizeObserver: ResizeObserver | null = null
 const canvasStyle = computed(() => props.fitCanvas ? {
-  position: 'absolute' as const, width: '1100px', height: '760px',
+  position: 'absolute' as const, width: `${viewportWidth.value}px`, height: `${canvasHeight.value}px`,
   left: '50%', top: '50%', transform: `translate(-50%, -50%) scale(${canvasScale.value})`,
 } : {})
 const target = shallowRef<HTMLElement | null>(null)
@@ -60,10 +64,23 @@ function syncStyles() {
   preview.documentElement.style.cssText = window.document.documentElement.style.cssText
 }
 
+function updateCanvas() {
+  if (!props.fitCanvas || !container.value) return
+  const content = target.value
+  canvasHeight.value = Math.max(1, Math.ceil(content?.getBoundingClientRect().height ?? 760))
+  canvasScale.value = Math.max(.01, Math.min(container.value.clientWidth / viewportWidth.value, container.value.clientHeight / canvasHeight.value))
+}
+
 function prepareFrame() {
   stylesObserver?.disconnect()
   syncStyles()
   target.value = frame.value?.contentDocument?.getElementById('page-preview') ?? null
+  contentObserver?.disconnect()
+  if (props.fitCanvas && target.value) {
+    contentObserver = new ResizeObserver(updateCanvas)
+    contentObserver.observe(target.value)
+    updateCanvas()
+  }
   stylesObserver = new MutationObserver(syncStyles)
   stylesObserver.observe(window.document.head, { childList: true, subtree: true, characterData: true })
 }
@@ -78,10 +95,9 @@ watch(() => props.selectedBlockId, async id => {
 })
 onMounted(() => {
   if (!props.fitCanvas || !container.value) return
-  sizeObserver = new ResizeObserver(([entry]) => {
-    if (entry) canvasScale.value = Math.max(.05, Math.min(entry.contentRect.width / 1100, entry.contentRect.height / 760))
-  })
+  sizeObserver = new ResizeObserver(updateCanvas)
   sizeObserver.observe(container.value)
 })
-onBeforeUnmount(() => { stylesObserver?.disconnect(); sizeObserver?.disconnect() })
+watch(viewportWidth, async () => { await nextTick(); updateCanvas() })
+onBeforeUnmount(() => { stylesObserver?.disconnect(); sizeObserver?.disconnect(); contentObserver?.disconnect() })
 </script>

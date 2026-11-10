@@ -9,6 +9,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
   // Only gate public routes. Admin, auth, and API routes are never gated.
   if (
     to.path.startsWith('/admin')
+    || to.path === '/super-admin'
+    || to.path.startsWith('/super-admin/')
     || to.path === '/login'
     || to.path === '/forgot-password'
     || to.path.startsWith('/reset-password')

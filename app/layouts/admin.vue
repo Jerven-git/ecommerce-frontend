@@ -82,7 +82,7 @@
       <!-- Sidebar header -->
       <div class="h-16 px-4 flex items-center justify-between border-b border-admin-border shrink-0">
         <NuxtLink to="/admin" class="admin-focus flex items-center gap-2.5 rounded-lg" @click="closeSidebarOnMobile">
-          <img src="~/assets/css/svg/databasy.svg" alt="Databasy" class="h-8 w-auto shrink-0" />
+          <img :src="theme === 'dark' ? databasyDarkLogo : databasyLogo" alt="Databasy" class="h-8 w-auto shrink-0" />
           <div class="leading-tight">
             <p class="text-sm font-semibold text-admin-text">Admin Panel</p>
             <p class="text-xs text-admin-muted">Store Manager</p>
@@ -237,11 +237,14 @@
 </template>
 
 <script setup lang="ts">
+import databasyLogo from '~/assets/css/svg/databasy.svg'
+import databasyDarkLogo from '~/assets/css/svg/databasy-dark.svg'
+
 const authStore = useAuthStore()
 const route = useRoute()
 const { isEnabled } = useModules()
 const guideRef = ref<{ startGuide: () => void } | null>(null)
-const { themeClass } = useAdminAppearance({ syncBody: true })
+const { theme, themeClass } = useAdminAppearance({ syncBody: true })
 const { storeUrl } = useStorefrontUrl()
 
 /**

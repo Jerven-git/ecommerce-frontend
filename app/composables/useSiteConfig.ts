@@ -534,6 +534,9 @@ export function useSiteConfig(routeContext?: SiteConfigRouteContext) {
 
   async function fetchSiteConfig(force = false, targetContext: SiteConfigContext = context.value) {
     const requestContext = targetContext
+    // The platform workspace has no tenant presentation. Explicit admin
+    // requests remain available when entering an impersonated store here.
+    if (requestContext === 'public' && /^\/super-admin(?:\/|$)/.test(route.path)) return
     const bucket = buckets[requestContext]
     // Several mounted surfaces can request site config at the same time on a
     // hard refresh. Wait for the in-flight request instead of returning while

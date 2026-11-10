@@ -25,7 +25,14 @@
       </aside>
       <section v-if="selected && exampleDocument" class="library-detail" aria-label="Section design preview">
         <div class="library-description"><h3 class="text-lg font-semibold">{{ selected.label }}</h3><p class="mt-1 max-w-xl text-sm leading-6 text-admin-muted">{{ selected.description }}</p></div>
-        <div class="library-preview"><AdminWebsitePagePreview fit-canvas iframe-title="Section layout preview" title="Section preview" :document="exampleDocument" :media="{}" :collections="exampleCollections" class="h-full w-full rounded-lg" /></div>
+        <div class="library-preview-toolbar">
+          <span class="text-xs font-medium text-admin-muted">Layout preview</span>
+          <div class="library-viewports" role="group" aria-label="Preview viewport">
+            <button type="button" :aria-pressed="previewWidth === 1100" @click="previewWidth = 1100"><Icon name="heroicons:computer-desktop" class="h-4 w-4" aria-hidden="true" />Desktop</button>
+            <button type="button" :aria-pressed="previewWidth === 390" @click="previewWidth = 390"><Icon name="heroicons:device-phone-mobile" class="h-4 w-4" aria-hidden="true" />Mobile</button>
+          </div>
+        </div>
+        <div class="library-preview"><AdminWebsitePagePreview fit-canvas :canvas-width="previewWidth" iframe-title="Section layout preview" title="Section preview" :document="exampleDocument" :media="{}" :collections="exampleCollections" class="h-full w-full rounded-lg" /></div>
         <div class="library-layouts"><AdminWebsitePageLayoutPicker v-model="selectedVariant" :variants="selected.variants" :type="selected.type" /></div>
         <p class="px-5 pb-4 text-xs leading-5 text-admin-muted">Example layout with editable starter text. Add your own images and factual figures. Connected sections use your store’s published content after adding.</p>
       </section>
@@ -46,6 +53,7 @@ const { themeClass } = useAdminAppearance()
 const titleId = useId()
 const dialog = ref<HTMLDialogElement | null>(null)
 const searchInput = ref<HTMLInputElement | null>(null)
+const previewWidth = ref(1100)
 const query = ref('')
 const group = ref('all')
 const selectedType = ref<string>('hero')
@@ -87,8 +95,8 @@ onBeforeUnmount(() => { if (dialog.value?.open) { dialog.value.close(); restore(
 .section-library[open] { display: flex; flex-direction: column; }
 .section-library::backdrop { background: rgb(15 23 42 / .45); }
 .library-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border-bottom: 1px solid var(--admin-border); }
-.library-icon { display: flex; align-items: center; justify-content: center; width: 2.75rem; min-height: 2.75rem; border-radius: .5rem; color: var(--admin-muted); }
-.library-icon:hover { background: var(--admin-soft); }
+.library-icon { display: flex; align-items: center; justify-content: center; width: 2.75rem; min-height: 2.75rem; border-radius: .5rem; color: var(--admin-text-muted); }
+.library-icon:hover { background: var(--admin-surface-soft); }
 .library-body { display: grid; grid-template-columns: 17rem minmax(0, 1fr); min-height: 0; height: min(42rem, calc(100dvh - 14rem)); }
 .library-catalog { display: flex; flex-direction: column; min-height: 0; padding: 1rem .5rem 0; border-right: 1px solid var(--admin-border); }
 .library-search { display: flex; align-items: center; gap: .5rem; margin: 0 .5rem .75rem; padding: 0 .75rem; border: 1px solid var(--admin-border); border-radius: .5rem; }
@@ -98,11 +106,15 @@ onBeforeUnmount(() => { if (dialog.value?.open) { dialog.value.close(); restore(
 .library-group { min-height: 2.75rem; margin: 0 .5rem 1.25rem; padding: 0 .5rem; border: 1px solid var(--admin-border); border-radius: .5rem; background: var(--admin-surface); font-size: .8125rem; }
 .library-list { min-height: 0; flex: 1; overflow-y: auto; }
 .library-row { display: flex; align-items: center; gap: .75rem; width: 100%; min-height: 4.25rem; padding: .75rem; border-radius: .5rem; text-align: left; }
-.library-row:hover { background: var(--admin-soft); }
+.library-row:hover { background: var(--admin-surface-soft); }
 .library-row[aria-pressed="true"] { color: var(--admin-accent-strong); background: var(--admin-accent-soft); }
 .library-detail { display: flex; flex-direction: column; min-height: 0; overflow-y: auto; }
 .library-description { padding: 1.25rem; }
-.library-preview { height: 23rem; min-height: 15rem; flex-shrink: 0; padding: 1rem; margin: 0 1.25rem; background: var(--admin-soft); border-radius: .75rem; }
+.library-preview { height: 25rem; min-height: 15rem; flex-shrink: 0; padding: 1rem; margin: 0 1.25rem; background: var(--admin-surface-soft); border-radius: .75rem; }
+.library-preview-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; padding: 0 1.25rem .75rem; }
+.library-viewports { display: flex; gap: .25rem; padding: .25rem; border: 1px solid var(--admin-border); border-radius: .5rem; }
+.library-viewports button { display: inline-flex; align-items: center; gap: .375rem; min-height: 2rem; padding: .25rem .5rem; border-radius: .25rem; color: var(--admin-text-muted); font-size: .75rem; }
+.library-viewports button[aria-pressed="true"] { background: var(--admin-accent-soft); color: var(--admin-accent-strong); }
 .library-layouts { padding: 1rem 1.25rem; }
 .library-layouts :deep(.layout-options) { grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); }
 .library-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .75rem 1.25rem; border-top: 1px solid var(--admin-border); }
