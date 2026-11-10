@@ -1,3 +1,4 @@
+import type { BuiltinSectionDesignMap } from '~/utils/builtinSectionDesigns'
 import { getCurrentInstance, inject } from 'vue'
 import { SITE_CONFIG_PREVIEW } from '~/utils/siteConfigPreview'
 import type { LocationQuery } from 'vue-router'
@@ -321,6 +322,7 @@ export interface SiteConfig {
   canonical_host: string | null
   website_profile: WebsiteProfileId
   navigation: WebsiteNavigationItem[]
+  section_designs?: BuiltinSectionDesignMap
   theme_layout: ThemeLayoutReference
   published_release_id: string | null
   published_release_sequence: number | null

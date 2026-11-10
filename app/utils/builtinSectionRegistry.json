@@ -1,0 +1,177 @@
+{
+  "home": {
+    "hero": {
+      "type": "hero",
+      "variants": [
+        "default",
+        "centered",
+        "split",
+        "media-left",
+        "media-right"
+      ]
+    },
+    "featured-products": {
+      "type": "product-list",
+      "variants": [
+        "default",
+        "grid",
+        "list"
+      ]
+    },
+    "showcase": {
+      "type": "gallery",
+      "variants": [
+        "default"
+      ]
+    },
+    "watch-shop": {
+      "type": "gallery",
+      "variants": [
+        "default"
+      ]
+    },
+    "best-sellers": {
+      "type": "product-list",
+      "variants": [
+        "default",
+        "grid",
+        "list"
+      ]
+    },
+    "how-it-works": {
+      "type": "features",
+      "variants": [
+        "default",
+        "grid",
+        "cards",
+        "list"
+      ]
+    },
+    "features": {
+      "type": "features",
+      "variants": [
+        "default",
+        "grid",
+        "cards",
+        "list"
+      ]
+    },
+    "stats": {
+      "type": "stats",
+      "variants": [
+        "default",
+        "grid",
+        "band"
+      ]
+    },
+    "statement": {
+      "type": "image-text",
+      "variants": [
+        "default",
+        "image-left",
+        "image-right",
+        "stacked"
+      ]
+    },
+    "newsletter": {
+      "type": "contact-form",
+      "variants": [
+        "default",
+        "compact",
+        "split"
+      ]
+    }
+  },
+  "about": {
+    "about-content": {
+      "type": "image-text",
+      "variants": [
+        "default",
+        "image-left",
+        "image-right",
+        "stacked"
+      ]
+    }
+  },
+  "story": {
+    "story-content": {
+      "type": "image-text",
+      "variants": [
+        "default",
+        "image-left",
+        "image-right",
+        "stacked"
+      ]
+    }
+  },
+  "contact": {
+    "contact-content": {
+      "type": "contact-form",
+      "variants": [
+        "default",
+        "compact",
+        "split"
+      ]
+    }
+  },
+  "shop": {
+    "shop-content": {
+      "type": "product-list",
+      "variants": [
+        "default",
+        "grid",
+        "list"
+      ]
+    }
+  },
+  "blog": {
+    "blog-content": {
+      "type": "blog-post-list",
+      "variants": [
+        "default",
+        "grid",
+        "list",
+        "feature"
+      ]
+    }
+  },
+  "services": {
+    "services-content": {
+      "type": "service-list",
+      "variants": [
+        "default",
+        "grid",
+        "list",
+        "feature"
+      ]
+    }
+  },
+  "global": {
+    "header": {
+      "type": "rich-text",
+      "variants": [
+        "default"
+      ]
+    },
+    "footer-banner": {
+      "type": "cta",
+      "variants": [
+        "default"
+      ]
+    },
+    "footer": {
+      "type": "rich-text",
+      "variants": [
+        "default"
+      ]
+    }
+  },
+  "popup": {
+    "welcome-popup": {
+      "type": "rich-text",
+      "variants": [
+        "default"
+      ]
+    }
+  }
+}

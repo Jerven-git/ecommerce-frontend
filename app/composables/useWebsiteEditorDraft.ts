@@ -1,3 +1,4 @@
+import { normalizeBuiltinSectionDesigns, type BuiltinSectionDesignMap } from '~/utils/builtinSectionDesigns'
 import type {
   AboutHighlights,
   BlogPage,
@@ -25,6 +26,7 @@ import { normalizeHomepageSections } from '~/utils/homepageSections'
 export interface WebsiteEditorDraftPayload {
   website_profile: WebsiteProfileId
   navigation: WebsiteNavigationItem[]
+  section_designs?: BuiltinSectionDesignMap
   theme_layout: ThemeLayoutReference
   default_locale: string
   supported_locales: string[]
@@ -184,6 +186,7 @@ export function normalizeWebsiteEditorDraft(
   return clone({
     website_profile: payload.website_profile ?? config.website_profile ?? 'hybrid',
     navigation: payload.navigation ?? config.navigation ?? [],
+    section_designs: normalizeBuiltinSectionDesigns(payload.section_designs ?? (Object.keys(payload).length ? {} : config.section_designs)),
     theme_layout: payload.theme_layout ?? config.theme_layout ?? { id: 'classic', version: '1.0.0', settings: {}, saved_settings: {} },
     default_locale: payload.default_locale ?? config.default_locale ?? 'en',
     supported_locales: payload.supported_locales ?? config.supported_locales ?? [config.default_locale ?? 'en'],

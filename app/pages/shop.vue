@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div v-bind="sectionDesign('shop-content')" data-storefront-section="shop-content" class="min-h-screen flex flex-col">
 
     <!-- Toolbar: heading + result count + search / sort -->
     <div class="bg-white border-b border-gray-100">
@@ -158,7 +158,7 @@
         </div>
 
         <!-- Product Grid with stagger -->
-        <div v-else class="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-3 xl:grid-cols-4">
+        <div v-else data-builtin-layout-grid class="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-3 xl:grid-cols-4">
           <div
             v-for="product in products"
             :key="product.id"
@@ -180,6 +180,8 @@
 </template>
 
 <script setup lang="ts">
+import { useBuiltinSectionDesigns } from '~/composables/useBuiltinSectionDesigns'
+const sectionDesign = useBuiltinSectionDesigns('shop')
 import type { Product } from '~/types/product'
 
 interface Category {

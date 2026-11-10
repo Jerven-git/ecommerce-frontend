@@ -1,12 +1,12 @@
 <template>
   <section class="relative overflow-hidden bg-secondary-900 py-16 lg:py-24 text-white">
     <div
-      class="pointer-events-none absolute inset-0 opacity-[0.06]"
+      class="newsletter-decoration pointer-events-none absolute inset-0 opacity-[0.06]"
       style="background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0); background-size: 22px 22px;"
       aria-hidden="true"
     />
     <div ref="newsletterRef" class="reveal relative mx-auto max-w-5xl px-6 lg:px-8">
-      <div class="grid items-center gap-10 md:grid-cols-2">
+      <div data-builtin-layout-grid class="grid items-center gap-10 md:grid-cols-2">
         <div>
           <p v-if="label" class="mb-3 text-sm font-medium text-white/60">{{ label }}</p>
           <h2 v-if="heading" class="display-2 font-bold">{{ heading }}</h2>

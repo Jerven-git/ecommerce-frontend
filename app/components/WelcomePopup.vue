@@ -14,6 +14,7 @@
 
         <div
           ref="dialogPanelRef"
+          v-bind="sectionDesign('welcome-popup')"
           class="welcome-popup-panel relative max-h-[calc(100dvh-2rem)] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-[0_28px_80px_-24px_rgba(15,23,42,0.65)] sm:max-h-[calc(100dvh-3rem)]"
           tabindex="-1"
           :data-storefront-section="editorPreview ? 'welcome-popup' : undefined"
@@ -174,6 +175,8 @@
 </template>
 
 <script setup lang="ts">
+import { useBuiltinSectionDesigns } from '~/composables/useBuiltinSectionDesigns'
+const sectionDesign = useBuiltinSectionDesigns('popup')
 const { editorPreview = false } = defineProps<{ editorPreview?: boolean }>()
 const { siteConfig } = useSiteConfig()
 const { $apiFetch } = useNuxtApp()

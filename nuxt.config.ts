@@ -247,7 +247,7 @@ export default defineNuxtConfig({
     dirs: ['~/components'],
   },
 
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css', '~/assets/css/builtin-section-designs.css', '~/assets/css/storefront-home.css'],
 
   app: {
     head: {

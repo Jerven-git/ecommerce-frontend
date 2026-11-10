@@ -2,7 +2,7 @@
   <section v-if="visible" class="section-accent py-16 sm:py-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Heading (matches the visual rhythm of Featured Products / How It Works) -->
-      <div v-if="hasHeading" class="text-center mb-10 sm:mb-12">
+      <div v-if="hasHeading" class="home-section-heading text-center mb-10 sm:mb-12">
         <p
           v-if="showcase!.label"
           class="text-xs font-semibold uppercase tracking-widest mb-2"

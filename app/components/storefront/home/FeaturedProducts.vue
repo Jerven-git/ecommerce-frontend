@@ -1,7 +1,7 @@
 <template>
   <section id="featured" class="bg-white py-16 lg:py-32">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div ref="featuredHeadingRef" class="reveal flex items-end justify-between gap-6 border-b border-gray-200 pb-6">
+      <div ref="featuredHeadingRef" class="home-section-heading reveal flex items-end justify-between gap-6 border-b border-gray-200 pb-6">
         <div>
           <h2 class="display-2 font-bold text-gray-900">New Arrivals</h2>
           <p class="mt-3 max-w-md text-gray-600">Fresh additions to the shop, hand-picked and just in.</p>
@@ -31,7 +31,7 @@
         <NuxtLink to="/shop" class="btn-primary mt-6 inline-flex items-center gap-2">Browse the shop</NuxtLink>
       </div>
 
-      <div v-else class="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 lg:mt-12 lg:gap-x-6 lg:gap-y-10 lg:grid-cols-4">
+      <div data-builtin-layout-grid v-else class="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 lg:mt-12 lg:gap-x-6 lg:gap-y-10 lg:grid-cols-4">
         <div
           v-for="(product, index) in products"
           :key="product.id"

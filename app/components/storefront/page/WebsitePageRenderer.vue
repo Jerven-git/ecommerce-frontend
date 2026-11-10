@@ -362,8 +362,9 @@ function featureItemClass(block: WebsitePageBlock) {
   if (block.variant === 'list') return 'feature-row'
   return 'feature-open'
 }
-function galleryItems(block: WebsitePageBlock) {
-  return (block.content.items || []).filter((item: { media_id?: unknown }) => props.preview || galleryMedia(item.media_id))
+function galleryItems(block: WebsitePageBlock): { media_id?: unknown, alt?: string, caption?: string }[] {
+  const items = Array.isArray(block.content.items) ? block.content.items : []
+  return items.filter((item: { media_id?: unknown }) => props.preview || galleryMedia(item.media_id))
 }
 function galleryClass(block: WebsitePageBlock) {
   if (block.variant === 'carousel') return 'flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4'

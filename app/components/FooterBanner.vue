@@ -1,5 +1,5 @@
 <template>
-  <section
+  <section v-bind="sectionDesign('footer-banner')"
     v-if="banner?.enabled && banner.heading"
     :style="{
       background: banner.background_color_to
@@ -24,6 +24,8 @@
 </template>
 
 <script setup lang="ts">
+import { useBuiltinSectionDesigns } from '~/composables/useBuiltinSectionDesigns'
+const sectionDesign = useBuiltinSectionDesigns('global')
 const { siteConfig } = useSiteConfig()
 const banner = computed(() => siteConfig.value?.footer_banner ?? null)
 </script>

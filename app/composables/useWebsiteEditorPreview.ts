@@ -19,6 +19,8 @@ export function useWebsiteEditorPreview(options: WebsiteEditorPreviewOptions) {
   const previewVersion = ref(0)
   const previewUrl = computed(() => `/admin/storefront-preview?version=${previewVersion.value}`)
   let previewTimeout: number | null = null
+  let loadTimeout: number | null = null
+  let disposed = false
 
   function clearPreviewTimeout() {
     if (previewTimeout !== null) window.clearTimeout(previewTimeout)
@@ -26,7 +28,7 @@ export function useWebsiteEditorPreview(options: WebsiteEditorPreviewOptions) {
   }
 
   function send(message: Record<string, unknown>) {
-    if (!import.meta.client || !previewFrame.value?.contentWindow) return
+    if (disposed || !import.meta.client || !previewFrame.value?.contentWindow) return
     // Reactive values cannot cross the iframe boundary. Keep this contract JSON-only.
     const payload = JSON.parse(JSON.stringify({ source: 'ssu-website-editor', ...message })) as Record<string, unknown>
     previewFrame.value.contentWindow.postMessage(payload, window.location.origin)
@@ -46,6 +48,7 @@ export function useWebsiteEditorPreview(options: WebsiteEditorPreviewOptions) {
   }
 
   function startTimeout() {
+    if (disposed) return
     clearPreviewTimeout()
     previewTimeout = window.setTimeout(() => {
       if (!previewLoading.value) return
@@ -55,11 +58,15 @@ export function useWebsiteEditorPreview(options: WebsiteEditorPreviewOptions) {
   }
 
   function prepare() {
+    if (disposed) return
     previewLoading.value = true
     previewError.value = false
   }
 
   function refresh() {
+    if (disposed) return
+    if (loadTimeout !== null) window.clearTimeout(loadTimeout)
+    loadTimeout = null
     previewReady.value = false
     prepare()
     previewVersion.value += 1
@@ -67,8 +74,16 @@ export function useWebsiteEditorPreview(options: WebsiteEditorPreviewOptions) {
   }
 
   function onLoad() {
+    if (disposed) return
+    if (loadTimeout !== null) window.clearTimeout(loadTimeout)
+    const loadedFrame = previewFrame.value
+    previewReady.value = false
+    prepare()
+    startTimeout()
     send({ type: 'preview-ping' })
-    window.setTimeout(() => {
+    loadTimeout = window.setTimeout(() => {
+      loadTimeout = null
+      if (disposed || previewFrame.value !== loadedFrame) return
       sendConfig(true)
       selectPage(options.activePage.value)
       selectSection(options.selectedSection.value)
@@ -96,12 +111,15 @@ export function useWebsiteEditorPreview(options: WebsiteEditorPreviewOptions) {
       previewError.value = false
       previewLoading.value = false
       selectPage(options.activePage.value)
-      nextTick(options.onRendered)
+      nextTick(() => { if (!disposed) options.onRendered() })
     }
   }
 
   onMounted(() => window.addEventListener('message', onMessage))
   onBeforeUnmount(() => {
+    disposed = true
+    if (loadTimeout !== null) window.clearTimeout(loadTimeout)
+    loadTimeout = null
     clearPreviewTimeout()
     window.removeEventListener('message', onMessage)
   })

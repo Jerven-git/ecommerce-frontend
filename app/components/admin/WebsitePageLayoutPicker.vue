@@ -17,7 +17,7 @@
 <script setup lang="ts">
 withDefaults(defineProps<{ modelValue: string | null, variants: string[], type: string, compact?: boolean }>(), { compact: false })
 defineEmits<{ 'update:modelValue': [value: string] }>()
-const label = (value: string) => ({ prose: 'Standard', 'media-left': 'Media left', 'media-right': 'Media right', 'image-left': 'Image left', 'image-right': 'Image right' }[value] ?? value.replace(/^./, character => character.toUpperCase()))
+const label = (value: string) => ({ default: 'Theme default', prose: 'Standard', 'media-left': 'Media left', 'media-right': 'Media right', 'image-left': 'Image left', 'image-right': 'Image right' }[value] ?? value.replace(/^./, character => character.toUpperCase()))
 </script>
 
 <style scoped>

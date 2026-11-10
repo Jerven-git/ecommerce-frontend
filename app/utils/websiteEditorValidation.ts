@@ -1,3 +1,4 @@
+import { builtinSectionDefinition } from './builtinSectionDesigns'
 import type { WebsiteEditorPageId } from '~/utils/websiteEditorPages'
 
 export interface WebsiteEditorValidationTarget {
@@ -10,6 +11,8 @@ export function websiteEditorValidationTarget(
   firstHomepageSection = 'hero',
 ): WebsiteEditorValidationTarget | null {
   const field = Object.keys(errors)[0] ?? ''
+  const [, group, page, section] = field.split('.')
+  if (group === 'section_designs' && page && section && builtinSectionDefinition(page, section)) return { page: page as WebsiteEditorPageId, section }
   if (field.startsWith('payload.social_links')) return { page: 'global', section: 'social-media' }
   if (
     field.startsWith('payload.logo_')

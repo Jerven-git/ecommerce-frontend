@@ -5,7 +5,7 @@
   >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Heading row + scroll arrows -->
-      <div class="flex items-end justify-between gap-4 mb-6 md:mb-8">
+      <div class="home-section-heading flex items-end justify-between gap-4 mb-6 md:mb-8">
         <div>
           <p
             v-if="bestSellers?.label"
@@ -48,6 +48,7 @@
 
       <!-- Cards -->
       <div
+        data-builtin-layout-grid
         ref="trackRef"
         @scroll.passive="updateScrollState"
         class="flex gap-5 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 best-sellers-track"

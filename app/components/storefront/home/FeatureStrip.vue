@@ -1,7 +1,7 @@
 <template>
   <section v-if="features.length" class="border-t border-gray-100 bg-white py-12 lg:py-16">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="grid gap-y-10 md:grid-cols-3 md:gap-y-0">
+      <div data-builtin-layout-grid class="grid gap-y-10 md:grid-cols-3 md:gap-y-0">
         <div
           v-for="(feature, index) in features"
           :key="index"

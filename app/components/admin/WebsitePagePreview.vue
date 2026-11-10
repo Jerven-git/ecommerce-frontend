@@ -1,7 +1,10 @@
 <template>
   <div ref="container" class="relative overflow-hidden bg-white">
-    <iframe ref="frame" :title="iframeTitle || 'Private page preview'" tabindex="-1" class="block h-full w-full border-0 bg-white" :style="canvasStyle" sandbox="allow-same-origin" :srcdoc="frameDocument" @load="prepareFrame" />
-    <Teleport v-if="target" :to="target">
+    <div v-if="previewError" class="flex h-full min-h-48 items-center justify-center p-6 text-center" role="alert">
+      <div><p class="text-sm font-semibold text-gray-900">Preview could not be displayed.</p><p class="mt-1 text-xs text-gray-600">Your draft is unchanged. Reload the preview to try again.</p><button type="button" class="mt-4 min-h-11 rounded-lg border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600" @click="reloadPreview">Reload preview</button></div>
+    </div>
+    <iframe v-else :key="previewVersion" ref="frame" :title="iframeTitle || 'Private page preview'" tabindex="-1" class="block h-full w-full border-0 bg-white" :style="canvasStyle" sandbox="allow-same-origin" :srcdoc="frameDocument" @load="prepareFrame" />
+    <Teleport v-if="target && !previewError" :to="target">
       <div aria-label="Page layout preview" @click.capture.prevent="selectFromPreview" @submit.capture.prevent @keydown.enter.capture.prevent @keydown.space.capture.prevent>
         <StorefrontPageWebsitePageRenderer :title="title" :document="document" :media="media" :collections="collections" preview />
       </div>
@@ -22,6 +25,12 @@ const props = defineProps<{
   media: Record<number, WebsitePageMedia>
   collections: Record<string, WebsitePageCollectionItem[]>
 }>()
+
+const previewError = ref(false)
+const previewVersion = ref(0)
+let disposed = false
+let styleFrame: number | null = null
+let preparedDocument: Document | null = null
 
 const emit = defineEmits<{ 'select-block': [id: string] }>()
 function selectFromPreview(event: MouseEvent) {
@@ -48,7 +57,7 @@ let stylesObserver: MutationObserver | null = null
 // Only application styles are copied; no user HTML or executable scripts enter srcdoc.
 function syncStyles() {
   const preview = frame.value?.contentDocument
-  if (!preview) return
+  if (disposed || !preview) return
   preview.head.querySelectorAll('[data-preview-style]').forEach(node => node.remove())
   window.document.head.querySelectorAll('style, link[rel="stylesheet"]').forEach(node => {
     const copy = node.cloneNode(true) as HTMLElement
@@ -65,14 +74,40 @@ function syncStyles() {
 }
 
 function updateCanvas() {
-  if (!props.fitCanvas || !container.value) return
+  if (disposed || !props.fitCanvas || !container.value || !target.value) return
   const content = target.value
   canvasHeight.value = Math.max(1, Math.ceil(content?.getBoundingClientRect().height ?? 760))
   canvasScale.value = Math.max(.01, Math.min(container.value.clientWidth / viewportWidth.value, container.value.clientHeight / canvasHeight.value))
 }
 
-function prepareFrame() {
+function disconnectPreview() {
   stylesObserver?.disconnect()
+  contentObserver?.disconnect()
+  if (styleFrame !== null) window.cancelAnimationFrame(styleFrame)
+  styleFrame = null
+  preparedDocument = null
+}
+function scheduleStyles() {
+  if (disposed || styleFrame !== null) return
+  styleFrame = window.requestAnimationFrame(() => { styleFrame = null; syncStyles() })
+}
+function reloadPreview() {
+  disconnectPreview()
+  target.value = null
+  previewError.value = false
+  previewVersion.value += 1
+}
+onErrorCaptured(() => {
+  previewError.value = true
+  disconnectPreview()
+  target.value = null
+  return false
+})
+function prepareFrame() {
+  const document = frame.value?.contentDocument
+  if (disposed || previewError.value || !document || document === preparedDocument) return
+  disconnectPreview()
+  preparedDocument = document
   syncStyles()
   target.value = frame.value?.contentDocument?.getElementById('page-preview') ?? null
   contentObserver?.disconnect()
@@ -81,7 +116,7 @@ function prepareFrame() {
     contentObserver.observe(target.value)
     updateCanvas()
   }
-  stylesObserver = new MutationObserver(syncStyles)
+  stylesObserver = new MutationObserver(scheduleStyles)
   stylesObserver.observe(window.document.head, { childList: true, subtree: true, characterData: true })
 }
 
@@ -90,7 +125,7 @@ watch(() => props.selectedBlockId, async id => {
   const sections = frame.value?.contentDocument?.querySelectorAll<HTMLElement>('[data-page-block]')
   sections?.forEach(section => {
     section.dataset.editorSelected = String(section.dataset.pageBlock === id)
-    if (section.dataset.pageBlock === id) section.scrollIntoView({ block: 'nearest', behavior: 'instant' })
+    if (section.dataset.pageBlock === id && !disposed) section.scrollIntoView({ block: 'nearest', behavior: 'instant' })
   })
 })
 onMounted(() => {
@@ -99,5 +134,5 @@ onMounted(() => {
   sizeObserver.observe(container.value)
 })
 watch(viewportWidth, async () => { await nextTick(); updateCanvas() })
-onBeforeUnmount(() => { stylesObserver?.disconnect(); sizeObserver?.disconnect(); contentObserver?.disconnect() })
+onBeforeUnmount(() => { disposed = true; disconnectPreview(); sizeObserver?.disconnect() })
 </script>

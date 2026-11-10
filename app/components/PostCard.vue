@@ -1,5 +1,5 @@
 <template>
-  <NuxtLink :to="`/blog/${post.slug}`" class="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-900/[0.08] bg-white shadow-sm transition-shadow duration-300 hover:shadow-md">
+  <NuxtLink :to="`/blog/${post.slug}`" class="builtin-post-card group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-900/[0.08] bg-white shadow-sm transition-shadow duration-300 hover:shadow-md">
     <!-- Cover image -->
     <div class="relative aspect-[16/10] overflow-hidden bg-gray-100">
       <SmoothImage

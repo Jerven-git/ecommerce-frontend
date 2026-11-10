@@ -1,3 +1,5 @@
+import builtinRegistry from './builtinSectionRegistry.json'
+import { normalizeBuiltinSectionDesigns } from './builtinSectionDesigns'
 import type { WebsiteEditorDraftPayload } from '~/composables/useWebsiteEditorDraft'
 import type { WebsiteEditorPageId } from '~/utils/websiteEditorPages'
 
@@ -45,7 +47,18 @@ const sameValue = (left: unknown, right: unknown) => JSON.stringify(left) === JS
 const text = (value: unknown) => typeof value === 'string' && value.trim().length > 0
 
 export function websiteEditorChangedAreas(published: WebsiteEditorDraftPayload, draft: WebsiteEditorDraftPayload) {
-  return areas.filter(area => area.fields.some(field => !sameValue(published[field], draft[field])))
+  const before = normalizeBuiltinSectionDesigns(published.section_designs)
+  const after = normalizeBuiltinSectionDesigns(draft.section_designs)
+  const designs: WebsiteEditorChangedArea[] = []
+  for (const [page, sections] of Object.entries(builtinRegistry)) {
+    for (const section of Object.keys(sections)) {
+      if (sameValue(before[page]?.[section], after[page]?.[section])) continue
+      const label = areas.find(area => area.page === page && area.section === section)?.label
+        ?? section.split('-').map(word => word[0]?.toUpperCase() + word.slice(1)).join(' ')
+      designs.push({ id: `design-${page}-${section}`, label: `${label} design`, page: page as WebsiteEditorPageId, section, fields: ['section_designs'] })
+    }
+  }
+  return [...areas.filter(area => area.fields.some(field => !sameValue(published[field], draft[field]))), ...designs]
 }
 
 export function websiteEditorReadinessWarnings(draft: WebsiteEditorDraftPayload): WebsiteEditorReadinessWarning[] {

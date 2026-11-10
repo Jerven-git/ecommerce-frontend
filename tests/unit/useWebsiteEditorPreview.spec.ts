@@ -109,4 +109,44 @@ describe('useWebsiteEditorPreview', () => {
 
     wrapper.unmount()
   })
+  it('cancels deferred load and refresh work when leaving the editor', async () => {
+    vi.useFakeTimers()
+    const postMessage = vi.fn()
+    let preview!: ReturnType<typeof useWebsiteEditorPreview>
+    const wrapper = mount(defineComponent({
+      setup() {
+        preview = useWebsiteEditorPreview({ config: ref({ site_name: 'Store' } as SiteConfig), activePage: ref('home'), selectedSection: ref('hero'), onRendered: vi.fn() })
+        return () => h('div')
+      },
+    }))
+    preview.previewFrame.value = markRaw({ contentWindow: { postMessage } }) as unknown as HTMLIFrameElement
+    preview.onLoad()
+    preview.refresh()
+    postMessage.mockClear()
+    wrapper.unmount()
+    await nextTick()
+    vi.runAllTimers()
+    expect(postMessage).not.toHaveBeenCalled()
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
+  it('ignores a queued rendered callback after navigation', async () => {
+    const rendered = vi.fn()
+    const contentWindow = markRaw({ postMessage: vi.fn() }) as unknown as Window
+    let preview!: ReturnType<typeof useWebsiteEditorPreview>
+    const wrapper = mount(defineComponent({
+      setup() {
+        preview = useWebsiteEditorPreview({ config: ref(null), activePage: ref('home'), selectedSection: ref('hero'), onRendered: rendered })
+        return () => h('div')
+      },
+    }))
+    preview.previewFrame.value = markRaw({ contentWindow }) as HTMLIFrameElement
+    const event = new Event('message')
+    Object.defineProperties(event, { origin: { value: window.location.origin }, source: { value: contentWindow }, data: { value: { source: 'ssu-storefront-preview', type: 'rendered' } } })
+    window.dispatchEvent(event)
+    wrapper.unmount()
+    await nextTick()
+    expect(rendered).not.toHaveBeenCalled()
+  })
+
 })

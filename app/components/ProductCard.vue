@@ -1,5 +1,5 @@
 <template>
-  <NuxtLink :to="`/product/${product.slug}`" class="group block">
+  <NuxtLink :to="`/product/${product.slug}`" class="builtin-product-card group block">
     <!-- Image -->
     <div class="relative aspect-[4/5] overflow-hidden rounded-xl bg-gray-100">
       <SmoothImage

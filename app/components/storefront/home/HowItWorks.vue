@@ -1,13 +1,13 @@
 <template>
   <section v-if="visible" class="section-accent py-16 lg:py-24">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div ref="headingRef" class="reveal max-w-2xl">
+      <div ref="headingRef" class="home-section-heading reveal max-w-2xl">
         <p v-if="label" class="mb-3 text-sm font-medium" :style="{ color: 'var(--color-primary-700)' }">{{ label }}</p>
         <h2 v-if="heading" class="display-2 font-bold text-gray-900">{{ heading }}</h2>
         <p v-if="subtitle" class="mt-4 text-lg text-gray-600">{{ subtitle }}</p>
       </div>
 
-      <ol v-if="steps.length" class="mt-10 grid gap-x-10 gap-y-10 md:mt-16 md:gap-y-12 md:grid-cols-3">
+      <ol data-builtin-layout-grid v-if="steps.length" class="mt-10 grid gap-x-10 gap-y-10 md:mt-16 md:gap-y-12 md:grid-cols-3">
         <li
           v-for="(step, index) in steps"
           :key="index"

@@ -1,7 +1,7 @@
 <template>
   <section v-if="showStatement" class="border-t border-gray-100 bg-white py-16 lg:py-28">
     <div class="mx-auto max-w-6xl px-6 lg:px-8">
-      <div class="grid items-center gap-10 lg:gap-16" :class="statement?.image_url ? 'md:grid-cols-2' : 'md:grid-cols-1'">
+      <div data-builtin-layout-grid class="grid items-center gap-10 lg:gap-16" :class="statement?.image_url ? 'md:grid-cols-2' : 'md:grid-cols-1'">
         <div v-if="statement?.image_url" :ref="addRevealRef" class="reveal">
           <img :src="statement.image_url" :alt="statement.attribution || statement.eyebrow || 'Statement'" class="aspect-[4/5] w-full rounded-2xl object-cover" />
         </div>

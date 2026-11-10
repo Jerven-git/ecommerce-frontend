@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-bind="sectionDesign('story-content')" data-storefront-section="story-content">
     <!-- Hero Section -->
     <section class="relative text-white py-28 overflow-hidden" :style="heroStyle" :aria-label="coverAltText || undefined">
       <!-- Slide progress bar while background image is loading -->
@@ -34,7 +34,7 @@
     <section v-if="hasSectionA" class="py-16 sm:py-24 bg-white border-t border-gray-100">
       <!-- With an image: two-column editorial layout, image left or right per admin -->
       <div v-if="sectionAImage" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <div data-builtin-layout-grid class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div :ref="addRevealRef" class="reveal" :class="sectionAImageRight ? 'md:order-2' : 'md:order-1'">
             <img :src="sectionAImage" :alt="story.section_a.heading || 'Our story'" class="w-full aspect-[4/5] object-cover rounded-2xl" />
           </div>
@@ -66,7 +66,7 @@
     <section v-if="hasSectionB" class="py-16 sm:py-24 section-accent border-t border-gray-100">
       <!-- With an image: two-column editorial layout, image left or right per admin -->
       <div v-if="sectionBImage" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <div data-builtin-layout-grid class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div :ref="addRevealRef" class="reveal" :class="sectionBImageRight ? 'md:order-2' : 'md:order-1'">
             <img :src="sectionBImage" :alt="story.section_b.heading || 'Our story'" class="w-full aspect-[4/5] object-cover rounded-2xl" />
           </div>
@@ -97,6 +97,8 @@
 </template>
 
 <script setup lang="ts">
+import { useBuiltinSectionDesigns } from '~/composables/useBuiltinSectionDesigns'
+const sectionDesign = useBuiltinSectionDesigns('story')
 import type { StoryPage } from '~/composables/useSiteConfig'
 
 const { siteConfig, fetchSiteConfig } = useSiteConfig()

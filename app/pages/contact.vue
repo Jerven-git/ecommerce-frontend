@@ -1,5 +1,5 @@
 <template>
-  <div class="storefront-page">
+  <div v-bind="sectionDesign('contact-content')" data-storefront-section="contact-content" class="storefront-page">
     <section class="relative overflow-hidden border-b border-secondary-200/70 text-white" :style="heroFallbackStyle">
       <img
         v-if="contactImageUrl"
@@ -34,7 +34,7 @@
     <section v-if="canReceiveEnquiries || hasDirectContactContent" class="section-accent py-14 sm:py-20">
       <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div
-          class="grid items-start gap-12 lg:gap-16"
+          data-builtin-layout-grid class="grid items-start gap-12 lg:gap-16"
           :class="canReceiveEnquiries && hasDirectContactContent ? 'lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)]' : 'mx-auto max-w-3xl'"
         >
           <div v-if="canReceiveEnquiries" class="min-w-0">
@@ -270,6 +270,8 @@
 </template>
 
 <script setup lang="ts">
+import { useBuiltinSectionDesigns } from '~/composables/useBuiltinSectionDesigns'
+const sectionDesign = useBuiltinSectionDesigns('contact')
 import MotionAccordion from '~/components/storefront/MotionAccordion.vue'
 
 interface ContactEntry {

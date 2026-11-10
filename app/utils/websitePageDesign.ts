@@ -14,7 +14,10 @@ const color = (value: unknown) => typeof value === 'string' && /^#[0-9a-f]{6}$/i
 const pixels = (value: unknown, max: number) => typeof value === 'number' && Number.isFinite(value) ? `${Math.round(Math.min(max, Math.max(0, value)))}px` : undefined
 
 export function websitePageSectionStyle(block: WebsitePageBlock): Record<string, string> {
-  const design: WebsitePageSectionDesign = block.settings.design ?? {}
+  return websiteSectionDesignStyle(block.settings.design ?? {})
+}
+
+export function websiteSectionDesignStyle(design: WebsitePageSectionDesign = {}): Record<string, string> {
   const widths = { narrow: '42rem', standard: '64rem', wide: '80rem', full: 'none' }
   const alignment = ['left', 'center', 'right'].includes(design.alignment ?? '') ? design.alignment! : undefined
   return Object.fromEntries(Object.entries({

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-bind="sectionDesign('about-content')" data-storefront-section="about-content">
     <!-- ─────────────────────────  HERO  ───────────────────────── -->
     <section
       class="relative isolate flex min-h-[56vh] overflow-hidden text-white"
@@ -48,7 +48,7 @@
     <!-- ────────────────────────  OUR STORY  ──────────────────────── -->
     <section class="bg-white py-24 lg:py-28">
       <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div class="grid items-center gap-10 lg:gap-16" :class="storyImage ? 'md:grid-cols-2' : 'md:grid-cols-1'">
+        <div data-builtin-layout-grid class="grid items-center gap-10 lg:gap-16" :class="storyImage ? 'md:grid-cols-2' : 'md:grid-cols-1'">
           <!-- Image -->
           <div v-if="storyImage" ref="storyImageRef" class="reveal">
             <img :src="storyImage" :alt="coverAltText || `Inside ${siteName}`" class="aspect-[4/5] w-full rounded-2xl object-cover" />
@@ -134,6 +134,8 @@
 </template>
 
 <script setup lang="ts">
+import { useBuiltinSectionDesigns } from '~/composables/useBuiltinSectionDesigns'
+const sectionDesign = useBuiltinSectionDesigns('about')
 import type { AboutHighlightItem } from '~/composables/useSiteConfig'
 import { DEFAULT_ICON } from '~/composables/useHighlightIcons'
 

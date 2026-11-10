@@ -1,7 +1,7 @@
 <template>
   <div data-website-editor-shell class="editor-workspace website-editor-shell flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-admin-canvas text-admin-text">
-    <header class="workspace-toolbar z-40">
-      <div class="flex min-w-0 items-center gap-2 sm:gap-3">
+    <header class="workspace-toolbar editor-topbar z-40">
+      <div class="editor-header-identity flex min-w-0 items-center gap-2">
         <NuxtLink
           to="/admin"
           class="editor-focus flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl text-admin-muted hover:bg-admin-soft hover:text-admin-text"
@@ -11,7 +11,7 @@
           <Icon name="heroicons:arrow-left" class="h-5 w-5" aria-hidden="true" />
         </NuxtLink>
         <span class="hidden h-7 w-px bg-admin-border sm:block" aria-hidden="true" />
-        <span class="hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-admin-accent-soft text-admin-accent-strong md:flex">
+        <span class="editor-brand-mark hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-admin-accent-soft text-admin-accent-strong md:flex">
           <Icon name="heroicons:paint-brush" class="h-4 w-4" aria-hidden="true" />
         </span>
         <div class="min-w-0 sm:max-w-none">
@@ -23,27 +23,8 @@
         </div>
       </div>
 
-      <div class="workspace-actions">
-        <AdminWebsiteEditorDocumentActions
-          :can-save="!loadingDraft && !selectedVersionId && isDirty"
-          :can-publish="!loadingDraft && !selectedVersionId && !isDirty && (hasSavedDraft || selectedPageDrafts.length > 0)"
-          :saving="saving" :publishing="publishing || workflowLoading || discarding"
-          :publish-hint="isDirty ? 'Save draft before reviewing publication' : undefined"
-          @save="saveChanges" @publish="openPublishReview"
-        />
-        <a
-          :href="activeStoreUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="editor-focus hidden min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl border border-admin-border bg-admin-surface text-admin-text hover:bg-admin-soft sm:inline-flex"
-          aria-label="Open live store"
-          title="Open live store"
-        >
-          <Icon name="heroicons:arrow-top-right-on-square" class="h-4 w-4" aria-hidden="true" />
-        </a>
-      </div>
-    </header>
-    <div class="workspace-utilitybar" aria-label="Website editing tools">
+      <div class="editor-header-controls" aria-label="Website editing tools">
+        <div class="editor-header-tools flex items-center gap-1">
         <button
           ref="controlsTrigger"
           type="button"
@@ -54,7 +35,7 @@
           :title="controlsToggleLabel"
           @click="toggleControls"
         >
-          <Icon name="heroicons:adjustments-horizontal" class="h-4 w-4" aria-hidden="true" /><span class="ml-2 text-xs font-semibold">Sections</span>
+          <Icon name="heroicons:adjustments-horizontal" class="h-4 w-4" aria-hidden="true" /><span class="editor-tool-label ml-2 text-xs font-semibold">Sections</span>
         </button>
 
         <button
@@ -76,10 +57,10 @@
           :title="isDirty ? 'Save or discard changes before opening Theme Library' : 'Open Theme Library'"
           @click="themeLibraryOpen = true"
         >
-          <Icon name="heroicons:squares-2x2" class="h-4 w-4" aria-hidden="true" /><span class="ml-2 text-xs font-semibold">Themes</span>
+          <Icon name="heroicons:squares-2x2" class="h-4 w-4" aria-hidden="true" /><span class="editor-tool-label ml-2 text-xs font-semibold">Themes</span>
         </button>
 
-        <div class="hidden items-center gap-1 md:flex" role="group" aria-label="Editing history">
+        <div class="flex items-center gap-1" role="group" aria-label="Editing history">
           <button
             type="button"
             class="editor-focus flex min-h-11 min-w-11 items-center justify-center rounded-lg bg-admin-surface text-admin-muted hover:bg-admin-soft hover:text-admin-text disabled:cursor-not-allowed disabled:opacity-30"
@@ -112,8 +93,70 @@
         >
           <Icon name="heroicons:arrow-path" class="h-4 w-4" :class="discarding ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
         </button>
-      <NuxtLink to="/admin/website-pages" class="workspace-button ml-auto" aria-label="Manage pages"><Icon name="heroicons:document-text" class="h-4 w-4" aria-hidden="true" /><span class="hidden sm:inline">Manage pages</span></NuxtLink>
-    </div>
+        </div>
+          <div v-if="draft" class="editor-header-selectors flex min-w-0 flex-wrap items-center gap-2">
+            <AdminWebsiteEditorLocalePicker
+              v-if="draft"
+              v-model="activeLocale"
+              :draft="draft"
+              @update:supported-locales="updateSupportedLocales"
+            />
+            <AdminWebsiteEditorPagePicker
+              :model-value="activePage"
+              :options="pagePickerOptions"
+              :custom-pages="navigationPages"
+              :custom-pages-loading="navigationLoading"
+              :custom-pages-error="navigationError"
+              @retry="loadPageDrafts().catch(() => {})"
+              @update:model-value="switchPage"
+            />
+          </div>
+          <div v-if="draft" class="editor-header-preview flex items-center gap-2">
+            <div class="flex items-center rounded-xl border border-admin-border bg-admin-soft p-1" role="group" aria-label="Preview size">
+              <button
+                v-for="device in devices"
+                :key="device.id"
+                type="button"
+                class="editor-focus flex min-h-11 min-w-11 items-center justify-center rounded-lg px-2 text-admin-muted transition-colors"
+                :class="activeDevice === device.id ? 'bg-admin-surface text-admin-accent-strong shadow-[var(--admin-shadow-quiet)]' : 'hover:text-admin-text'"
+                :aria-label="`${device.label} preview`"
+                :aria-pressed="activeDevice === device.id"
+                :title="`${device.label} preview`"
+                @click="activeDevice = device.id"
+              >
+                <Icon :name="device.icon" class="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+
+            <button type="button" class="editor-focus inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft" aria-label="Refresh preview" title="Refresh preview" @click="refreshPreview">
+              <Icon name="heroicons:arrow-path" class="h-4 w-4" :class="previewLoading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
+
+            </button>
+          </div>
+        <NuxtLink to="/admin/website-pages" class="workspace-button editor-header-manage" aria-label="Manage pages"><Icon name="heroicons:document-text" class="h-4 w-4" aria-hidden="true" /><span class="editor-tool-label">Manage pages</span></NuxtLink>
+      </div>
+
+      <div class="workspace-actions editor-header-actions">
+        <AdminWebsiteEditorDocumentActions
+          :can-save="!loadingDraft && !selectedVersionId && isDirty"
+          :can-publish="!loadingDraft && !selectedVersionId && !isDirty && (hasSavedDraft || selectedPageDrafts.length > 0)"
+          :saving="saving" :publishing="publishing || workflowLoading || discarding"
+          :publish-hint="isDirty ? 'Save draft before reviewing publication' : undefined"
+          @save="saveChanges" @publish="openPublishReview"
+        />
+        <a
+          :href="activeStoreUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="editor-focus hidden min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl border border-admin-border bg-admin-surface text-admin-text hover:bg-admin-soft sm:inline-flex"
+          aria-label="Open live store"
+          title="Open live store"
+        >
+          <Icon name="heroicons:arrow-top-right-on-square" class="h-4 w-4" aria-hidden="true" />
+        </a>
+      </div>
+    </header>
+
 
     <div v-if="actionError" class="z-30 flex shrink-0 items-center gap-3 border-b border-admin-danger/20 bg-admin-danger-soft px-4 py-2 text-admin-danger" role="alert">
       <Icon name="heroicons:exclamation-triangle" class="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
@@ -248,14 +291,20 @@
           <p>This is a published version. Return to your draft to edit this section.</p>
           <button type="button" class="workspace-back mt-3" @click="exitVersionPreview">Return to draft</button>
         </div>
+        <template v-if="!selectedVersionId && localeIsDefault">
+          <nav v-if="builtinDesignDefinition" class="workspace-tabs" aria-label="Section settings">
+            <button type="button" :aria-pressed="builtinInspectorTab === 'content'" @click="builtinInspectorTab = 'content'">Content</button>
+            <button type="button" :aria-pressed="builtinInspectorTab === 'design'" @click="builtinInspectorTab = 'design'">Design</button>
+          </nav>
+          <AdminWebsiteBuiltinSectionDesignInspector v-if="builtinDesignDefinition && builtinInspectorTab === 'design'" v-model="draft" :page="activePage" :section="selectedSection" :errors="validationErrors" />
         <AdminWebsiteEditorInspector
-          v-if="!selectedVersionId && localeIsDefault && activePage === 'home'"
+          v-else-if="activePage === 'home'"
           v-model="draft"
           :section="selectedSection"
           :errors="validationErrors"
         />
         <AdminWebsiteEditorPageInspector
-          v-else-if="!selectedVersionId && localeIsDefault"
+          v-else
           v-model="draft"
           :section="selectedSection"
           :errors="validationErrors"
@@ -265,6 +314,7 @@
           :navigation-error="navigationError"
           @retry-navigation="loadPageDrafts().catch(() => {})"
         />
+        </template>
         <AdminWebsiteEditorTranslationInspector
           v-else-if="!selectedVersionId && draft"
           v-model="draft"
@@ -278,47 +328,7 @@
       </aside>
 
       <section class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-admin-surface" aria-label="Storefront preview workspace">
-        <div class="editor-preview-tools flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-admin-border px-3 py-2">
-          <div class="editor-preview-selectors flex min-w-0 flex-wrap items-center gap-2">
-            <AdminWebsiteEditorLocalePicker
-              v-if="draft"
-              v-model="activeLocale"
-              :draft="draft"
-              @update:supported-locales="updateSupportedLocales"
-            />
-            <AdminWebsiteEditorPagePicker
-              :model-value="activePage"
-              :options="pagePickerOptions"
-              :custom-pages="navigationPages"
-              :custom-pages-loading="navigationLoading"
-              :custom-pages-error="navigationError"
-              @retry="loadPageDrafts().catch(() => {})"
-              @update:model-value="switchPage"
-            />
-          </div>
-          <div class="editor-preview-actions flex items-center gap-2">
-            <div class="flex items-center rounded-xl border border-admin-border bg-admin-soft p-1" role="group" aria-label="Preview size">
-              <button
-                v-for="device in devices"
-                :key="device.id"
-                type="button"
-                class="editor-focus flex min-h-11 min-w-11 items-center justify-center rounded-lg px-2 text-admin-muted transition-colors"
-                :class="activeDevice === device.id ? 'bg-admin-surface text-admin-accent-strong shadow-[var(--admin-shadow-quiet)]' : 'hover:text-admin-text'"
-                :aria-label="`${device.label} preview`"
-                :aria-pressed="activeDevice === device.id"
-                :title="`${device.label} preview`"
-                @click="activeDevice = device.id"
-              >
-                <Icon :name="device.icon" class="h-4 w-4" aria-hidden="true" />
-              </button>
-            </div>
 
-            <button type="button" class="editor-focus inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-admin-border bg-admin-surface px-3 text-xs font-semibold text-admin-text hover:bg-admin-soft" aria-label="Refresh preview" title="Refresh preview" @click="refreshPreview">
-              <Icon name="heroicons:arrow-path" class="h-4 w-4" :class="previewLoading ? 'animate-spin motion-reduce:animate-none' : ''" aria-hidden="true" />
-
-            </button>
-          </div>
-        </div>
 
         <div class="preview-canvas relative flex min-h-0 flex-1 justify-center overflow-auto bg-admin-soft p-2 sm:p-3">
           <div class="relative shrink-0 overflow-hidden rounded-lg bg-white shadow-[var(--admin-shadow-quiet)]" :style="previewFrameStyle">
@@ -455,6 +465,7 @@
 </template>
 
 <script setup lang="ts">
+import { builtinSectionDefinition } from '~/utils/builtinSectionDesigns'
 import { resolvePreviewNavigation } from '~/utils/websiteEditorPreviewNavigation'
 import type { ThemeLayoutReference } from '~/composables/useSiteConfig'
 import type { WebsiteEditorDraftPayload } from '~/composables/useWebsiteEditorDraft'
@@ -739,6 +750,9 @@ const {
   selectPreviewSection,
 })
 
+const builtinInspectorTab = ref<'content' | 'design'>('content')
+const builtinDesignDefinition = computed(() => builtinSectionDefinition(activePage.value, selectedSection.value))
+watch([activePage, selectedSection, activeLocale], () => { builtinInspectorTab.value = 'content' })
 watch(selectedSection, () => { inspectorOpen.value = true; sidebarTool.value = 'sections' })
 watch(activePage, () => { inspectorOpen.value = false; sidebarTool.value = 'sections'; selectPreviewPage(activePage.value) })
 
@@ -756,6 +770,7 @@ function focusFirstInvalidSection(errors: Record<string, string[]>) {
   const target = websiteEditorValidationTarget(errors, draft.value?.homepage_sections[0]?.id)
   if (!target) return
   switchPage(target.page, target.section)
+  if (Object.keys(errors)[0]?.startsWith('payload.section_designs.')) nextTick(() => { builtinInspectorTab.value = 'design' })
   void revealInspector()
   if (controlsDocked.value) controlsCollapsed.value = false
   else controlsOpen.value = true
@@ -877,20 +892,6 @@ onBeforeUnmount(() => {
 .website-editor-shell :deep(h6) {
   font-family: ui-sans-serif, system-ui, sans-serif;
 }
-.workspace-utilitybar {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: .25rem;
-  padding: .375rem 1rem;
-  border-bottom: 1px solid var(--admin-border);
-  background: var(--admin-surface);
-}
-@media (max-width: 639px) {
-  .workspace-utilitybar { padding: .375rem .5rem; }
-  .workspace-toolbar .workspace-actions { gap: .375rem; }
-  .workspace-toolbar .workspace-button { padding: 0 .625rem; }
-}
 .editor-focus:focus-visible {
   outline: 2px solid var(--admin-accent);
   outline-offset: 2px;
@@ -907,7 +908,6 @@ onBeforeUnmount(() => {
 
 /* Desktop editor density: the canvas leads; chrome uses a consistent 32px rhythm. */
 .website-editor-shell .workspace-toolbar { min-height: 3.25rem; padding: .375rem .75rem; }
-.website-editor-shell .workspace-utilitybar { padding: .25rem .75rem; }
 .website-editor-shell .workspace-tabs { padding: 0 .75rem; gap: 1rem; }
 .website-editor-shell .workspace-tabs button { flex: 0 1 auto; border-radius: 0; border-bottom: 2px solid transparent; padding: 0 .25rem; }
 .website-editor-shell .workspace-tabs button[aria-pressed="true"] { background: transparent; color: var(--admin-text); border-bottom-color: var(--admin-accent); }
@@ -917,15 +917,10 @@ onBeforeUnmount(() => {
 .editor-controls-scroll :deep(::selection) { background: var(--admin-accent-soft); color: var(--admin-accent-strong); }
 @media (min-width: 768px) and (pointer: fine) {
   .website-editor-shell .workspace-toolbar :is(button, a),
-  .workspace-utilitybar :is(button, a),
-  .editor-preview-tools :deep(button),
   .editor-panel-heading button,
   .website-editor-shell .workspace-tabs button,
   .editor-controls-scroll .workspace-back { min-height: 2rem; min-width: 2rem; border-radius: .375rem; }
   .website-editor-shell .workspace-tabs button { min-height: 2.5rem; border-radius: 0; }
-  .editor-preview-selectors :deep(.page-picker-trigger) { min-height: 2.375rem; }
-  .editor-preview-tools :deep(.rounded-xl) { border-radius: .375rem; }
-  .editor-preview-tools :deep([role="group"]), .editor-preview-tools :deep(.p-1) { padding: .125rem; }
   .editor-controls-scroll :deep(.section-menu-row),
   .editor-controls-scroll :deep(.section-menu-select),
   .editor-controls-scroll :deep(.section-menu-action) { min-height: 2.125rem; }
@@ -933,9 +928,6 @@ onBeforeUnmount(() => {
   .editor-controls-scroll :deep(.editor-color) { min-height: 2.125rem; border-radius: .375rem; }
 }
 @media (max-width: 767px), (pointer: coarse) {
-  .editor-preview-tools :deep(button) { min-height: 2.75rem; }
-  .editor-preview-selectors :deep(.page-picker-trigger) { min-height: 3.375rem; }
-  .editor-preview-actions { margin-left: auto; }
   .editor-controls-scroll :deep(.editor-input) { font-size: 1rem; }
 }
 </style>

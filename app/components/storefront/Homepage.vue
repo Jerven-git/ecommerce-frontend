@@ -1,8 +1,9 @@
 <template>
-  <div>
+  <div class="storefront-home" :data-home-theme="effectiveConfig?.theme_layout?.id ?? 'classic'">
     <template v-for="section in sections" :key="section.id">
       <div
         v-if="section.visible || editorPreview"
+        v-bind="sectionDesign(section.id)"
         :data-storefront-section="section.id"
         :data-editor-label="HOMEPAGE_SECTION_LABELS[section.id]"
         :data-editor-hidden="section.visible ? undefined : 'true'"
@@ -46,6 +47,7 @@
 </template>
 
 <script setup lang="ts">
+import { useBuiltinSectionDesigns } from '~/composables/useBuiltinSectionDesigns'
 import type { HomepageSectionId, SiteConfig } from '~/composables/useSiteConfig'
 import type { Product } from '~/types/product'
 import { HOMEPAGE_SECTION_LABELS, normalizeHomepageSections } from '~/utils/homepageSections'
@@ -65,6 +67,7 @@ interface ProductsResponse {
 const { $apiFetch } = useNuxtApp()
 const { siteConfig } = useSiteConfig()
 const effectiveConfig = computed(() => props.siteConfigOverride ?? siteConfig.value)
+const sectionDesign = useBuiltinSectionDesigns('home', effectiveConfig, props.editorPreview)
 const sections = computed(() => normalizeHomepageSections(effectiveConfig.value?.homepage_sections))
 const products = ref<Product[]>([])
 const loading = ref(true)

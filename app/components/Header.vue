@@ -1,5 +1,5 @@
 <template>
-  <header
+  <header v-bind="sectionDesign('header')"
     :class="[
       isFullBleedPage ? 'fixed w-full' : 'sticky',
       'top-0 z-50 transition-[background-color,box-shadow,border-color] duration-300',
@@ -410,6 +410,9 @@
 </template>
 
 <script setup lang="ts">
+import { useBuiltinSectionDesigns } from '~/composables/useBuiltinSectionDesigns'
+const sectionDesign = useBuiltinSectionDesigns('global')
+import { normalizeBuiltinSectionDesigns } from '~/utils/builtinSectionDesigns'
 import { storefrontNavigationLinks } from '~/utils/websiteNavigation'
 const route = useRoute()
 const { $apiFetch } = useNuxtApp()
@@ -564,6 +567,7 @@ const BANNER_PATHS = new Set(['/', '/about', '/contact', '/blog', '/services'])
 const isBannerPage = computed(() => BANNER_PATHS.has(route.path))
 const isFullBleedPage = computed(() =>
   !isApexMarketing.value && isBannerPage.value && (siteConfig.value?.hero_full_bleed ?? false)
+    && !(route.path === '/' && ['split', 'media-left', 'media-right'].includes(normalizeBuiltinSectionDesigns(siteConfig.value?.section_designs).home?.hero?.layout ?? 'default'))
 )
 const scrollY = ref(0)
 const isTransparent = computed(() =>

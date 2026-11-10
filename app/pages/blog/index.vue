@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-gray-50">
+  <div v-bind="sectionDesign('blog-content')" data-storefront-section="blog-content" class="min-h-screen flex flex-col bg-gray-50">
 
     <!-- Hero -->
     <section class="relative isolate flex min-h-[52vh] overflow-hidden">
@@ -148,7 +148,7 @@
         </div>
 
         <!-- Grid -->
-        <div v-else :key="`grid-${animationKey}`" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div v-else data-builtin-layout-grid :key="`grid-${animationKey}`" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <template v-for="(post, idx) in posts" :key="post.id">
             <div
               :ref="el => observeCard(el as Element | null)"
@@ -222,6 +222,8 @@
 </template>
 
 <script setup lang="ts">
+import { useBuiltinSectionDesigns } from '~/composables/useBuiltinSectionDesigns'
+const sectionDesign = useBuiltinSectionDesigns('blog')
 import type { Post } from '~/types/post'
 
 const { siteConfig } = useSiteConfig()

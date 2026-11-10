@@ -1,7 +1,7 @@
 <template>
   <section v-if="stats.length" class="section-accent py-14 lg:py-20">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="grid grid-cols-2 gap-y-10 md:grid-cols-4">
+      <div :style="{ '--builtin-stat-count': Math.max(1, Math.min(stats.length, 4)) }" data-builtin-layout-grid class="grid grid-cols-2 gap-y-10 md:grid-cols-4">
         <div
           v-for="(stat, index) in stats"
           :key="stat.label"

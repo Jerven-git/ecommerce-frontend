@@ -33,7 +33,7 @@
       </div>
     </div>
   </footer>
-  <footer v-else class="bg-white border-t border-gray-900/10">
+  <footer v-else v-bind="sectionDesign('footer')" class="bg-white border-t border-gray-900/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
       <div class="grid grid-cols-2 gap-x-6 gap-y-10" :class="gridColsClass">
         <div class="col-span-2 md:col-span-1">
@@ -103,6 +103,8 @@
 </template>
 
 <script setup lang="ts">
+import { useBuiltinSectionDesigns } from '~/composables/useBuiltinSectionDesigns'
+const sectionDesign = useBuiltinSectionDesigns('global')
 const { siteConfig } = useSiteConfig()
 const isApexMarketing = computed(() => siteConfig.value?.is_storefront_host === false)
 const authStore = useAuthStore()

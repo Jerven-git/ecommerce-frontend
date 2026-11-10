@@ -1,7 +1,7 @@
 <template>
   <div data-page-editor-shell class="page-editor-shell editor-workspace">
-    <header class="workspace-toolbar">
-      <div class="workspace-identity">
+    <header class="workspace-toolbar editor-topbar">
+      <div class="workspace-identity editor-header-identity">
         <NuxtLink to="/admin/website-pages" class="workspace-icon-button" aria-label="Back to website pages" title="Back to website pages"><Icon name="heroicons:arrow-left" class="h-5 w-5" aria-hidden="true" /></NuxtLink>
         <span class="workspace-divider" aria-hidden="true" />
         <div class="min-w-0">
@@ -9,15 +9,25 @@
           <p class="truncate text-xs text-admin-muted">{{ page?.title || 'Custom page' }} · Private draft</p>
         </div>
       </div>
-      <div class="workspace-actions">
-        <span class="hidden text-xs text-admin-muted lg:inline" role="status">{{ loading ? 'Loading…' : error ? 'Unavailable' : saving ? 'Saving…' : dirty ? 'Unsaved changes' : page?.has_unpublished_changes ? 'Draft saved · Not published' : 'No unsaved changes' }}</span>
+      <div class="editor-header-controls">
+        <div class="editor-header-selectors"><AdminWebsiteEditorPagePicker model-value="home" :options="pageOptions" :selected-custom-page="page || { uuid: props.uuid, title: 'Custom page' }" :custom-pages="directory.pages.value" :custom-pages-loading="directory.loading.value" :custom-pages-error="directory.error.value" @update:model-value="openBuiltinPage" @retry="directory.load().catch(() => {})" /></div>
+        <div v-if="page" class="editor-header-preview flex items-center gap-2">              <label class="sr-only" for="page-editor-locale">Editing language</label>
+              <select id="page-editor-locale" v-model="activeLocale" class="workspace-locale"><option value="default">Default content</option><option v-for="locale in supportedLocales" :key="locale" :value="locale">{{ locale }}</option></select>
+              <div class="workspace-devices" role="group" aria-label="Preview size">
+                <button v-for="device in previewDevices" :key="device.id" type="button" :aria-label="device.label + ' preview'" :title="device.label + ' preview'" :aria-pressed="previewDevice === device.id" @click="previewDevice = device.id"><Icon :name="device.icon" class="h-4 w-4" aria-hidden="true" /></button>
+              </div></div>
+        <NuxtLink to="/admin/website-pages" aria-label="Manage pages" class="workspace-button editor-header-manage"><Icon name="heroicons:document-text" class="h-4 w-4" aria-hidden="true" /><span class="hidden sm:inline">Manage pages</span></NuxtLink>
+        <div class="workspace-mobile-switch editor-header-view" role="group" aria-label="Editor view">
+        <button type="button" :aria-pressed="mobileView === 'tools'" @click="mobileView = 'tools'"><Icon name="heroicons:adjustments-horizontal" class="h-4 w-4" aria-hidden="true" />Edit page</button>
+        <button type="button" :aria-pressed="mobileView === 'preview'" @click="mobileView = 'preview'"><Icon name="heroicons:eye" class="h-4 w-4" aria-hidden="true" />Preview</button>
+      </div>
+      </div>
+      <div class="workspace-actions editor-header-actions">
+        <span class="editor-header-status text-xs text-admin-muted" role="status">{{ loading ? 'Loading…' : error ? 'Unavailable' : saving ? 'Saving…' : dirty ? 'Unsaved changes' : page?.has_unpublished_changes ? 'Draft saved · Not published' : 'No unsaved changes' }}</span>
         <AdminWebsiteEditorDocumentActions :can-save="dirty && !conflict && !uploadingMediaKey && !loading" :can-publish="Boolean(page) && !dirty && !conflict && !loading && !error && !uploadingMediaKey" :saving="saving" :publishing="publicationBusy" :publish-hint="dirty ? 'Save draft before reviewing publication' : undefined" @save="save" @publish="publication?.open()" />
       </div>
     </header>
-    <div class="flex shrink-0 items-center justify-between gap-3 border-b border-admin-border bg-admin-surface px-3 py-2">
-      <AdminWebsiteEditorPagePicker model-value="home" :options="pageOptions" :selected-custom-page="page || { uuid: props.uuid, title: 'Custom page' }" :custom-pages="directory.pages.value" :custom-pages-loading="directory.loading.value" :custom-pages-error="directory.error.value" @update:model-value="openBuiltinPage" @retry="directory.load().catch(() => {})" />
-      <NuxtLink to="/admin/website-pages" class="workspace-button"><Icon name="heroicons:document-text" class="h-4 w-4" aria-hidden="true" /><span class="hidden sm:inline">Manage pages</span></NuxtLink>
-    </div>
+
     <AdminWebsiteEditorPagePublication v-if="page" ref="publication" :page-uuid="page.uuid" :page-version="page.draft_version" :disabled="dirty || saving || Boolean(uploadingMediaKey) || conflict" @busy="publicationBusy = $event" @published="refreshPublishedPage" @reload-page="reloadLatestPage" />
     <div v-if="loading" class="flex-1 bg-admin-surface"><AdminSpinner label="Loading page editor…" variant="form" /></div>
     <div v-else-if="error" class="rounded-2xl border border-admin-danger/20 bg-admin-danger-soft p-8 text-center"><p class="text-sm text-admin-danger" role="alert">{{ error }}</p><button type="button" class="admin-focus mt-4 min-h-11 rounded-xl bg-admin-surface px-4 text-sm font-semibold text-admin-text" @click="load">Reload page</button></div>
@@ -35,10 +45,7 @@
         <button type="button" class="workspace-button" @click="copyChanges">Copy my changes</button>
         <button type="button" class="workspace-button" @click="reloadLatestPage">Reload latest</button>
       </div>
-      <div class="workspace-mobile-switch" role="group" aria-label="Editor view">
-        <button type="button" :aria-pressed="mobileView === 'tools'" @click="mobileView = 'tools'"><Icon name="heroicons:adjustments-horizontal" class="h-4 w-4" aria-hidden="true" />Edit page</button>
-        <button type="button" :aria-pressed="mobileView === 'preview'" @click="mobileView = 'preview'"><Icon name="heroicons:eye" class="h-4 w-4" aria-hidden="true" />Preview</button>
-      </div>
+
       <div class="workspace-body" :data-mobile-view="mobileView">
         <aside class="workspace-panel" aria-label="Page controls">
           <nav class="workspace-tabs" aria-label="Page tools">
@@ -276,23 +283,14 @@
         </aside>
 
         <section class="workspace-preview" aria-label="Page preview">
-          <div class="workspace-preview-toolbar">
-            <div class="flex min-w-0 items-center gap-2 text-xs text-admin-muted"><Icon name="heroicons:lock-closed" class="h-3.5 w-3.5 shrink-0" aria-hidden="true" /><span class="truncate">{{ page.path }}</span></div>
-            <div class="flex items-center gap-2">
-              <label class="sr-only" for="page-editor-locale">Editing language</label>
-              <select id="page-editor-locale" v-model="activeLocale" class="workspace-locale"><option value="default">Default content</option><option v-for="locale in supportedLocales" :key="locale" :value="locale">{{ locale }}</option></select>
-              <div class="workspace-devices" role="group" aria-label="Preview size">
-                <button v-for="device in previewDevices" :key="device.id" type="button" :aria-label="device.label + ' preview'" :title="device.label + ' preview'" :aria-pressed="previewDevice === device.id" @click="previewDevice = device.id"><Icon :name="device.icon" class="h-4 w-4" aria-hidden="true" /></button>
-              </div>
-            </div>
-          </div>
+
           <div class="workspace-canvas">
             <AdminWebsitePagePreview :title="page.title" :document="previewDocument" :media="previewMedia" :collections="previewCollections" :selected-block-id="selectedBlockId" @select-block="openBlock" :style="{ width: previewDevice === 'mobile' ? '390px' : previewDevice === 'tablet' ? '768px' : '100%' }" class="workspace-preview-frame" />
           </div>
           <footer class="workspace-preview-footer">
             <span v-if="previewCollectionsLoading" role="status">Refreshing connected content…</span>
             <span v-else-if="previewCollectionsError" class="text-admin-danger" role="alert">{{ previewCollectionsError }}</span>
-            <span v-else>Preview · Links and forms disabled</span>
+            <span v-else class="min-w-0 truncate" :title="page.path">Preview · {{ page.path }} · Links and forms disabled</span>
             <span class="hidden sm:inline">Private draft</span>
           </footer>
         </section>

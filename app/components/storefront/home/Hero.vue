@@ -1,7 +1,37 @@
 <template>
-  <section
+  <section v-if="sideLayout" class="hero builtin-hero-side" :class="`builtin-hero-side--${heroLayout}`">
+    <div class="builtin-hero-side__inner" :class="{ 'builtin-hero-side__inner--media': siteConfig?.hero_image_url }">
+      <div class="builtin-hero-side__copy">
+        <h1 v-if="heroTitle" class="hero-title hero-stagger display-1 font-bold text-white text-balance drop-shadow-sm" style="animation-delay: 0.15s">
+          {{ heroTitle }}
+        </h1>
+        <p v-if="heroSubtitle" class="hero-description hero-stagger mt-4 max-w-xl text-base leading-relaxed text-white/85 md:mt-6 md:text-xl" style="animation-delay: 0.35s">
+          {{ heroSubtitle }}
+        </p>
+        <div class="hero-actions hero-stagger mt-8 flex flex-wrap items-center gap-3 md:mt-10 md:gap-4" style="animation-delay: 0.55s">
+          <NuxtLink :to="primaryAction.to" class="hero-cta-primary">
+            {{ primaryAction.label }}
+            <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
+          </NuxtLink>
+          <NuxtLink v-if="secondaryAction" :to="secondaryAction.to" class="hero-cta-ghost">
+            {{ secondaryAction.label }}
+            <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
+          </NuxtLink>
+          <button v-else type="button" class="hero-cta-ghost" @click="scrollToFeatured">
+            Discover more
+            <Icon name="heroicons:arrow-down" class="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+      <div v-if="siteConfig?.hero_image_url" class="builtin-hero-side__media">
+        <video v-if="isHeroVideo" ref="heroVideoRef" :src="siteConfig.hero_image_url" :aria-label="heroAltText || undefined" :style="{ objectPosition: heroFocalPosition }" autoplay loop muted playsinline preload="metadata" @canplay="videoReady = true" />
+        <img v-else :src="siteConfig.hero_image_url" :alt="heroAltText" :style="{ objectPosition: heroFocalPosition }" fetchpriority="high" decoding="async" />
+      </div>
+    </div>
+  </section>
+  <section v-else
     class="hero relative isolate flex overflow-hidden"
-    :class="isFullBleed ? 'min-h-[92svh] lg:min-h-screen' : 'min-h-[92svh] lg:min-h-[calc(100vh-4rem)]'"
+    :class="[isFullBleed ? 'hero-full-bleed min-h-[92svh] lg:min-h-screen' : 'min-h-[92svh] lg:min-h-[calc(100vh-4rem)]']"
     :style="heroStyle"
     :aria-label="heroAltText || undefined"
   >
@@ -46,15 +76,15 @@
     <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" aria-hidden="true" />
     <div class="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-transparent" aria-hidden="true" />
 
-    <div class="relative z-10 mx-auto flex w-full max-w-7xl flex-col justify-end px-6 pb-16 pt-28 lg:px-8 lg:pb-28">
-      <div class="max-w-2xl">
-        <h1 v-if="heroTitle" class="hero-stagger display-1 font-bold text-white text-balance drop-shadow-sm" style="animation-delay: 0.15s">
+    <div class="hero-content relative z-10 mx-auto flex w-full max-w-7xl flex-col justify-end px-6 pb-16 pt-28 lg:px-8 lg:pb-28">
+      <div class="hero-copy max-w-2xl">
+        <h1 v-if="heroTitle" class="hero-title hero-stagger display-1 font-bold text-white text-balance drop-shadow-sm" style="animation-delay: 0.15s">
           {{ heroTitle }}
         </h1>
-        <p v-if="heroSubtitle" class="hero-stagger mt-4 max-w-xl text-base leading-relaxed text-white/85 md:mt-6 md:text-xl" style="animation-delay: 0.35s">
+        <p v-if="heroSubtitle" class="hero-description hero-stagger mt-4 max-w-xl text-base leading-relaxed text-white/85 md:mt-6 md:text-xl" style="animation-delay: 0.35s">
           {{ heroSubtitle }}
         </p>
-        <div class="hero-stagger mt-8 flex flex-wrap items-center gap-3 md:mt-10 md:gap-4" style="animation-delay: 0.55s">
+        <div class="hero-actions hero-stagger mt-8 flex flex-wrap items-center gap-3 md:mt-10 md:gap-4" style="animation-delay: 0.55s">
           <NuxtLink :to="primaryAction.to" class="hero-cta-primary">
             {{ primaryAction.label }}
             <Icon name="heroicons:arrow-right" class="h-4 w-4" aria-hidden="true" />
@@ -83,11 +113,15 @@
 </template>
 
 <script setup lang="ts">
+import { normalizeBuiltinSectionDesigns } from '~/utils/builtinSectionDesigns'
 import type { SiteConfig } from '~/composables/useSiteConfig'
 
 const props = defineProps<{
   siteConfig: SiteConfig | null
 }>()
+
+const heroLayout = computed(() => normalizeBuiltinSectionDesigns(props.siteConfig?.section_designs).home?.hero?.layout ?? 'default')
+const sideLayout = computed(() => ['split', 'media-left', 'media-right'].includes(heroLayout.value))
 
 const imageLoading = ref(false)
 const imageLoaded = ref(false)
@@ -180,6 +214,20 @@ watch(() => props.siteConfig?.hero_image_url, (url) => {
 </script>
 
 <style scoped>
+.builtin-hero-side { background: var(--builtin-background, var(--color-secondary-950)); color: var(--section-text, #fff); padding: clamp(1.5rem,4vw,4rem); min-height: 0; }
+.builtin-hero-side__inner { display: grid; align-items: center; gap: clamp(2rem,5vw,5rem); width: 100%; max-width: var(--section-width,80rem); margin-inline: auto; }
+.builtin-hero-side__copy { min-width: 0; padding-block: 2rem; }
+.builtin-hero-side__media { min-width: 0; overflow: hidden; border-radius: 1rem; background: color-mix(in srgb,currentColor 6%,transparent); }
+.builtin-hero-side__media :is(img,video) { display: block; width: 100%; height: auto; max-height: 36rem; aspect-ratio: 4/3; object-fit: contain; }
+.builtin-hero-side--split { padding: 0; }
+.builtin-hero-side--split .builtin-hero-side__inner { gap: 0; max-width: none; align-items: stretch; }
+.builtin-hero-side--split .builtin-hero-side__copy { align-self: center; padding: clamp(2rem,5vw,5rem); }
+.builtin-hero-side--split .builtin-hero-side__media { border-radius: 0; display: flex; align-items: center; }
+@media (min-width:768px) {
+  .builtin-hero-side__inner--media { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .builtin-hero-side--media-left .builtin-hero-side__media { order: -1; }
+}
+
 .hero-gradient {
   background:
     radial-gradient(115% 85% at 78% 12%, color-mix(in srgb, var(--color-primary) 50%, transparent), transparent 58%),

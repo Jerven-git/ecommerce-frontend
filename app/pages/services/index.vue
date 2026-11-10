@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-gray-50">
+  <div v-bind="sectionDesign('services-content')" data-storefront-section="services-content" class="min-h-screen flex flex-col bg-gray-50">
 
     <!-- Hero -->
     <section class="relative isolate flex min-h-[54svh] sm:min-h-[60vh] overflow-hidden">
@@ -96,12 +96,12 @@
         </h2>
         <div class="mt-4 mb-8 sm:mb-12 h-[3px] w-12 rounded-full" :style="{ background: 'var(--color-primary-600)' }" aria-hidden="true" />
 
-        <div class="space-y-12 sm:space-y-20">
+        <div data-builtin-layout-grid class="space-y-12 sm:space-y-20">
           <NuxtLink
             v-for="(service, ii) in group.items"
             :key="service.id"
             :to="`/services/${service.slug}`"
-            class="group grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center"
+            data-builtin-service-card class="group grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center"
             :class="ii % 2 === 1 ? 'md:[&>*:first-child]:order-2' : ''"
           >
             <div
@@ -193,6 +193,8 @@
 </template>
 
 <script setup lang="ts">
+import { useBuiltinSectionDesigns } from '~/composables/useBuiltinSectionDesigns'
+const sectionDesign = useBuiltinSectionDesigns('services')
 import type { Service, ServiceCategory } from '~/types/service'
 
 const { siteConfig, fetchSiteConfig } = useSiteConfig()
