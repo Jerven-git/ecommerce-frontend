@@ -17,28 +17,7 @@
     </div>
 
     <div v-if="section === 'hero'" class="space-y-4">
-      <div class="space-y-2.5">
-        <div>
-          <p class="text-xs font-semibold text-admin-text">Hero media</p>
-          <p class="mt-1 text-xs leading-5 text-admin-muted">Upload an image or short background video, then use the focus controls below to frame it.</p>
-        </div>
-        <AdminMediaUploader
-          :url="modelValue.hero_image_url || ''"
-          :uploading="assetUploading.hero"
-          :video="modelValue.hero_media_mime?.startsWith('video/')"
-          label="Hero media"
-          hint="JPG, PNG, WebP, MP4 or WebM · max 10 MB"
-          input-id="editorHeroMediaInput"
-          accept="image/*,video/mp4,video/webm"
-          overlay
-          compact
-          library
-          preview-class="h-40 w-full object-cover"
-          @select="uploadAsset($event, 'hero')"
-          @remove="removeAsset('hero')"
-          @browse="librarySlot = 'hero'"
-        />
-      </div>
+      <AdminWebsiteHeroMediaEditor :model-value="modelValue" @update:model-value="emit('update:modelValue', $event)" />
       <AdminEditorField label="Heading" :error="errorFor('hero_title')">
         <input :value="modelValue.hero_title" maxlength="255" class="editor-input" @input="setRoot('hero_title', inputValue($event))" />
       </AdminEditorField>
@@ -72,6 +51,15 @@
       <AdminEditorField label="Label"><input :value="modelValue.homepage_steps.label" maxlength="100" class="editor-input" @input="setNested('homepage_steps', 'label', inputValue($event))" /></AdminEditorField>
       <AdminEditorField label="Heading"><input :value="modelValue.homepage_steps.heading" maxlength="100" class="editor-input" @input="setNested('homepage_steps', 'heading', inputValue($event))" /></AdminEditorField>
       <AdminEditorField label="Supporting text"><textarea :value="modelValue.homepage_steps.subtitle" maxlength="255" rows="3" class="editor-input min-h-24 resize-y" @input="setNested('homepage_steps', 'subtitle', inputValue($event))" /></AdminEditorField>
+      <fieldset class="space-y-3 border-t border-admin-border pt-4">
+        <legend class="text-xs font-semibold text-admin-text">Section button</legend>
+        <label class="flex min-h-11 items-center gap-2 text-sm text-admin-text"><input type="checkbox" :checked="modelValue.homepage_steps.button?.enabled !== false" class="h-4 w-4 accent-admin-accent" @change="setStepsButton('enabled', checkedValue($event))" />Show button</label>
+        <template v-if="modelValue.homepage_steps.button?.enabled !== false">
+          <AdminEditorField label="Button text" :error="errorFor('homepage_steps.button.label')"><input :value="modelValue.homepage_steps.button?.label ?? ''" :placeholder="stepsDefaultAction.label" aria-label="Button text" maxlength="100" class="editor-input" @input="setStepsButton('label', inputValue($event))" /></AdminEditorField>
+          <AdminEditorField label="Button destination" :error="errorFor('homepage_steps.button.link')"><input :value="modelValue.homepage_steps.button?.link ?? ''" :placeholder="stepsDefaultAction.to" aria-label="Button destination" maxlength="500" class="editor-input" @input="setStepsButton('link', inputValue($event))" /></AdminEditorField>
+          <p class="text-xs leading-5 text-admin-muted">Use a page path such as /shop or a full website URL. Leave either field blank to use its theme default.</p>
+        </template>
+      </fieldset>
       <AdminEditorRepeater title="Steps" add-label="Add step" :can-add="modelValue.homepage_steps.items.length < 12" @add="addItem('homepage_steps', { icon: 'heroicons:check-circle', title: '', description: '' })">
         <AdminEditorRepeaterItem v-for="(item, index) in modelValue.homepage_steps.items" :key="index" :label="`Step ${index + 1}`" @remove="removeItem('homepage_steps', index)">
           <input :value="item.title" maxlength="100" placeholder="Title" aria-label="Step title" class="editor-input" @input="setItem('homepage_steps', index, 'title', inputValue($event))" />
@@ -112,10 +100,11 @@
           label="Statement image"
           hint="JPG, PNG or WebP · max 10 MB"
           input-id="editorStatementImageInput"
+          replace-upload
           overlay
           compact
           library
-          preview-class="h-36 w-full object-cover"
+          preview-class="h-36 w-full object-contain"
           @select="uploadAsset($event, 'homepage_statement')"
           @remove="removeAsset('homepage_statement')"
           @browse="librarySlot = 'homepage_statement'"
@@ -162,6 +151,8 @@
 </template>
 
 <script setup lang="ts">
+import { howItWorksDefaultAction } from '~/utils/howItWorks'
+import type { HomepageSteps } from '~/composables/useSiteConfig'
 import type { WebsiteEditorAssetSlot, WebsiteEditorAssetUpload, WebsiteEditorDraftPayload } from '~/composables/useWebsiteEditorDraft'
 
 const props = defineProps<{
@@ -171,6 +162,7 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: WebsiteEditorDraftPayload] }>()
 const { uploadDraftAsset } = useWebsiteEditorDraft()
+const stepsDefaultAction = computed(() => howItWorksDefaultAction({ theme_layout: props.modelValue.theme_layout, modules_enabled: {} }))
 const assetUploading = reactive<Partial<Record<WebsiteEditorAssetSlot, boolean>>>({})
 const assetError = ref('')
 const librarySlot = ref<'hero' | 'homepage_statement' | null>(null)
@@ -288,6 +280,12 @@ function removeAsset(slot: 'hero' | 'homepage_statement') {
   next[fields.url] = null
   if (slot === 'hero') next.hero_media_mime = null
   emit('update:modelValue', next as unknown as WebsiteEditorDraftPayload)
+}
+
+function setStepsButton<K extends keyof NonNullable<HomepageSteps['button']>>(field: K, value: NonNullable<HomepageSteps['button']>[K]) {
+  const next = clone()
+  next.homepage_steps.button = { ...next.homepage_steps.button, [field]: value }
+  emit('update:modelValue', next)
 }
 
 function setRoot(field: Extract<keyof WebsiteEditorDraftPayload, string>, value: unknown) {

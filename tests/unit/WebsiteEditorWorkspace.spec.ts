@@ -8,7 +8,7 @@ import LegacyPage from '~/pages/admin/website-pages/[uuid].vue'
 import { resolveWebsiteEditorSelection, websiteEditorDocumentKey } from '~/utils/websiteEditorSelection'
 
 const dirty = Vue.ref(false)
-const confirmLeave = vi.fn(() => false)
+const confirmLeave = vi.fn<() => boolean | Promise<boolean>>(() => false)
 const mounted = { builtin: 0, custom: [] as string[] }
 function workspace(kind: 'builtin' | 'custom') {
   return Vue.defineComponent({ props: ['uuid'], setup(props, { expose }) {
@@ -61,6 +61,27 @@ describe('unified workspace routing', () => {
     expect(confirmLeave).toHaveBeenCalledOnce()
     confirmLeave.mockReturnValue(true)
     await router.push('/admin/website-editor?customPage=first'); await flushPromises()
+    expect(wrapper.text()).toContain('custom:first')
+    wrapper.unmount()
+  })
+  it('waits for the modal response before switching documents', async () => {
+    const { wrapper, router } = await render()
+    dirty.value = true
+    let respond!: (leave: boolean) => void
+    confirmLeave.mockImplementation(() => new Promise(resolve => { respond = resolve }))
+    const cancelled = router.push('/admin/website-editor?customPage=first')
+    await flushPromises()
+    expect(wrapper.text()).toContain('builtin:home')
+    expect(mounted.custom).toEqual([])
+    respond(false)
+    await cancelled
+    expect(router.currentRoute.value.query.customPage).toBeUndefined()
+    const accepted = router.push('/admin/website-editor?customPage=first')
+    await flushPromises()
+    expect(mounted.custom).toEqual([])
+    respond(true)
+    await accepted
+    await flushPromises()
     expect(wrapper.text()).toContain('custom:first')
     wrapper.unmount()
   })

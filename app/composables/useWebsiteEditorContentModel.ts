@@ -124,7 +124,7 @@ export function useWebsiteEditorContentModel(options: WebsiteEditorContentModelO
     if (section === 'header') return value.navigation.some(item => item.visible) || (value.header_cta.enabled && Boolean(value.header_cta.label))
     if (section === 'footer-banner') return value.footer_banner.enabled && Boolean(value.footer_banner.heading)
     if (section === 'footer') return hasContent(value.footer)
-    if (section === 'about-content') return Boolean(value.about_image_url || value.about_content.trim() || value.about_highlights.items.length)
+    if (section === 'about-content') return Boolean(value.about_image_url || value.about_story_image_url || value.about_content.trim() || value.about_highlights.items.length)
     if (section === 'story-content') return value.story_page.enabled && Boolean(hasContent(value.story_page.hero) || value.story_image_a_url || value.story_image_b_url)
     if (section === 'contact-content') return Boolean(value.contact_image_url || hasContent(value.contact_page))
     if (section === 'shop-content') return hasContent(value.shop_header) || hasContent(value.shop_promo)

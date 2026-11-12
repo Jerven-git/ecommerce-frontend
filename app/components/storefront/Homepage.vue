@@ -9,7 +9,7 @@
         :data-editor-hidden="section.visible ? undefined : 'true'"
       >
         <template v-if="section.visible">
-          <StorefrontHomeHero v-if="section.id === 'hero'" :site-config="effectiveConfig" />
+          <StorefrontHomeHero v-if="section.id === 'hero'" :site-config="effectiveConfig" :editor-preview="editorPreview" />
           <StorefrontHomeFeaturedProducts
             v-else-if="section.id === 'featured-products'"
             :error="error"
@@ -23,7 +23,7 @@
           <StorefrontHomeFeatureStrip v-else-if="section.id === 'features'" :config="effectiveConfig?.homepage_features ?? null" />
           <StorefrontHomeStats v-else-if="section.id === 'stats'" :config="effectiveConfig?.homepage_stats ?? null" />
           <StorefrontHomeStatement v-else-if="section.id === 'statement'" :statement="effectiveConfig?.homepage_statement ?? null" />
-          <StorefrontHomeNewsletter v-else-if="section.id === 'newsletter'" :config="effectiveConfig?.homepage_newsletter ?? null" />
+          <StorefrontHomeNewsletter v-else-if="section.id === 'newsletter' && hasSectionContent(section.id)" :config="effectiveConfig?.homepage_newsletter ?? null" />
         </template>
 
         <div

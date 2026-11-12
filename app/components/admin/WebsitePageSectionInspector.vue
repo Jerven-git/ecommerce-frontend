@@ -15,6 +15,7 @@
       </div>
       <nav v-if="editable" class="inspector-tabs" aria-label="Section settings">
         <button type="button" :aria-pressed="panel === 'content'" @click="$emit('update:panel', 'content')">Content</button>
+        <span class="inspector-tab-divider" aria-hidden="true" />
         <button type="button" :aria-pressed="panel === 'design'" @click="$emit('update:panel', 'design')">Design</button>
       </nav>
     </header>
@@ -57,6 +58,7 @@ defineExpose({ focus: () => backButton.value?.focus() })
 .inspector-switch[aria-checked="true"] > span { background: var(--admin-accent-strong); }
 .inspector-switch[aria-checked="true"] > span::after { transform: translateX(1rem); background: var(--admin-on-accent, #fff); }
 .inspector-tabs { display: flex; gap: 1rem; padding: 0 1rem; }
+.inspector-tab-divider { flex: 0 0 1px; align-self: center; height: 1rem; background: var(--admin-border); }
 .inspector-tabs button { position: relative; display: flex; align-items: center; min-height: 2.75rem; padding: .5rem .25rem; color: var(--admin-muted); font-size: .8125rem; font-weight: 600; }
 .inspector-tabs button[aria-pressed="true"] { color: var(--admin-text); }
 .inspector-tabs button[aria-pressed="true"]::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(--admin-accent-strong); }

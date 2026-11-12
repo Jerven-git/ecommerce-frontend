@@ -1,6 +1,6 @@
 <template>
   <div v-bind="sectionDesign('contact-content')" data-storefront-section="contact-content" class="storefront-page">
-    <section class="relative overflow-hidden border-b border-secondary-200/70 text-white" :style="heroFallbackStyle">
+    <section data-contact-header class="relative overflow-hidden border-b border-secondary-200/70 py-12 text-white sm:py-16" :style="heroFallbackStyle">
       <img
         v-if="contactImageUrl"
         :src="contactImageUrl"
@@ -20,26 +20,24 @@
         aria-hidden="true"
       />
 
-      <div class="relative mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-28 lg:px-8">
-        <p class="mb-3 text-sm font-semibold text-white/90">Customer care</p>
+      <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <h1 class="max-w-3xl text-4xl font-semibold leading-[1.08] text-white sm:text-5xl lg:text-6xl contact-display">
           How can we help?
         </h1>
-        <p class="mt-6 max-w-2xl text-base leading-7 text-white/90 sm:text-lg">
+        <p class="mt-4 max-w-2xl text-base leading-7 text-white/90">
           Tell us what you need and our team will point you in the right direction.
         </p>
       </div>
     </section>
 
-    <section v-if="canReceiveEnquiries || hasDirectContactContent" class="section-accent py-14 sm:py-20">
+    <section v-if="canReceiveEnquiries || hasDirectContactContent" class="section-accent py-12 sm:py-16">
       <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div
-          data-builtin-layout-grid class="grid items-start gap-12 lg:gap-16"
+          data-builtin-layout-grid class="grid items-start gap-8 lg:gap-12"
           :class="canReceiveEnquiries && hasDirectContactContent ? 'lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)]' : 'mx-auto max-w-3xl'"
         >
           <div v-if="canReceiveEnquiries" class="min-w-0">
-            <div class="mb-9 border-b border-secondary-200/70 pb-7">
-              <p class="storefront-kicker">Send an enquiry</p>
+            <div class="mb-6 border-b border-secondary-200/70 pb-5">
               <h2 class="text-2xl font-semibold text-secondary-950 sm:text-3xl">Tell us what’s happening</h2>
               <p class="mt-3 max-w-xl text-sm leading-6 text-gray-600">
                 Complete the form below. Fields marked with an asterisk are required.
@@ -199,7 +197,6 @@
             class="min-w-0 border-t border-secondary-200/70 pt-8"
             :class="canReceiveEnquiries ? 'lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0' : ''"
           >
-            <p v-if="hasContactIntro" class="storefront-kicker">Direct contact</p>
             <h2 v-if="contactPage.info_title" class="text-xl font-semibold text-secondary-950">{{ contactPage.info_title }}</h2>
             <p v-if="contactPage.info_subtitle" class="mt-2 text-sm font-medium text-secondary-700">{{ contactPage.info_subtitle }}</p>
             <p v-if="contactPage.info_description" class="mt-3 text-sm leading-6 text-gray-600">{{ contactPage.info_description }}</p>
@@ -499,6 +496,9 @@ useStaticPageSeo('contact')
 }
 
 .contact-input {
+  font-family: inherit;
+  font-size: var(--contact-field-size, 16px);
+  line-height: 1.5;
   width: 100%;
   min-height: 3rem;
   border: 1px solid rgb(209 213 219);

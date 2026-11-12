@@ -87,9 +87,8 @@
 .storefront-home[data-home-theme="classic"] .hero-stagger { animation: none; opacity: 1; transform: none; }
 .storefront-home[data-home-theme="classic"] .builtin-hero-side { min-height: 0; }
 .storefront-home[data-home-theme="classic"] [data-builtin-section="features"] [data-builtin-layout-grid],
-.storefront-home[data-home-theme="classic"] [data-builtin-section="stats"] [data-builtin-layout-grid] { margin-top: 0; }
-.storefront-home[data-home-theme="classic"] [data-builtin-section="features"] h3 { margin-top: 1rem; font-size: 1rem; }
-.storefront-home[data-home-theme="classic"] [data-builtin-section="features"] p { font-size: .9375rem; line-height: 1.7; }
+.storefront-home[data-home-theme="classic"] [data-builtin-section="stats"] [data-builtin-layout-grid],
+.storefront-home[data-home-theme="classic"] [data-builtin-section="statement"] [data-builtin-layout-grid] { margin-top: 0; }
 .storefront-home[data-home-theme="classic"] [data-builtin-section="newsletter"] .newsletter-decoration { display: none; }
 .storefront-home[data-home-theme="classic"] [data-builtin-section="newsletter"] form input { min-height: 2.75rem; padding: .75rem 1rem; }
 .storefront-home[data-home-theme="classic"] [data-builtin-section="newsletter"] form button { min-height: 2.75rem; font-size: .875rem; }

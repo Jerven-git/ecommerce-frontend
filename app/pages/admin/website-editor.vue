@@ -15,14 +15,14 @@ definePageMeta({ middleware: 'auth' })
 const route = useRoute()
 const host = ref<HTMLElement | null>(null)
 async function focusWorkspace() { await nextTick(); host.value?.querySelector<HTMLElement>('h1')?.focus({ preventScroll: true }) }
-const workspace = ref<{ canLeave: () => boolean } | null>(null)
+const workspace = ref<{ canLeave: () => boolean | Promise<boolean> } | null>(null)
 const selection = computed(() => resolveWebsiteEditorSelection(route.query))
 const documentKey = computed(() => websiteEditorDocumentKey(selection.value))
 
 // Query-only navigation does not invoke route-leave guards. Check the current
 // document before a UUID or document-kind change can unmount its workspace.
-onBeforeRouteUpdate(to => {
+onBeforeRouteUpdate(async to => {
   const nextKey = websiteEditorDocumentKey(resolveWebsiteEditorSelection(to.query))
-  return nextKey === documentKey.value || workspace.value?.canLeave() !== false
+  return nextKey === documentKey.value || (await workspace.value?.canLeave()) !== false
 })
 </script>

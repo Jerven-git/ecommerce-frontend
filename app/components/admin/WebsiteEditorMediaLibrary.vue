@@ -181,7 +181,7 @@ let searchTimer: number | null = null
 
 const slotLabels: Record<WebsiteEditorAssetSlot, string> = {
   logo: 'the header logo', favicon: 'the browser icon', cart_icon: 'the cart icon', footer_logo: 'the footer logo',
-  hero: 'the home hero', homepage_statement: 'the statement image', about: 'the About cover',
+  hero: 'the home hero', homepage_statement: 'the statement image', about: 'the About cover', about_story: 'the About story image',
   story_image_a: 'Story section 1', story_image_b: 'Story section 2', contact: 'the Contact cover',
   blog: 'the Blog cover', services: 'the Services cover',
 }

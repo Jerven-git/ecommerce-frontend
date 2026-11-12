@@ -7,6 +7,32 @@ import { websiteEditorChangedAreas } from '~/utils/websiteEditorPublishing'
 import { websiteEditorValidationTarget } from '~/utils/websiteEditorValidation'
 
 describe('built-in section design contract', () => {
+  it('keeps newsletter colors readable on light and dark backgrounds and preserves explicit text choices', () => {
+    const attrs = (design: Record<string, any>) => builtinSectionAttributes({ section_designs: { home: { newsletter: { design } } } }, 'home', 'newsletter')
+    expect(attrs({}).style['--newsletter-foreground']).toBe('#ffffff')
+    expect(attrs({ background: '#ffffff' }).style['--newsletter-foreground']).toBe('#111827')
+    expect(attrs({ background: '#102030' }).style['--newsletter-foreground']).toBe('#ffffff')
+    expect(attrs({ background: '#ffffff', text_color: '#123456', alignment: 'center' }).style['--newsletter-foreground']).toBe('#123456')
+    expect(attrs({ alignment: 'center' })['data-builtin-alignment']).toBe('center')
+    expect(attrs({})['data-builtin-alignment']).toBe('default')
+  })
+  it('round trips Contact typography and exposes safe CSS for both preview and public rendering', () => {
+    const draft = normalizeWebsiteEditorDraft({ section_designs: { contact: { 'contact-content': { layout: 'split', typography: { body: 14, field: 15, page_heading: 32, section_heading: 20 } } } } })
+    const reloaded = normalizeWebsiteEditorDraft({}, JSON.parse(JSON.stringify(draft)))
+    expect(reloaded.section_designs).toEqual(draft.section_designs)
+    expect(builtinSectionAttributes(reloaded, 'contact', 'contact-content').style).toMatchObject({ '--contact-body-size': '14px', '--contact-field-size': '15px', '--contact-page-heading-size': '32px', '--contact-section-heading-size': '20px' })
+    expect(normalizeBuiltinSectionDesigns({ contact: { 'contact-content': { typography: { body: 999, field: -1, page_heading: NaN, section_heading: 'url(x)', position: 'fixed' } } }, home: { hero: { typography: { body: 15 } } } })).toEqual({ contact: { 'contact-content': { typography: { body: 22, field: 14 } } } })
+  })
+  it('round trips a bounded About image width and applies it to shared render attributes', () => {
+    const draft = normalizeWebsiteEditorDraft({ section_designs: { about: { 'about-content': { layout: 'stacked', image_width: 45 } } } })
+    const reloaded = normalizeWebsiteEditorDraft({}, JSON.parse(JSON.stringify(draft)))
+    expect(reloaded.section_designs?.about?.['about-content']?.image_width).toBe(45)
+    expect(builtinSectionAttributes(reloaded, 'about', 'about-content').style['--builtin-story-image-width']).toBe('45%')
+    expect(builtinSectionAttributes(null, 'about', 'about-content').style['--builtin-story-image-width']).toBe('70%')
+    expect(normalizeBuiltinSectionDesigns({ about: { 'about-content': { image_width: 200 } }, home: { hero: { image_width: 50 } } })).toEqual({ about: { 'about-content': { image_width: 100 } } })
+    expect(normalizeBuiltinSectionDesigns({ about: { 'about-content': { image_width: -1 } } })).toEqual({ about: { 'about-content': { image_width: 25 } } })
+    expect(normalizeBuiltinSectionDesigns({ about: { 'about-content': { image_width: NaN } } })).toEqual({})
+  })
   it('keeps frontend and backend layout registries identical', () => {
     expect(registry).toEqual(JSON.parse(readFileSync(new URL('../../../ssu-backend/app/Support/WebsiteEditor/builtin-section-designs.json', import.meta.url), 'utf8')))
   })

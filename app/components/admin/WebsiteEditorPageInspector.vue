@@ -144,9 +144,10 @@
           <p class="text-xs font-semibold text-admin-text">About cover image</p>
           <p class="mt-1 text-xs leading-5 text-admin-muted">The primary visual shown at the top of the About page.</p>
         </div>
-        <AdminMediaUploader :url="modelValue.about_image_url || ''" :uploading="assetUploading.about" label="About cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorAboutImageInput" overlay compact library preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'about')" @remove="removeAsset('about')" @browse="librarySlot = 'about'" />
+        <AdminMediaUploader :url="modelValue.about_image_url || ''" :uploading="assetUploading.about" label="About cover image" hint="JPG, PNG or WebP · max 10 MB" input-id="editorAboutImageInput" replace-upload overlay compact library preview-class="h-36 w-full object-cover" @select="uploadAsset($event, 'about')" @remove="removeAsset('about')" @browse="librarySlot = 'about'" />
       </div>
       <AdminEditorField label="Our story"><textarea :value="modelValue.about_content" maxlength="10000" rows="7" class="editor-input min-h-40 resize-y" @input="setPath(['about_content'], inputValue($event))" /></AdminEditorField>
+      <AdminWebsiteAboutStoryMediaEditor :model-value="modelValue" @update:model-value="emit('update:modelValue', $event)" />
       <AdminEditorRepeater title="Highlights" add-label="Add highlight" :can-add="modelValue.about_highlights.items.length < 12" @add="addItem(['about_highlights', 'items'], { icon: 'heroicons:check-circle', title: '', description: '' })">
         <AdminEditorRepeaterItem v-for="(item, index) in modelValue.about_highlights.items" :key="index" :label="`Highlight ${index + 1}`" @remove="removeItem(['about_highlights', 'items'], index)">
           <input :value="item.title" maxlength="100" placeholder="Title" aria-label="Highlight title" class="editor-input" @input="setItem(['about_highlights', 'items'], index, 'title', inputValue($event))" />
@@ -352,6 +353,7 @@ const assetFields: Record<WebsiteEditorAssetSlot, { id: string; url: string }> =
   hero: { id: 'hero_media_id', url: 'hero_image_url' },
   homepage_statement: { id: 'homepage_statement_media_id', url: 'homepage_statement_image_url' },
   about: { id: 'about_media_id', url: 'about_image_url' },
+  about_story: { id: 'about_story_media_id', url: 'about_story_image_url' },
   story_image_a: { id: 'story_image_a_media_id', url: 'story_image_a_url' },
   story_image_b: { id: 'story_image_b_media_id', url: 'story_image_b_url' },
   contact: { id: 'contact_media_id', url: 'contact_image_url' },

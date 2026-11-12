@@ -54,6 +54,8 @@ export interface WebsiteEditorDraftPayload {
   homepage_statement_image_url: string | null
   about_media_id: number | null
   about_image_url: string | null
+  about_story_media_id: number | null
+  about_story_image_url: string | null
   story_image_a_media_id: number | null
   story_image_a_url: string | null
   story_image_b_media_id: number | null
@@ -140,6 +142,7 @@ export type WebsiteEditorAssetSlot =
   | 'hero'
   | 'homepage_statement'
   | 'about'
+  | 'about_story'
   | 'story_image_a'
   | 'story_image_b'
   | 'contact'
@@ -222,6 +225,8 @@ export function normalizeWebsiteEditorDraft(
     homepage_statement_image_url: statementImageUrl,
     about_media_id: payloadValue('about_media_id', null),
     about_image_url: aboutImageUrl,
+    about_story_media_id: payloadValue('about_story_media_id', null),
+    about_story_image_url: payloadValue('about_story_image_url', Object.keys(payload).length ? null : config.about_story_image_url ?? null),
     story_image_a_media_id: payloadValue('story_image_a_media_id', null),
     story_image_a_url: storyImageAUrl,
     story_image_b_media_id: payloadValue('story_image_b_media_id', null),

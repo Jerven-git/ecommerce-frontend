@@ -115,7 +115,7 @@ export function websiteEditorTranslationFields(
   let fields: WebsiteEditorTranslationField[] = []
   if (section === 'hero') fields = [scalar(payload, 'hero_title', 'Heading', 255), scalar(payload, 'hero_subtitle', 'Supporting text', 255, true)]
   else if (section === 'how-it-works') fields = [
-    scalar(payload, 'homepage_steps.label', 'Label', 100), scalar(payload, 'homepage_steps.heading', 'Heading', 100), scalar(payload, 'homepage_steps.subtitle', 'Supporting text', 255, true),
+    scalar(payload, 'homepage_steps.label', 'Label', 100), scalar(payload, 'homepage_steps.heading', 'Heading', 100), scalar(payload, 'homepage_steps.subtitle', 'Supporting text', 255, true), scalar(payload, 'homepage_steps.button.label', 'Button text', 100),
     ...indexed(payload, 'homepage_steps.items', [{ key: 'title', label: 'Step title', maxlength: 100 }, { key: 'description', label: 'Step description', maxlength: 255, multiline: true }]),
   ]
   else if (section === 'features') fields = indexed(payload, 'homepage_features.items', [{ key: 'title', label: 'Feature title', maxlength: 100 }, { key: 'description', label: 'Feature description', maxlength: 255, multiline: true }])

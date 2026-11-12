@@ -42,8 +42,24 @@ header.builtin-section[data-design-text="true"] .nav-link, footer.builtin-sectio
 .builtin-section[data-builtin-section="stats"][data-builtin-layout="grid"] [data-builtin-layout-grid] > div { padding: 1.5rem; border: 1px solid color-mix(in srgb,currentColor 12%,transparent); border-radius: 1rem; background: color-mix(in srgb,currentColor 3%,transparent); }
 .builtin-section[data-builtin-section="stats"][data-builtin-layout="grid"] [data-builtin-layout-grid] { gap: 1rem; }
 .builtin-section[data-builtin-layout="compact"] [data-builtin-layout-grid] { grid-template-columns: minmax(0,1fr) !important; max-width: 44rem; margin-inline: auto; }
+.builtin-section[data-builtin-section="newsletter"][data-builtin-alignment="center"] .newsletter-layout { grid-template-columns: minmax(0,1fr) !important; max-width: 42rem; margin-inline: auto; text-align: center; }
+.builtin-section[data-builtin-section="newsletter"][data-builtin-alignment="center"] .newsletter-subtitle { margin-inline: auto; }
+.builtin-section[data-builtin-section="newsletter"][data-builtin-alignment="right"] .newsletter-subtitle { margin-left: auto; }
 .builtin-section[data-builtin-layout="stacked"] [data-builtin-layout-grid] { grid-template-columns: minmax(0,1fr) !important; max-width: 56rem; margin-inline: auto; }
 .builtin-section[data-builtin-layout="stacked"] [data-builtin-layout-grid] > * { order: initial !important; }
+.builtin-section[data-builtin-page="about"][data-builtin-section="about-content"][data-builtin-layout="stacked"] [data-about-story-media] { width: var(--builtin-story-image-width, 70%); min-width: 0; justify-self: center; }
+/* Contact uses one bounded type scale across themes, layouts, and typed form values. */
+.builtin-section[data-builtin-page="contact"] > [data-contact-header] { min-height: 0 !important; }
+.builtin-section[data-builtin-page="contact"] h1 { font-size: var(--contact-page-heading-size, 40px) !important; line-height: 1.15 !important; letter-spacing: -.03em; overflow-wrap: anywhere; }
+.builtin-section[data-builtin-page="contact"] h2 { font-size: var(--contact-section-heading-size, 24px) !important; line-height: 1.3 !important; overflow-wrap: anywhere; }
+.builtin-section[data-builtin-page="contact"] :is(p, aside a) { font-size: var(--contact-body-size, 15px) !important; line-height: 1.65; overflow-wrap: anywhere; }
+.builtin-section[data-builtin-page="contact"] :is(label, h3, h3 button > span:first-child) { font-size: var(--contact-body-size, 15px) !important; line-height: 1.5; overflow-wrap: anywhere; }
+.builtin-section[data-builtin-page="contact"] :is(.contact-input, button[type="submit"]) { font-size: var(--contact-field-size, 16px) !important; line-height: 1.5; }
+.builtin-section[data-builtin-page="contact"][data-builtin-layout="compact"] [data-builtin-layout-grid] > aside { border-left: 0 !important; border-top: 1px solid var(--color-secondary-200); padding-left: 0 !important; padding-top: 2rem !important; }
+@media (max-width:767px) {
+  .builtin-section[data-builtin-page="contact"] h1 { font-size: min(var(--contact-page-heading-size, 40px), 36px) !important; }
+  .builtin-section[data-builtin-page="contact"] :is(.contact-input, button[type="submit"]) { font-size: max(var(--contact-field-size, 16px), 16px) !important; }
+}
 .builtin-section[data-builtin-layout="grid"]:is([data-builtin-section="best-sellers"]) [data-builtin-layout-grid] { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); overflow: visible; }
 .builtin-section[data-builtin-layout="grid"] [data-builtin-layout-grid] > div { min-width: 0; }
 .builtin-section[data-builtin-layout="grid"][data-builtin-section="best-sellers"] [data-builtin-layout-grid] > div { width: auto; }

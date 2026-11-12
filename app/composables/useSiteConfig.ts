@@ -61,6 +61,8 @@ export interface HomepageStat {
 }
 
 export interface HomepageSteps {
+  button?: { enabled?: boolean; label?: string | null; link?: string | null }
+  typography?: Partial<Record<'heading' | 'subtitle' | 'step_title' | 'description', number>>
   label: string
   heading: string
   subtitle: string
@@ -351,6 +353,7 @@ export interface SiteConfig {
   hero_media_mime: string | null
   about_content: string | null
   about_image_url: string | null
+  about_story_image_url?: string | null
   story_page: StoryPage | null
   about_overlay_color: string
   about_overlay_opacity: number

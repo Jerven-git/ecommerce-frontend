@@ -1,6 +1,6 @@
 <template>
   <section v-if="sideLayout" class="hero builtin-hero-side" :class="`builtin-hero-side--${heroLayout}`">
-    <div class="builtin-hero-side__inner" :class="{ 'builtin-hero-side__inner--media': siteConfig?.hero_image_url }">
+    <div class="builtin-hero-side__inner" :class="{ 'builtin-hero-side__inner--media': hasMediaArea }">
       <div class="builtin-hero-side__copy">
         <h1 v-if="heroTitle" class="hero-title hero-stagger display-1 font-bold text-white text-balance drop-shadow-sm" style="animation-delay: 0.15s">
           {{ heroTitle }}
@@ -23,9 +23,14 @@
           </button>
         </div>
       </div>
-      <div v-if="siteConfig?.hero_image_url" class="builtin-hero-side__media">
-        <video v-if="isHeroVideo" ref="heroVideoRef" :src="siteConfig.hero_image_url" :aria-label="heroAltText || undefined" :style="{ objectPosition: heroFocalPosition }" autoplay loop muted playsinline preload="metadata" @canplay="videoReady = true" />
-        <img v-else :src="siteConfig.hero_image_url" :alt="heroAltText" :style="{ objectPosition: heroFocalPosition }" fetchpriority="high" decoding="async" />
+      <div v-if="hasMediaArea" class="builtin-hero-side__media">
+        <video v-if="isHeroVideo && siteConfig?.hero_image_url" ref="heroVideoRef" :src="siteConfig.hero_image_url" :aria-label="heroAltText || undefined" :style="{ objectPosition: heroFocalPosition }" autoplay loop muted playsinline preload="metadata" @canplay="videoReady = true" />
+        <img v-else-if="siteConfig?.hero_image_url" :src="siteConfig.hero_image_url" :alt="heroAltText" :style="{ objectPosition: heroFocalPosition }" fetchpriority="high" decoding="async" />
+        <div v-else class="builtin-hero-side__empty" data-editor-empty-media>
+          <Icon name="heroicons:photo" class="h-8 w-8" aria-hidden="true" />
+          <p>Add hero media</p>
+          <span>Upload an image or video in the hero settings.</span>
+        </div>
       </div>
     </div>
   </section>
@@ -118,10 +123,13 @@ import type { SiteConfig } from '~/composables/useSiteConfig'
 
 const props = defineProps<{
   siteConfig: SiteConfig | null
+  editorPreview?: boolean
 }>()
 
 const heroLayout = computed(() => normalizeBuiltinSectionDesigns(props.siteConfig?.section_designs).home?.hero?.layout ?? 'default')
 const sideLayout = computed(() => ['split', 'media-left', 'media-right'].includes(heroLayout.value))
+
+const hasMediaArea = computed(() => Boolean(props.siteConfig?.hero_image_url || props.editorPreview))
 
 const imageLoading = ref(false)
 const imageLoaded = ref(false)
@@ -218,11 +226,15 @@ watch(() => props.siteConfig?.hero_image_url, (url) => {
 .builtin-hero-side__inner { display: grid; align-items: center; gap: clamp(2rem,5vw,5rem); width: 100%; max-width: var(--section-width,80rem); margin-inline: auto; }
 .builtin-hero-side__copy { min-width: 0; padding-block: 2rem; }
 .builtin-hero-side__media { min-width: 0; overflow: hidden; border-radius: 1rem; background: color-mix(in srgb,currentColor 6%,transparent); }
-.builtin-hero-side__media :is(img,video) { display: block; width: 100%; height: auto; max-height: 36rem; aspect-ratio: 4/3; object-fit: contain; }
+.builtin-hero-side__empty { display: flex; width: 100%; min-height: 16rem; aspect-ratio: 4/3; flex-direction: column; align-items: center; justify-content: center; gap: .75rem; padding: 1.5rem; border: 1px dashed currentColor; color: inherit; text-align: center; }
+.builtin-hero-side__empty p { font-size: 1rem; font-weight: 600; }
+.builtin-hero-side__empty span { max-width: 24ch; font-size: .8125rem; line-height: 1.6; }
+/* Uploaded media defines the frame proportions; only the empty editor state has a fixed ratio. */
+.builtin-hero-side__media :is(img,video) { display: block; width: 100%; height: auto; }
 .builtin-hero-side--split { padding: 0; }
 .builtin-hero-side--split .builtin-hero-side__inner { gap: 0; max-width: none; align-items: stretch; }
 .builtin-hero-side--split .builtin-hero-side__copy { align-self: center; padding: clamp(2rem,5vw,5rem); }
-.builtin-hero-side--split .builtin-hero-side__media { border-radius: 0; display: flex; align-items: center; }
+.builtin-hero-side--split .builtin-hero-side__media { align-self: center; border-radius: 0; }
 @media (min-width:768px) {
   .builtin-hero-side__inner--media { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .builtin-hero-side--media-left .builtin-hero-side__media { order: -1; }

@@ -52,9 +52,8 @@
           ref="themeLibraryTrigger"
           type="button"
           class="editor-focus flex min-h-11 min-w-11 shrink-0 items-center justify-center px-3 rounded-lg bg-admin-surface text-admin-text hover:bg-admin-soft disabled:cursor-not-allowed disabled:opacity-50"
-          :disabled="loadingDraft || isDirty || Boolean(selectedVersionId)"
           aria-label="Open Theme Library"
-          :title="isDirty ? 'Save or discard changes before opening Theme Library' : 'Open Theme Library'"
+          title="Theme Library (coming soon)"
           @click="themeLibraryOpen = true"
         >
           <Icon name="heroicons:squares-2x2" class="h-4 w-4" aria-hidden="true" /><span class="editor-tool-label ml-2 text-xs font-semibold">Themes</span>
@@ -237,8 +236,15 @@
           <button type="button" :aria-pressed="sidebarTool === 'sections'" @click="sidebarTool = 'sections'; closeInspector()">Sections</button>
           <button type="button" :aria-pressed="sidebarTool === 'history'" @click="showVersionHistory">History</button>
         </nav>
+        <div v-if="sidebarTool === 'sections' && inspectorOpen" class="workspace-inspector-navigation">
+          <button ref="inspectorBack" type="button" class="workspace-back" @click="closeInspector"><Icon name="heroicons:arrow-left" class="h-4 w-4" aria-hidden="true" />All sections</button>
+        </div>
+        <nav v-if="sidebarTool === 'sections' && inspectorOpen && !selectedVersionId && localeIsDefault && builtinDesignDefinition" class="workspace-tabs workspace-section-tabs" aria-label="Section settings">
+          <button type="button" :aria-pressed="builtinInspectorTab === 'content'" @click="builtinInspectorTab = 'content'">Content</button>
+          <span class="workspace-tab-divider" aria-hidden="true" />
+          <button type="button" :aria-pressed="builtinInspectorTab === 'design'" @click="builtinInspectorTab = 'design'">Design</button>
+        </nav>
         <div class="editor-controls-scroll min-h-0 flex-1 overflow-y-auto" :class="sidebarTool === 'sections' && !inspectorOpen ? 'p-2' : 'p-4'">
-        <button v-if="sidebarTool === 'sections' && inspectorOpen" ref="inspectorBack" type="button" class="workspace-back mb-3" @click="closeInspector"><Icon name="heroicons:arrow-left" class="h-4 w-4" aria-hidden="true" />All sections</button>
         <AdminEditorSettingsLink
           v-if="activePageDisabled && activePageOption.module"
           class="mb-3"
@@ -292,10 +298,6 @@
           <button type="button" class="workspace-back mt-3" @click="exitVersionPreview">Return to draft</button>
         </div>
         <template v-if="!selectedVersionId && localeIsDefault">
-          <nav v-if="builtinDesignDefinition" class="workspace-tabs" aria-label="Section settings">
-            <button type="button" :aria-pressed="builtinInspectorTab === 'content'" @click="builtinInspectorTab = 'content'">Content</button>
-            <button type="button" :aria-pressed="builtinInspectorTab === 'design'" @click="builtinInspectorTab = 'design'">Design</button>
-          </nav>
           <AdminWebsiteBuiltinSectionDesignInspector v-if="builtinDesignDefinition && builtinInspectorTab === 'design'" v-model="draft" :page="activePage" :section="selectedSection" :errors="validationErrors" />
         <AdminWebsiteEditorInspector
           v-else-if="activePage === 'home'"
@@ -419,14 +421,18 @@
       @toggle-page="togglePageDraft"
     />
 
-    <AdminWebsiteThemeLibrary
-      :open="themeLibraryOpen"
-      :draft-version="draftVersion"
-      :current-profile="draft?.website_profile ?? 'hybrid'"
-      @close="closeThemeLibrary"
-      @preview="previewTheme"
-      @applied="handleThemeApplied"
-    />
+    <BaseModal :open="themeLibraryOpen" title="Theme Library" size="sm" @close="closeThemeLibrary">
+      <div class="space-y-3">
+        <Icon name="heroicons:squares-2x2" class="h-8 w-8 text-admin-accent" aria-hidden="true" />
+        <h3 class="text-base font-semibold text-admin-text">Coming soon</h3>
+        <p class="text-sm leading-6 text-admin-muted">The Theme Library is not available yet. Theme browsing and switching are coming soon.</p>
+      </div>
+      <template #footer>
+        <div class="flex justify-end">
+          <button type="button" class="editor-focus workspace-button workspace-button-primary" @click="closeThemeLibrary">Got it</button>
+        </div>
+      </template>
+    </BaseModal>
 
     <BaseModal :open="conflictOpen" aria-label="Your draft changed elsewhere" size="sm" hide-close body-class="p-5" @close="closeConflict">
       <div class="flex items-start gap-3">
@@ -461,10 +467,12 @@
       @confirm="confirmVersionDeletion"
       @cancel="cancelVersionDeletion"
     />
+    <AdminWebsiteEditorLeaveDialog :open="leaveConfirmation.open.value" @cancel="leaveConfirmation.finish(false)" @leave="leaveConfirmation.finish(true)" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { useWebsiteEditorLeaveConfirmation } from '~/composables/useWebsiteEditorLeaveConfirmation'
 import { builtinSectionDefinition } from '~/utils/builtinSectionDesigns'
 import { resolvePreviewNavigation } from '~/utils/websiteEditorPreviewNavigation'
 import type { ThemeLayoutReference } from '~/composables/useSiteConfig'
@@ -476,6 +484,7 @@ import type { WebsiteEditorPageId } from '~/utils/websiteEditorPages'
 import { websiteEditorValidationTarget } from '~/utils/websiteEditorValidation'
 
 const editorRoute = useRoute()
+const leaveConfirmation = useWebsiteEditorLeaveConfirmation()
 const sidebarTool = ref<'sections' | 'history'>('sections')
 const inspectorOpen = ref(Boolean(useRoute().query.section))
 const inspectorBack = ref<HTMLButtonElement | null>(null)
@@ -770,7 +779,7 @@ function focusFirstInvalidSection(errors: Record<string, string[]>) {
   const target = websiteEditorValidationTarget(errors, draft.value?.homepage_sections[0]?.id)
   if (!target) return
   switchPage(target.page, target.section)
-  if (Object.keys(errors)[0]?.startsWith('payload.section_designs.')) nextTick(() => { builtinInspectorTab.value = 'design' })
+  if (Object.keys(errors)[0]?.startsWith('payload.section_designs.') || Object.keys(errors)[0]?.startsWith('payload.homepage_steps.typography')) nextTick(() => { builtinInspectorTab.value = 'design' })
   void revealInspector()
   if (controlsDocked.value) controlsCollapsed.value = false
   else controlsOpen.value = true
@@ -861,7 +870,14 @@ function updateSupportedLocales(locales: string[]) {
   ensureActiveLocale(draft.value)
 }
 
-function canLeave() { if (saving.value || publishing.value || workflowLoading.value || discarding.value) { actionError.value = 'Wait for the current save or publication action to finish before leaving.'; return false } return !isDirty.value || window.confirm('Leave the editor and lose your unsaved changes?') }
+async function canLeave() {
+  const busy = () => saving.value || publishing.value || workflowLoading.value || discarding.value
+  if (busy()) { actionError.value = 'Wait for the current save or publication action to finish before leaving.'; return false }
+  if (!isDirty.value) return true
+  if (!await leaveConfirmation.request()) return false
+  if (busy()) { actionError.value = 'Wait for the current save or publication action to finish before leaving.'; return false }
+  return true
+}
 onBeforeRouteLeave(canLeave)
 defineExpose({ canLeave })
 watch(effectivePreviewConfig, () => sendPreviewConfig(), { deep: true })

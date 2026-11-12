@@ -6,8 +6,11 @@
       <div v-for="field in colorFields" :key="field.key" class="space-y-2">
         <label :for="`${block.id}-${field.key}`" class="text-xs font-semibold text-admin-text">{{ field.label }}</label>
         <div class="flex items-center gap-2">
-          <input :id="`${block.id}-${field.key}`" type="color" :value="design[field.key] || field.fallback" class="h-11 w-12 rounded-lg border border-admin-border bg-admin-surface p-1" @input="set(field.key, ($event.target as HTMLInputElement).value)" />
-          <span class="flex-1 text-xs text-admin-muted">{{ design[field.key] || 'Default' }}</span>
+          <div class="relative flex h-11 items-center rounded-lg border border-admin-border bg-admin-surface" :class="design[field.key] ? 'w-12' : 'px-3'">
+            <span v-if="!design[field.key]" class="text-xs text-admin-text" aria-hidden="true">Choose color</span>
+            <input :id="`${block.id}-${field.key}`" type="color" :value="design[field.key] || field.fallback" :class="design[field.key] ? 'h-11 w-12 p-1' : 'absolute inset-0 h-full w-full cursor-pointer opacity-0'" @input="set(field.key, ($event.target as HTMLInputElement).value)" />
+          </div>
+          <span class="flex-1 text-xs text-admin-muted">{{ design[field.key] || 'Theme default' }}</span>
           <button v-if="design[field.key]" type="button" class="min-h-11 px-2 text-xs font-semibold text-admin-muted hover:text-admin-text" :aria-label="`Reset ${field.label.toLowerCase()}`" @click="set(field.key, undefined)">Reset</button>
         </div>
       </div>
@@ -47,5 +50,6 @@ function clear() { emit('change', {}) }
 .section-design { border-top: 1px solid var(--admin-border); padding-top: .75rem; }
 .design-input { display: block; width: 100%; min-height: 2.75rem; margin-top: .5rem; padding: .5rem .75rem; border: 1px solid var(--admin-border); border-radius: .5rem; background: var(--admin-surface); color: var(--admin-text); font-size: .8125rem; font-weight: 400; }
 :is(input, select, button, summary):focus-visible { outline: 2px solid var(--admin-accent); outline-offset: 2px; }
+.section-design div:has(> input[type="color"]:focus-visible) { outline: 2px solid var(--admin-accent); outline-offset: 2px; }
 @media (max-width: 767px) { .design-input { font-size: 1rem; } }
 </style>

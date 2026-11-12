@@ -298,10 +298,12 @@
     </template>
     <AdminWebsitePageSectionLibrary :open="sectionLibraryOpen" :definitions="blockDefinitions" @close="sectionLibraryOpen = false" @add="addBlock" />
     <AdminToast />
+    <AdminWebsiteEditorLeaveDialog :open="leaveConfirmation.open.value" @cancel="leaveConfirmation.finish(false)" @leave="leaveConfirmation.finish(true)" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { useWebsiteEditorLeaveConfirmation } from '~/composables/useWebsiteEditorLeaveConfirmation'
 import type { WebsiteEditorMediaAsset } from '~/composables/useWebsiteEditorMediaLibrary'
 import { useWebsitePages } from '~/composables/useWebsitePages'
 import type { WebsiteBlockType } from '~/themes/contracts'
@@ -313,6 +315,7 @@ import { useWebsitePageDraftSession } from '~/composables/useWebsitePageDraftSes
 import { useWebsiteEditorPageDirectory } from '~/composables/useWebsiteEditorPageDirectory'
 import { applyWebsitePageLocale } from '~/utils/websitePageLocalization'
 
+const leaveConfirmation = useWebsiteEditorLeaveConfirmation()
 const props = defineProps<{ uuid: string }>()
 const { siteConfig, fetchSiteConfig } = useSiteConfig()
 const pagesApi = useWebsitePages()
@@ -411,7 +414,7 @@ function guardHeaderShortcut(event: MouseEvent) {
   }
 }
 async function reloadLatestPage() {
-  if (!canLeave()) return
+  if (!await canLeave()) return
   await load()
 }
 async function refreshPublishedPage() {
@@ -775,7 +778,14 @@ watch(
   schedulePreviewCollections,
   { immediate: true },
 )
-function canLeave() { if (saving.value || publicationBusy.value || uploadingMediaKey.value) { saveError.value = 'Wait for the current save, upload or publication action to finish before leaving.'; return false } return !dirty.value || window.confirm('Discard unsaved page changes?') }
+async function canLeave() {
+  const busy = () => saving.value || publicationBusy.value || uploadingMediaKey.value
+  if (busy()) { saveError.value = 'Wait for the current save, upload or publication action to finish before leaving.'; return false }
+  if (!dirty.value) return true
+  if (!await leaveConfirmation.request()) return false
+  if (busy()) { saveError.value = 'Wait for the current save, upload or publication action to finish before leaving.'; return false }
+  return true
+}
 onBeforeRouteLeave(canLeave)
 defineExpose({ canLeave })
 function guardUnload(event: BeforeUnloadEvent) {

@@ -34,7 +34,7 @@ const areas: WebsiteEditorChangedArea[] = [
   { id: 'stats', label: 'Stats', page: 'home', section: 'stats', fields: ['homepage_stats'] },
   { id: 'statement', label: 'Statement', page: 'home', section: 'statement', fields: ['homepage_statement_media_id', 'homepage_statement_image_url', 'homepage_statement'] },
   { id: 'newsletter', label: 'Newsletter', page: 'home', section: 'newsletter', fields: ['homepage_newsletter'] },
-  { id: 'about', label: 'About', page: 'about', section: 'about-content', fields: ['about_media_id', 'about_image_url', 'about_content', 'about_highlights'] },
+  { id: 'about', label: 'About', page: 'about', section: 'about-content', fields: ['about_media_id', 'about_image_url', 'about_story_media_id', 'about_story_image_url', 'about_content', 'about_highlights'] },
   { id: 'story', label: 'Story', page: 'story', section: 'story-content', fields: ['story_page', 'story_image_a_media_id', 'story_image_a_url', 'story_image_b_media_id', 'story_image_b_url'] },
   { id: 'contact', label: 'Contact', page: 'contact', section: 'contact-content', fields: ['contact_page', 'contact_media_id', 'contact_image_url'] },
   { id: 'shop', label: 'Shop', page: 'shop', section: 'shop-content', fields: ['shop_header', 'shop_promo'] },

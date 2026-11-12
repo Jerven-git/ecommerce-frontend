@@ -38,6 +38,8 @@
 .workspace-button { padding: 0 .875rem; border: 1px solid var(--admin-border); background: var(--admin-surface); }
 .workspace-icon-button { width: 2.75rem; color: var(--admin-muted); }
 .workspace-back { justify-content: flex-start; color: var(--admin-muted); }
+.workspace-inspector-navigation { flex-shrink: 0; padding: .5rem 1rem; background: var(--admin-surface); }
+.workspace-tab-divider { flex: 0 0 1px; align-self: center; height: 1rem; background: var(--admin-border); }
 .workspace-button:hover, .workspace-icon-button:hover, .workspace-back:hover { background: var(--admin-soft); }
 .workspace-button-primary { background: var(--admin-accent); border-color: transparent; color: var(--admin-on-accent); }
 .workspace-button-primary:hover { background: var(--admin-accent-strong); }

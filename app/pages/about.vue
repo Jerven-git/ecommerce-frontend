@@ -48,14 +48,19 @@
     <!-- ────────────────────────  OUR STORY  ──────────────────────── -->
     <section class="bg-white py-24 lg:py-28">
       <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div data-builtin-layout-grid class="grid items-center gap-10 lg:gap-16" :class="storyImage ? 'md:grid-cols-2' : 'md:grid-cols-1'">
+        <div data-builtin-layout-grid class="grid items-center gap-10 lg:gap-16" :class="showStoryMedia ? 'md:grid-cols-2' : 'md:grid-cols-1'">
           <!-- Image -->
-          <div v-if="storyImage" ref="storyImageRef" class="reveal">
-            <img :src="storyImage" :alt="coverAltText || `Inside ${siteName}`" class="aspect-[4/5] w-full rounded-2xl object-cover" />
+          <div v-if="showStoryMedia" data-about-story-media>
+            <img v-if="storyImage" :src="storyImage" :alt="`Our story at ${siteName}`" class="h-auto w-full rounded-2xl" />
+            <div v-else class="flex aspect-[4/3] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center text-gray-600" data-editor-empty-story-image>
+              <Icon name="heroicons:photo" class="h-8 w-8" aria-hidden="true" />
+              <p class="text-sm font-semibold">Add an Our story image</p>
+              <p class="max-w-xs text-xs leading-5">Choose an image under Our story image in the About page settings. The cover is managed separately.</p>
+            </div>
           </div>
 
           <!-- Narrative -->
-          <div ref="storyCardRef" class="reveal" :class="storyImage ? '' : 'mx-auto max-w-3xl'" style="transition-delay: 0.1s">
+          <div class="about-story-copy" :class="showStoryMedia ? '' : 'mx-auto max-w-3xl'">
             <p class="mb-3 text-sm font-medium" :style="{ color: 'var(--color-primary-700)' }">Our story</p>
             <h2 class="display-2 font-bold text-gray-900">Built for people who care what they buy.</h2>
             <p v-if="aboutContent" class="mt-6 whitespace-pre-line break-words text-lg leading-relaxed text-gray-600">
@@ -134,6 +139,8 @@
 </template>
 
 <script setup lang="ts">
+import { inject } from 'vue'
+import { SITE_CONFIG_PREVIEW } from '~/utils/siteConfigPreview'
 import { useBuiltinSectionDesigns } from '~/composables/useBuiltinSectionDesigns'
 const sectionDesign = useBuiltinSectionDesigns('about')
 import type { AboutHighlightItem } from '~/composables/useSiteConfig'
@@ -143,14 +150,14 @@ const { siteConfig } = useSiteConfig()
 const { isEnabled } = useModules()
 
 // Scroll reveal
-const { revealRef: storyCardRef } = useScrollReveal()
-const { revealRef: storyImageRef } = useScrollReveal()
 const { revealRef: valuesHeadingRef } = useScrollReveal()
 const { revealRef: ctaRef } = useScrollReveal()
 const { addRevealRef } = useScrollRevealAll()
 
 const siteName = computed(() => siteConfig.value?.site_name || 'Us')
-const storyImage = computed(() => siteConfig.value?.about_image_url || null)
+const storyImage = computed(() => siteConfig.value?.about_story_image_url || null)
+const editorPreviewConfig = inject(SITE_CONFIG_PREVIEW, null)
+const showStoryMedia = computed(() => Boolean(storyImage.value || (editorPreviewConfig && ['image-left', 'image-right', 'stacked'].includes(siteConfig.value?.section_designs?.about?.['about-content']?.layout ?? ''))))
 const aboutContent = computed(() => siteConfig.value
   ? (siteConfig.value.about_content ?? '')
   : 'Welcome to our store. We are committed to providing quality products and excellent customer service.',
